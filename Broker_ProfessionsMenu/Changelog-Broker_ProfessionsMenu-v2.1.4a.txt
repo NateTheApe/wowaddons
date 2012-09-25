@@ -1,0 +1,47 @@
+------------------------------------------------------------------------
+r115 | pathur | 2012-03-13 20:15:38 +0000 (Tue, 13 Mar 2012) | 1 line
+Changed paths:
+   A /tags/v2.1.4a (from /trunk:114)
+
+Tagged as v2.1.4a
+------------------------------------------------------------------------
+r114 | pathur | 2012-03-13 20:14:56 +0000 (Tue, 13 Mar 2012) | 1 line
+Changed paths:
+   M /trunk/core.lua
+   M /trunk/localization/localization.xml
+   A /trunk/localization/zhCN.lua
+   A /trunk/localization/zhTW.lua
+
+- Added zhCN and zhTW localization (thanks to haidaodou)
+------------------------------------------------------------------------
+r112 | pathur | 2012-03-13 14:47:25 +0000 (Tue, 13 Mar 2012) | 1 line
+Changed paths:
+   M /trunk/core.lua
+   A /trunk/icons
+   A /trunk/icons/fav.tga
+   M /trunk/localization/deDE.lua
+   M /trunk/localization/enUS.lua
+
+- Modified Favorites (Favorite button removed, favorites can now be created with a right-click on the tradeskills)
+------------------------------------------------------------------------
+r110 | pathur | 2012-03-01 14:53:19 +0000 (Thu, 01 Mar 2012) | 1 line
+Changed paths:
+   M /trunk/core.lua
+
+- ...
+------------------------------------------------------------------------
+r109 | pathur | 2012-03-01 14:52:32 +0000 (Thu, 01 Mar 2012) | 3 lines
+Changed paths:
+   M /trunk/Broker_ProfessionsMenu.toc
+   M /trunk/core.lua
+   M /trunk/dropdownmenu.lua
+   M /trunk/localization/deDE.lua
+   M /trunk/localization/enUS.lua
+   M /trunk/quicktradeskills/disenchant.lua
+   M /trunk/quicktradeskills/milling.lua
+   M /trunk/quicktradeskills/prospecting.lua
+
+- Updated TOC for 4.3
+- "Craftable by" - Info in Tooltips can now be disabled
+- Bugfix in Quicktradeskills
+------------------------------------------------------------------------

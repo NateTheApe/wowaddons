@@ -1,0 +1,27 @@
+﻿## Interface: 40300
+## Title: Broker_Location
+## Notes: Keeps track of your current location.
+## Version: 1.5
+## Author: CodeRedLin
+## SavedVariables: Broker_LocationDB
+## OptionalDeps: Ace3, LibTourist-3.0, TabletLib, LibBabble-Zone-3.0
+## DefaultState: enabled
+## X-Curse-Packaged-Version: v1.5
+## X-Curse-Project-Name: Broker_Location
+## X-Curse-Project-ID: broker_location
+## X-Curse-Repository-ID: wow/broker_location/mainline
+
+#@no-lib-strip@
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\AceLibrary\AceLibrary.lua
+Libs\Tablet-2.0\Tablet-2.0.lua
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.xml
+Libs\LibBabble-Zone-3.0\lib.xml
+Libs\LibTourist-3.0\lib.xml
+#@end-no-lib-strip@
+
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+
+Broker_Location.lua

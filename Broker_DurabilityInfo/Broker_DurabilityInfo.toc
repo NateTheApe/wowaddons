@@ -1,0 +1,34 @@
+﻿## Interface: 40300
+## Title: Broker: DurabilityInfo
+## Notes: Displays item durability and repair cost.
+## Version: 1.11.1
+## Author: iceeagle
+## OptionalDeps: Ace3, LibDataBroker-1.1, LibCrayon-3.0
+## SavedVariables: Broker_DurabilityInfoDB
+## DefaultState: enabled
+## X-Curse-Packaged-Version: v1.11.1
+## X-Curse-Project-Name: Broker_DurabilityInfo
+## X-Curse-Project-ID: broker_durabilityinfo
+## X-Curse-Repository-ID: wow/broker_durabilityinfo/mainline
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: Delayed
+
+#@no-lib-strip@
+embeds.xml
+#@end-no-lib-strip@
+
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+
+Locales\enUS.lua
+Locales\deDE.lua
+Locales\frFR.lua
+Locales\esES.lua
+Locales\esMX.lua
+Locales\koKR.lua
+Locales\ptBR.lua
+Locales\ruRU.lua
+Locales\zhTW.lua
+Locales\zhCN.lua
+
+Broker_DurabilityInfo.lua

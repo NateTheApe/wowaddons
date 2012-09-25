@@ -1,0 +1,10 @@
+<Bindings>
+  <Binding name="CLICK K_TB_TopTrinket:LeftButton" header="TRINKETBAR">
+
+  </Binding>
+  <Binding name="CLICK K_TB_BottomTrinket:LeftButton">
+
+  </Binding>
+
+</Bindings>
+

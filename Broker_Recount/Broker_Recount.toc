@@ -1,0 +1,17 @@
+## Interface: 40000
+## Title: Broker: Recount
+## Notes: Broker launcher plugin for Recount
+## Dependencies: Recount
+## Author: Elsia
+## X-Category: Miscellaneous
+## Version: 1.0
+## X-Curse-Packaged-Version: v4.0.6 release
+## X-Curse-Project-Name: Broker_Recount
+## X-Curse-Project-ID: broker_recount
+## X-Curse-Repository-ID: wow/broker_recount/mainline
+
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+LibDataBroker-1.1.lua
+
+Broker_Recount.lua

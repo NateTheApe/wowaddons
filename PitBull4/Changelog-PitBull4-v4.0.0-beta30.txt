@@ -1,0 +1,22 @@
+tag v4.0.0-beta30
+eda0436a6a582fa0569f37b0703d408ff7abd2bc
+Shefki <shefki@shefki.org>
+2011-11-29 22:08:01 -0800
+
+Tagging as v4.0.0-beta30
+
+
+--------------------
+
+Shefki:
+	- Bump TOC files for 4.3
+	- Fix bug #976, flaw in Aura layout that shows up as divide by zero in 4.3
+	This was arguably always a bug since it makes the layout misbeehave
+	on 4.2.  Calculating the size of the aura as inf never really made
+	sense.
+	- Remove the HappinessIcon module I missed in the last commit.
+	- Remove all references to pet Happiness.
+	- Rename VisualHeal5 to just VisualHeal.  Remove ManaSpark module.
+	- Delete old HealComm based VisualHeal module.
+	- Fix divide by error issues with UnitFrameLayout.lua and 4.3.0
+	- Fix divide by zero errors for 4.3.0

@@ -1,0 +1,110 @@
+tag 2.3.0
+8e85850adca539638c8b36d256451b1c2226f539
+mike <mike@broinitup.com>
+2012-01-15 22:46:24 -0500
+
+Tagging as 2.3.0
+
+
+--------------------
+
+James D. Callahan III:
+	- Updated the ChangeLog.
+mike:
+	- Changed the name of two mobs in the mob db... Crimson Sorceror/Inquisitor - > Risen */*
+	- Updated the "Enchant Gloves - Herbalism" Enchanting recipe entry
+	- Removed two  mobs from the Mob db
+	- Fix rarity for "Green Dragonscale Breastplate" COMMON->RARE
+	- Updated the "Green Dragonscale Leggings"  and "Green Dragonscale Breastplate" entries in the Leatherworking db
+	- Removed the Vendor: Masat T'andr from the Vendor db
+	- Datamined the vendor: Nergal
+	- Updated the coordinates for the Vendor: Nergal
+	- All the Tough Scorpid * recipes were brought back to the game in 4.3, so no longer mark em as R_F_G and mark them appropriately, ticket 1421
+	- Removed two mobs no longer in wow or profession related
+	- Fix two vendor coordinates.. tickets 1410, 1411
+James D. Callahan III:
+	- Updated CSV/BBCode/XML dump for the new Filter Flag format, and corrected some weird BBCode newlines. This does not show the Item Type filters, and I won't be adding them since I believe this feature is of dubious value. Prod Ackis if this is a deal-breaker.
+mike:
+	- Fixed the coordinates of a vendor, Gretta Ganter .. ticket 1422
+James D. Callahan III:
+	- Blacksmithing dump; re-arranged entries.
+	- Yanked the "REMOVED_FROM_GAME" message from Runic Plate Boots, Helm, Leggings, and Shoulders and added Dramm Riverhorn as their vendor.
+	- Added vendor "Dramm Riverhorn".
+	- Add newline to the end of the file.
+	- Fix for ticket 1416.
+	- Store the current sub-panel on the item filter menu so hiding the previous one is simple.
+	- Normalized look of non-item filter menus.
+	- Cleaned up Alchemy filter panel code.
+	- Set item filter type for Gurubashi Mojo Madness as ALCHEMY_MISC.
+	- Removed the now-non-existent TWO_HAND filter flag from the Runeforging 'recipes'.
+	- Added Engineering filter menu panel.
+	- Add the Engineering item filter types and updated the recipes to use them.
+	- Added Jewelcrafting filter menu panel.
+	- Add the Jewelcrafting item filter types and updated the recipes to use them.
+	- Added localizations necessary for the new Jewelcrafting item filters, and removed some now-unused localizations.
+	- Added Leatherworking filter menu panel.
+	- Add the Leatherworking item filter types and updated the recipes to use them.
+	- Added Inscription filter menu panel.
+	- Add the Inscription item filter types and updated the recipes to use them.
+	- Added localization for "Scroll".
+	- Added some more filter automation, applied it, then promptly commented it all out until it's required again.
+	- While we're scanning the tooltip, look for Glyph info and set the item filter type accordingly.
+	- Annoying name fix: ScanToolTip --> ScanTooltip
+	- Go ahead and scan the recipe tooltip before checking for a recipe item ID, so we can catch everything.
+	- Commented out the item-checking code for now; the new filter types are drastically different (and more numerous) so this will need more thought.
+	- Fixed class and role types in the scanner to work with the new filters. Amended the quality type warning message.
+	- Removed the ONE_HAND filter flag from all Inscription recipes; not only does it no longer exist, but why the FUCK was it on them to begin with?
+	- Add the Tailoring item filter types and updated the recipes to use them. Removed the Warlock filter flag from two bags, since soul shards haven't existed for quite some time now…
+	- Added Tailoring filter menu panel.
+	- Output the item filter type when performing a recipe dump.
+	- Updated the Enchanting recipes to use item filter types.
+	- Updated the Blacksmithing recipes to use item filter types.
+	- Killed off the localization for "Chest".
+	- Cleaned up Blacksmithing panel code a bit. Replaced the Plate and Mail Armor types with Chest, Feet, Hands, Head, Legs, Shoulder, Waist, and Wrist.
+	- Updated the Alchemy recipes to use item filter types.
+	- Replaced the item filter bit flags with item filter types, because possibility of an item flagged as, for example, ALCHEMY_POTION and BLACKSMITHING_DAGGER makes no damn sense.
+	- Added check for valid filter flags in recipe_prototype:AddFilters()
+	- Doubled the brightness of disabled filter menu buttons.
+	- Added Enchanting filter menu panel.
+	- Updated Enchanting recipes for the new filter flags.
+	- Added a few localizations for Enchanting (may be re-used elsewhere as well).
+	- Added filter flags for Enchanting.
+	- Removed a few now-unused localizations, and replaced many others with GROUP_TOGGLE_FORMAT.
+	- Populate db.profile.filters.item from the item filter flag-word tables instead of maintaining it by hand.
+	- Populate private.FILTER_STRINGS by iterating over every flag-word table instead of maintaining it by hand.
+	- Show tooltips for filter menu toggles even when disabled.
+	- Only deal with the item panel if it's actually visible.
+	- Enable or disable the item filter toggle when displaying the list panel, depending on whether or not the profession has filters.
+	- Centered the toggle buttons over the filter menu panel.
+	- Small refactoring of CreateFilterMenuButton()
+	- Cleaned up code in ToggleMenuFilters()
+	- Added Blacksmithing filter menu panel.
+	- Updated Blacksmithing recipes for the new filter flags.
+	- Added localizations for Blacksmithing filters and removed some that are now unused.
+	- Yanked old weapon/armor filters for the DB defaults and added the new ones for Blacksmithing.
+	- Added filter flags for Blacksmithing.
+	- Added optional support to private.GenerateCheckBoxes() for an alternate anchor frame.
+mike:
+	- Fix the crafteditemid for the "Pumpkin Pie" recipe
+James D. Callahan III:
+	- Reduced the width of generated CheckButton columns by 25 pixels.
+	- Scoping fix.
+	- Removed the BOW and XBOW flags and their associated localizations.
+	- Check to see if the item filter menu is visible when displaying the panel and refresh it if so.
+	- Removed the STAFF flag and its associated localization phrase.
+	- Restored Interface\FilterMenus.lua
+	- Added the Alchemy filter menu panel.
+	- Changed/added the alchemy filter states in the DB defaults.
+	- Added the new filter flags to all of the Alchemy recipes.
+	- Added localizations for "Oil" and "Flask".
+	- Added the new Alchemy-specific filter flags: Moved all of the ITEM_FLAGS_WORD1 entries into WORD2 for the transition, and started WORD1 afresh with the Alchemy flags.
+	- Removed the Armor and Weapon entries from the FilterPanel.value_map - these will be injected as required when a profession's filters are initialized.
+	- Initialize the filter menus the first time the main panel is shown, rather than when the filter button is first clicked, to allow professions to inject their flags in time to be filtered appropriately.
+	- Moved HARD_FILTERS to be a member of the private table and removed all weapon and armor entries; these will be added to the table as necessary upon initialization of a profession's filter menu.
+	- Use the FLAG_MEMBER field name directly in the HARD_FILTERS and SOFT_FILTERS table instead of looking it up by index.
+	- Removed Armor and Weapon checkbox creation; added profession-based filter menu initialization code in its place.
+	- Added localizations for Alchemy item types, and localizations for general use in item filter menus.
+	- Added alchemy item filters for the DB defaults table.
+	- Moved GenerateCheckBoxes() to be a method of the private table, since the function will be used in multiple files.
+	- Added private.PROFESSION_LABELS
+	- Moved Interface\FilterMenus.lua to Interface\FilterMenus\Common.lua in preparation for filter menu overhaul. Renamed private.PROFESSION_NAMES to private.LOCALIZED_PROFESSION_NAMES for clarity of purpose.

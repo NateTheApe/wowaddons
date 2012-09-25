@@ -1,0 +1,18 @@
+﻿## Interface: 40300
+## Title: Macaroon: Spell & Macro Binder
+## Author: Maul
+## Version: 40300.1
+## Notes: Direct binding of spellbook spells and macros in the Blizzard macro interface
+## DefaultState: enabled
+## Dependencies: Macaroon
+## OptionalDeps:
+## SavedVariables:
+## SavedVariablesPerCharacter: MacaroonBoundSavedState
+## X-Child-Of: Macaroon
+## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved..
+## X-Email: trinityui@live.com
+
+MacaroonBound_Strings.lua
+
+MacaroonBound.lua
+MacaroonBound.xml

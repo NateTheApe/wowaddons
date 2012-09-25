@@ -1,0 +1,8 @@
+## Title: TrinketBar
+## Notes: A Simple Trinket Bar Addon
+## Version: 0.52
+## Author: Killakhan
+## Interface: 40000
+## SavedVariablesPerCharacter: TrinketBarDB
+localization.lua
+TrinketBar.lua

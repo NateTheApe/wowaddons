@@ -1,0 +1,14 @@
+tag 40300.18-Release
+bb95f2f5b9147079451408bd1d311da45c29be12
+Adrian L Lange <adrianlund@gmail.com>
+2012-02-07 17:47:55 +0100
+
+Tag 40300.18-Release
+
+
+--------------------
+
+Adrian L Lange:
+	- Update game version
+	- Update localization
+	- Let the packager(s) set the version number automaticly

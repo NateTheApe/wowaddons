@@ -1,0 +1,19 @@
+﻿## Interface: 40300
+## Title: Macaroon: Profile Manager
+## Author: Maul
+## Version: 40300.1
+## Notes: A suplemental addon to manage Macaroon profiles
+## DefaultState: enabled
+## Dependencies: Macaroon
+## OptionalDeps:
+## SavedVariables: MacaroonProfiles
+## LoadOnDemand: 1
+## X-Child-Of: Macaroon
+## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved.
+## X-Email: trinityui@live.com
+
+
+MacaroonProfiles.lua
+MacaroonProfiles_Strings.lua
+
+MacaroonProfiles.xml

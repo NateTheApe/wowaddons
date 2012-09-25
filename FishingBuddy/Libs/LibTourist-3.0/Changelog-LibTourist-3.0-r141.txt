@@ -1,0 +1,22 @@
+------------------------------------------------------------------------
+r141 | Odica | 2012-04-06 17:55:50 +0000 (Fri, 06 Apr 2012) | 3 lines
+Changed paths:
+   M /trunk/LibTourist-3.0.lua
+
+- added Darkmoon Island
+- added Elwynn Forest - Darkmoon Island portal v.v.
+- added Mulgore - Darkmoon Island portal v.v.
+------------------------------------------------------------------------
+r140 | Odica | 2012-04-04 09:58:13 +0000 (Wed, 04 Apr 2012) | 2 lines
+Changed paths:
+   M /trunk/LibTourist-3.0.lua
+
+- Set faction for Wailing Caverns to 'contested' because of the presence of neutral quests (ticket 27)
+- Dire Maul has been split up into a complex and three instance wings (East/North/West), each with their own level range and entrance portal coordinates (ticket 28)
+------------------------------------------------------------------------
+r139 | Odica | 2012-03-16 19:07:50 +0000 (Fri, 16 Mar 2012) | 1 line
+Changed paths:
+   M /trunk/LibTourist-3.0.lua
+
+Changed faction for Shadowfang Keep (was Horde, now for both factions)
+------------------------------------------------------------------------

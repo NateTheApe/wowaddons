@@ -1,0 +1,39 @@
+------------------------------------------------------------------------
+r23 | yess | 2011-11-01 16:10:59 +0000 (Tue, 01 Nov 2011) | 1 line
+Changed paths:
+   A /tags/v1.3.1 (from /trunk:22)
+
+Tagging as v1.3.1
+------------------------------------------------------------------------
+r22 | yess | 2011-11-01 16:04:38 +0000 (Tue, 01 Nov 2011) | 2 lines
+Changed paths:
+   M /trunk/.pkgmeta
+   M /trunk/Broker_MicroMenu.lua
+   M /trunk/Broker_MicroMenu.toc
+   M /trunk/Options.lua
+   M /trunk/localization.lua
+
+Added option to hide fps.
+Fixed libs.
+------------------------------------------------------------------------
+r20 | yess | 2011-10-29 14:09:35 +0000 (Sat, 29 Oct 2011) | 3 lines
+Changed paths:
+   M /trunk/.pkgmeta
+   M /trunk/Broker_MicroMenu.lua
+   M /trunk/Broker_MicroMenu.toc
+   A /trunk/Options.lua
+   A /trunk/localization.lua
+   A /trunk/media/journal.tga
+   A /trunk/media/raid.tga
+
+Added options to show/hide home/world latency. World latency is now the default one. Ticket #13 
+Added options to show fps first. Ticket #6
+Added localization.
+------------------------------------------------------------------------
+r18 | yess | 2011-10-02 12:49:57 +0000 (Sun, 02 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/Broker_MicroMenu.lua
+   M /trunk/Broker_MicroMenu.toc
+
+Added dungeon jornal.
+------------------------------------------------------------------------

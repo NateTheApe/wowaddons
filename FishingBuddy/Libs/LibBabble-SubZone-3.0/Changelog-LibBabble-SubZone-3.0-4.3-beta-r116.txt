@@ -1,0 +1,139 @@
+------------------------------------------------------------------------
+r117 | arith | 2011-11-14 14:17:31 +0000 (Mon, 14 Nov 2011) | 1 line
+Changed paths:
+   A /tags/4.3-beta-r116 (from /trunk:116)
+
+Tagging as 4.3-beta-r116
+------------------------------------------------------------------------
+r116 | arith | 2011-11-14 13:17:54 +0000 (Mon, 14 Nov 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+   M /trunk/LibBabble-SubZone-3.0_de-DE.lua
+   M /trunk/LibBabble-SubZone-3.0_es-ES.lua
+   M /trunk/LibBabble-SubZone-3.0_fr-FR.lua
+   M /trunk/LibBabble-SubZone-3.0_ko-KR.lua
+   M /trunk/LibBabble-SubZone-3.0_pt-BR.lua
+   M /trunk/LibBabble-SubZone-3.0_ru-RU.lua
+   M /trunk/LibBabble-SubZone-3.0_zh-TW.lua
+
+translation update to 4.3.0.14980
+------------------------------------------------------------------------
+r115 | arith | 2011-11-13 14:39:09 +0000 (Sun, 13 Nov 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0_es-ES.lua
+   D /trunk/LibBabble-SubZone-3.0_es-MX.lua
+
+combine esES and esMX into one since they have the same zone names
+------------------------------------------------------------------------
+r114 | arith | 2011-11-12 03:00:40 +0000 (Sat, 12 Nov 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+   A /trunk/LibBabble-SubZone-3.0_de-DE.lua
+   A /trunk/LibBabble-SubZone-3.0_es-ES.lua
+   A /trunk/LibBabble-SubZone-3.0_es-MX.lua
+   A /trunk/LibBabble-SubZone-3.0_fr-FR.lua
+   A /trunk/LibBabble-SubZone-3.0_ko-KR.lua
+   A /trunk/LibBabble-SubZone-3.0_pt-BR.lua
+   A /trunk/LibBabble-SubZone-3.0_ru-RU.lua
+   A /trunk/LibBabble-SubZone-3.0_zh-CN.lua
+   A /trunk/LibBabble-SubZone-3.0_zh-TW.lua
+   M /trunk/lib.xml
+
+split languages into separated lua files
+------------------------------------------------------------------------
+r113 | dynaletik | 2011-10-30 12:38:07 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+- deDE fix
+------------------------------------------------------------------------
+r112 | arith | 2011-10-30 03:51:00 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added zhTW
+------------------------------------------------------------------------
+r111 | arith | 2011-10-30 03:50:21 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added zhCN
+------------------------------------------------------------------------
+r110 | arith | 2011-10-30 03:49:32 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added koKR
+------------------------------------------------------------------------
+r109 | arith | 2011-10-30 03:48:44 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added ruRU
+------------------------------------------------------------------------
+r108 | arith | 2011-10-30 03:47:54 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added ptBR
+------------------------------------------------------------------------
+r107 | arith | 2011-10-30 03:47:00 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added localization
+------------------------------------------------------------------------
+r106 | arith | 2011-10-30 03:44:22 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added localization
+------------------------------------------------------------------------
+r105 | arith | 2011-10-30 03:43:03 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added localization
+------------------------------------------------------------------------
+r104 | arith | 2011-10-30 03:41:01 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added several new zones from WoW 4.3.0-14899
+------------------------------------------------------------------------
+r103 | arith | 2011-10-30 02:01:08 +0000 (Sun, 30 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+translation update, added several new zones from WoW 4.3.0-14899
+------------------------------------------------------------------------
+r102 | dynaletik | 2011-10-24 18:54:15 +0000 (Mon, 24 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+- deDE fix
+------------------------------------------------------------------------
+r101 | dynaletik | 2011-10-15 12:20:45 +0000 (Sat, 15 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+- deDE update
+------------------------------------------------------------------------
+r100 | arith | 2011-10-15 05:52:51 +0000 (Sat, 15 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+translation update, added several new zones from WoW 4.3
+------------------------------------------------------------------------
+r99 | arith | 2011-10-15 05:40:34 +0000 (Sat, 15 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+to trigger the database exporting
+------------------------------------------------------------------------
+r98 | arith | 2011-10-11 17:55:00 +0000 (Tue, 11 Oct 2011) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added ptBR
+------------------------------------------------------------------------

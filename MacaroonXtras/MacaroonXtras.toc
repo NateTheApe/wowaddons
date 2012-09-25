@@ -1,0 +1,14 @@
+﻿## Interface: 40300
+## Title: Macaroon: Bag & Menu Bars
+## Author: Maul
+## Version: 40300.1.2
+## Notes: Xtra UI elements to complement Macaroon
+## DefaultState: enabled
+## Dependencies: Macaroon
+## SavedVariablesPerCharacter: MacaroonXtrasSavedState
+## X-Child-Of: Macaroon
+## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved..
+## X-Email: trinityui@live.com
+
+MacaroonXtras.lua
+MacaroonXtras.xml
