@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Aran", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 384 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
 mod:SetCreatureID(16524)
 mod:SetModelID(16621)
 mod:RegisterCombat("combat")
@@ -132,10 +132,10 @@ do
 	
 	mod:RegisterOnUpdateHandler(function(self)
 		if self.Options.ElementalIcons and (DBM:GetRaidRank() > 0 and not iconsSet == 4) then
-			for i = 1, GetNumRaidMembers() do
+			for i = 1, DBM:GetGroupMembers() do
 				local uId = "raid"..i.."target"
 				local guid = UnitGUID(uId)
-				if beastIcon[guid] then
+				if elementalIcon[guid] then
 					SetRaidTarget(uId, elementalIcon[guid])
 					iconsSet = iconsSet + 1
 					elementalIcon[guid] = nil
@@ -145,13 +145,9 @@ do
 	end, 1)
 end
 
-do 
-	local lastBlizzard = 0
-	function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-		if spellId == 29951 and destGUID == UnitGUID("player") and GetTime() - lastBlizzard > 2 then
-			specWarnBlizzard:Show()
-			lastBlizzard = GetTime()
-		end
+function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
+	if spellId == 29951 and destGUID == UnitGUID("player") and self:AntiSpam() then
+		specWarnBlizzard:Show()
 	end
-	mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 end
+mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE

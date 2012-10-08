@@ -1,6 +1,6 @@
-## Interface: 40300
+## Interface: 50001
 ## Title: Fishing Buddy
-## Version: 1.0.8a
+## Version: 1.1b
 ## Notes: Help with fishing related tasks -- clothing, fish information, etc.
 ## Notes-deDE: Erleichtert das Angeln - Ausr\195\188stung und Fish-Infos
 ## Notes-frFR: Vous facilite la vie de pecheur. Informations sur les poissons, changement d'habits, etc.
@@ -16,6 +16,7 @@ localization.lua
 localization.de.lua
 localization.es.lua
 localization.fr.lua
+localization.itIT.lua
 localization.koKR.lua
 localization.ptBR.lua
 localization.ruRU.lua
@@ -29,7 +30,7 @@ FishingLocationsFrame.xml
 FishingOutfitManager.xml
 FishingOutfitter.xml
 FishingGearManager.lua
-FishingBuddyMinimap.xml
+FishingBuddyMinimap.lua
 FishingExtravaganza.xml
 FishingWatcher.xml
 FishingSchools.lua

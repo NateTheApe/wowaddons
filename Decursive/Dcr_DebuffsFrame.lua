@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John Wellesz).
@@ -11,14 +11,14 @@
     To distribute Decursive through other means a special authorization is required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
     
-    This file was last updated on 2011-06-06T21:10:50Z
+    This file was last updated on 2012-09-27T23:56:03Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -37,6 +37,7 @@ if not T._FatalError then
         whileDead = 1,
         hideOnEscape = 1,
         showAlert = 1,
+        preferredIndex = 3,
     }; -- }}}
     T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -123,7 +124,6 @@ local fmod              = _G.math.fmod;
 local UnitIsUnit        = _G.UnitIsUnit;
 local str_upper         = _G.string.upper;
 local InCombatLockdown  = _G.InCombatLockdown;
-local UnitAura          = _G.UnitAura;
 local GetRaidTargetIndex= _G.GetRaidTargetIndex;
 
 
@@ -250,7 +250,7 @@ function MicroUnitF:ResetAllPositions () -- {{{
         D:Debug("Resetting all MF position", 'perRow:', D.profile.DebuffsFramePerline, '#Unit_Array:', #Unit_Array);
 
         for i=1, #Unit_Array do
-            MF = self.ExistingPerUNIT[ Unit_Array[i] ]
+            local MF = self.ExistingPerUNIT[ Unit_Array[i] ]
 
             if MF then
                 MF.Frame:SetPoint(unpack(self:GetMUFAnchor(i)));
@@ -558,7 +558,7 @@ do
             D:Print(D:ColorText("WARNING: Your Micro-Unit-Frames' window is too big to fit entirely on your screen, you should change MUFs display settings (scale and/or disposition)! (Type /Decursive)", "FFFF0000"));
         end
 
-        D:Debug(x_out_arrays[1], x_out_arrays[#x_out_arrays], y_out_arrays[1], y_out_arrays[#x_out_arrays]);
+        --D:Debug("MicroUnitF:Place(), outliers:", x_out_arrays[1], x_out_arrays[#x_out_arrays], y_out_arrays[1], y_out_arrays[#x_out_arrays]);
 
         -- x
         if x_out_arrays[1] then
@@ -578,7 +578,7 @@ do
             end
         end
 
-        D:Debug(Handle_x_offset, Handle_y_offset);
+        --D:Debug("MicroUnitF:Place(), handle offset:", Handle_x_offset, Handle_y_offset);
 
 
 
@@ -715,6 +715,7 @@ end
 -- MUF EVENTS (MicroUnitF children) (OnEnter, OnLeave, OnLoad, OnPreClick) {{{
 -- It's outside the function to avoid creating and discarding this table at each call
 local UnitGUID = _G.UnitGUID;
+local GetSpellInfo = _G.GetSpellInfo;
 local TooltipButtonsInfo = {}; -- help tooltip text table
 local TooltipUpdate = 0; -- help tooltip change update check
 -- This function is responsible for showing the tooltip when the mouse pointer is over a MUF
@@ -749,14 +750,13 @@ function MicroUnitF:OnEnter(frame) -- {{{
         return; -- If the user overs the MUF befor it's completely initialized
     end
 
-    --Test for unstable affliction
+    --Test for unstable affliction like spells
     if MF.Debuffs then
         for i, Debuff in ipairs(MF.Debuffs) do
             if Debuff.Type then
-                -- Create a warning if the Unstable Affliction is detected
-                if Debuff.Name == DS["Unstable Affliction"] then
-                    --if Debuff.Name == "Malédiction de Stalvan" then -- to test easily
-                    D:Println("|cFFFF0000 ==> %s !!|r (%s)", DS["Unstable Affliction"], D:MakePlayerName((D:PetUnitName(      Unit, true    ))));
+                -- Create a warning if an Unstable Affliction like spell is detected XXX not very pretty will be integrated along with the filtering system comming 'soon'(tm)
+                if Debuff.Name == DS["Unstable Affliction"] or Debuff.Name == DS["Vampiric Touch"] then
+                    D:Println("|cFFFF0000 ==> %s !!|r (%s)", Debuff.Name, D:MakePlayerName((D:PetUnitName(      Unit, true    ))));
                     PlaySoundFile("Sound\\Doodad\\G_NecropolisWound.wav", "Master");
                 end
             end
@@ -851,7 +851,7 @@ function MicroUnitF:OnEnter(frame) -- {{{
 
             for Spell, Prio in pairs(D.Status.CuringSpellsPrio) do
                 TooltipButtonsInfo[Prio] =
-                str_format("%s: %s%s", D:ColorText(DC.MouseButtonsReadable[MouseButtons[Prio]], D:NumToHexColor(MF_colors[Prio])), Spell, (D.Status.FoundSpells[Spell] and D.Status.FoundSpells[Spell][5]) and "|cFFFF0000*|r" or "");
+                str_format("%s: %s%s", D:ColorText(DC.MouseButtonsReadable[MouseButtons[Prio]], D:NumToHexColor(MF_colors[Prio])), (GetSpellInfo(Spell)) or Spell, (D.Status.FoundSpells[Spell] and D.Status.FoundSpells[Spell][5]) and "|cFFFF0000*|r" or "");
             end
 
             t_insert(TooltipButtonsInfo, str_format("%s: %s", DC.MouseButtonsReadable[MouseButtons[#MouseButtons - 1]], L["TARGETUNIT"]));
@@ -1151,7 +1151,7 @@ function MicroUnitF.prototype:Update(SkipSetColor, SkipDebuffs, CheckStealth)
         if (not SkipDebuffs) then
             -- get the manageable debuffs of this unit
             MF:SetDebuffs();
-            D:Debug("Debuff set for ", MF.ID);
+            --D:Debug("Debuff set for ", MF.ID);
             if CheckStealth then
                 D.Stealthed_Units[MF.CurrUnit] = D:CheckUnitStealth(MF.CurrUnit); -- update stealth status
                 --              D:Debug("MF:Update(): Stealth status checked as requested.");
@@ -1337,7 +1337,7 @@ do
     local profile = {};
 
     -- global access optimization
-    local IsSpellInRange    = _G.IsSpellInRange;
+    local IsSpellInRange    = D.IsSpellInRange;
     local UnitClass         = _G.UnitClass;
     local UnitExists        = _G.UnitExists;
     local UnitIsVisible     = _G.UnitIsVisible;
@@ -1791,6 +1791,6 @@ local MF_Textures = { -- unused
 
 -- }}}
 
-T._LoadedFiles["Dcr_DebuffsFrame.lua"] = "2.7.0.5";
+T._LoadedFiles["Dcr_DebuffsFrame.lua"] = "2.7.2.2";
 
 -- Heresy

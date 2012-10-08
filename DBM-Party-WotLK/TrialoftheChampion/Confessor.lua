@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Confessor", "DBM-Party-WotLK", 13)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4422 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(34928)
 mod:SetModelID(29490)
 --mod:SetZone()
@@ -20,12 +20,12 @@ local isDispeller = select(2, UnitClass("player")) == "MAGE"
 
 local warnReflectiveShield	= mod:NewTargetAnnounce(66515, 2)
 local warnRenew				= mod:NewTargetAnnounce(66537, 2)
-local warnOldWounds			= mod:NewTargetAnnounce(67679, 3)
-local timerOldWounds		= mod:NewTargetTimer(12, 67679)
-local warnHolyFire			= mod:NewTargetAnnounce(67676, 3)
-local timerHolyFire			= mod:NewTargetTimer(8, 67676)
-local warnShadows			= mod:NewTargetAnnounce(67678, 2)
-local timerShadows          = mod:NewTargetTimer(5, 67678)
+local warnOldWounds			= mod:NewTargetAnnounce(66620, 3)
+local timerOldWounds		= mod:NewTargetTimer(12, 66620)
+local warnHolyFire			= mod:NewTargetAnnounce(66538, 3)
+local timerHolyFire			= mod:NewTargetTimer(8, 66538)
+local warnShadows			= mod:NewTargetAnnounce(66619, 2)
+local timerShadows          = mod:NewTargetTimer(5, 66619)
 local specwarnRenew			= mod:NewSpecialWarningDispel(66537, isDispeller)
 
 local shielded				= false

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Razorscale", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4610 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(33186)
 mod:SetModelID(28787)
 mod:SetUsedIcons(8)
@@ -31,12 +31,10 @@ local timerTurret4					= mod:NewTimer(113, "timerTurret4", 48642)
 local timerGrounded                 = mod:NewTimer(45, "timerGrounded")
 
 local combattime = 0
-local antiSpam = 0
 
 function mod:OnCombatStart(delay)
 	enrageTimer:Start(-delay)
 	combattime = GetTime()
-	antiSpam = 0
 	if self:IsDifficulty("normal10") then
 		warnTurretsReadySoon:Schedule(53-delay)
 		warnTurretsReady:Schedule(73-delay)
@@ -53,9 +51,8 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 64733 or spellId == 64704) and destGUID == UnitGUID("player") and GetTime() - antiSpam > 3 then
+	if (spellId == 64733 or spellId == 64704) and destGUID == UnitGUID("player") and self:AntiSpam() then
 		specWarnDevouringFlame:Show()
-		antiSpam = GetTime()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE
@@ -93,7 +90,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg, mob)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(64021) then	-- deep breath
+	if args:IsSpellID(63317, 64021) then	-- deep breath
 		timerDeepBreathCast:Start()
 		timerDeepBreathCooldown:Start()
 	end

@@ -162,14 +162,8 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad>
-						self.scrollBar.doNotHide  = 1;
-						FishingPetsMenu_OnLoad(self);
-					</OnLoad>
-					<OnShow>
-						HybridScrollFrame_CreateButtons(self, "FishingPetButtonTemplate");
-						FishingPetsMenu_Update();
-					</OnShow>
+					<OnLoad function="FishingPetsMenu_OnLoad" />
+					<OnShow function="FishingPetsMenu_Update" />
 				</Scripts>
 			</ScrollFrame>
 		</Frames>

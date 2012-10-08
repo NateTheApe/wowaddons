@@ -1,12 +1,12 @@
-## Interface: 40300
+## Interface: 50001
 ## Title: Broker - |cffffffffPortals|r
 ## Notes: Provides access to all Portal and Teleport spells on right click of one button.
 ## Author: CrazyBenny of Stormrage-EU
 ## X-Email: s_m AT centrum DOT cz
-## LastUpdate: 2011-12-09T22:45:20Z
-## Version: 1.8.26
+## LastUpdate: 2012-09-30T21:02:04Z
+## Version: 1.8.29
 ## OptionalDeps: LibDBIcon-1.0
-## X-Curse-Packaged-Version: 1.8.26
+## X-Curse-Packaged-Version: 1.8.29
 ## X-Curse-Project-Name: Broker_Portals
 ## X-Curse-Project-ID: broker-portals
 ## X-Curse-Repository-ID: wow/broker-portals/mainline

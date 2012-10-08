@@ -5,6 +5,9 @@ FishingBuddy.Locations = {};
 local Crayon = LibStub("LibCrayon-3.0");
 local FL = LibStub("LibFishing-1.0");
 
+-- 5.0.4 has a problem with a global "_" (see some for loops below)
+local _
+
 local NUM_THINGIES_DISPLAYED = 21;
 local FRAME_THINGIEHEIGHT = 16;
 FishingBuddy.Locations.FRAME_THINGIEHEIGHT = FRAME_THINGIEHEIGHT;

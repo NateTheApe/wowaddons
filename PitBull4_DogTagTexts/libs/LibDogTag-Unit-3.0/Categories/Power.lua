@@ -1,10 +1,14 @@
 local MAJOR_VERSION = "LibDogTag-Unit-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 211 $"):match("%d+")) or 0
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 225 $"):match("%d+")) or 0
 
 if MINOR_VERSION > _G.DogTag_Unit_MINOR_VERSION then
 	_G.DogTag_Unit_MINOR_VERSION = MINOR_VERSION
 end
 
+local _G, select, unpack = _G, select, unpack
+local ALTERNATE_POWER_INDEX, UnitPower, UnitPowerMax, UnitPowerType = 
+	  ALTERNATE_POWER_INDEX, UnitPower, UnitPowerMax, UnitPowerType
+	  
 DogTag_Unit_funcs[#DogTag_Unit_funcs+1] = function(DogTag_Unit, DogTag)
 
 local L = DogTag_Unit.L

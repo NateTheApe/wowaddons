@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("LordMarrowgar", "DBM-Icecrown", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4409 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(36612)
 mod:SetModelID(31119)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -21,7 +21,7 @@ local preWarnWhirlwind   	= mod:NewSoonAnnounce(69076, 3)
 local warnBoneSpike			= mod:NewCastAnnounce(69057, 2)
 local warnImpale			= mod:NewAnnounce("WarnImpale", 4, 72669)
 
-local specWarnColdflame		= mod:NewSpecialWarningMove(70825)
+local specWarnColdflame		= mod:NewSpecialWarningMove(69146)
 local specWarnWhirlwind		= mod:NewSpecialWarningRun(69076)
 
 local timerBoneSpike		= mod:NewCDTimer(18, 69057)
@@ -36,7 +36,6 @@ mod:AddBoolOption("SetIconOnImpale", true)
 
 local impaleTargets = {}
 local impaleIcon	= 8
-local lastColdflame = 0
 
 local function showImpaleWarning()
 	warnImpale:Show(table.concat(impaleTargets, "<, >"))
@@ -86,9 +85,8 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 69146 or spellId == 70823 or spellId == 70824 or spellId == 70825) and destGUID == UnitGUID("player") and GetTime() - lastColdflame > 2 then
+	if (spellId == 69146 or spellId == 70823 or spellId == 70824 or spellId == 70825) and destGUID == UnitGUID("player") and self:AntiSpam() then
 		specWarnColdflame:Show()
-		lastColdflame = GetTime()
 	end
 end
 mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE

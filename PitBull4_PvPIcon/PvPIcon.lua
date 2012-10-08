@@ -31,11 +31,16 @@ function PitBull4_PvPIcon:GetTexture(frame)
 		return [[Interface\TargetingFrame\UI-PVP-FFA]]
 	end
 	
+	local faction = UnitFactionGroup(unit) or UnitFactionGroup("player")
+	if not faction or faction == "Neutral" then
+		return nil
+	end
+
 	if not UnitIsPVP(unit) then
 		return nil
 	end
 	
-	return [[Interface\TargetingFrame\UI-PVP-]] .. (UnitFactionGroup(unit) or UnitFactionGroup("player"))
+	return [[Interface\TargetingFrame\UI-PVP-]] .. faction
 end
 
 local FRIENDLY_CLASSIFICATIONS = {
@@ -59,7 +64,7 @@ function PitBull4_PvPIcon:GetExampleTexture(frame)
 	
 	local player_faction = UnitFactionGroup("player")
 	
-	if FRIENDLY_CLASSIFICATIONS[classification] or (frame.guid and UnitIsFriend("player", frame.unit)) then
+	if FRIENDLY_CLASSIFICATIONS[classification] or (frame.guid and frame.unit and UnitIsFriend("player", frame.unit)) then
 		return [[Interface\TargetingFrame\UI-PVP-]] .. player_faction
 	else
 		return [[Interface\TargetingFrame\UI-PVP-]] .. OPPOSITE_PLAYER_FACTION[player_faction]

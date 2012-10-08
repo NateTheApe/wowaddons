@@ -1,12 +1,13 @@
-## Interface: 40300
+## Interface: 50001
 ## Title: Repair Broker
 ## Notes: Auto repair + shows durability.
 ## Author: Merl @ chainwet.net, continued by Parnic @ parnic.com
-## Version: 4.3.0
+## Version: 5.0.4
 ## OptionalDeps: Ace3, LibQTip-1.0
 ## DefaultState: enabled
 ## SavedVariables: RepairBrokerDB
-## X-Curse-Packaged-Version: 4.3.0
+## X-Compatible-With: 40300
+## X-Curse-Packaged-Version: 5.0.4
 ## X-Curse-Project-Name: RepairBroker
 ## X-Curse-Project-ID: repairbroker
 ## X-Curse-Repository-ID: wow/repairbroker/mainline

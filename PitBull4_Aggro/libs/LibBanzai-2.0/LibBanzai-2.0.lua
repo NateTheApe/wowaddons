@@ -1,6 +1,6 @@
 --[[
 Name: LibBanzai-2.0
-Revision: $Revision: 35 $
+Revision: $Revision: 43 $
 Author(s): Rabbit (rabbit.magtheridon@gmail.com), maia
 Documentation: http://www.wowace.com/index.php/Banzai-2.0_API_Documentation
 SVN: http://svn.wowace.com/wowace/trunk/BanzaiLib/Banzai-2.0
@@ -13,7 +13,7 @@ Dependencies: LibStub
 -------------------------------------------------------------------------------
 
 local MAJOR_VERSION = "LibBanzai-2.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 35 $"):match("(%d+)"))
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 43 $"):match("(%d+)"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
 local lib = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
@@ -25,40 +25,18 @@ lib.frame = lib.frame or CreateFrame("Frame")
 local frame = lib.frame
 
 local _G = _G
-local table_insert = table.insert
 local UnitExists = _G.UnitExists
 local UnitName = _G.UnitName
 local UnitCanAttack = _G.UnitCanAttack
-local GetNumRaidMembers = _G.GetNumRaidMembers
-local GetNumPartyMembers = _G.GetNumPartyMembers
-local unpack = _G.unpack
-local type = _G.type
-local assert = _G.assert
-
--------------------------------------------------------------------------------
--- Local heap
--------------------------------------------------------------------------------
-
-local new, del
-do
-	local cache = setmetatable({},{__mode='k'})
-	function new()
-		local t = next(cache)
-		if t then
-			cache[t] = nil
-			return t
-		else
-			return {}
-		end
-	end
-	function del(t)
-		for k in pairs(t) do
-			t[k] = nil
-		end
-		cache[t] = true
-		return nil
+local IsInRaid = _G.IsInRaid
+if not IsInRaid then
+	IsInRaid = function()
+		return GetNumRaidMembers() > 0
 	end
 end
+local GetNumGroupMembers = _G.GetNumGroupMembers or _G.GetNumRaidMembers
+local GetNumSubgroupMembers = _G.GetNumSubgroupMembers or _G.GetNumPartyMembers
+local unpack = _G.unpack
 
 -------------------------------------------------------------------------------
 -- Roster
@@ -86,20 +64,22 @@ local needsUpdate = nil
 local function addUnit(unit)
 	if not UnitExists(unit) then return end
 	local name = UnitName(unit)
-	if not roster[name] then roster[name] = new() end
-	table_insert(roster[name], unit)
+	if not roster[name] then roster[name] = {} end
+	roster[name][#roster[name] + 1] = unit
 end
 
 local function actuallyUpdateRoster()
-	for k in pairs(roster) do roster[k] = del(roster[k]) end
+	wipe(roster)
 	addUnit("player")
 	addUnit("pet")
 	addUnit("focus")
-	for i = 1, GetNumRaidMembers() do
-		addUnit(raidUnits[i])
-		addUnit(raidPetUnits[i])
+	if IsInRaid() then
+		for i = 1, GetNumGroupMembers() do
+			addUnit(raidUnits[i])
+			addUnit(raidPetUnits[i])
+		end
 	end
-	for i = 1, GetNumPartyMembers() do
+	for i = 1, GetNumSubgroupMembers() do
 		addUnit(partyUnits[i])
 		addUnit(partyPetUnits[i])
 	end
@@ -134,6 +114,10 @@ local function updateBanzai(_, elapsed)
 			local targetId = targets[unit]
 			if UnitExists(targetId) then
 				local ttId = targets[targetId]
+				if unit == "focus" and UnitIsEnemy("focus", "player") then
+					ttId = "focustarget"
+					targetId = "focus"
+				end
 				if UnitExists(ttId) and UnitCanAttack(ttId, targetId) then
 					for n, u in pairs(roster) do
 						if UnitIsUnit(u[1], ttId) then
@@ -152,13 +136,13 @@ local function updateBanzai(_, elapsed)
 			if banzai[name] and banzai[name] > 15 then
 				if not aggro[name] then
 					aggro[name] = true
-					for i, v in ipairs(callbacks) do
+					for i, v in next, callbacks do
 						v(1, name, unpack(units))
 					end
 				end
 			elseif aggro[name] then
 				aggro[name] = nil
-				for i, v in ipairs(callbacks) do
+				for i, v in next, callbacks do
 					v(0, name, unpack(units))
 				end
 			end
@@ -208,7 +192,7 @@ function lib:RegisterCallback(func)
 		error(("Bad argument to :RegisterCallback, function expected, got %q."):format(type(func)), 2)
 	end
 
-	table_insert(callbacks, func)
+	callbacks[#callbacks + 1] = func
 	start()
 end
 
@@ -218,7 +202,7 @@ function lib:UnregisterCallback(func)
 	end
 
 	local found = nil
-	for i, v in ipairs(callbacks) do
+	for i, v in next, callbacks do
 		if v == func then
 			table.remove(callbacks, i)
 			found = true

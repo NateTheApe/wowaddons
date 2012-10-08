@@ -1,0 +1,12 @@
+tag v4.0.0-beta40
+23cf77e9c14e96386e09e3fafdbb46a00b00049b
+Shefki <shefki@shefki.org>
+2012-09-26 22:23:48 -0700
+
+Tagging as v4.0.0-beta40
+
+
+--------------------
+
+Shefki:
+	- Fix class setting with Monks in the Portrait module.

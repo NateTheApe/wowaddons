@@ -424,6 +424,10 @@ FishingInit.UpdateFishingDB = function()
 		end
 	end
 
+	if ( version < 10002 ) then
+		FishingBuddy_Player["MinimapButtonVisible"] = nil;
+	end
+	
 	if ( not FishingBuddy_Info["Locales"] or #FishingBuddy_Info["Locales"] == 0 ) then
 		-- look for broken ZoneIndex
 		local broken = false;
@@ -567,10 +571,6 @@ FishingInit.RegisterMyAddOn = function()
 end
 
 FishingInit.RegisterFunctionTraps = function()
-	temp = ToggleMinimap;
-	if ( FishingInit.HookFunction("ToggleMinimap", "FishingBuddy_ToggleMinimap") ) then
-		FishingBuddy.SavedToggleMinimap = temp;
-	end
 	FishingBuddy.TrapWorldMouse();
 end
 

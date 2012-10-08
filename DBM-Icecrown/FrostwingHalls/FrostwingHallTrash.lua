@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("FrostwingHallTrash", "DBM-Icecrown", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4408 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetModelID(31050)
 
 mod:RegisterEvents(
@@ -42,16 +42,12 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-do 
-	local lastBlade = 0
-	function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-		if spellId == 70305 and destGUID == UnitGUID("player") and GetTime() - lastBlade > 2 then
-			specWarnBlade:Show()
-			lastBlade = GetTime()
-		end
+function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
+	if spellId == 70305 and destGUID == UnitGUID("player") and self:AntiSpam() then
+		specWarnBlade:Show()
 	end
-	mod.SPELL_MISSED = mod.SPELL_DAMAGE
 end
+mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.SindragosaEvent and self:LatencyCheck() then

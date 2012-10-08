@@ -38,6 +38,7 @@ local EXPANSION_FRAMES = {
 	["expansion1"]	= true,
 	["expansion2"]	= true,
 	["expansion3"]	= true,
+	["expansion4"]	= true,
 }
 
 local CATEGORY_TOOLTIP = {
@@ -430,12 +431,13 @@ function private.InitializeFilterPanel()
 		druid		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["DRUID"],		row = 1, col = 2 },
 		hunter		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["HUNTER"],		row = 2, col = 1 },
 		mage		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["MAGE"],		row = 2, col = 2 },
-		paladin		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["PALADIN"],	row = 3, col = 1 },
-		priest		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["PRIEST"],		row = 3, col = 2 },
-		rogue		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["ROGUE"],		row = 4, col = 1 },
-		shaman		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["SHAMAN"],		row = 4, col = 2 },
-		warlock		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["WARLOCK"],	row = 5, col = 1 },
-		warrior		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["WARRIOR"],	row = 5, col = 2 },
+		monk		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["MONK"],		row = 3, col = 1 },
+		paladin		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["PALADIN"],	row = 3, col = 2 },
+		priest		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["PRIEST"],		row = 4, col = 1 },
+		rogue		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["ROGUE"],		row = 4, col = 2 },
+		shaman		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["SHAMAN"],		row = 5, col = 1 },
+		warlock		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["WARLOCK"],	row = 5, col = 2 },
+		warrior		= { tt = L["CLASS_DESC"],	text = _G.LOCALIZED_CLASS_NAMES_MALE["WARRIOR"],	row = 6, col = 1 },
 	}
 
 	local class_panel = _G.CreateFrame("Frame", nil, general_frame)
@@ -491,10 +493,11 @@ function private.InitializeFilterPanel()
 			pvp		= { tt = L["PVP_DESC"],			text = _G.PVP,					row = 3, col = 1 },
 			quest		= { tt = L["QUEST_DESC"],		text = L["Quest"],				row = 3, col = 2 },
 			raid		= { tt = L["RAID_DESC"],		text = _G.RAID,					row = 4, col = 1 },
-			seasonal	= { tt = L["SEASONAL_DESC"],		text = private.ACQUIRE_NAMES[A.SEASONAL],	row = 4, col = 2 },
-			trainer		= { tt = L["TRAINER_DESC"],		text = L["Trainer"],				row = 5, col = 1 },
-			vendor		= { tt = L["VENDOR_DESC"],		text = L["Vendor"],				row = 5, col = 2 },
-			worlddrop	= { tt = L["WORLD_DROP_DESC"],		text = L["World Drop"],				row = 6, col = 1 },
+			reputation	= { tt = L["REPUTATION_DESC"],		text = _G.REPUTATION,				row = 4, col = 2 },
+			seasonal	= { tt = L["SEASONAL_DESC"],		text = private.ACQUIRE_NAMES[A.SEASONAL],	row = 5, col = 1 },
+			trainer		= { tt = L["TRAINER_DESC"],		text = L["Trainer"],				row = 5, col = 2 },
+			vendor		= { tt = L["VENDOR_DESC"],		text = L["Vendor"],				row = 6, col = 1 },
+			worlddrop	= { tt = L["WORLD_DROP_DESC"],		text = L["World Drop"],				row = 6, col = 2 },
 		}
 
 		local acquire_panel = _G.CreateFrame("Frame", nil, obtain_frame)
@@ -533,13 +536,17 @@ function private.InitializeFilterPanel()
 			MainPanel.list_frame:Update(nil, false)
 		end)
 
+		local function ExpansionDesc(expansion_text)
+			return L["EXPANSION_DESC_FORMAT"]:format(expansion_text)
+		end
 		obtain_frame.version_toggle = version_toggle
 
 		local version_buttons = {
-			expansion0	= { tt = L["ORIGINAL_WOW_DESC"],	text = _G.EXPANSION_NAME0,			row = 1, col = 1 },
-			expansion1	= { tt = L["BC_WOW_DESC"],		text = _G.EXPANSION_NAME1,			row = 2, col = 1 },
-			expansion2	= { tt = L["LK_WOW_DESC"],		text = _G.EXPANSION_NAME2,			row = 3, col = 1 },
-			expansion3	= { tt = L["CATA_WOW_DESC"],		text = _G.EXPANSION_NAME3,			row = 4, col = 1 },
+			expansion0	= { tt = ExpansionDesc(_G.EXPANSION_NAME0),	text = _G.EXPANSION_NAME0,	row = 1, col = 1 },
+			expansion1	= { tt = ExpansionDesc(_G.EXPANSION_NAME1),	text = _G.EXPANSION_NAME1,	row = 2, col = 1 },
+			expansion2	= { tt = ExpansionDesc(_G.EXPANSION_NAME2),	text = _G.EXPANSION_NAME2,	row = 3, col = 1 },
+			expansion3	= { tt = ExpansionDesc(_G.EXPANSION_NAME3),	text = _G.EXPANSION_NAME3,	row = 4, col = 1 },
+			expansion4	= { tt = ExpansionDesc(_G.EXPANSION_NAME4),	text = _G.EXPANSION_NAME4,	row = 5, col = 1 },
 		}
 
 		local version_panel = _G.CreateFrame("Frame", nil, obtain_frame)
@@ -549,6 +556,7 @@ function private.InitializeFilterPanel()
 		version_panel:SetPoint("RIGHT", obtain_frame, "RIGHT")
 
 		private.GenerateCheckBoxes(obtain_frame, version_buttons, version_panel)
+		ExpansionDesc = nil
 	end	-- do-block
 
 	-------------------------------------------------------------------------------
@@ -613,7 +621,7 @@ function private.InitializeFilterPanel()
 		end)
 
 		item_frame:SetScript("OnShow", function(self)
-			local sub_panel = self["items_" .. private.PROFESSION_LABELS[MainPanel.profession]]
+			local sub_panel = self["items_" .. private.PROFESSION_LABELS[MainPanel.current_profession]]
 
 			if sub_panel then
 				sub_panel:Show()
@@ -733,10 +741,11 @@ function private.InitializeFilterPanel()
 		local rep_frame = FilterPanel:CreateSubMenu("rep")
 
 		local EXPANSION_TOOLTIP = {
-			expansion0	= L["FILTERING_OLDWORLD_DESC"],
-			expansion1	= L["FILTERING_BC_DESC"],
-			expansion2	= L["FILTERING_WOTLK_DESC"],
-			expansion3	= L["FILTERING_CATA_DESC"],
+			expansion0	= L["EXPANSION_FILTER_FORMAT"]:format(_G.EXPANSION_NAME0),
+			expansion1	= L["EXPANSION_FILTER_FORMAT"]:format(_G.EXPANSION_NAME1),
+			expansion2	= L["EXPANSION_FILTER_FORMAT"]:format(_G.EXPANSION_NAME2),
+			expansion3	= L["EXPANSION_FILTER_FORMAT"]:format(_G.EXPANSION_NAME3),
+			expansion4	= L["EXPANSION_FILTER_FORMAT"]:format(_G.EXPANSION_NAME4),
 		}
 		-------------------------------------------------------------------------------
 		-- This manages the WoW expansion reputation filter menu panel
@@ -771,8 +780,8 @@ function private.InitializeFilterPanel()
 		-------------------------------------------------------------------------------
 		function rep_frame:CreateExpansionButton(texture, expansion)
 			local cButton = _G.CreateFrame("CheckButton", nil, self)
-			cButton:SetWidth(100)
-			cButton:SetHeight(46)
+			cButton:SetWidth(110)
+			cButton:SetHeight(50)
 			cButton:SetChecked(false)
 			cButton:SetScript("OnClick", function(self, button, down)
 				ToggleExpansionMenu(expansion)
@@ -780,8 +789,8 @@ function private.InitializeFilterPanel()
 
 			local iconTex = cButton:CreateTexture(nil, "BORDER")
 			iconTex:SetTexture(([[Interface\Glues\Common\%s]]):format(texture))
-			iconTex:SetWidth(100)
-			iconTex:SetHeight(46)
+			iconTex:SetWidth(110)
+			iconTex:SetHeight(50)
 			iconTex:SetAllPoints(cButton)
 
 			local pushedTexture = cButton:CreateTexture(nil, "ARTWORK")
@@ -822,10 +831,14 @@ function private.InitializeFilterPanel()
 		local expansion3 = rep_frame:CreateExpansionButton("Glues-WOW-CCLogo", "expansion3")
 		expansion3:SetPoint("TOP", expansion2, "BOTTOM", 0, 0)
 
+		local expansion4 = rep_frame:CreateExpansionButton("Glues-WOW-MPLogo", "expansion4")
+		expansion4:SetPoint("TOP", expansion3, "BOTTOM", 0, 0)
+
 		rep_frame.toggle_expansion0 = expansion0
 		rep_frame.toggle_expansion1 = expansion1
 		rep_frame.toggle_expansion2 = expansion2
 		rep_frame.toggle_expansion3 = expansion3
+		rep_frame.toggle_expansion4 = expansion4
 	end	-- do
 
 	-------------------------------------------------------------------------------
@@ -1083,6 +1096,72 @@ function private.InitializeFilterPanel()
 	end	-- do-block
 
 	-------------------------------------------------------------------------------
+	-- Create FilterPanel.rep.expansion4, and set its scripts.
+	-------------------------------------------------------------------------------
+	do
+		local expansion4_frame = _G.CreateFrame("Frame", nil, FilterPanel.rep)
+		expansion4_frame:SetWidth(200)
+		expansion4_frame:SetHeight(FILTERMENU_HEIGHT)
+		expansion4_frame:EnableMouse(true)
+		expansion4_frame:EnableKeyboard(true)
+		expansion4_frame:SetMovable(false)
+		expansion4_frame:SetPoint("TOPRIGHT", FilterPanel, "TOPRIGHT", 0, 0)
+		expansion4_frame:Hide()
+
+		FilterPanel.rep.expansion4 = expansion4_frame
+
+		-------------------------------------------------------------------------------
+		-- Create the Reputation toggle and CheckButtons
+		-------------------------------------------------------------------------------
+		local function DisabledText(text)
+			return SetTextColor(private.BASIC_COLORS["grey"], text)
+		end
+
+		local expansion4_buttons = {
+			foresthozen		= { tt = ReputationDesc(BFAC["Forest Hozen"]),			text = BFAC["Forest Hozen"],				row = 2,	col = 1 },
+			goldenlotus		= { tt = ReputationDesc(BFAC["Golden Lotus"]),			text = BFAC["Golden Lotus"],				row = 3,	col = 1 },
+			huojinpandaren		= { tt = ReputationDesc(BFAC["Huojin Pandaren"]),		text = BFAC["Huojin Pandaren"],				row = 4,	col = 1 },
+			cloudserpent		= { tt = ReputationDesc(BFAC["Order of the Cloud Serpent"]),	text = BFAC["Order of the Cloud Serpent"],		row = 5,	col = 1 },
+			pearlfinjinyu		= { tt = ReputationDesc(BFAC["Pearlfin Jinyu"]),		text = BFAC["Pearlfin Jinyu"],				row = 6,	col = 1 },
+			shadopan		= { tt = ReputationDesc(BFAC["Shado-Pan"]),			text = BFAC["Shado-Pan"],				row = 7,	col = 1 },
+			anglers			= { tt = ReputationDesc(BFAC["The Anglers"]),			text = BFAC["The Anglers"],				row = 8,	col = 1 },
+			augustcelestials	= { tt = ReputationDesc(BFAC["The August Celestials"]),		text = BFAC["The August Celestials"],			row = 9,	col = 1 },
+			brewmasters		= { tt = ReputationDesc(BFAC["The Brewmasters"]),		text = BFAC["The Brewmasters"],				row = 10,	col = 1 },
+			klaxxi			= { tt = ReputationDesc(BFAC["The Klaxxi"]),			text = BFAC["The Klaxxi"],				row = 11,	col = 1 },
+			lorewalkers		= { tt = ReputationDesc(BFAC["The Lorewalkers"]),		text = BFAC["The Lorewalkers"],				row = 12,	col = 1 },
+			tillers			= { tt = ReputationDesc(BFAC["The Tillers"]),			text = BFAC["The Tillers"],				row = 13,	col = 1 },
+			tushuipandaren		= { tt = ReputationDesc(BFAC["Tushui Pandaren"]),		text = BFAC["Tushui Pandaren"],				row = 14,	col = 1 },
+			blackprince		= { tt = ReputationDesc(BFAC["The Black Prince"]),		text = BFAC["The Black Prince"],			row = 15,	col = 1 },
+			shangxiacademy		= { tt = ReputationDesc(BFAC["Shang Xi's Academy"]),		text = BFAC["Shang Xi's Academy"],			row = 16,	col = 1 },
+		}
+		private.GenerateCheckBoxes(expansion4_frame, expansion4_buttons)
+
+		-- Disable them as the data isn't in yet.
+--		expansion4_frame.catacommon1:Disable()
+--		expansion4_frame.catacommon2:Disable()
+--		expansion4_frame.guardiansofhyjal:Disable()
+--		expansion4_frame.ramkahen:Disable()
+--		expansion4_frame.earthenring:Disable()
+--		expansion4_frame.therazane:Disable()
+
+		local expansion4_toggle = _G.CreateFrame("Button", nil, expansion4_frame)
+		expansion4_toggle:SetWidth(105)
+		expansion4_toggle:SetHeight(20)
+		expansion4_toggle:SetNormalFontObject("QuestTitleFont")
+		expansion4_toggle:SetHighlightFontObject("QuestTitleFontBlackShadow")
+		expansion4_toggle:SetText(_G.REPUTATION .. ":")
+		expansion4_toggle:SetPoint("TOPLEFT", expansion4_frame, "TOPLEFT", -2, -7)
+		expansion4_toggle:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+
+		private.SetTooltipScripts(expansion4_toggle, L["GROUP_TOGGLE_FORMAT"]:format(_G.REPUTATION))
+
+		expansion4_toggle.buttons = expansion4_buttons
+		expansion4_toggle.frame = expansion4_frame
+
+		expansion4_toggle:SetScript("OnClick", ToggleExpansionCheckBoxes)
+	end	-- do-block
+
+	-------------------------------------------------------------------------------
 	-- Miscellaneous Filter Menu
 	-------------------------------------------------------------------------------
 	FilterPanel.misc = _G.CreateFrame("Frame", "ARL_FilterMenu_Misc", FilterPanel)
@@ -1318,6 +1397,7 @@ function private.InitializeFilterPanel()
 	local expansion1 = FilterPanel.rep.expansion1
 	local expansion2 = FilterPanel.rep.expansion2
 	local expansion3 = FilterPanel.rep.expansion3
+	local expansion4 = FilterPanel.rep.expansion4
 
 	FilterPanel.value_map = {
 		------------------------------------------------------------------------------------------------
@@ -1336,6 +1416,7 @@ function private.InitializeFilterPanel()
 		["druid"]		= { cb = FilterPanel.general.druid,		svroot = filterdb.classes },
 		["hunter"]		= { cb = FilterPanel.general.hunter,		svroot = filterdb.classes },
 		["mage"]		= { cb = FilterPanel.general.mage,		svroot = filterdb.classes },
+		["monk"]		= { cb = FilterPanel.general.monk,		svroot = filterdb.classes },
 		["paladin"]		= { cb = FilterPanel.general.paladin,		svroot = filterdb.classes },
 		["priest"]		= { cb = FilterPanel.general.priest,		svroot = filterdb.classes },
 		["rogue"]		= { cb = FilterPanel.general.rogue,		svroot = filterdb.classes },
@@ -1345,21 +1426,23 @@ function private.InitializeFilterPanel()
 		------------------------------------------------------------------------------------------------
 		-- Obtain Options
 		------------------------------------------------------------------------------------------------
-		["instance"]		= { cb = FilterPanel.obtain.instance,		svroot = filterdb.obtain },
-		["raid"]		= { cb = FilterPanel.obtain.raid,		svroot = filterdb.obtain },
-		["quest"]		= { cb = FilterPanel.obtain.quest,		svroot = filterdb.obtain },
-		["seasonal"]		= { cb = FilterPanel.obtain.seasonal,		svroot = filterdb.obtain },
-		["trainer"]		= { cb = FilterPanel.obtain.trainer,		svroot = filterdb.obtain },
-		["vendor"]		= { cb = FilterPanel.obtain.vendor,		svroot = filterdb.obtain },
-		["pvp"]			= { cb = FilterPanel.obtain.pvp,		svroot = filterdb.obtain },
-		["discovery"]		= { cb = FilterPanel.obtain.discovery,		svroot = filterdb.obtain },
-		["worlddrop"]		= { cb = FilterPanel.obtain.worlddrop,		svroot = filterdb.obtain },
-		["mobdrop"]		= { cb = FilterPanel.obtain.mobdrop,		svroot = filterdb.obtain },
 		["achievement"]		= { cb = FilterPanel.obtain.achievement,	svroot = filterdb.obtain },
+		["discovery"]		= { cb = FilterPanel.obtain.discovery,		svroot = filterdb.obtain },
 		["expansion0"]		= { cb = FilterPanel.obtain.expansion0,		svroot = filterdb.obtain },
 		["expansion1"]		= { cb = FilterPanel.obtain.expansion1,		svroot = filterdb.obtain },
 		["expansion2"]		= { cb = FilterPanel.obtain.expansion2,		svroot = filterdb.obtain },
 		["expansion3"]		= { cb = FilterPanel.obtain.expansion3,		svroot = filterdb.obtain },
+		["expansion4"]		= { cb = FilterPanel.obtain.expansion4,		svroot = filterdb.obtain },
+		["instance"]		= { cb = FilterPanel.obtain.instance,		svroot = filterdb.obtain },
+		["mobdrop"]		= { cb = FilterPanel.obtain.mobdrop,		svroot = filterdb.obtain },
+		["pvp"]			= { cb = FilterPanel.obtain.pvp,		svroot = filterdb.obtain },
+		["quest"]		= { cb = FilterPanel.obtain.quest,		svroot = filterdb.obtain },
+		["raid"]		= { cb = FilterPanel.obtain.raid,		svroot = filterdb.obtain },
+		["reputation"]		= { cb = FilterPanel.obtain.reputation,		svroot = filterdb.obtain },
+		["seasonal"]		= { cb = FilterPanel.obtain.seasonal,		svroot = filterdb.obtain },
+		["trainer"]		= { cb = FilterPanel.obtain.trainer,		svroot = filterdb.obtain },
+		["vendor"]		= { cb = FilterPanel.obtain.vendor,		svroot = filterdb.obtain },
+		["worlddrop"]		= { cb = FilterPanel.obtain.worlddrop,		svroot = filterdb.obtain },
 		------------------------------------------------------------------------------------------------
 		-- Binding Options
 		------------------------------------------------------------------------------------------------
@@ -1432,6 +1515,24 @@ function private.InitializeFilterPanel()
 		["ramkahen"]		= { cb = expansion3.ramkahen,			svroot = nil },
 		["earthenring"]		= { cb = expansion3.earthenring,		svroot = nil },
 		["therazane"]		= { cb = expansion3.therazane,			svroot = nil },
+		------------------------------------------------------------------------------------------------
+		-- Mists of Pandaria Rep Options
+		------------------------------------------------------------------------------------------------
+		["foresthozen"]		= { cb = expansion4.foresthozen,		svroot = filterdb.rep },
+		["goldenlotus"]		= { cb = expansion4.goldenlotus,		svroot = filterdb.rep },
+		["huojinpandaren"]	= { cb = expansion4.huojinpandaren,		svroot = filterdb.rep },
+		["cloudserpent"]	= { cb = expansion4.cloudserpent,		svroot = filterdb.rep },
+		["pearlfinjinyu"]	= { cb = expansion4.pearlfinjinyu,		svroot = filterdb.rep },
+		["shadopan"]		= { cb = expansion4.shadopan,			svroot = filterdb.rep },
+		["anglers"]		= { cb = expansion4.anglers,			svroot = filterdb.rep },
+		["augustcelestials"]	= { cb = expansion4.augustcelestials,		svroot = filterdb.rep },
+		["brewmasters"]		= { cb = expansion4.brewmasters,		svroot = filterdb.rep },
+		["klaxxi"]		= { cb = expansion4.klaxxi,			svroot = filterdb.rep },
+		["lorewalkers"]		= { cb = expansion4.lorewalkers,		svroot = filterdb.rep },
+		["tillers"]		= { cb = expansion4.tillers,			svroot = filterdb.rep },
+		["tushuipandaren"]	= { cb = expansion4.tushuipandaren,		svroot = filterdb.rep },
+		["blackprince"]		= { cb = expansion4.blackprince,		svroot = filterdb.rep },
+		["shangxiacademy"]	= { cb = expansion4.shangxiacademy,		svroot = filterdb.rep },
 	}
 	private.InitializeFilterPanel = nil
 end

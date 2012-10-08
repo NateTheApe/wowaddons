@@ -11,6 +11,7 @@ local CLASS_TEX_COORDS = {
 	WARLOCK     = {0.7421875, 0.98828125, 0.25, 0.5},
 	PALADIN     = {0, 0.25, 0.5, 0.75},
 	DEATHKNIGHT = {0.25, 0.49609375, 0.5, 0.75},
+	MONK        = {0.496039375, 0.7421875, 0.5, 0.75},
 }
 
 for k, v in pairs(CLASS_TEX_COORDS) do
@@ -115,7 +116,17 @@ local function model_OnUpdate(self, elapsed)
 	local style = frame.Portrait.style
 	local full_body = PitBull4_Portrait:GetLayoutDB(frame).full_body
 
-	if style == "pirate" then
+	if style == "three_dimensional" then
+		if not frame.Portrait.falling_back then
+			self:SetUnit(frame.unit)
+			self:SetPortraitZoom(full_body and 0 or 1)
+			self:SetPosition(0, 0, 0)
+		else
+			self:SetModelScale(4.25)
+			self:SetPosition(0, 0, -1.5)
+			self:SetModel([[Interface\Buttons\talktomequestionmark.mdx]])
+		end
+	else -- style == "pirate"
 		self:SetUnit(frame.unit)
 		self:Undress()
 		self:TryOn(9636)
@@ -124,32 +135,16 @@ local function model_OnUpdate(self, elapsed)
 		self:TryOn(6836)
 		self:TryOn(2955)
 		self:TryOn(3935)
-		if not full_body then
-			self:SetCamera(0)
-		end
-	elseif style == "three_dimensional" then
-		if not frame.Portrait.falling_back then
-			self:SetUnit(frame.unit)
-			if not full_body then
-				-- For portrait mode set the models camera to the 0 preset.
-				-- Note: Full body is technically preset 1, but under no circumstances
-				-- should we directly set it.  The camera will already be set to preset
-				-- 1 and doing it ourselves causes some models to show up as just a blob.
-				self:SetCamera(0)
-			end
-		else
-			self:SetModelScale(4.25)
-			self:SetPosition(0, 0, -1.5)
-			self:SetModel([[Interface\Buttons\talktomequestionmark.mdx]])
-		end
-
-		-- work around a Blizzard bug that causes model frames not to
-		-- adjust their alpha realtive to their parent frames alpha after
-		-- the model is updated.  So we nudge the alpha down a bit and 
-		-- then back up to get it to update.
-		self:SetAlpha(0.9999999)
-		self:SetAlpha(1)
+		self:SetPosition(0, 0, 0)
+		self:SetPortraitZoom(full_body and 0 or 1)
 	end
+
+	-- work around a Blizzard bug that causes model frames not to
+	-- adjust their alpha realtive to their parent frames alpha after
+	-- the model is updated.  So we nudge the alpha down a bit and 
+	-- then back up to get it to update.
+	self:SetAlpha(0.9999999)
+	self:SetAlpha(1)
 	
 	if type(self:GetModel()) == "string" then
 		-- the portrait was set properly, we can stop trying to set the portrait 
@@ -171,7 +166,7 @@ end
 function PitBull4_Portrait:UpdateFrame(frame)
 	local layout_db = self:GetLayoutDB(frame)
 	local style = layout_db.style
-	local pirate = pirate_day and self.db.profile.global.pirate
+	local pirate = pirate_day and self.db.profile.global.pirate and not InCombatLockdown()
 	local falling_back = false
 	
 	local unit = frame.unit
@@ -213,13 +208,13 @@ function PitBull4_Portrait:UpdateFrame(frame)
 		portrait.height = 4
 		portrait.style = style
 	
-		if style == "pirate" then
-			local model = PitBull4.Controls.MakeDressUpModel(frame)
+		if style == "three_dimensional" then
+			local model = PitBull4.Controls.MakePlayerModel(frame)
 			model:SetFrameLevel(frame:GetFrameLevel() + 5)
 			portrait.model = model
 			model:SetAllPoints(portrait)
-		elseif style == "three_dimensional" then
-			local model = PitBull4.Controls.MakePlayerModel(frame)
+		elseif style == "pirate" then
+			local model = PitBull4.Controls.MakeDressUpModel(frame)
 			model:SetFrameLevel(frame:GetFrameLevel() + 5)
 			portrait.model = model
 			model:SetAllPoints(portrait)
@@ -261,7 +256,7 @@ function PitBull4_Portrait:UpdateFrame(frame)
 	elseif style == "blank" then
 		portrait.texture:SetTexture("")
 	else -- class	
-		local class
+		local class, _
 		if unit then
 			_, class = UnitClass(unit)
 		end

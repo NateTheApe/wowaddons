@@ -29,21 +29,7 @@ me.quicktradeskills.milling.func=function()
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(me.L["leftclick"]..": ".. spellname..me.L["autoloot"],0,1,0)
         GameTooltip:AddLine(" ")
-        GameTooltip:AddLine(me.L["possiblereagents"])
-        for k,v in pairs(me.quicktradeskills.milling.herbs[GetContainerItemID(i,j)]) do
-         local name="---"
-         local color="ffffffff"
-         if GetItemInfo(v) then
-          name = select(1,GetItemInfo(v))
-          color = select(4,GetItemQualityColor(select(3,GetItemInfo(v))))
-         elseif me.quicktradeskills.milling.pigmentnames[v] then
-          name = me.quicktradeskills.milling.pigmentnames[v]
-         end
-         GameTooltip:AddLine("|c"..color..name.."|r")
-         if GetItemInfo(v) then
-          GameTooltip:AddTexture(strmatch(select(10,GetItemInfo(v)),"^(.+)"))
-         end
-        end
+        GameTooltip:AddLine(me.quicktradeskills.milling.herbs[GetContainerItemID(i,j)])	--Add Addon Name
        end
       }
      end
@@ -54,80 +40,59 @@ me.quicktradeskills.milling.func=function()
 end
 
 me.quicktradeskills.milling.herbs = {
-	[2447]  = {39151},     --Friedensblume
-	[765]   = {39151},     --Silberblatt
-	[2449]  = {39151},     --Erdwurzel
-	[785]   = {39334,43103},   --Maguskönigskraut
-	[2452]  = {39334,43103},   --Flitzdistel
-	[2450]  = {39334,43103},   --Wilddornrose
-	[3820]  = {39334,43103},   --Würgetang
-	[2453]  = {39334,43103},   --Beulengras
-	[3369]  = {39338,43104},   --Grabmoos
-	[3355]  = {39338,43104},   --Wildstahlblume
-	[3356]  = {39338,43104},   --Königsblut
-	[3357]  = {39338,43104},   --Lebenswurz
-	[3818]  = {39339,43105},   --Blassblatt
-	[3821]  = {39339,43105},   --Golddorn
-	[3358]  = {39339,43105},   --Khadgars Schnurrbart
-	[3819]  = {39339,43105},   --Winterbiss
-	[4625]  = {39340,43106},   --Feuerblüte
-	[8831]  = {39340,43106},   --Lila Lotus
-	[8836]  = {39340,43106},   --Arthas' Tränen
-	[8838]  = {39340,43106},   --Sonnengras
-	[8845]  = {39340,43106},   --Geisterpilz
-	[8839]  = {39340,43106},   --Blindkraut
-	[8846]  = {39340,43106},   --Gromsblut
-	[13464] = {39341,43107}, --Goldener Sansam
-	[13463] = {39341,43107}, --Traumblatt
-	[13465] = {39341,43107}, --Bergsilbersalbei
-	[13466] = {39341,43107}, --Pestblüte
-	[13467] = {39341,43107}, --Eiskappe
-	--BC
-	[22789] = {39342,43108}, --Terozapfen
-	[22786] = {39342,43108}, --Traumwinde
-	[22785] = {39342,43108}, --Teufelsgras
-	[22787] = {39342,43108}, --Zottelkappe
-	[22790] = {39342,43108}, --Urflechte
-	[22793] = {39342,43108}, --Manadistel
-	[22792] = {39342,43108}, --Alptraumranke
-	--WotLK
-	[22791] = {39342,43108}, --Netherblüte
-	[37921] = {39343,43109}, --Brennnessel
-	[36907] = {39343,43109}, --Talandras Rose
-	[36904] = {39343,43109}, --Tigerlilie
-	[36901] = {39343,43109}, --Goldklee
-	[36903] = {39343,43109}, --Schlangenzunge
-	[36906] = {39343,43109}, --Eisdorn
-	[36905] = {39343,43109}, --Lichblüte
-	--Cata
-	[52983] = {61979,61980}, --Aschenblüte
-	[52984] = {61979,61980}, --Sturmwinde
-	[52985] = {61979,61980}, --Azsharas Schleier
-	[52986] = {61979,61980}, --Herzblüte
-	[52987] = {61979,61980}, --Schattenjasmin
-	[52988] = {61979,61980}, --Gertenrohr
-	[52989] = {61979,61980}, --Deathspore Pod
-}
-
-me.quicktradeskills.milling.pigmentnames = {--if GetItemInfo returns nil
-	[39341] = "Silvery Pigment",
-	[39340] = "Violet Pigment",
-	[39339] = "Emerald Pigment",
-	[39338] = "Golden Pigment",
-	[39334] = "Dusky Pigment",
-	[39151] = "Alabaster Pigment",
-	[43107] = "Sapphire Pigment",
-	[43106] = "Ruby Pigment",
-	[43105] = "Indigo Pigment",
-	[43104] = "Burnt Pigment",
-	[43103] = "Verdant Pigment",
-	--BC
-	[39342] = "Nether Pigment",
-	[43108] = "Ebon Pigment",
-	--WotLK
-	[39343] = "Azure Pigment",
-	[43109] = "Icy Pigment",
-	--Cata
-	[61979] = "Ashen Pigment",
-	[61980] = "Burning Embers",
+	[2447]  = "Classic",						--Friedensblume
+	[765]   = "Classic",						--Silberblatt
+	[2449]  = "Classic",						--Erdwurzel
+	[785]   = "Classic",						--Maguskönigskraut
+	[2452]  = "Classic",						--Flitzdistel
+	[2450]  = "Classic",						--Wilddornrose
+	[3820]  = "Classic",						--Würgetang
+	[2453]  = "Classic",						--Beulengras
+	[3369]  = "Classic",						--Grabmoos
+	[3355]  = "Classic",						--Wildstahlblume
+	[3356]  = "Classic",						--Königsblut
+	[3357]  = "Classic",						--Lebenswurz
+	[3818]  = "Classic",						--Blassblatt
+	[3821]  = "Classic",						--Golddorn
+	[3358]  = "Classic",						--Khadgars Schnurrbart
+	[3819]  = "Classic",						--Winterbiss
+	[4625]  = "Classic",						--Feuerblüte
+	[8831]  = "Classic",						--Lila Lotus
+	[8836]  = "Classic",						--Arthas' Tränen
+	[8838]  = "Classic",						--Sonnengras
+	[8845]  = "Classic",						--Geisterpilz
+	[8839]  = "Classic",						--Blindkraut
+	[8846]  = "Classic",						--Gromsblut
+	[13464] = "Classic",						--Goldener Sansam
+	[13463] = "Classic",						--Traumblatt
+	[13465] = "Classic",						--Bergsilbersalbei
+	[13466] = "Classic",						--Pestblüte
+	[13467] = "Classic",						--Eiskappe
+	[22789] = "Burning Crusade",			--Terozapfen
+	[22786] = "Burning Crusade",			--Traumwinde
+	[22785] = "Burning Crusade",			--Teufelsgras
+	[22787] = "Burning Crusade",			--Zottelkappe
+	[22790] = "Burning Crusade",			--Urflechte
+	[22793] = "Burning Crusade",			--Manadistel
+	[22792] = "Burning Crusade",			--Alptraumranke
+	[22791] = "Wrath of the Lich King",	--Netherblüte
+	[37921] = "Wrath of the Lich King",	--Brennnessel
+	[36907] = "Wrath of the Lich King",	--Talandras Rose
+	[36904] = "Wrath of the Lich King",	--Tigerlilie
+	[36901] = "Wrath of the Lich King",	--Goldklee
+	[36903] = "Wrath of the Lich King",	--Schlangenzunge
+	[36906] = "Wrath of the Lich King",	--Eisdorn
+	[36905] = "Wrath of the Lich King",	--Lichblüte
+	[52983] = "Cataclysm",					--Aschenblüte
+	[52984] = "Cataclysm",					--Sturmwinde
+	[52985] = "Cataclysm",					--Azsharas Schleier
+	[52986] = "Cataclysm",					--Herzblüte
+	[52987] = "Cataclysm",					--Schattenjasmin
+	[52988] = "Cataclysm",					--Gertenrohr
+	[52989] = "Cataclysm",					--Deathspore Pod
+	[79011] = "Mists of Pandaria",		--Narrenkappe
+	[79010] = "Mists of Pandaria",		--Schneelilie
+	[72235] = "Mists of Pandaria",		--Seidenkraut
+	[72234] = "Mists of Pandaria",		--Teepflanze
+	[72237] = "Mists of Pandaria",		--Regenmohn
 }

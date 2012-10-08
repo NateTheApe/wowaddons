@@ -37,6 +37,8 @@
 --    * Share Alike. If you alter, transform, or build upon this work, you may distribute the resulting work only under the same or similar license to this one.
 
 
+
+
 ---------------
 --  Globals  --
 ---------------
@@ -47,13 +49,13 @@ DBT_SavedOptions = {}
 --------------
 --  Locals  --
 --------------
-local fCounter = 1
 local barPrototype = {}
 local unusedBars = {}
 local unusedBarObjects = setmetatable({}, {__mode = "kv"})
 local instances = {}
 local updateClickThrough
 local options
+local setupHandlers
 local function stringFromTimer(t)
 	if t <= 60 then
 		return ("%.1f"):format(t)
@@ -109,7 +111,7 @@ options = {
 	},
 	Texture = {
 		type = "string",
-		default = "Interface\\AddOns\\DBM-Core\\textures\\default.tga",
+		default = "Interface\\AddOns\\DBM-DefaultSkin\\textures\\default.tga",
 	},
 	StartColorR = {
 		type = "number",
@@ -218,6 +220,14 @@ options = {
 	FontSize = {
 		type = "number",
 		default = 10
+	},
+	Template = {
+		type = "string",
+		default = "DBTBarTemplate"
+	},
+	Skin = {
+		type = "string",
+		default = "DefaultSkin"
 	}
 }
 
@@ -359,14 +369,15 @@ end
 --  Bar Constructor  --
 -----------------------
 do
+	local fCounter = 1
 	local function createBarFrame(self)
 		local frame
 		if unusedBars[#unusedBars] then
 			frame = unusedBars[#unusedBars]
 			unusedBars[#unusedBars] = nil
-			frame:Show()
 		else
-			frame = CreateFrame("Frame", "DBT_Bar_"..fCounter, self.mainAnchor, "DBTBarTemplate")
+			frame = CreateFrame("Frame", "DBT_Bar_"..fCounter, self.mainAnchor, self.options.Template)
+			setupHandlers(frame)
 			fCounter = fCounter + 1
 		end
 		frame:EnableMouse(not self.options.ClickThrough or self.movable)
@@ -426,12 +437,12 @@ do
 			else
 				self.smallBars:Append(newBar)
 			end
-			newBar:ApplyStyle()
 			newBar:SetText(id)
 			newBar:SetIcon(icon)
 			newBar:SetPosition()
-			newBar:Update(0)
 			self.bars[newBar] = true
+			newBar:ApplyStyle()
+			newBar:Update(0)
 		end
 		return newBar
 	end
@@ -557,16 +568,18 @@ function barPrototype:SetText(text)
 end
 
 function barPrototype:SetIcon(icon)
-	_G[self.frame:GetName().."BarIcon1"]:SetTexture("")
-	_G[self.frame:GetName().."BarIcon1"]:SetTexture(icon)
-	_G[self.frame:GetName().."BarIcon2"]:SetTexture("")
-	_G[self.frame:GetName().."BarIcon2"]:SetTexture(icon)
+	local frame_name = self.frame:GetName()
+	_G[frame_name.."BarIcon1"]:SetTexture("")
+	_G[frame_name.."BarIcon1"]:SetTexture(icon)
+	_G[frame_name.."BarIcon2"]:SetTexture("")
+	_G[frame_name.."BarIcon2"]:SetTexture(icon)
 end
 
 function barPrototype:SetColor(color)
 	self.color = color
-	_G[self.frame:GetName().."Bar"]:SetStatusBarColor(color.r, color.g, color.b)
-	_G[self.frame:GetName().."BarSpark"]:SetVertexColor(color.r, color.g, color.b)
+	local frame_name = self.frame:GetName()
+	_G[frame_name.."Bar"]:SetStatusBarColor(color.r, color.g, color.b)
+	_G[frame_name.."BarSpark"]:SetVertexColor(color.r, color.g, color.b)
 end
 
 ------------------
@@ -574,10 +587,11 @@ end
 ------------------
 function barPrototype:Update(elapsed)
 	local frame = self.frame
-	local bar = _G[frame:GetName().."Bar"]
-	local texture = _G[frame:GetName().."BarTexture"]
-	local spark = _G[frame:GetName().."BarSpark"]
-	local timer = _G[frame:GetName().."BarTimer"]
+	local frame_name = frame:GetName()
+	local bar = _G[frame_name.."Bar"]
+	local texture = _G[frame_name.."BarTexture"]
+	local spark = _G[frame_name.."BarSpark"]
+	local timer = _G[frame_name.."BarTimer"]
 	local obj = self.owner
 	self.timer = self.timer - elapsed
 	if obj.options.DynamicColor and not self.color then
@@ -650,9 +664,10 @@ function barPrototype:Update(elapsed)
 	if (self.timer <= self.owner.options.EnlargeBarsTime or (self.timer/self.totalTime) <= self.owner.options.EnlargeBarsPercent) and (not self.small) and not self.enlarged and self.moving ~= "enlarge" and self.owner:GetOption("HugeBarsEnabled") then
 		local next = self.next
 		self:RemoveFromList()
+		local oldX, oldY
 		if next then
-			local oldX = next.frame:GetRight() - next.frame:GetWidth()/2 -- the next frame's point needs to be cleared before we enlarge the bar to prevent the frame from "jumping around"
-			local oldY = next.frame:GetTop() -- so we need to save the old point for :MoveToNextPosition() as :GetTop() and :GetRight() might return nil (sometimes? happened only once in 2 weeks of raiding...but it crashed DBT...) after :ClearAllPoints()
+			oldX = next.frame:GetRight() - next.frame:GetWidth()/2 -- the next frame's point needs to be cleared before we enlarge the bar to prevent the frame from "jumping around"
+			oldY = next.frame:GetTop() -- so we need to save the old point for :MoveToNextPosition() as :GetTop() and :GetRight() might return nil (sometimes? happened only once in 2 weeks of raiding...but it crashed DBT...) after :ClearAllPoints()
 			next.frame:ClearAllPoints()
 		end
 		self:Enlarge()
@@ -752,13 +767,14 @@ end
 
 function barPrototype:ApplyStyle()
 	local frame = self.frame
-	local bar = _G[frame:GetName().."Bar"]
-	local spark = _G[frame:GetName().."BarSpark"]
-	local texture = _G[frame:GetName().."BarTexture"]
-	local icon1 = _G[frame:GetName().."BarIcon1"]
-	local icon2 = _G[frame:GetName().."BarIcon2"]
-	local name = _G[frame:GetName().."BarName"]
-	local timer = _G[frame:GetName().."BarTimer"]
+	local frame_name = frame:GetName()
+	local bar = _G[frame_name.."Bar"]
+	local spark = _G[frame_name.."BarSpark"]
+	local texture = _G[frame_name.."BarTexture"]
+	local icon1 = _G[frame_name.."BarIcon1"]
+	local icon2 = _G[frame_name.."BarIcon2"]
+	local name = _G[frame_name.."BarName"]
+	local timer = _G[frame_name.."BarTimer"]
 	texture:SetTexture(self.owner.options.Texture)
 	if self.color then
 		bar:SetStatusBarColor(self.color.r, self.color.g, self.color.b)
@@ -814,6 +830,104 @@ end
 	
 options.ClickThrough.onChange = updateClickThrough
 
+--------------------
+--  Skinning API  --
+--------------------
+do
+	local skins = {}
+	local textures = {}
+	local fonts = {}
+
+	local skin = {}
+	skin.__index = skin
+
+	function DBT:RegisterSkin(id)
+		if id:sub(0, 4) == "DBM-" then
+			id = id:sub(5)
+		end
+		local obj = skins[id]
+		if not obj then
+			error("unknown skin id; the id must be equal to the addon's name (with the DBM- prefix being optional)", 2)
+		end
+		obj.loaded = true
+		obj.defaults = {}
+		return obj
+	end
+	
+	function DBT:SetSkin(id)
+		local skin = skins[id]
+		if not skin then
+			error("skin " .. id .. " doesn't exist", 2)
+		end
+		-- changing the skin cancels all timers; this is much easier than creating new frames for all currently running timers
+		for bar in self:GetBarIterator() do
+			bar:Cancel()
+		end
+		self:SetOption("Skin", id)
+		-- throw away old bars (note: there is no way to re-use them as the new skin uses a different XML template)
+		-- note: this doesn't update dummy bars (and can't do it by design); anyone who has a dummy bar for preview purposes (i.e. the GUI) must create new bars (e.g. in a callback)
+		unusedBars = {}
+		-- apply default options from the skin and reset all other options
+		for k, v in pairs(options) do
+			if k ~= "TimerPoint" and k ~= "TimerX" and k ~= "TimerY" -- do not reset the position
+				and k ~= "HugeTimerPoint" and k ~= "HugeTimerX" and k ~= "HugeTimerY"
+				and k ~= "Skin" then -- do not reset the skin we just set
+				self:SetOption(k, skin.defaults[k] or v.default)
+			end
+		end
+	end
+
+	for i = 1, GetNumAddOns() do
+		if GetAddOnMetadata(i, "X-DBM-Timer-Skin") then
+			-- load basic skin data
+			local id = GetAddOnInfo(i)
+			if not IsAddOnLoadOnDemand(i) then
+				geterrorhandler()(id .. " should be marked as load on demand")
+			end
+			if id:sub(0, 4) == "DBM-" then
+				id = id:sub(5)
+			end
+			local name = GetAddOnMetadata(i, "X-DBM-Timer-Skin-Name")
+			skins[id] = setmetatable({
+				name = name
+			}, skin)
+
+			-- load textures and fonts that might be embedded in this skin (to make them available to other skins)
+			local skinTextures = { strsplit(",", GetAddOnMetadata(i, "X-DBM-Timer-Skin-Textures") or "") }
+			local skinTextureNames = { strsplit(",", GetAddOnMetadata(i, "X-DBM-Timer-Skin-Texture-Names") or "") }
+			if #skinTextures ~= #skinTextureNames then
+				geterrorhandler()(id .. ": toc file defines " .. #skinTextures .. " textures but " .. #skinTextureNames .. " names for textures")
+			else
+				for i = 1, #skinTextures do
+					textures[skinTextureNames[i]:trim()] = skinTextures[i]:trim()
+				end
+			end
+			local skinFonts = { strsplit(",", GetAddOnMetadata(i, "X-DBM-Timer-Skin-Fonts") or "") }
+			local skinFontNames = { strsplit(",", GetAddOnMetadata(i, "X-DBM-Timer-Skin-Font-Names") or "") }
+			if #skinFonts ~= #skinFontNames then
+				geterrorhandler()(id .. ": toc file defines " .. #skinFonts .. " fonts but " .. #skinFontNames .. " names for fonts")
+			else
+				for i = 1, #skinFonts do
+					fonts[skinFontNames[i]:trim()] = skinFonts[i]:trim()
+				end
+			end
+
+		end
+	end
+
+	function DBT:GetSkins()
+		return skins
+	end
+
+	function DBT:GetTextures()
+		return textures
+	end
+
+	function DBT:GetFonts()
+		return fonts
+	end
+end
+
 
 --------------------
 --  Bar Announce  --
@@ -828,7 +942,7 @@ function barPrototype:Announce()
 	if chatWindow then
 		chatWindow:Insert(msg)
 	else
-		SendChatMessage(msg, (select(2, IsInInstance()) == "pvp" and "BATTLEGROUND") or (GetNumRaidMembers() > 0 and "RAID") or "PARTY")
+		SendChatMessage(msg, (select(2, IsInInstance()) == "pvp" and "BATTLEGROUND") or (IsInRaid() and "RAID") or "PARTY")
 	end
 end
 
@@ -927,62 +1041,60 @@ function barPrototype:AnimateEnlarge(elapsed)
 	end
 end
 
---[[
+------------------------
+-- Bar event handlers --
+------------------------
 do
-	local breakFrames = {}
-	function barPrototype:Break() -- coming soon
-		local frame = table.remove(breakTextures, #breakTextures) or CreateFrame("Frame", nil, self.owner.mainAnchor)
-		frame:SetParent(self.owner.mainAnchor)
-		frame.tex1 = frame.tex1 or frame:CreateTexture(nil, "OVERLAY")
-		frame.tex2 = frame.tex2 or frame:CreateTexture(nil, "OVERLAY")
-		local tex1 = frame.tex1
-		local tex2 = frame.tex2
-		tex1:SetTexture(self.owner.options.Texture)
-		tex2:SetTexture(self.owner.options.Texture)
-		-- tex1:SetTexCoordModifiesRect(true)  
-		tex1:SetHorizTile(true)
-		tex1:SetVertTile(true)
-		tex1:SetTexCoord(0, 0.5, 0, 1)
-	end
-end
-]]--
 
-----------------------------------------
--- Functions used by the XML Template --
-----------------------------------------
-function DBT_Bar_OnLoad(self)
-	self:SetMinMaxValues(0, 1)
-	self:SetValue(1)
-end
-
-function DBT_Bar_OnUpdate(self, elapsed)
-	self.obj:Update(elapsed)
-end
-
-function DBT_Bar_OnMouseDown(self, btn)
-	if self.obj.owner.movable and btn == "LeftButton" then
-		if self.obj.enlarged then
-			self.obj.owner.secAnchor:StartMoving()
+	local function onUpdate(self, elapsed)
+		if self.obj then
+			self.obj:Update(elapsed)
 		else
-			self.obj.owner.mainAnchor:StartMoving()
+		 	-- This should *never* happen; .obj is only set to nil when calling :Hide() and :Show() is only called in a function that also sets .obj
+			-- However, there have been several reports of this happening since WoW 5.x, wtf?
+			-- Unfortunately, none of the developers was ever able to reproduce this.
+			-- The bug reports show screenshots of expired timers that are still visible (showing 0.00) with all clean-up operations (positioning, list entry) except for the :Hide() call being performed...
+			self:Hide()
 		end
 	end
-end
 
-function DBT_Bar_OnMouseUp(self, btn)
-	self.obj.owner.mainAnchor:StopMovingOrSizing()
-	self.obj.owner.secAnchor:StopMovingOrSizing()
-	self.obj.owner:SavePosition()
-	if btn == "RightButton" then
-		self.obj:Cancel()
-	elseif btn == "LeftButton" and IsShiftKeyDown() then
-		self.obj:Announce()
+	local function onMouseDown(self, btn)
+		if self.obj then
+			if self.obj.owner.movable and btn == "LeftButton" then
+				if self.obj.enlarged then
+					self.obj.owner.secAnchor:StartMoving()
+				else
+					self.obj.owner.mainAnchor:StartMoving()
+				end
+			end
+		end
 	end
-end
 
-function DBT_Bar_OnHide(self)
-	if self.obj then
-		self.obj.owner.mainAnchor:StopMovingOrSizing()
-		self.obj.owner.secAnchor:StopMovingOrSizing()
+	local function onMouseUp(self, btn)
+		if self.obj then
+			self.obj.owner.mainAnchor:StopMovingOrSizing()
+			self.obj.owner.secAnchor:StopMovingOrSizing()
+			self.obj.owner:SavePosition()
+			if btn == "RightButton" then
+				self.obj:Cancel()
+			elseif btn == "LeftButton" and IsShiftKeyDown() then
+				self.obj:Announce()
+			end
+		end
+	end
+
+	local function onHide(self)
+		if self.obj then
+			self.obj.owner.mainAnchor:StopMovingOrSizing()
+			self.obj.owner.secAnchor:StopMovingOrSizing()
+		end
+	end
+
+	function setupHandlers(frame)
+		frame:SetScript("OnUpdate", onUpdate)
+		frame:SetScript("OnMouseDown", onMouseDown)
+		frame:SetScript("OnMouseUp", onMouseUp)
+		frame:SetScript("OnHide", onHide)
+		_G[frame:GetName() .. "Bar"]:SetMinMaxValues(0, 1) -- used to be in the OnLoad handler
 	end
 end

@@ -1,8 +1,14 @@
 if select(6, GetAddOnInfo("PitBull4_" .. (debugstack():match("[o%.][d%.][u%.]les\\(.-)\\") or ""))) ~= "MISSING" then return end
 
-if select(2, UnitClass('player')) ~= "SHAMAN" then
-	-- don't load if player is not a shaman.
+local player_class = select(2,UnitClass('player'))
+if player_class ~= "SHAMAN" and player_class ~= "DRUID" and player_class ~= "DEATHKNIGHT" and player_class ~= "MONK" then
 	return
+end
+
+local mop_500 = select(4,GetBuildInfo()) >= 50000
+local GetSpecialization = GetSpecialization
+if not mop_500 then
+	GetSpecialization = GetPrimaryTalentTree
 end
 
 local _G = _G
@@ -15,6 +21,27 @@ local DEBUG = PitBull4.DEBUG
 
 -- CONSTANTS ----------------------------------------------------------------
 local MAX_TOTEMS = MAX_TOTEMS or 4 -- comes from blizzard's totem frame lua
+local REQUIRED_SPEC_1
+local REQUIRED_SPEC_2
+local REQUIRED_LEVEL
+if player_class == 'DRUID' then
+	MAX_TOTEMS = 3
+	REQUIRED_LEVEL = 84
+	if mop_500 then
+		REQUIRED_SPEC_1 = 1
+		REQUIRED_SPEC_2 = 4
+	end
+elseif player_class == 'DEATHKNIGHT' then
+	MAX_TOTEMS = 1
+	REQUIRED_SPEC_1 = 1 
+	REQUIRED_SPEC_2 = 2
+	REQUIRED_LEVEL = 56
+elseif player_class == "MONK" then
+	MAX_TOTEMS = 1
+	REQUIRED_SPEC_1 = 1
+	REQUIRED_SPEC_2 = 2
+	REQUIRED_LEVEL = 70
+end
 local FIRE_TOTEM_SLOT  = FIRE_TOTEM_SLOT  or 1
 local EARTH_TOTEM_SLOT = EARTH_TOTEM_SLOT or 2
 local WATER_TOTEM_SLOT = WATER_TOTEM_SLOT or 3
@@ -737,29 +764,24 @@ end
 
 
 function PitBull4_Totems:PLAYER_TOTEM_UPDATE(event, slot)
-	local sSlot = tostring(slot)
+	if not slot or slot < 1 or slot > MAX_TOTEMS then return end
 
-	for frame in PitBull4:IterateFrames() do
-		local unit = frame.unit
-		if unit and UnitIsUnit(unit,"player") and self:GetLayoutDB(frame).enabled and frame.Totems then
-			local haveTotem, name, startTime, duration, icon = MyGetTotemInfo(slot,frame)
-			if ( haveTotem and name ~= "") then
-				-- New totem created
-				self:ActivateTotem(slot)
-			elseif ( haveTotem ) then
-				-- Totem just got removed or killed.
-				self:DeactivateTotem(slot)
-				
-				-- Sound functions
-				if global_option_get('death_sound') and not (event == nil) then
-					local soundpath = DEFAULT_SOUND_PATH 
-					if LSM then
-						soundpath = LSM:Fetch('sound', global_option_get('sound_slot'..tostring(slot)))
-					end
-					--dbg('Playing Death sound for slot %s: %s', tostring(slot), tostring(soundpath))
-					PlaySoundFile(soundpath)
-				end
+	local haveTotem, name, startTime, duration, icon = GetTotemInfo(slot)
+	if ( haveTotem and name ~= "") then
+		-- New totem created
+		self:ActivateTotem(slot)
+	else
+		-- Totem just got removed or killed.
+		self:DeactivateTotem(slot)
+			
+		-- Sound functions
+		if global_option_get('death_sound') and not (event == nil) then
+			local soundpath = DEFAULT_SOUND_PATH 
+			if LSM then
+				soundpath = LSM:Fetch('sound', global_option_get('sound_slot'..tostring(slot)))
 			end
+			--dbg('Playing Death sound for slot %s: %s', tostring(slot), tostring(soundpath))
+			PlaySoundFile(soundpath)
 		end
 	end
 end
@@ -773,6 +795,10 @@ end
 function PitBull4_Totems:PLAYER_ENTERING_WORLD(...)
 	-- we simulate totem events whenever a player zones to make sure totems left back in the instance hide properly.
 	self:ForceSilentTotemUpdate()
+end
+
+function PitBull4_Totems:PLAYER_TALENT_UPDATE()
+	self:UpdateAll()
 end
 
 function PitBull4_Totems:BuildFrames(frame)
@@ -957,7 +983,14 @@ function PitBull4_Totems:UpdateFrame(frame)
 		-- Disable for wacky frames, because something... wacky is going on with their updates.
 		return self:ClearFrame(frame)
 	end
-	
+	if REQUIRED_LEVEL and UnitLevel('player') < REQUIRED_LEVEL then
+		return self:ClearFrame(frame)
+	end
+	local spec = GetSpecialization()
+	if REQUIRED_SPEC_1 and spec ~= REQUIRED_SPEC_1 and REQUIRED_SPEC_2 and spec ~= REQUIRED_SPEC_2 and (player_class ~= "DEATHKNIGHT" or spec) then
+		return self:ClearFrame(frame)
+	end
+
 	if (layout_option_get(frame,'enabled') ~= true) and frame.Totems then
 		return self:ClearFrame(frame)
 	end
@@ -1030,6 +1063,8 @@ end
 function PitBull4_Totems:OnEnable()
 	self:RegisterEvent("PLAYER_TOTEM_UPDATE")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_TALENT_UPDATE")
+	self:RegisterEvent("CHARACTER_POINTS_CHANGED","PLAYER_TALENT_UPDATE")
 end
 
 function PitBull4_Totems:OnInitialize()

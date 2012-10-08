@@ -10,7 +10,8 @@ local cfg = {
 	if_showItemLevelAndId = true,
 	if_showQuestLevelAndId = true,
 	if_showSpellIdAndRank = false,
-	if_showAchievementIdAndCategory = false,
+	if_showCurrencyId = true,					-- Az: no option for this added to TipTac/options yet!
+	if_showAchievementIdAndCategory = false,	-- Az: no option for this added to TipTac/options yet!
 	if_modifyAchievementTips = true,
 	if_showIcon = true,
 	if_smartIcons = true,
@@ -48,7 +49,7 @@ local function BoolCol(bool) return (bool and "|cff80ff80" or "|cffff8080"); end
 -- Set Texture and Text
 local function SetIconTextureAndText(self,texture,count)
 	if (texture) then
-		self.ttIcon:SetTexture(texture == "" and "Interface\\Icons\\INV_Misc_QuestionMark" or texture);
+		self.ttIcon:SetTexture(texture ~= "" and texture or "Interface\\Icons\\INV_Misc_QuestionMark");
 		self.ttCount:SetText(count);
 		self.ttIcon:Show();
 	else
@@ -246,9 +247,13 @@ end
 --------------------------------------------------------------------------------------------------------
 
 -- instancelock
---function TipTypeFuncs:instancelock(linkToken,guid,mapId,difficulty,encounterbits)
---	AzDump(guid,mapId,difficulty,encounterbits)
---end
+function TipTypeFuncs:instancelock(linkToken,guid,mapId,difficulty,encounterBits)
+	--AzDump(guid,mapId,difficulty,encounterBits)
+  	-- TipType Border Color -- Disable these 3 lines to color border. Az: Work into options?
+--	if (cfg.if_itemQualityBorder) then
+--		self:SetBackdropBorderColor(1, .5, 0, 1);
+--	end
+end
 
 -- item
 function TipTypeFuncs:item(linkToken,id)
@@ -288,6 +293,10 @@ function TipTypeFuncs:spell(linkToken,id)
 		self:AddLine("SpellID: "..id..(rank and rank ~= "" and ", "..rank or ""),unpack(cfg.if_infoColor));
 		self:Show();
 	end
+  	-- TipType Border Color -- Disable these 3 lines to color border. Az: Work into options?
+--	if (cfg.if_itemQualityBorder) then
+--		self:SetBackdropBorderColor(.44, .84, 1, 1);
+--	end
 end
 
 -- quest
@@ -296,6 +305,27 @@ function TipTypeFuncs:quest(linkToken,id,level)
 		self:AddLine(format("QuestLevel: %d, QuestID: %d",level or 0,id or 0),unpack(cfg.if_infoColor));
 		self:Show();
 	end
+  	-- TipType Border Color -- Disable these 3 lines to color border. Az: Work into options?
+--	if (cfg.if_itemQualityBorder) then
+--		self:SetBackdropBorderColor(1, 1, 0, 1);
+--	end
+end
+
+-- currency -- Thanks to Vladinator for adding this!
+function TipTypeFuncs:currency(linkToken,id)
+	local _, currencyCount, currencyTexture = GetCurrencyInfo(id);
+	if (self.SetIconTextureAndText) then
+		self:SetIconTextureAndText("Interface\\Icons\\"..currencyTexture,currencyCount);
+	end
+	-- ID
+	if (cfg.if_showCurrencyId) then
+		self:AddLine(format("CurrencyID: %d",id),unpack(cfg.if_infoColor));
+		self:Show();
+	end
+  	-- TipType Border Color -- Disable these 3 lines to color border. Az: Work into options?
+--	if (cfg.if_itemQualityBorder) then
+--		self:SetBackdropBorderColor(0, .67, 0, 1);
+--	end
 end
 
 -- achievement
@@ -358,9 +388,13 @@ function TipTypeFuncs:achievement(linkToken,id,guid,completed,month,day,year,unk
 				end
 				if (not isPlayer) then
 					myDone1 = select(3,GetAchievementCriteriaInfo(id,i));
-					myDone2 = select(3,GetAchievementCriteriaInfo(id,i + 1));
+					if (i + 1 <= #criteriaList) then
+						myDone2 = select(3,GetAchievementCriteriaInfo(id,i + 1));
+					end
 				end
-				self:AddDoubleLine((isPlayer and "" or BoolCol(myDone1).."*|r")..criteriaList[i].label,criteriaList[i + 1] and criteriaList[i + 1].label..(isPlayer and "" or BoolCol(myDone2).."*"),r1,g1,b1,r2,g2,b2);
+				myDone1 = (isPlayer and "" or BoolCol(myDone1).."*|r")..criteriaList[i].label;
+				myDone2 = criteriaList[i + 1] and criteriaList[i + 1].label..(isPlayer and "" or BoolCol(myDone2).."*"); 
+				self:AddDoubleLine(myDone1,myDone2,r1,g1,b1,r2,g2,b2);
 			end
 		end
 		-- ID + Category
@@ -386,4 +420,8 @@ function TipTypeFuncs:achievement(linkToken,id,guid,completed,month,day,year,unk
 			self:Show();
 		end
 	end
+  	-- TipType Border Color -- Disable these 3 lines to color border. Az: Work into options?
+--	if (cfg.if_itemQualityBorder) then
+--		self:SetBackdropBorderColor(1, 1, 0, 1);
+--	end
 end

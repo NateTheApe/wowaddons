@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Anub'arak_Coliseum", "DBM-Coliseum")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4685 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(34564)
 mod:SetModelID(29268) 
 
@@ -32,13 +32,13 @@ local warnPhase3			= mod:NewPhaseAnnounce(3)
 local specWarnPursue		= mod:NewSpecialWarning("SpecWarnPursue")
 local specWarnSubmergeSoon	= mod:NewSpecialWarning("specWarnSubmergeSoon", mod:IsTank())
 local specWarnShadowStrike	= mod:NewSpecialWarning("SpecWarnShadowStrike", mod:IsTank())
-local specWarnPCold			= mod:NewSpecialWarningYou(68510, false)
+local specWarnPCold			= mod:NewSpecialWarningYou(66013, false)
 
 local timerAdds				= mod:NewTimer(45, "timerAdds", 45419)
 local timerSubmerge			= mod:NewTimer(75, "TimerSubmerge", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp")
 local timerEmerge			= mod:NewTimer(65, "TimerEmerge", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp")
 local timerFreezingSlash	= mod:NewCDTimer(20, 66012, nil, mod:IsHealer() or mod:IsTank())
-local timerPCold			= mod:NewBuffActiveTimer(15, 68509)
+local timerPCold			= mod:NewBuffActiveTimer(15, 66013)
 local timerShadowStrike		= mod:NewNextTimer(30.5, 66134)
 local timerHoP				= mod:NewBuffActiveTimer(10, 1022, nil, false)--So we will track bops to make this easier.
 
@@ -98,21 +98,19 @@ end
 
 do
 	local function sort_by_group(v1, v2)
-		return DBM:GetRaidSubgroup(UnitName(v1)) < DBM:GetRaidSubgroup(UnitName(v2))
+		return DBM:GetRaidSubgroup(DBM:GetUnitFullName(v1)) < DBM:GetRaidSubgroup(DBM:GetUnitFullName(v2))
 	end
 	function mod:SetPcoldIcons()
-		if DBM:GetRaidRank() > 0 then
-			table.sort(PColdTargets, sort_by_group)
-			local PColdIcon = 7
-			for i, v in ipairs(PColdTargets) do
-				if self.Options.AnnouncePColdIcons and IsRaidLeader() then
-					SendChatMessage(L.PcoldIconSet:format(PColdIcon, UnitName(v)), "RAID")
-				end
-				self:SetIcon(UnitName(v), PColdIcon)
-				PColdIcon = PColdIcon - 1
+		table.sort(PColdTargets, sort_by_group)
+		local PColdIcon = 7
+		for i, v in ipairs(PColdTargets) do
+			if self.Options.AnnouncePColdIcons and DBM:GetRaidRank() > 0 then
+				SendChatMessage(L.PcoldIconSet:format(PColdIcon, DBM:GetUnitFullName(v)), "RAID")
 			end
-			self:Schedule(5, ClearPcoldTargets)
+			self:SetIcon(v, PColdIcon)
+			PColdIcon = PColdIcon - 1
 		end
+		self:Schedule(5, ClearPcoldTargets)
 	end
 end
 

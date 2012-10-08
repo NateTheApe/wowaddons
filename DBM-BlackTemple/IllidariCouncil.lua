@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Council", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 387 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 397 $"):sub(12, -3))
 mod:SetCreatureID(22949, 22950, 22951, 22592, 23426)
 mod:SetModelID(21416)
 mod:SetUsedIcons(8)
@@ -115,7 +115,7 @@ function mod:SPELL_CAST_START(args)
 		warnCoHCast:Show()
 		timerCoH:Start()
 		if self:GetUnitCreatureId("target") == 22951 or self:GetUnitCreatureId("focus") == 22951 then
-			specWarnCoH:Show()
+			specWarnCoH:Show(args.sourceName)
 		end
 	end
 end

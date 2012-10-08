@@ -23,7 +23,6 @@ local FOLDER_NAME, private = ...
 local LibStub = _G.LibStub
 local addon = LibStub("AceAddon-3.0"):GetAddon(private.addon_name)
 local L = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
-local BZ = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
 local BFAC = LibStub("LibBabble-Faction-3.0"):GetLookupTable()
 
 local A = private.ACQUIRE_TYPES
@@ -43,7 +42,7 @@ local recipe_meta = {
 	__index = recipe_prototype
 }
 
----Adds a tradeskill recipe into the specified recipe database
+--- Adds a tradeskill recipe into the specified recipe database
 -- @name AckisRecipeList:AddRecipe
 -- @usage AckisRecipeList:AddRecipe(28927, 23109, V.TBC, Q.UNCOMMON)
 -- @param spell_id The [[http://www.wowpedia.org/SpellLink|Spell ID]] of the recipe being added to the database
@@ -71,7 +70,7 @@ function addon:AddRecipe(spell_id, profession, genesis, quality)
 
 	if not recipe.name or recipe.name == "" then
 		recipe.name = ("%s: %d"):format(_G.UNKNOWN, tonumber(spell_id))
-		self:Print(L["SpellIDCache"]:format(spell_id))
+		self:Debug(L["SpellIDCache"]:format(spell_id))
 	end
 	recipe_list[spell_id] = recipe
 
@@ -88,6 +87,7 @@ end
 -- Recipe methods.
 -------------------------------------------------------------------------------
 function recipe_prototype:SetRecipeItemID(item_id)
+	local item_name, item_link, item_quality = _G.GetItemInfo(item_id) -- Do this now to get the item into the cache.
 	self.recipe_item_id = item_id
 end
 
@@ -96,6 +96,7 @@ function recipe_prototype:RecipeItemID()
 end
 
 function recipe_prototype:SetCraftedItemID(item_id)
+	local item_name, item_link, item_quality = _G.GetItemInfo(item_id) -- Do this now to get the item into the cache.
 	self.crafted_item_id = item_id
 end
 
@@ -138,6 +139,14 @@ function recipe_prototype:RequiredFaction()
 	return self.required_faction
 end
 
+-- Sets the spell ID for the recipe this recipe replaces
+function recipe_prototype:SetPreviousRankID(spell_id)
+	self.old_rank_spell_id = spell_id
+end
+
+function recipe_prototype:PreviousRankID()
+	return self.old_rank_spell_id
+end
 
 -------------------------------------------------------------------------------
 -- Recipe state flags.
@@ -179,6 +188,15 @@ function recipe_prototype:RemoveState(state_name)
 	end
 end
 
+function recipe_prototype:SetAsKnownOrLinked(is_linked)
+	if is_linked then
+		self:AddState("LINKED")
+	else
+		self:AddState("KNOWN")
+		self:RemoveState("LINKED")
+	end
+end
+
 do
 	local BITFIELD_MAP = {
 		common1 = private.COMMON_FLAGS_WORD1,
@@ -204,8 +222,8 @@ do
 		local _, _, _, quality_color = _G.GetItemQualityColor(self.quality)
 		local recipe_name = self.name
 
-		if private.ORDERED_PROFESSIONS[addon.Frame.profession] == private.LOCALIZED_PROFESSION_NAMES.ENCHANTING then
-			recipe_name = recipe_name:gsub(_G.ENSCRIBE .. " ","")
+		if private.ORDERED_PROFESSIONS[addon.Frame.current_profession] == private.LOCALIZED_PROFESSION_NAMES.ENCHANTING then
+			recipe_name = recipe_name:gsub(_G.ENSCRIBE .. " ", "")
 		end
 		local has_faction = private.Player:HasProperRepLevel(self.acquire_data[A.REPUTATION])
 		local skill_level = private.current_profession_scanlevel
@@ -258,7 +276,7 @@ function recipe_prototype:ItemFilterType()
 	return self.item_filter_type
 end
 
-function recipe_prototype:AddFilters(...)
+local function SetFilterState(recipe, turn_on, ...)
 	local num_filters = select('#', ...)
 
 	for index = 1, num_filters, 1 do
@@ -280,18 +298,42 @@ function recipe_prototype:AddFilters(...)
 				return
 			end
 
-			if not self.flags[member_name] then
-				self.flags[member_name] = 0
+			if not recipe.flags[member_name] then
+				recipe.flags[member_name] = 0
 			end
 
-			if bit.band(self.flags[member_name], bitfield[filter_name]) == bitfield[filter_name] then
-				return
+			if turn_on then
+				if bit.band(recipe.flags[member_name], bitfield[filter_name]) == bitfield[filter_name] then
+					if recipe.flags[member_name] == 0 then
+						recipe.flags[member_name] = nil
+					end
+					return
+				end
+			else
+				if bit.band(recipe.flags[member_name], bitfield[filter_name]) ~= bitfield[filter_name] then
+					if recipe.flags[member_name] == 0 then
+						recipe.flags[member_name] = nil
+					end
+					return
+				end
 			end
-			self.flags[member_name] = bit.bxor(self.flags[member_name], bitfield[filter_name])
+			recipe.flags[member_name] = bit.bxor(recipe.flags[member_name], bitfield[filter_name])
+
+			if recipe.flags[member_name] == 0 then
+				recipe.flags[member_name] = nil
+			end
 		else
-			addon:Debug("Recipe '%s' (spell ID %d): Attempting to assign non-existent filter flag.", self.name, self.spell_id)
+			addon:Debug("Recipe '%s' (spell ID %d): Attempting to %s non-existent filter flag.", recipe.name, recipe.spell_id, turn_on and "assign" or "remove")
 		end
 	end
+end
+
+function recipe_prototype:AddFilters(...)
+	SetFilterState(self, true, ...)
+end
+
+function recipe_prototype:RemoveFilters(...)
+	SetFilterState(self, false, ...)
 end
 
 function recipe_prototype:AddAcquireData(acquire_type, type_string, unit_list, ...)
@@ -335,7 +377,7 @@ function recipe_prototype:AddAcquireData(acquire_type, type_string, unit_list, .
 		else
 			local string_id = type(identifier) == "string"
 
-			location_name = string_id and BZ[identifier] or nil
+			location_name = string_id and identifier or nil
 
 			if location_name then
 				affiliation = "world_drop"
@@ -436,10 +478,10 @@ function recipe_prototype:AddRepVendor(faction_id, rep_level, ...)
 				rep_vendor.item_list = rep_vendor.item_list or {}
 				rep_vendor.item_list[self.spell_id] = true
 			else
-				self:Debug("Spell ID %d: Reputation Vendor ID %s does not exist in the database.", self.spell_id, tostring(vendor_id))
+				addon:Debug("Spell ID %d: Reputation Vendor ID %s does not exist in the database.", self.spell_id, tostring(vendor_id))
 			end
 		else
-			self:Debug("Spell ID %d: Faction ID %d does not exist in the database.", self.spell_id, faction_id)
+			addon:Debug("Spell ID %d: Faction ID %d does not exist in the database.", self.spell_id, faction_id)
 		end
 		acquire_list[A.REPUTATION] = acquire_list[A.REPUTATION] or {}
 		acquire_list[A.REPUTATION].recipes = acquire_list[A.REPUTATION].recipes or {}
@@ -471,18 +513,23 @@ local DUMP_FUNCTION_FORMATS = {
 local sorted_data = {}
 local reverse_map = {}
 
-function recipe_prototype:Dump(output)
-	local genesis = private.GAME_VERSIONS[self.genesis]
+function recipe_prototype:Dump()
+	local output = private.TextDump
 
-	table.insert(output, ("-- %s -- %d"):format(self.name, self.spell_id))
-	table.insert(output, ("recipe = AddRecipe(%d, V.%s, Q.%s)"):format(self.spell_id, private.GAME_VERSION_NAMES[genesis], private.ITEM_QUALITY_NAMES[self.quality]))
+	output:AddLine(("-- %s -- %d"):format(self.name, self.spell_id))
+	output:AddLine(("recipe = AddRecipe(%d, V.%s, Q.%s)"):format(self.spell_id, self.genesis, private.ITEM_QUALITY_NAMES[self.quality]))
 
 	if self.recipe_item_id then
-		table.insert(output, ("recipe:SetRecipeItemID(%d)"):format(self.recipe_item_id))
+		output:AddLine(("recipe:SetRecipeItemID(%d)"):format(self.recipe_item_id))
 	end
 
 	if self.crafted_item_id then
-		table.insert(output, ("recipe:SetCraftedItemID(%d)"):format(self.crafted_item_id))
+		output:AddLine(("recipe:SetCraftedItemID(%d)"):format(self.crafted_item_id))
+	end
+	local previous_rank_recipe = private.profession_recipe_list[self.profession][self:PreviousRankID()]
+
+	if previous_rank_recipe then
+		output:AddLine(("recipe:SetPreviousRankID(%d)"):format(previous_rank_recipe.spell_id))
 	end
 	local skill_level = self.skill_level
 	local optimal_level = self.optimal_level
@@ -490,18 +537,18 @@ function recipe_prototype:Dump(output)
 	local easy_level = self.easy_level
 	local trivial_level = self.trivial_level
 
-	table.insert(output, ("recipe:SetSkillLevels(%d, %d, %d, %d, %d)"):format(skill_level, optimal_level, medium_level, easy_level, trivial_level))
+	output:AddLine(("recipe:SetSkillLevels(%d, %d, %d, %d, %d)"):format(skill_level, optimal_level, medium_level, easy_level, trivial_level))
 
 	if self.specialty then
-		table.insert(output, ("recipe:SetSpecialty(%d)"):format(self.specialty))
+		output:AddLine(("recipe:SetSpecialty(%d)"):format(self.specialty))
 	end
 
 	if self.required_faction then
-		table.insert(output, ("recipe:SetRequiredFaction(\"%s\")"):format(self.required_faction))
+		output:AddLine(("recipe:SetRequiredFaction(\"%s\")"):format(self.required_faction))
 	end
 
 	if self.item_filter_type then
-		table.insert(output, ("recipe:SetItemFilterType(\"%s\")"):format(self.item_filter_type:upper()))
+		output:AddLine(("recipe:SetItemFilterType(\"%s\")"):format(self.item_filter_type:upper()))
 	end
 	local flag_string
 
@@ -531,7 +578,11 @@ function recipe_prototype:Dump(output)
 			end
 		end
 	end
-	table.insert(output, ("recipe:AddFilters(%s)"):format(flag_string))
+
+	if flag_string then
+		output:AddLine(("recipe:AddFilters(%s)"):format(flag_string))
+	end
+	local ZL = private.ZONE_LABELS_FROM_NAME
 
 	flag_string = nil
 
@@ -566,7 +617,7 @@ function recipe_prototype:Dump(output)
 							values = vendor_id
 						end
 					end
-					table.insert(output, ("recipe:AddRepVendor(%s, %s, %s)"):format(faction_string, rep_string, values))
+					output:AddLine(("recipe:AddRepVendor(%s, %s, %s)"):format(faction_string, rep_string, values))
 				end
 			end
 		elseif acquire_type == A.VENDOR then
@@ -608,11 +659,11 @@ function recipe_prototype:Dump(output)
 			end
 
 			if values then
-				table.insert(output, ("recipe:AddVendor(%s)"):format(values))
+				output:AddLine(("recipe:AddVendor(%s)"):format(values))
 			end
 
 			if limited_values then
-				table.insert(output, ("recipe:AddLimitedVendor(%s)"):format(limited_values))
+				output:AddLine(("recipe:AddLimitedVendor(%s)"):format(limited_values))
 			end
 		elseif DUMP_FUNCTION_FORMATS[acquire_type] then
 			local values
@@ -629,7 +680,11 @@ function recipe_prototype:Dump(output)
 				local saved_id
 
 				if type(identifier) == "string" then
-					saved_id = ("\"%s\""):format(identifier)
+					if acquire_type == A.WORLD_DROP then
+						saved_id = ("Z.%s"):format(ZL[identifier])
+					else
+						saved_id = ("\"%s\""):format(identifier)
+					end
 				else
 					saved_id = identifier
 				end
@@ -640,7 +695,7 @@ function recipe_prototype:Dump(output)
 					values = saved_id
 				end
 			end
-			table.insert(output, (DUMP_FUNCTION_FORMATS[acquire_type]):format(values))
+			output:AddLine((DUMP_FUNCTION_FORMATS[acquire_type]):format(values))
 		else
 			for identifier in pairs(acquire_info) do
 				local saved_id
@@ -661,9 +716,9 @@ function recipe_prototype:Dump(output)
 	end
 
 	if flag_string then
-		table.insert(output, ("recipe:AddAcquireData(%s)"):format(flag_string))
+		output:AddLine(("recipe:AddAcquireData(%s)"):format(flag_string))
 	end
-	table.insert(output, "")
+	output:AddLine(" ")
 end
 
 function recipe_prototype:DumpTrainers(registry)

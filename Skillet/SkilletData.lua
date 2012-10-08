@@ -73,6 +73,10 @@ Skillet.TradeSkillAutoTarget = {
 		[53038] = 5, -- Obsidium Ore
 		[52183] = 5, -- Pyrite Ore
 		[52185] = 5, -- Elementium Ore
+		
+		[72092] = 5, -- Ghost Iron Ore
+		[72103] = 5, -- White Trillium Ore
+		[72094] = 5, -- Black Trillium Ore
 	},
 	[51005] = {   -- Millling
 		[765]  = 5, -- Silverleaf
@@ -135,6 +139,12 @@ Skillet.TradeSkillAutoTarget = {
 		[52987] = 5, -- Twilight Jasmine
 		[52988] = 5, -- Whiptail
 		[52989] = 5, -- Deathspore Pod
+		
+		[79011] = 5, -- Fool's Cap
+		[79010] = 5, -- Snow Lily
+		[72235] = 5, -- Silkweed
+		[72234] = 5, -- Green Tea Leaf
+		[72237] = 5, -- Rain Poppy
 	}
 }
 
@@ -192,6 +202,8 @@ local TradeSkillIgnoredMats  = {
 		[42615] = 1 , -- small prismatic shard
 		[42613] = 1 , -- nexus transformation
 		[28022] = 1 , -- large prismatic shard
+		[118238] = 1 , -- ethereal shard shatter
+		[118237] = 1 , -- mysterious diffusion
 }
 
 Skillet.TradeSkillIgnoredMats = TradeSkillIgnoredMats
@@ -364,10 +376,11 @@ function Skillet:CollectRecipeInformation()
 				if skillString then
 					local skillData = string.split(" ",skillString)
 
-					if skillData ~= "header" then
+					if skillData ~= "header" or skillData ~= "subheader" then
 						local recipeID = string.sub(skillData,2)
 
-						recipeID = tonumber(recipeID)
+						recipeID = tonumber(recipeID) or 0
+						
 						self.data.skillIndexLookup[player][recipeID] = i
 					end
 				end
@@ -417,7 +430,25 @@ local specialVendorItems = {
 	[61981] = {10, 61978},  		--Inferno Ink
 }
 
+local specialVendorItemsMoP	 = {
+	[37101] = {1, 79254}, 			--Ivory Ink
+	[39469] = {1, 79254}, 			--Moonglow Ink
+	[39774] = {1, 79254}, 			--Midnight Ink
+	[43116] = {1, 79254}, 			--Lions Ink
+	[43118] = {1, 79254}, 			--Jadefire Ink
+	[43120] = {1, 79254}, 			--Celestial Ink
+	[43122] = {1, 79254}, 			--Shimmering Ink
+	[43124] = {1, 79254},  			--Ethereal Ink
+	[43126] = {1, 79254},  			--Ink of the Sea
+	[43127] = {10, 79254},  		--Snowfall Ink
+	[61981] = {10, 79254},  		--Inferno Ink
+	[79255] = {10, 79254},  		--Starlight Ink	
+}
+
 function Skillet:VendorItemAvailable(itemID)
+	if Skillet.wowVersion>50000 then
+		specialVendorItems = specialVendorItemsMoP
+	end
 	if specialVendorItems[itemID] then
 		local divider = specialVendorItems[itemID][1]
 		local currency = specialVendorItems[itemID][2]
@@ -440,6 +471,9 @@ end
 -- queries periodic table for vendor info for a particual itemID
 function Skillet:VendorSellsReagent(itemID)
 	if PT then
+		if Skillet.wowVersion>50000 then
+			specialVendorItems = specialVendorItemsMoP
+		end
 		if missingVendorItems[itemID] or specialVendorItems[itemID] then
 			return true
 		end
@@ -452,8 +486,14 @@ end
 
 -- resets the blizzard tradeskill search filters just to make sure no other addon has monkeyed with them
 function SkilletData:ResetTradeSkillFilter()
-	if not GetTradeSkillSubClassFilter(0) then
-		SetTradeSkillSubClassFilter(0, 1, 1)
+	if (Skillet.wowVersion>50000) then 
+		if not GetTradeSkillCategoryFilter(0) then
+			SetTradeSkillCategoryFilter(0, 1, 1)
+		end
+	else
+		if not GetTradeSkillSubClassFilter(0) then
+			SetTradeSkillSubClassFilter(0, 1, 1)
+		end	
 	end
 	SetTradeSkillItemNameFilter("")
 	SetTradeSkillItemLevelFilter(0,0)
@@ -461,8 +501,14 @@ end
 
 
 function SkilletLink:ResetTradeSkillFilter()
-	if not GetTradeSkillSubClassFilter(0) then
-		SetTradeSkillSubClassFilter(0, 1, 1)
+	if (Skillet.wowVersion>50000) then 
+		if not GetTradeSkillCategoryFilter(0) then
+			SetTradeSkillCategoryFilter(0, 1, 1)
+		end
+	else
+		if not GetTradeSkillSubClassFilter(0) then
+			SetTradeSkillSubClassFilter(0, 1, 1)
+		end	
 	end
 	SetTradeSkillItemNameFilter("")
 	SetTradeSkillItemLevelFilter(0,0)
@@ -720,7 +766,14 @@ function SkilletLink:GetSkill(player,trade,index)
 --DEFAULT_CHAT_FRAME:AddMessage("getskillLink "..(player or "noplayer").." "..(trade or "notrade").." "..(index or "noindex"))
 
 		if scanned then
-			return Skillet.data.skillList[player][trade][index]
+			local skill = Skillet.data.skillList[player]
+			if skill then
+				local trade = skill[trade]
+				if trade then
+					return trade[index]
+				end
+			end
+			return nil
 		else
 			return nil
 		end
@@ -791,7 +844,7 @@ function SkilletLink:ScanTrade()
 
 	for i = 1, numSkills do
 		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
-		if skillType == "header" then
+		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
 			end
@@ -835,13 +888,14 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 	local numHeaders = 0
 	local alreadyScannedThisRun = 0
 
+	local parentGroup=nil
 	for i = 1, numSkills, 1 do
 		repeat
 --DebugSpam("scanning index "..i)
-			local skillName, skillType, isExpanded, subSpell, extra
+			local subSpell, extra
 
 
-			skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
 
 
 --DEFAULT_CHAT_FRAME:AddMessage("**** skill: "..(skillName or "nil").." "..i)
@@ -849,7 +903,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 			gotNil = false
 
 			if skillName then
-				if skillType == "header" then
+				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
 
 					if not isExpanded then
@@ -875,7 +929,12 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 					currentGroup = Skillet:RecipeGroupNew(player, tradeID, "Blizzard", groupName)
 					currentGroup.autoGroup = true
 
-					Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					if skillType == "header" then
+						parentGroup = currentGroup
+						Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					else
+						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
+					end
 				else
 					local recipeLink = GetTradeSkillRecipeLink(i)
 					local recipeID = Skillet:GetItemIDFromLink(recipeLink)
@@ -1141,7 +1200,7 @@ function SkilletData:GetSkill(player,trade,index)
 
 				local data = { string.split(" ",skillString) }
 
-				if data[1] == "header" then
+				if data[1] == "header" or data[1] == "subheader" then
 					skill.id = 0
 				else
 					local difficulty = string.sub(data[1],1,1)
@@ -1254,7 +1313,7 @@ end
 
 -- [3273] = "|cffffd000|Htrade:3274:148:150:23F381A:zD<<t=|h[First Aid]|h|r",
 
-local allDataInitialize = false
+local allDataInitialized = false
 function Skillet:InitializeAllDataLinks(name)
 	if allDataInitialized then return end
 
@@ -1388,7 +1447,7 @@ end
 
 function Skillet:ContinueCastCheckUnit(event, unit, spell, rank)
 --DEFAULT_CHAT_FRAME:AddMessage("ContinueCastCheckUnit "..(unit or "nil"))
-	if unit == "player" then
+	if unit == "player" and spell==self.processingSpell then
 		self:ContinueCast(spell)
 --		AceEvent:ScheduleEvent("Skillet_StopCast", self.StopCast, 0.1,self,event,spell)
 	end
@@ -1723,7 +1782,7 @@ DebugSpam("TRADE MISMATCH for player "..(Skillet.currentPlayer or "nil").."!  ".
 
 	for i = 1, numSkills do
 		local _, skillType, _, isExpanded = GetTradeSkillInfo(i)
-		if skillType == "header" then
+		if skillType == "header" or skillType == "subheader" then
 			if not isExpanded then
 				ExpandTradeSkillSubClass(i)
 			end
@@ -1771,7 +1830,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 	Skillet.db.realm.linkDB[player][tradeID] = GetTradeSkillListLink()
 
 	local numHeaders = 0
-
+	local parentGroup
 	local alreadyScannedThisRun = 0
 	for i = 1, numSkills, 1 do
 		repeat
@@ -1779,7 +1838,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 			local skillName, skillType, isExpanded, subSpell, extra
 
 
-			skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
+			local skillName, skillType, _, isExpanded = GetTradeSkillInfo(i)
 
 
 --DebugSpam("**** skill: "..(skillName or "nil"))
@@ -1788,7 +1847,7 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 
 			if skillName then
-				if skillType == "header" then
+				if skillType == "header" or skillType == "subheader" then
 					numHeaders = numHeaders + 1
 
 					if not isExpanded then
@@ -1810,8 +1869,13 @@ DebugSpam("Scanning Trade "..(profession or "nil")..":"..(tradeID or "nil").." "
 
 					currentGroup = Skillet:RecipeGroupNew(player, tradeID, "Blizzard", groupName)
 					currentGroup.autoGroup = true
-
-					Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					
+					if skillType == "header" then
+						parentGroup = currentGroup
+						Skillet:RecipeGroupAddSubGroup(mainGroup, currentGroup, i)
+					else
+						Skillet:RecipeGroupAddSubGroup(parentGroup, currentGroup, i)
+					end
 				else
 					local recipeLink = API.GetRecipeLink(i)
 					local recipeID = Skillet:GetItemIDFromLink(recipeLink)

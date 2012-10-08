@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ValkTwins", "DBM-Coliseum")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4395 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(34497, 34496)
 mod:SetModelID(29240)
 mod:SetMinCombatTime(30)
@@ -28,14 +28,14 @@ local specWarnSpecial				= mod:NewSpecialWarning("SpecWarnSpecial")
 local specWarnSwitch				= mod:NewSpecialWarning("SpecWarnSwitchTarget")
 local specWarnKickNow 				= mod:NewSpecialWarning("SpecWarnKickNow")
 local specWarnPoweroftheTwins		= mod:NewSpecialWarning("SpecWarnPoweroftheTwins")
-local specWarnEmpoweredDarkness		= mod:NewSpecialWarningYou(67215)
-local specWarnEmpoweredLight		= mod:NewSpecialWarningYou(67218)
+local specWarnEmpoweredDarkness		= mod:NewSpecialWarningYou(65724)
+local specWarnEmpoweredLight		= mod:NewSpecialWarningYou(65748)
 
 local enrageTimer					= mod:NewBerserkTimer(360)
 local timerSpecial					= mod:NewTimer(45, "TimerSpecialSpell", "Interface\\Icons\\INV_Enchant_EssenceMagicLarge")
 local timerHeal						= mod:NewCastTimer(15, 65875)
-local timerLightTouch				= mod:NewTargetTimer(20, 67298)
-local timerDarkTouch				= mod:NewTargetTimer(20, 67283)
+local timerLightTouch				= mod:NewTargetTimer(20, 65950)
+local timerDarkTouch				= mod:NewTargetTimer(20, 66001)
 local timerAchieve					= mod:NewAchievementTimer(180, 3815, "TimerSpeedKill")
 
 mod:AddBoolOption("SpecialWarnOnDebuff", false, "announce")
@@ -134,9 +134,9 @@ do
 		if shieldedMob == destGUID then
 			local absorbed
 			if subEvent == "SWING_MISSED" then 
-				absorbed = select( 2, ... ) 
+				absorbed = select( 3, ... ) 
 			elseif subEvent == "RANGE_MISSED" or subEvent == "SPELL_MISSED" or subEvent == "SPELL_PERIODIC_MISSED" then 
-				absorbed = select( 5, ... )
+				absorbed = select( 6, ... )
 			end
 			if absorbed then
 				absorbRemaining = absorbRemaining - absorbed

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ScourgelordTyrannus", "DBM-Party-WotLK", 15)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4373 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(36658, 36661)
 mod:SetModelID(30277)
 mod:SetUsedIcons(8)
@@ -19,20 +19,20 @@ mod:RegisterEvents(
 	"SPELL_PERIODIC_MISSED"
 )
 
-local warnUnholyPower			= mod:NewSpellAnnounce(69629, 3)
-local warnForcefulSmash			= mod:NewSpellAnnounce(69627, 2)
+local warnUnholyPower			= mod:NewSpellAnnounce(69167, 3)
+local warnForcefulSmash			= mod:NewSpellAnnounce(69155, 2)
 local warnOverlordsBrand		= mod:NewTargetAnnounce(69172, 4)
 local warnHoarfrost				= mod:NewTargetAnnounce(69246, 2)
 
 local specWarnHoarfrost			= mod:NewSpecialWarning("specWarnHoarfrost")
 local specWarnHoarfrostNear		= mod:NewSpecialWarning("specWarnHoarfrostNear")
-local specWarnIcyBlast			= mod:NewSpecialWarningMove(69628)
+local specWarnIcyBlast			= mod:NewSpecialWarningMove(69238)
 local specWarnOverlordsBrand	= mod:NewSpecialWarningYou(69172)
 
 local timerCombatStart			= mod:NewTimer(31, "TimerCombatStart", 2457)
 local timerOverlordsBrand		= mod:NewTargetTimer(8, 69172)
-local timerUnholyPower			= mod:NewBuffActiveTimer(10, 69629)
-local timerForcefulSmash		= mod:NewCDTimer(50, 69627) --hotfixed? new combat logs show it every 50 seconds'ish.
+local timerUnholyPower			= mod:NewBuffActiveTimer(10, 69167)
+local timerForcefulSmash		= mod:NewCDTimer(50, 69155) --hotfixed? new combat logs show it every 50 seconds'ish.
 
 mod:AddBoolOption("SetIconOnHoarfrostTarget", true)
 
@@ -42,7 +42,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(69629, 69167) then					-- Unholy Power
+	if args:IsSpellID(69167, 69629) then					-- Unholy Power
         warnUnholyPower:Show()
 		timerUnholyPower:Start()
 	end
@@ -55,16 +55,12 @@ function mod:SPELL_CAST_SUCCESS(args)
 	end
 end
 
-do 
-	local lasticyblast = 0
-	function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-		if (spellId == 69238 or spellId == 69628) and destGUID == UnitGUID("player") and time() - lasticyblast > 3 then		-- Icy Blast, MOVE!
-			specWarnIcyBlast:Show()
-			lasticyblast = time()
-		end
+function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if (spellId == 69238 or spellId == 69628) and destGUID == UnitGUID("player") and self:AntiSpam() then		-- Icy Blast, MOVE!
+		specWarnIcyBlast:Show()
 	end
-	mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 end
+mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(69172) then							-- Overlord's Brand

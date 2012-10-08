@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John
@@ -14,13 +14,13 @@
     required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2011-12-03T21:51:53Z
+    This file was last updated on 2012-09-23T20:33:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -58,6 +58,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -71,7 +72,7 @@ end
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "frFR");
 
 if not L then 
-    T._LoadedFiles["frFR.lua"] = "2.7.0.5";
+    T._LoadedFiles["frFR.lua"] = "2.7.2.2";
     return;
 end
 
@@ -117,6 +118,9 @@ L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33Merci d'envoyer le contenu de cette fen�
 Dîtes également dans votre rapport si vous avez remarqué un comportement étrange de Decursive.
 ]=]
 L["DECURSIVE_DEBUG_REPORT"] = "**** |cFFFF0000Rapport de debuggage de Decursive|r ****"
+L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"] = [=[|cFF11FF33Decursive s'est planté ! Mais n'ayez crainte ! Une NOUVELLE version de Decursive a été détectée (%s). Il suffit simplement de vous mettre à jour. Aller sur Curse.com et chercher 'Decursive' ou utilisez le client de Curse.com, Il mettra à jour tous vos add-ons préférés automatiquement.|r
+|cFFFF1133Ne perdez donc pas votre temps en rapportant ce problème, ce bug à probablement déjà été corrigé. Mettez simplement Decursive à jour pour vous débarrasser de ce problème. !|r
+|cFF11FF33Merci d'avoir lu ce message !|r]=]
 L["DECURSIVE_DEBUG_REPORT_NOTIFY"] = [=[Un rapport de debuggage est disponible !
 Taper |cFFFF0000/DCRREPORT|r pour le voir.]=]
 L["DECURSIVE_DEBUG_REPORT_SHOW"] = "Rapport de debuggage disponible !"
@@ -241,6 +245,8 @@ Note: En cochant cela vous pourrez modifier les sorts gérés par Decursive.
 (---Seulement pour les utilisateurs avancés---)]=]
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "Types d'afflictions"
 L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "Ce sort fait partie de la configuration automatique de Decursive. Si le sort ne fonctionne plus correctement, vous pouvez l'effacer pour retrouver le comportement par défaut de Decursive."
+L["OPT_CUSTOM_SPELL_ISPET"] = "Capacité de familier"
+L["OPT_CUSTOM_SPELL_ISPET_DESC"] = "Cocher cette option si c'est une capacité appartenant à l'un de vos familiers afin que Decursive puisse la détecter et l'utiliser correctement."
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"] = "Attention: le sort %q n’apparaît pas dans votre macro, les informations de cooldown et de portée ne correspondront pas... "
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_UNITID_KEYWORD"] = "Le mot-clé UNITID est manquant."
 L["OPT_CUSTOM_SPELL_MACRO_TEXT"] = "Texte de la macro :"
@@ -253,13 +259,15 @@ L["OPT_CUSTOM_SPELL_MACRO_TEXT_DESC"] = [=[Modifiez le texte original de la macr
 (Gardez cela à l'esprit si vous comptez utiliser différents sorts avec des conditions)]=]
 L["OPT_CUSTOM_SPELL_MACRO_TOO_LONG"] = "Votre macro est trop longue, vous devez enlever %d caractères."
 L["OPT_CUSTOM_SPELL_PRIORITY"] = "Priorité du sort"
-L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = "Quand plusieurs sorts peuvent guérir les mêmes types d'afflictions, ceux ayant la priorité la plus élevée seront préférés."
+L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = [=[Quand plusieurs sorts peuvent guérir les mêmes types d'afflictions, ceux ayant la priorité la plus élevée seront préférés.
+
+Notez que les sorts par défaut gérés par Decursive ont une priorité allant de 0 à 9.
+
+Ainsi, si vous donnez une priorité négative à l'un de vos sort, il ne sera choisi que si le sort par défaut n'est pas disponible.]=]
 L["OPT_CUSTOMSPELLS"] = "Sorts personnalisés"
 L["OPT_CUSTOMSPELLS_DESC"] = [=[Ici vous pouvez ajouter des sorts pour étendre la configuration automatique de Decursive.
 Vos sorts personnalisés auront toujours une priorité plus élevée et remplaceront systématiquement les sorts par défaut (si et seulement si votre personnage peut utiliser ces sorts)]=]
 L["OPT_CUSTOMSPELLS_EFFECTIVE_ASSIGNMENTS"] = "Assignations effectives des sorts :"
-L["OPT_CUSTOM_SPELL_STOPCASTING"] = "/StopCasting"
-L["OPT_CUSTOM_SPELL_STOPCASTING_DESC"] = "L'utilisation de ce sort interrompra les autres sorts en cours (Décochez cette option si le sort vient d'un familier)"
 L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "indisponible"
 L["OPT_DEBCHECKEDBYDEF"] = [=[
 
@@ -453,5 +461,5 @@ L["UNSTABLERELEASE"] = "Version instable"
 
 
 
-T._LoadedFiles["frFR.lua"] = "2.7.0.5";
+T._LoadedFiles["frFR.lua"] = "2.7.2.2";
 

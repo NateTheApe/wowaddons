@@ -1,0 +1,25 @@
+------------------------------------------------------------------------
+r65 | parnic | 2012-08-28 14:34:43 +0000 (Tue, 28 Aug 2012) | 1 line
+Changed paths:
+   A /tags/5.0.4 (from /trunk:64)
+
+Tagging as 5.0.4
+------------------------------------------------------------------------
+r64 | parnic | 2012-08-27 19:06:09 +0000 (Mon, 27 Aug 2012) | 1 line
+Changed paths:
+   M /trunk/RepairBroker.toc
+
+- Added X-Compatible-With 40300.
+------------------------------------------------------------------------
+r63 | parnic | 2012-08-27 17:52:20 +0000 (Mon, 27 Aug 2012) | 1 line
+Changed paths:
+   M /trunk/RepairBroker.toc
+
+- Updated TOC for 5.0.
+------------------------------------------------------------------------
+r62 | parnic | 2012-08-25 19:58:25 +0000 (Sat, 25 Aug 2012) | 1 line
+Changed paths:
+   M /trunk/RepairBroker.lua
+
+- Nuked the ranged slot in WoW 5.0 and above.
+------------------------------------------------------------------------

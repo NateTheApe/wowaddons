@@ -47,7 +47,7 @@ local slotNames = {
 --	{ 0, 0, 0, "Trinket1", L["Trinket1"], 0 },
 	{ 0, 0, 0, "MainHand", L["MainHand"], 0 },
 	{ 0, 0, 0, "SecondaryHand", L["SecondaryHand"], 0 },
-	{ 0, 0, 0, "Ranged", L["Ranged"], 0 },
+--	{ 0, 0, 0, "Ranged", L["Ranged"], 0 },
 }
 local bagCost = 0
 local bagPercent = 0
@@ -422,6 +422,12 @@ end
 
 function addon:OnMerchantClose()
 	merchantState = NOT_AT_MERCHANT
+	if StaticPopupDialogs["Broker_DurabilityInfo_Confirm"] then
+		StaticPopup_Hide("Broker_DurabilityInfo_Confirm")
+	end
+	if StaticPopupDialogs["Broker_DurabilityInfo_Dialog"] then
+		StaticPopup_Hide("Broker_DurabilityInfo_Dialog")
+	end
 end
 
 function addon:OnRegenEnable()
@@ -528,7 +534,11 @@ function addon:GetRepairData()
 				end
 			end
 		end
-		bagPercent = bagCurrent / bagTotal
+		if bagTotal > 0 then
+			bagPercent = bagCurrent / bagTotal
+		else
+			bagPercent = 1
+		end
 		totalcost = totalcost + bagCost
 	end
 

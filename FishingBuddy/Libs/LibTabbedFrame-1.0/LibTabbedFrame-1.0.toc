@@ -1,4 +1,4 @@
-## Interface: 40300
+## Interface: 50001
 ## Title: LibTabbedFrame-1.0
 ## Notes: Handle Player sized frames with tabs
 ## Author: Sutorix=AT=hotmail.com

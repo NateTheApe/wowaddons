@@ -1,7 +1,7 @@
-local mod	= DBM:NewMod("Ozumat", "DBM-Party-Cataclysm", 9)
+local mod	= DBM:NewMod(104, "DBM-Party-Cataclysm", 9, 65)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7122 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
 mod:SetCreatureID(40792)--42172 is Ozumat, but we need Neptulon for engage trigger.
 mod:SetModelID(35100)--32911Looks like crap, definitely doesn't scale well. so just use one of his tenticles instead
 mod:SetZone()
@@ -18,6 +18,7 @@ local warnPhase2		= mod:NewPhaseAnnounce(2)
 local warnPhase3		= mod:NewPhaseAnnounce(3)
 local warnBlightSpray	= mod:NewSpellAnnounce(83985, 2)
 
+local timerPhase		= mod:NewTimer(95, "TimerPhase")
 local timerBlightSpray	= mod:NewBuffActiveTimer(4, 83985)
 
 local warnedPhase2 = false
@@ -26,7 +27,7 @@ local warnedPhase3 = false
 function mod:OnCombatStart(delay)
 	warnedPhase2 = false
 	warnedPhase3 = false
-	DBM.Bars:CreateBar(95, "Phase 2")--Can be done right later once consistency is confirmed.
+	timerPhase:Start()--Can be done right later once consistency is confirmed.
 end
 
 function mod:SPELL_AURA_APPLIED(args)

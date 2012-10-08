@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Horsemen", "DBM-Naxx", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 2248 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(16063, 16064, 16065, 30549)
 mod:SetModelID(10729)
 mod:RegisterCombat("combat")
@@ -34,10 +34,8 @@ function mod:OnCombatStart(delay)
 --	warnMarkSoon:Schedule(12, markCounter + 1)
 end
 
-local markSpam = 0
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(28832, 28833, 28834, 28835) and (GetTime() - markSpam) > 5 then
-		markSpam = GetTime()
+	if args:IsSpellID(28832, 28833, 28834, 28835) and self:AntiSpam(5) then
 		markCounter = markCounter + 1
 --		warnMarkNow:Show(markCounter)
 --		warnMarkSoon:Schedule(5, markCounter + 1)

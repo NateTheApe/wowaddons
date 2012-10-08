@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("HyjalWaveTimers", "DBM-Hyjal")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 342 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
 
 mod:RegisterEvents(
 	"UPDATE_WORLD_STATES",
@@ -198,6 +198,6 @@ function mod:WaveFunction(currentWave)
 		end
 		timerWave:Cancel()
 		warnWaveSoon:Cancel()
-		lastWave = curentWave
+		lastWave = currentWave
 	end
 end

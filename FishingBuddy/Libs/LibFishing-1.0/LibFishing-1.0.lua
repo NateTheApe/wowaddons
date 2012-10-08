@@ -7,7 +7,7 @@ Licensed under a Creative Commons "Attribution Non-Commercial Share Alike" Licen
 --]]
 
 local MAJOR_VERSION = "LibFishing-1.0"
-local MINOR_VERSION = 90000 + tonumber(("$Rev: 587 $"):match("%d+"))
+local MINOR_VERSION = 90000 + tonumber(("$Rev: 634 $"):match("%d+"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -16,11 +16,15 @@ if not FishLib then
 	return
 end
 
+-- 5.0.4 has a problem with a global "_" (see some for loops below)
+local _
+
 local Crayon = LibStub("LibCrayon-3.0");
-local BL = LibStub("LibBabble-Zone-3.0"):GetBaseLookupTable();
-local BZ = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
-local BZR = LibStub("LibBabble-Zone-3.0"):GetReverseLookupTable();
 local LT = LibStub("LibTourist-3.0");
+-- These are now provided by LibTourist
+local BZ = LibStub("LibTourist-3.0"):GetLookupTable()
+local BZR = LibStub("LibTourist-3.0"):GetReverseLookupTable();
+
 local BSL = LibStub("LibBabble-SubZone-3.0"):GetBaseLookupTable();
 local BSZ = LibStub("LibBabble-SubZone-3.0"):GetLookupTable();
 local BSZR = LibStub("LibBabble-SubZone-3.0"):GetReverseLookupTable();
@@ -306,7 +310,7 @@ local fishlibframe = getglobal(FISHLIBFRAMENAME);
 if ( not fishlibframe) then
 	fishlibframe = CreateFrame("Frame", FISHLIBFRAMENAME);
 	fishlibframe:RegisterEvent("UPDATE_CHAT_WINDOWS");
-	fishlibframe:RegisterEvent("LOOT_CLOSED");
+	fishlibframe:RegisterEvent("LOOT_OPENED");
 	fishlibframe:RegisterEvent("SKILL_LINES_CHANGED");
 	fishlibframe:RegisterEvent("UNIT_INVENTORY_CHANGED");
 	fishlibframe:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START");
@@ -325,15 +329,14 @@ fishlibframe:SetScript("OnEvent", function(self, event, ...)
 		if (self.fl) then
 			self.fl:UpdateLureInventory();
 		end
-	elseif ( event == "LOOT_CLOSED" ) then
-		caughtSoFar = caughtSoFar + 1;
+	elseif ( event == "LOOT_OPENED" ) then
+		if (IsFishingLoot()) then
+			caughtSoFar = caughtSoFar + 1;
+		end
 	elseif ( event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" ) then
 		if (arg1 ~= "player" ) then
 			return;
 		end
-	end
-	if (self.fl) then
-		self.fl:ResetOverride();
 	end
 end);
 fishlibframe:Show();
@@ -360,34 +363,34 @@ function FishLib:SetBobberName(name)
 	self.BOBBER_NAME = name;
 end
 
+
 -- set up a table of slot mappings for looking up item information
 local slotinfo = {
-	[0] = { name = "AmmoSlot", },
-	[1] = { name = "HeadSlot", },
-	[2] = { name = "NeckSlot", },
-	[3] = { name = "ShoulderSlot", },
-	[4] = { name = "ShirtSlot", },
-	[5] = { name = "BackSlot", },
-	[6] = { name = "ChestSlot", },
-	[7] = { name = "WaistSlot", },
-	[8] = { name = "LegsSlot", },
-	[9] = { name = "FeetSlot", },
-	[10] = { name = "WristSlot", },
-	[11] = { name = "HandsSlot", },
-	[12] = { name = "Finger0Slot", },
-	[13] = { name = "Finger1Slot", },
-	[14] = { name = "Trinket0Slot", },
-	[15] = { name = "Trinket1Slot", },
-	[16] = { name = "MainHandSlot", },
-	[17] = { name = "SecondaryHandSlot", },
-	[18] = { name = "RangedSlot", },
-	[19] = { name = "TabardSlot", },
+	[0] = { name = "AmmoSlot", tooltip = AMMOSLOT },
+	[1] = { name = "HeadSlot", tooltip = HEADSLOT },
+	[2] = { name = "NeckSlot", tooltip = NECKSLOT },
+	[3] = { name = "ShoulderSlot", tooltip = SHOULDERSLOT },
+	[4] = { name = "BackSlot", tooltip = BACKSLOT },
+	[5] = { name = "ChestSlot", tooltip = CHESTSLOT },
+	[6] = { name = "ShirtSlot", tooltip = SHIRTSLOT },
+	[7] = { name = "TabardSlot", tooltip = TABARDSLOT },
+	[8] = { name = "WristSlot", tooltip = WRISTSLOT },
+	[9] = { name = "HandsSlot", tooltip = HANDSSLOT },
+	[10] = { name = "WaistSlot", tooltip = WAISTSLOT },
+	[11] = { name = "LegsSlot", tooltip = LEGSSLOT },
+	[12] = { name = "FeetSlot", tooltip = FEETSLOT },
+	[13] = { name = "Finger0Slot", tooltip = FINGER0SLOT },
+	[14] = { name = "Finger1Slot", tooltip = FINGER1SLOT },
+	[15] = { name = "Trinket0Slot", tooltip = TRINKET0SLOT },
+	[16] = { name = "Trinket1Slot", tooltip = TRINKET1SLOT },
+	[17] = { name = "MainHandSlot", tooltip = MAINHANDSLOT },
+	[18] = { name = "SecondaryHandSlot", tooltip = SECONDARYHANDSLOT },
 }
-for i=0,19,1 do
+for i=0,18,1 do
 	local sn = slotinfo[i].name;
 	slotinfo[i].id, _ = GetInventorySlotInfo(sn);
 end
-local mainhand = slotinfo[16].id;
+local mainhand = slotinfo[17].id;
 
 -- A map of item types to locations
 local slotmap = {
@@ -421,6 +424,14 @@ local slotmap = {
 	["INVTYPE_QUIVER"] = { 20,21,22,23 }, 
 	[""] = { },
 };
+
+function FishLib:GetSlotInfo()
+	return slotinfo[17].id, slotinfo[18].id, slotinfo;
+end
+
+function FishLib:GetSlotMap()
+	return slotmap;
+end
 
 function FishLib:copytable(tab, level)
 	local t = {};
@@ -606,6 +617,18 @@ function FishLib:IsFishingPole(itemLink)
 	return false;
 end
 
+function FishLib:IsFishingGear()
+	if (self:IsFishingPole()) then
+		return true;
+	end
+	for i=1,16,1 do
+		if (self:FishingBonusPoints(slotinfo[i].id, 1) > 0) then
+			return true;
+		end
+	end
+	-- return nil;
+end
+
 -- fish tracking skill
 function FishLib:GetTrackingID(tex)
 	if ( tex ) then
@@ -728,7 +751,7 @@ function FishLib:GetBaseZone(zname)
 		return FishLib.UNKNOWN;
 	end
 	
-	if (zname and not BL[zname] ) then
+	if (zname and not BZ[zname] ) then
 		zname = BZR[zname];
 	end
 	if (not zname) then
@@ -756,7 +779,7 @@ function FishLib:GetLocZone(zname)
 		return UNKNOWN;
 	end
 
-	if (zname and BL[zname]) then
+	if (zname and BZR[zname]) then
 		zname = BZ[zname];
 	end
 	if (not zname) then
@@ -840,7 +863,7 @@ function FishLib:GetFishingSkillLine(join, withzone)
 		part1 = part1..Crayon:Red(UNKNOWN);
 	end
 	-- have some more details if we've got a pole equipped
-	if ( self:IsFishingPole() ) then
+	if ( self:IsFishingGear() ) then
 		part2 = Crayon:Green(skill.."+"..mods).." "..Crayon:Silver("["..totskill.."]");
 	end
 	if ( join ) then
@@ -1052,18 +1075,11 @@ end
 -- Secure action button
 local SABUTTONNAME = "LibFishingSAButton";
 
-local function WaitForCombat(self)
-	if (self.clear and not InCombatLockdown()) then
-		self.clear = nil;
-		self:Hide();
-		ClearOverrideBindings(self);
-	end
-end
-
 function FishLib:ResetOverride()
 	local btn = self.sabutton;
 	if ( btn ) then
-		btn.clear = true;
+		btn.holder:Hide();
+		ClearOverrideBindings(btn);
 	end
 end
 
@@ -1077,14 +1093,16 @@ end
 function FishLib:CreateSAButton()
 	local btn = getglobal(SABUTTONNAME);
 	if ( not btn ) then
-		btn = CreateFrame("Button", SABUTTONNAME, UIParent, "SecureActionButtonTemplate");
-		btn.clear = nil;
-		btn:SetPoint("LEFT", UIParent, "RIGHT", 10000, 0);
-		btn:SetFrameStrata("LOW");
+		local holder = CreateFrame("Frame", nil, UIParent);
+		btn = CreateFrame("Button", SABUTTONNAME, holder, "SecureActionButtonTemplate");
+		btn.holder = holder;
 		btn:EnableMouse(true);
 		btn:RegisterForClicks("RightButtonUp");
-		btn:SetScript("OnUpdate", WaitForCombat);
-		btn:Hide();
+		btn:Show();
+
+		holder:SetPoint("LEFT", UIParent, "RIGHT", 10000, 0);
+		holder:SetFrameStrata("LOW");
+		holder:Hide();
 	end
 	btn:SetScript("PostClick", ClickHandled);
 	self.sabutton = btn;
@@ -1131,10 +1149,10 @@ function FishLib:OverrideClick(postclick)
 		return;
 	end
 	fishlibframe.fl = self;
+	btn.fl = self;
 	btn.postclick = postclick;
 	SetOverrideBindingClick(btn, true, "BUTTON2", SABUTTONNAME);
-	btn.clear = nil;
-	btn:Show();
+	btn.holder:Show();
 end
 
 -- Taken from wowwiki tooltip handling suggestions
@@ -1231,7 +1249,7 @@ function FishLib:GetOutfitBonus()
 end
 
 -- return a list of the best items we have for a fishing outfit
-function FishLib:GetFishingOutfitItems(wearing)
+function FishLib:GetFishingOutfitItems(wearing, usepole)
 	local ibp = function(link) return self:FishingBonusPoints(link); end;
 	-- find fishing gear
 	-- no affinity, check all bags
@@ -1239,39 +1257,41 @@ function FishLib:GetFishingOutfitItems(wearing)
 	local itemtable = {};
 	for invslot=1,17,1 do
 		local slotid = slotinfo[invslot].id;
-		local slotname = slotinfo[invslot].name;
-		local maxb = nil;
-		local link;
-		-- should we include what we're already wearing?
-		if ( wearing ) then
-			link = GetInventoryItemLink("player", slotid);
-			if ( link ) then
-				maxb = self:FishingBonusPoints(link);
-				outfit = outfit or {};
-				if (maxb > 0) then
-					outfit[invslot] = { link=link, slot=slotid };
+		if ( not nopole or slotid ~= main ) then
+			local slotname = slotinfo[invslot].name;
+			local maxb = nil;
+			local link;
+			-- should we include what we're already wearing?
+			if ( wearing ) then
+				link = GetInventoryItemLink("player", slotid);
+				if ( link ) then
+					maxb = self:FishingBonusPoints(link);
+					outfit = outfit or {};
+					if (maxb > 0) then
+						outfit[invslot] = { link=link, slot=slotid };
+					end
 				end
 			end
-		end
-
-		-- this only gets items in bags, hence the check above for slots
-		wipe(itemtable);
-		itemtable = GetInventoryItemsForSlot(slotid, itemtable);
-
-		for location,id in pairs(itemtable) do
-			local player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(location);
-			if ( bags ) then
-				link = GetContainerItemLink(bag, slot);
-			else
-				link = nil;
-			end
-			if ( link ) then
-				local b = self:FishingBonusPoints(link);
-				if (b > 0) then
-					if ( not maxb or b > maxb ) then
-						maxb = b;
-						outfit = outfit or {};
-						outfit[slotid] = { link=link, bag=bag, slot=slot, slotname=slotname };
+	
+			-- this only gets items in bags, hence the check above for slots
+			wipe(itemtable);
+			itemtable = GetInventoryItemsForSlot(slotid, itemtable);
+	
+			for location,id in pairs(itemtable) do
+				local player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(location);
+				if ( bags ) then
+					link = GetContainerItemLink(bag, slot);
+				else
+					link = nil;
+				end
+				if ( link ) then
+					local b = self:FishingBonusPoints(link);
+					if (b > 0) then
+						if ( not maxb or b > maxb ) then
+							maxb = b;
+							outfit = outfit or {};
+							outfit[slotid] = { link=link, bag=bag, slot=slot, slotname=slotname };
+						end
 					end
 				end
 			end

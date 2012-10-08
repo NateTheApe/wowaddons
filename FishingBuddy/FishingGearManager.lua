@@ -1,5 +1,8 @@
 -- Interface with the Blizz Equipment Manager
 
+-- 5.0.4 has a problem with a global "_" (see some for loops below)
+local _
+
 local FL = LibStub("LibFishing-1.0");
 
 local lastOutfit;
@@ -39,9 +42,14 @@ gearframe:SetScript("OnUpdate", function(self)
 	elseif ( self.state == 1 ) then
 		-- reset slot ignore flags
 		EquipmentManagerClearIgnoredSlotsForSave();
-		EquipmentManager_EquipSet(FB_TEMP_OUTFIT);
-		self.state = 2;
-		self.nextstate = 3;
+		local icon, _ = GetEquipmentSetInfoByName(FB_TEMP_OUTFIT);
+		if ( icon ) then
+			EquipmentManager_EquipSet(FB_TEMP_OUTFIT);
+			self.state = 2;
+			self.nextstate = 3;
+		else
+			self.state = FINAL_STATE;
+		end
 	elseif ( self.state == 2 ) then
 		-- waiting for EQUIPMENT_SWAP_FINISHED
 	elseif (self.state == 3) then
@@ -78,7 +86,7 @@ local function GearManagerInitialize()
 			-- but we actually have to equip the items for this to work
 			-- let's save what we have on now...
 			SaveEquipmentSet(FB_TEMP_OUTFIT, 1);
-			for slot=1,19 do
+			for slot=1,18 do
 				EquipmentManagerIgnoreSlotForSave(slot);
 			end
 
@@ -135,7 +143,7 @@ local function GetCurrentOutfit()
 end
 
 local function GearManagerSwitch(outfitName)
-	if ( FL:IsFishingPole() ) then
+	if ( FL:IsFishingGear() ) then
 		local name = FishingBuddy_Info["LastGearSet"];
 		if ( not name ) then
 			name, _, _ = GetEquipmentSetInfo(1);

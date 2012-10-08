@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Fathomlord", "DBM-Serpentshrine")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 338 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 397 $"):sub(12, -3))
 mod:SetCreatureID(21214)
 mod:SetModelID(20662)
 mod:SetZone()
@@ -42,7 +42,7 @@ function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(38330) then
 		warnHeal:Show()
 		if self:GetUnitCreatureId("target") == 21964 then
-			specWarnHeal:Show()
+			specWarnHeal:Show(args.sourceName)
 		end
 	end
 end

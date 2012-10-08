@@ -1,4 +1,26 @@
-TipTacTalents Changes | 2010 Sep 29
+TipTacTalents Changes | 2012 Sep 05
+-----------------------------------
+- Now shows the talent spec even when the tooltip shows yourself.
+
+TipTacTalents Changes | 2012 Sep 01
+-----------------------------------
+- Removed some remnant debug code.
+- Fixed a talent inspection issue that could occur, if the inspection window was opened from the unitframe's right click menu.
+- Localised the string used for when a person has no specialization.
+
+TipTacTalents Changes | 2012 Aug 30
+-----------------------------------
+- Changed the TOC version to 50001 for the 5.0 Mists of Pandaria patch.
+- Moved inspect frame check to a helper function.
+- Added a second inspect frame check for the scheduled inspect.
+- Modified the code to support the changes in the Mists of Pandaria expansion.
+- Removed the InspectPaperDollFrame.lua @ line 23 inspect workaround.
+
+TipTacTalents Changes | 2012 May 20
+-----------------------------------
+- Changed the TOC version to 40300 for the 4.3 patch.
+
+TipTacTalents Changes | 2011 Sep 29
 -----------------------------------
 - Changed the TOC version to 40200 for the 4.2 patch.
 

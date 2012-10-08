@@ -1,11 +1,12 @@
 local mod	= DBM:NewMod("Halion", "DBM-ChamberOfAspects", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4657 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(39863)--40142 (twilight form)
 mod:SetModelID(31952)
-mod:SetMinSyncRevision(4358)
 mod:SetUsedIcons(7, 8)
+--mod:SetMinSyncRevision(4358)
+mod:SetMinSyncRevision(7)--Could break if someone is running out of date version with higher revision
 
 mod:RegisterCombat("combat")
 --mod:RegisterKill("yell", L.Kill)
@@ -29,24 +30,24 @@ local warnPhase3					= mod:NewPhaseAnnounce(3)
 local warningShadowConsumption		= mod:NewTargetAnnounce(74792, 4)
 local warningFieryConsumption		= mod:NewTargetAnnounce(74562, 4)
 local warningMeteor					= mod:NewSpellAnnounce(74648, 3)
-local warningShadowBreath			= mod:NewSpellAnnounce(75954, 2, nil, mod:IsTank() or mod:IsHealer())
-local warningFieryBreath			= mod:NewSpellAnnounce(74526, 2, nil, mod:IsTank() or mod:IsHealer())
-local warningTwilightCutter			= mod:NewAnnounce("TwilightCutterCast", 4, 77844)
+local warningShadowBreath			= mod:NewSpellAnnounce(74806, 2, nil, mod:IsTank() or mod:IsHealer())
+local warningFieryBreath			= mod:NewSpellAnnounce(74525, 2, nil, mod:IsTank() or mod:IsHealer())
+local warningTwilightCutter			= mod:NewAnnounce("TwilightCutterCast", 4, 74769)
 
 local specWarnShadowConsumption		= mod:NewSpecialWarningRun(74792)
 local specWarnFieryConsumption		= mod:NewSpecialWarningRun(74562)
-local specWarnMeteorStrike			= mod:NewSpecialWarningMove(75952)
-local specWarnTwilightCutter		= mod:NewSpecialWarningSpell(77844)
+local specWarnMeteorStrike			= mod:NewSpecialWarningMove(74648)
+local specWarnTwilightCutter		= mod:NewSpecialWarningSpell(74769)
 
 local timerShadowConsumptionCD		= mod:NewNextTimer(25, 74792)
 local timerFieryConsumptionCD		= mod:NewNextTimer(25, 74562)
 local timerMeteorCD					= mod:NewNextTimer(40, 74648)
 local timerMeteorCast				= mod:NewCastTimer(7, 74648)--7-8 seconds from boss yell the meteor impacts.
-local timerTwilightCutterCast		= mod:NewCastTimer(5, 77844)
-local timerTwilightCutter			= mod:NewBuffActiveTimer(10, 77844)
-local timerTwilightCutterCD			= mod:NewNextTimer(15, 77844)
-local timerShadowBreathCD			= mod:NewCDTimer(19, 75954, nil, mod:IsTank() or mod:IsHealer())--Same as debuff timers, same CD, can be merged into 1.
-local timerFieryBreathCD			= mod:NewCDTimer(19, 74526, nil, mod:IsTank() or mod:IsHealer())--But unique icons are nice pertaining to phase you're in ;)
+local timerTwilightCutterCast		= mod:NewCastTimer(5, 74769)
+local timerTwilightCutter			= mod:NewBuffActiveTimer(10, 74769)
+local timerTwilightCutterCD			= mod:NewNextTimer(15, 74769)
+local timerShadowBreathCD			= mod:NewCDTimer(19, 74806, nil, mod:IsTank() or mod:IsHealer())--Same as debuff timers, same CD, can be merged into 1.
+local timerFieryBreathCD			= mod:NewCDTimer(19, 74525, nil, mod:IsTank() or mod:IsHealer())--But unique icons are nice pertaining to phase you're in ;)
 
 local berserkTimer					= mod:NewBerserkTimer(480)
 
@@ -60,7 +61,6 @@ mod:AddBoolOption("SetIconOnConsumption", true)
 local warned_preP2 = false
 local warned_preP3 = false
 local phasethree = false
-local lastflame = 0
 local phases = {}
 
 function mod:OnCombatStart(delay)--These may still need retuning too, log i had didn't have pull time though.
@@ -68,7 +68,6 @@ function mod:OnCombatStart(delay)--These may still need retuning too, log i had 
 	warned_preP2 = false
 	warned_preP3 = false
 	phasethree = false
-	lastflame = 0
 	berserkTimer:Start(-delay)
 	timerMeteorCD:Start(20-delay)
 	timerFieryConsumptionCD:Start(15-delay)
@@ -123,7 +122,7 @@ function mod:SPELL_AURA_APPLIED(args)--We don't use spell cast success for actua
 		end
 		if not self.Options.AnnounceAlternatePhase then
 			warningShadowConsumption:Show(args.destName)
-			if IsRaidLeader() and self.Options.WhisperOnConsumption then
+			if DBM:GetRaidRank() > 0 and self.Options.WhisperOnConsumption then
 				self:SendWhisper(L.WhisperConsumption, args.destName)
 			end
 		end
@@ -143,7 +142,7 @@ function mod:SPELL_AURA_APPLIED(args)--We don't use spell cast success for actua
 		end
 		if not self.Options.AnnounceAlternatePhase then
 			warningFieryConsumption:Show(args.destName)
-			if IsRaidLeader() and self.Options.WhisperOnConsumption then
+			if DBM:GetRaidRank() > 0 and self.Options.WhisperOnConsumption then
 				self:SendWhisper(L.WhisperCombustion, args.destName)
 			end
 		end
@@ -166,9 +165,8 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 75947 or spellId == 75948 or spellId == 75949 or spellId == 75950 or spellId == 75951 or spellId == 75952) and destGUID == UnitGUID("player") and GetTime() - lastflame > 2 then
+	if (spellId == 75947 or spellId == 75948 or spellId == 75949 or spellId == 75950 or spellId == 75951 or spellId == 75952) and destGUID == UnitGUID("player") and self:AntiSpam() then
 		specWarnMeteorStrike:Show()
-		lastflame = GetTime()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE

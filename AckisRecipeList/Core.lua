@@ -3,10 +3,10 @@
 Core.lua
 Core functions for Ackis Recipe List
 ************************************************************************
-File date: 2012-01-14T17:56:16Z
-File hash: 769072c
-Project hash: de16aef
-Project version: 2.3.0
+File date: 2012-09-23T04:55:21Z
+File hash: 0665ae9
+Project hash: 9e1f108
+Project version: 2.4.1
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -42,7 +42,7 @@ local table = _G.table
 local FOLDER_NAME, private = ...
 
 local LibStub = _G.LibStub
-local addon = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0", "AceEvent-3.0")
+local addon = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 _G.AckisRecipeList = addon
 
 --[===[@alpha@
@@ -95,28 +95,6 @@ Toast:Register("ARL_DebugToast", function(toast, ...)
 	toast:SetIconTexture([[Interface\HELPFRAME\HotIssueIcon]])
 end)
 
-do
-	local output = {}
-
-	function addon:DumpMembers(match)
-		table.wipe(output)
-		table.insert(output, "Addon Object members.\n")
-
-		local count = 0
-
-		for key, value in pairs(self) do
-			local val_type = type(value)
-
-			if not match or val_type == match then
-				table.insert(output, ("%s (%s)"):format(key, val_type))
-				count = count + 1
-			end
-		end
-		table.insert(output, ("\n%d found\n"):format(count))
-		self:DisplayTextDump(nil, nil, table.concat(output, "\n"))
-	end
-end -- do
-
 -------------------------------------------------------------------------------
 -- Initialization functions
 -------------------------------------------------------------------------------
@@ -124,7 +102,6 @@ local REQUIRED_LIBS = {
 	"AceLocale-3.0",
 	"LibBabble-Boss-3.0",
 	"LibBabble-Faction-3.0",
-	"LibBabble-Zone-3.0",
 	"LibQTip-1.0",
 	"LibToast-1.0"
 }
@@ -241,21 +218,23 @@ function addon:OnInitialize()
 				-- Obtain Filters
 				-------------------------------------------------------------------------------
 				obtain = {
-					trainer = true,
-					vendor = true,
-					instance = true,
-					raid = true,
-					seasonal = true,
-					quest = true,
-					pvp = true,
-					discovery = true,
-					worlddrop = true,
-					mobdrop = true,
 					achievement = true,
+					discovery = true,
 					expansion0 = true,
 					expansion1 = true,
 					expansion2 = true,
 					expansion3 = true,
+					expansion4 = true,
+					instance = true,
+					mobdrop = true,
+					pvp = true,
+					quest = true,
+					raid = true,
+					reputation = true,
+					seasonal = true,
+					trainer = true,
+					vendor = true,
+					worlddrop = true,
 				},
 				-------------------------------------------------------------------------------
 				-- Profession Item Filters
@@ -333,6 +312,21 @@ function addon:OnInitialize()
 					ramkahen = true,
 					earthenring = true,
 					therazane = true,
+					foresthozen = true,
+					goldenlotus = true,
+					huojinpandaren = true,
+					cloudserpent = true,
+					pearlfinjinyu = true,
+					shadopan = true,
+					anglers = true,
+					augustcelestials = true,
+					brewmasters = true,
+					klaxxi = true,
+					lorewalkers = true,
+					tillers = true,
+					tushuipandaren = true,
+					blackprince = true,
+					shangxiacademy = true,
 				},
 				-------------------------------------------------------------------------------
 				-- Class Filters
@@ -342,12 +336,14 @@ function addon:OnInitialize()
 					druid = true,
 					hunter = true,
 					mage = true,
+					monk = true,
 					paladin = true,
 					priest = true,
 					rogue = true,
 					shaman = true,
 					warlock = true,
 					warrior = true,
+					monk = true,
 				},
 			}
 		}
@@ -377,7 +373,7 @@ function addon:OnInitialize()
 	version = debug_version and "Devel" or (alpha_version and version .. "-Alpha") or version
 
 	self.version = version
-
+	self.is_development_version = debug_version
 	self:SetupOptions()
 
 	-- Register slash commands
@@ -458,92 +454,30 @@ function addon:OnEnable()
 	if addon.db.profile.scanvendors then
 		self:RegisterEvent("MERCHANT_SHOW")
 	end
-
-	-------------------------------------------------------------------------------
-	-- Set the parent and scripts for addon.scan_button.
-	-------------------------------------------------------------------------------
-	local scan_button = self.scan_button
-
-	-- Add an option so that ARL will work with Manufac
-	if _G.Manufac then
-		_G.Manufac.options.args.ARLScan = {
-			type = 'execute',
-			name = L["Scan"],
-			desc = L["SCAN_RECIPES_DESC"],
-			func = function() addon:Scan(false) end,
-			order = 550,
-		}
-	end
 	private.Player:Initialize()
 
 	-------------------------------------------------------------------------------
 	-- Initialize the SpecialtyTable and AllSpecialtiesTable.
 	-------------------------------------------------------------------------------
 	do
-		--[[
-		local AlchemySpec = {
-			[_G.GetSpellInfo(28674)] = 28674,
-			[_G.GetSpellInfo(28678)] = 28678,
-			[_G.GetSpellInfo(28676)] = 28676,
-		}
-		]] --
-
-		--[[
-		local BlacksmithSpec = {
-			[_G.GetSpellInfo(9788)] = 9788,		-- Armorsmith
-			[_G.GetSpellInfo(17041)] = 17041,	-- Master Axesmith
-			[_G.GetSpellInfo(17040)] = 17040,	-- Master Hammersmith
-			[_G.GetSpellInfo(17039)] = 17039,	-- Master Swordsmith
-			[_G.GetSpellInfo(9787)] = 9787,		-- Weaponsmith
-		}
-		]] --
-
 		local EngineeringSpec = {
 			[_G.GetSpellInfo(20219)] = 20219, -- Gnomish
 			[_G.GetSpellInfo(20222)] = 20222, -- Goblin
 		}
 
-		--[[
-		local LeatherworkSpec = {
-			[_G.GetSpellInfo(10657)] = 10657, -- Dragonscale
-			[_G.GetSpellInfo(10659)] = 10659, -- Elemental
-			[_G.GetSpellInfo(10661)] = 10661, -- Tribal
-		}
-		]] --
-
-		--[[
-		local TailorSpec = {
-			[_G.GetSpellInfo(26797)] = 26797, -- Spellfire
-			[_G.GetSpellInfo(26801)] = 26801, -- Shadoweave
-			[_G.GetSpellInfo(26798)] = 26798, -- Primal Mooncloth
-		}
-		]] --
-
 		SpecialtyTable = {
-			--[_G.GetSpellInfo(51304)] = AlchemySpec,
-			--[_G.GetSpellInfo(51300)] = BlacksmithSpec,
-			[_G.GetSpellInfo(51306)] = EngineeringSpec,
-			--[_G.GetSpellInfo(51302)] = LeatherworkSpec,
-			--[_G.GetSpellInfo(51309)] = TailorSpec,
+			[private.LOCALIZED_PROFESSION_NAMES.ENGINEERING] = EngineeringSpec,
 		}
 
-		-- Populate the Specialty table with all Specialties, adding alchemy even though no recipes have alchemy filters
-		--for i in pairs(AlchemySpec) do AllSpecialtiesTable[i] = true end
-		--for i in pairs(BlacksmithSpec) do AllSpecialtiesTable[i] = true end
-		for i in pairs(EngineeringSpec) do AllSpecialtiesTable[i] = true end
-		--for i in pairs(LeatherworkSpec) do AllSpecialtiesTable[i] = true end
-		--for i in pairs(TailorSpec) do AllSpecialtiesTable[i] = true end
+		for i in pairs(EngineeringSpec) do
+			AllSpecialtiesTable[i] = true
+		end
 	end -- do
 end
 
 function addon:OnDisable()
 	if addon.Frame then
 		addon.Frame:Hide()
-	end
-
-	-- Remove the option from Manufac
-	if _G.Manufac then
-		_G.Manufac.options.args.ARLScan = nil
 	end
 end
 
@@ -561,27 +495,9 @@ end
 -------------------------------------------------------------------------------
 -- Create the scan button
 -------------------------------------------------------------------------------
-function addon:CreateScanButton()
-	local scan_button = _G.CreateFrame("Button", nil, _G.TradeSkillFrame, "UIPanelButtonTemplate")
-	scan_button:SetHeight(20)
-	scan_button:RegisterForClicks("LeftButtonUp")
-	scan_button:SetText(L["Scan"])
-
-	if _G.Skillet and _G.Skillet:IsActive() then
-		scan_button:SetParent(_G.SkilletFrame)
-		_G.Skillet:AddButtonToTradeskillWindow(scan_button)
-		scan_button:SetWidth(80)
-	elseif _G.MRTAPI then
-		_G.MRTAPI:RegisterHandler("TradeSkillWindowOnShow", function()
-			scan_button:SetParent(_G.MRTSkillFrame)
-			scan_button:ClearAllPoints()
-			scan_button:SetPoint("RIGHT", _G.MRTSkillFrameCloseButton, "LEFT", 4, 0)
-			scan_button:SetWidth(scan_button:GetTextWidth() + 10)
-			scan_button:Show()
-		end)
-	elseif _G.ATSWFrame then
+local TRADESKILL_ADDON_INITS = {
+	ATSWFrame = function(scan_button)
 		scan_button:SetParent(_G.ATSWFrame)
-		scan_button:ClearAllPoints()
 
 		if _G.TradeJunkieMain and _G.TJ_OpenButtonATSW then
 			scan_button:SetPoint("RIGHT", _G.TJ_OpenButtonATSW, "LEFT", 0, 0)
@@ -590,21 +506,59 @@ function addon:CreateScanButton()
 		end
 		scan_button:SetHeight(_G.ATSWOptionsButton:GetHeight())
 		scan_button:SetWidth(_G.ATSWOptionsButton:GetWidth())
-	elseif _G.CauldronFrame then
+	end,
+	CauldronFrame = function(scan_button)
 		scan_button:SetParent(_G.CauldronFrame)
-		scan_button:ClearAllPoints()
 		scan_button:SetPoint("TOP", _G.CauldronFrame, "TOPRIGHT", -58, -52)
 		scan_button:SetWidth(90)
-	elseif _G.BPM_ShowTrainerFrame then
+	end,
+	BPM_ShowTrainerFrame = function(scan_button)
 		scan_button:SetParent(_G.BPM_ShowTrainerFrame)
-		scan_button:ClearAllPoints()
 		scan_button:SetPoint("RIGHT", _G.BPM_ShowTrainerFrame, "LEFT", 4, 0)
 		scan_button:SetWidth(scan_button:GetTextWidth() + 10)
 		scan_button:Show()
+	end,
+	MRTAPI = function(scan_button)
+		_G.MRTAPI:RegisterHandler("TradeSkillWindowOnShow", function()
+			scan_button:SetParent(_G.MRTSkillFrame)
+			scan_button:SetPoint("RIGHT", _G.MRTSkillFrameCloseButton, "LEFT", 4, 0)
+			scan_button:SetWidth(scan_button:GetTextWidth() + 10)
+			scan_button:Show()
+		end)
+	end,
+	MRTSkillFrame = function(scan_button)
+		scan_button:SetParent(_G.MRTSkillFrame)
+		scan_button:SetPoint("RIGHT", _G.MRTSkillFrame, "LEFT", 4, 0)
+		scan_button:SetWidth(scan_button:GetTextWidth() + 10)
+		scan_button:Show()
+	end,
+	Skillet = function(scan_button)
+		if not _G.Skillet:IsActive() then
+			return
+		end
+		scan_button:SetParent(_G.SkilletFrame)
+		scan_button:SetWidth(80)
+		_G.Skillet:AddButtonToTradeskillWindow(scan_button)
+	end,
+}
+
+function addon:CreateScanButton()
+	local scan_button = _G.CreateFrame("Button", nil, _G.TradeSkillFrame, "UIPanelButtonTemplate")
+	scan_button:SetHeight(20)
+	scan_button:RegisterForClicks("LeftButtonUp")
+	scan_button:SetText(L["Scan"])
+
+	-------------------------------------------------------------------------------
+	-- Grab the first lucky Trade Skill AddOn that exists and hand the scan button to it.
+	-------------------------------------------------------------------------------
+	for entity, init_func in pairs(TRADESKILL_ADDON_INITS) do
+		if _G[entity] then
+			scan_button:ClearAllPoints()
+			init_func(scan_button)
+			break
+		end
 	end
 	local scan_parent = scan_button:GetParent()
-
-	-- Set the frame level of the button to be 1 higher than its parent
 	scan_button:SetFrameLevel(scan_parent:GetFrameLevel() + 1)
 	scan_button:SetFrameStrata(scan_parent:GetFrameStrata())
 	scan_button:Enable()
@@ -614,7 +568,7 @@ function addon:CreateScanButton()
 		local prev_profession
 
 		if main_panel then
-			prev_profession = private.ORDERED_PROFESSIONS[main_panel.profession]
+			prev_profession = private.ORDERED_PROFESSIONS[main_panel.current_profession]
 		end
 		local shift_pressed = _G.IsShiftKeyDown()
 		local alt_pressed = _G.IsAltKeyDown()
@@ -724,23 +678,47 @@ end
 -------------------------------------------------------------------------------
 -- ARL Logic Functions
 -------------------------------------------------------------------------------
-function addon:InitializeProfession(profession)
-	if not profession then
-		addon:Debug("nil profession passed to InitializeProfession()")
-		return
-	end
-	local func = PROFESSION_INIT_FUNCS[profession]
+do
+	local function InitializeLookups()
+		addon:InitCustom()
+		addon:InitDiscovery()
+		addon:InitMob()
+		addon:InitQuest()
+		addon:InitReputation()
+		addon:InitTrainer()
+		addon:InitSeasons()
+		addon:InitVendor()
 
-	if func then
-		func(addon)
-		PROFESSION_INIT_FUNCS[profession] = nil
+		InitializeLookups = nil
 	end
-end
+
+	-- Returns true if a profession was initialized.
+	function addon:InitializeProfession(profession)
+		if not profession then
+			addon:Debug("nil profession passed to InitializeProfession()")
+			return false
+		end
+
+		if InitializeLookups then
+			InitializeLookups()
+		end
+		local func = PROFESSION_INIT_FUNCS[profession]
+
+		if func then
+			func(addon)
+			PROFESSION_INIT_FUNCS[profession] = nil
+			return true
+		end
+		return false
+	end
+end -- do-block
 
 do
 	-- Code snippet stolen from GearGuage by Torhal and butchered by Ackis
 	local function StrSplit(input)
-		if not input then return nil, nil end
+		if not input then
+			return nil, nil
+		end
 		local arg1, arg2, var1
 
 		arg1, var1 = input:match("^([^%s]+)%s*(.*)$")
@@ -802,22 +780,6 @@ do
 	end
 end
 
---- Public API function to initialize all of the lookup lists - self-nils once run.
--- @name AckisRecipeList:InitializeLookups()
--- @usage if AckisRecipeList.InitializeLookups then AckisRecipeList:InitializeLookups() end
-function addon:InitializeLookups()
-	self:InitCustom()
-	self:InitDiscovery()
-	self:InitMob()
-	self:InitQuest()
-	self:InitReputation()
-	self:InitTrainer()
-	self:InitSeasons()
-	self:InitVendor()
-
-	self.InitializeLookups = nil
-end
-
 -------------------------------------------------------------------------------
 -- Recipe Scanning Functions
 -------------------------------------------------------------------------------
@@ -837,16 +799,6 @@ do
 		_G.PrimaryProfession2SpellButtonBottom,
 	}
 
-	-- Toggles a recipe's stats based on whether it's linked or actually known.
-	local function SetRecipeAsKnownOrLinked(recipe, is_linked)
-		if is_linked then
-			recipe:AddState("LINKED")
-		else
-			recipe:AddState("KNOWN")
-			recipe:RemoveState("LINKED")
-		end
-	end
-
 	--- Causes a scan of the tradeskill to be conducted. Function called when the scan button is clicked.   Parses recipes and displays output
 	-- @name AckisRecipeList:Scan
 	-- @usage AckisRecipeList:Scan(true)
@@ -859,15 +811,7 @@ do
 			self:Print(L["OpenTradeSkillWindow"])
 			return
 		end
-
-		if _G.TradeSkillFrame and _G.TradeSkillFrame:IsVisible() then
-			-- Clear the search box focus so the scan will have correct results.
-			local search_box = _G.TradeSkillFrameSearchBox
-			search_box:SetText("")
-			_G.TradeSkillSearch_OnTextChanged(search_box)
-			search_box:ClearFocus()
-			search_box:GetScript("OnEditFocusLost")(search_box)
-		end
+		private.current_profession_specialty = nil
 
 		if profession_name == private.LOCALIZED_PROFESSION_NAMES.RUNEFORGING then
 			prof_level = _G.UnitLevel("player")
@@ -879,6 +823,15 @@ do
 		player:UpdateProfessions()
 
 		private.current_profession_scanlevel = prof_level
+
+		-- Clear the search box and its focus so the scan will have correct results.
+		if _G.TradeSkillFrame and _G.TradeSkillFrame:IsVisible() then
+			local search_box = _G.TradeSkillFrameSearchBox
+			search_box:ClearFocus()
+			search_box:GetScript("OnEditFocusLost")(search_box)
+			search_box:SetText("")
+			_G.TradeSkillSearch_OnTextChanged(search_box)
+		end
 
 		-- Make sure we're only updating a profession the character actually knows - this could be a scan from a tradeskill link.
 		local tradeskill_is_linked = _G.IsTradeSkillLinked() or _G.IsTradeSkillGuild()
@@ -893,27 +846,28 @@ do
 		for index = 1, #PROFESSION_BUTTONS do
 			local button = PROFESSION_BUTTONS[index]
 			local spell_offset = button:GetParent().spellOffset
+			local specialization_offset = button:GetParent().specializationOffset
 
 			if spell_offset then
-				specialtices_indices[insert_index] = button:GetID() + spell_offset
+				specialtices_indices[insert_index] = specialization_offset + spell_offset
 				insert_index = insert_index + 1
 			end
 		end
-		local specialty = SpecialtyTable[profession_name]
 
-		for index, book_index in ipairs(specialtices_indices) do
-			local spell_name = _G.GetSpellBookItemName(book_index, "profession")
+		local profession_specialties = SpecialtyTable[profession_name]
 
-			if not spell_name then
-				private.current_profession_specialty = nil
-				break
-			elseif specialty and specialty[spell_name] then
-				private.current_profession_specialty = specialty[spell_name]
+		if profession_specialties then
+			for index, book_index in ipairs(specialtices_indices) do
+
+				local spell_name = _G.GetSpellBookItemName(book_index, _G.BOOKTYPE_PROFESSION)
+
+				if not spell_name then
+					break
+				elseif profession_specialties[spell_name] then
+					private.current_profession_specialty = profession_specialties[spell_name]
+					break
+				end
 			end
-		end
-
-		if self.InitializeLookups then
-			self:InitializeLookups()
 		end
 		addon:InitializeProfession(profession_name)
 
@@ -945,18 +899,17 @@ do
 			_G.TradeSkillFrame_Update()
 
 			-- Expand all headers so we can see all the recipes there are
-			for i = _G.GetNumTradeSkills(), 1, -1 do
-				local name, tradeType, _, isExpanded = _G.GetTradeSkillInfo(i)
+			for skill_index = _G.GetNumTradeSkills(), 1, -1 do
+				local entry_name, entry_type, _, is_expanded = _G.GetTradeSkillInfo(skill_index)
 
-				if tradeType == "header" and not isExpanded then
-					header_list[name] = true
-					_G.ExpandTradeSkillSubClass(i)
+				if (entry_type == "header" or entry_type == "subheader") and not is_expanded then
+					header_list[entry_name] = true
+					_G.ExpandTradeSkillSubClass(skill_index)
 				end
 			end
 		end
 		local profession_recipes = private.profession_recipe_list[profession_name]
 		local recipes_found = 0
-		local SPELL_OVERWRITE_MAP = private.SPELL_OVERWRITE_MAP
 
 		for spell_id, recipe in pairs(profession_recipes) do
 			recipe:RemoveState("KNOWN")
@@ -965,34 +918,43 @@ do
 			recipe:RemoveState("LINKED")
 		end
 
-		for index = 1, _G.GetNumTradeSkills() do
-			local tradeName, tradeType = _G.GetTradeSkillInfo(index)
+		for skill_index = 1, _G.GetNumTradeSkills() do
+			local entry_name, entry_type = _G.GetTradeSkillInfo(skill_index)
 
-			if tradeType ~= "header" then
-				local spell_link = _G.GetTradeSkillRecipeLink(index)
-				local spell_string = spell_link:match("^|c%x%x%x%x%x%x%x%x|H%w+:(%d+)")
-				local spell_id = tonumber(spell_string)
+			if entry_type ~= "header" and entry_type ~= "subheader" then
+				local spell_id = tonumber(_G.GetTradeSkillRecipeLink(skill_index):match("^|c%x%x%x%x%x%x%x%x|H%w+:(%d+)"))
 				local recipe = profession_recipes[spell_id]
 
 				if recipe then
-					-- Mark the first rank of the spell as known if we know rank 2 for certain recipes.
-					-- This is only done for recipes which when you learn the higher rank, you lose the
-					-- ability to learn the lower rank.
+					local previous_rank_id = recipe:PreviousRankID()
 
-					-- If we have it in the mapping, set the lower rank spell to known
-					if SPELL_OVERWRITE_MAP[spell_id] then
-						local overwrite_recipe = profession_recipes[SPELL_OVERWRITE_MAP[spell_id]]
+					if previous_rank_id then
+						local previous_rank_recipe = profession_recipes[previous_rank_id]
 
-						if overwrite_recipe then
-							SetRecipeAsKnownOrLinked(overwrite_recipe, tradeskill_is_linked)
+						if previous_rank_recipe then
+							previous_rank_recipe:SetAsKnownOrLinked(tradeskill_is_linked)
 						else
-							self:Debug(tradeName .. " " .. SPELL_OVERWRITE_MAP[spell_id] .. L["MissingFromDB"])
+							self:Debug("%s (%d): %s", entry_name, previous_rank_id, L["MissingFromDB"])
 						end
 					end
-					SetRecipeAsKnownOrLinked(recipe, tradeskill_is_linked)
+					recipe:SetAsKnownOrLinked(tradeskill_is_linked)
 					recipes_found = recipes_found + 1
 				else
-					self:Debug(tradeName .. " " .. spell_string .. L["MissingFromDB"])
+					--[===[@debug@
+					local profession_id
+					for name, profession_spell_id in pairs(private.PROFESSION_SPELL_IDS) do
+						if profession_name == _G.GetSpellInfo(profession_spell_id) then
+							profession_id = profession_spell_id
+							break
+						end
+					end
+					addon:AddRecipe(spell_id, profession_id, _G.GetExpansionLevel() + 1, private.ITEM_QUALITIES.COMMON)
+					addon:Printf("Added '%s (%d)' to %s. Do a profession dump.", entry_name, spell_id, profession_name)
+					--@end-debug@]===]
+
+					if not self.is_development_version then
+						self:Debug("%s (%d): %s", entry_name, spell_id, L["MissingFromDB"])
+					end
 				end
 			end
 		end
@@ -1001,11 +963,11 @@ do
 		if _G.MRTAPI then
 			_G.MRTAPI:PopFilterSelection()
 		else
-			for i = _G.GetNumTradeSkills(), 1, -1 do
-				local name, tradeType, _, isExpanded = _G.GetTradeSkillInfo(i)
+			for skill_index = _G.GetNumTradeSkills(), 1, -1 do
+				local entry_name, _, _, is_expanded = _G.GetTradeSkillInfo(skill_index)
 
-				if header_list[name] then
-					_G.CollapseTradeSkillSubClass(i)
+				if header_list[entry_name] then
+					_G.CollapseTradeSkillSubClass(skill_index)
 				end
 			end
 			_G.TradeSkillFrame.filterTbl.hasMaterials = have_materials
@@ -1028,7 +990,8 @@ do
 		-- Everything is ready - display the GUI or dump the list to text.
 		-------------------------------------------------------------------------------
 		if textdump then
-			self:DisplayTextDump(profession_recipes, profession_name)
+			private.TextDump:AddLine(self:GetTextDump(profession_name))
+			private.TextDump:Display()
 		else
 			if private.InitializeFrame then
 				private.InitializeFrame()
@@ -1037,78 +1000,6 @@ do
 		end
 	end
 end
-
--------------------------------------------------------------------------------
--- Text dumping functions
--------------------------------------------------------------------------------
-
---------------------------------------------------------------------------------
---- Creates a new frame with the contents of a text dump so you can copy and paste
--- Code borrowed from Antiarc (Chatter) with permission
--- @name AckisRecipeList:DisplayTextDump
--- @param RecipeDB The database (array) which you wish read data from.
--- @param profession Which profession are you displaying data for
--- @param text The text to be dumped
---------------------------------------------------------------------------------
-do
-	local copy_frame = _G.CreateFrame("Frame", "ARLCopyFrame", _G.UIParent)
-	copy_frame:SetBackdrop({
-		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background]],
-		edgeFile = [[Interface\DialogFrame\UI-DialogBox-Border]],
-		tile = true,
-		tileSize = 16,
-		edgeSize = 16,
-		insets = {
-			left = 3,
-			right = 3,
-			top = 5,
-			bottom = 3
-		}
-	})
-	copy_frame:SetBackdropColor(0, 0, 0, 1)
-	copy_frame:SetWidth(750)
-	copy_frame:SetHeight(400)
-	copy_frame:SetPoint("CENTER", _G.UIParent, "CENTER")
-	copy_frame:SetFrameStrata("DIALOG")
-
-	table.insert(_G.UISpecialFrames, "ARLCopyFrame")
-
-	local scrollArea = _G.CreateFrame("ScrollFrame", "ARLCopyScroll", copy_frame, "UIPanelScrollFrameTemplate")
-	scrollArea:SetPoint("TOPLEFT", copy_frame, "TOPLEFT", 8, -30)
-	scrollArea:SetPoint("BOTTOMRIGHT", copy_frame, "BOTTOMRIGHT", -30, 8)
-
-	local edit_box = _G.CreateFrame("EditBox", nil, copy_frame)
-	edit_box:SetMultiLine(true)
-	edit_box:SetMaxLetters(0)
-	edit_box:EnableMouse(true)
-	edit_box:SetAutoFocus(true)
-	edit_box:SetFontObject("ChatFontNormal")
-	edit_box:SetWidth(650)
-	edit_box:SetHeight(270)
-	edit_box:SetScript("OnEscapePressed", function()
-		copy_frame:Hide()
-	end)
-	edit_box:HighlightText(0)
-
-	scrollArea:SetScrollChild(edit_box)
-
-	local close = _G.CreateFrame("Button", nil, copy_frame, "UIPanelCloseButton")
-	close:SetPoint("TOPRIGHT", copy_frame, "TOPRIGHT")
-
-	copy_frame:Hide()
-
-	function addon:DisplayTextDump(recipe_list, profession, text)
-		local display_text = (not recipe_list and not profession) and text or self:GetTextDump(profession)
-
-		if display_text == "" then
-			return
-		end
-		edit_box:SetText(display_text)
-		edit_box:HighlightText(0)
-		edit_box:SetCursorPosition(1)
-		copy_frame:Show()
-	end
-end -- do
 
 do
 	-------------------------------------------------------------------------------
@@ -1169,6 +1060,7 @@ do
 				ROGUE = LC["ROGUE"],
 				WARLOCK = LC["WARLOCK"],
 				WARRIOR = LC["WARRIOR"],
+				MONK = LC["MONK"],
 				-------------------------------------------------------------------------------
 				-- Reputation flags.
 				-------------------------------------------------------------------------------

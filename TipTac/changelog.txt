@@ -1,3 +1,29 @@
+TipTac Changes | 2012 Sep 29
+----------------------------
+- Fixed a Lua error that could occur, if another addon used TipTac's AddModifiedTip() function before the saved variables had been loaded.
+- Added support for the new classification "minus" used for certain units.
+
+TipTac Changes | 2012 Sep 05
+----------------------------
+- Added an option for the removal of the Alliance and Horde faction text from the tooltip. It can currently be found under the Special category. Turned off by default.
+- Updated TipTacTalents, with a fix to allow talent spec to show for yourself.
+
+TipTac Changes | 2012 Sep 01
+----------------------------
+- Now removes the Alliance and Horde faction text from the tooltip.
+
+TipTac Changes | 2012 Aug 30
+----------------------------
+- Changed the TOC version to 50001 for the 5.0 Mists of Pandaria patch.
+- Fixed the "Show Who Targets the Unit" feature, so it now works with the changed API.
+- Removed the level estimator that was used for units returning -1 as level, those more than 10 levels above the player. This estimation was determined by the number of talent points they had spent.
+
+TipTac Changes | 2012 May 20
+----------------------------
+- Changed the TOC version to 40300 for the 4.3 patch.
+- New option to show player gender. It will be displayed before the race. E.g. "85  Female Blood Elf Paladin".
+- Added the three "ItemRefShoppingTooltip" to the tooltips to get modified. These are the ones showing when you hold down shift over the ItemRefTooltip.
+
 TipTac Changes | 2011 Sep 29
 ----------------------------
 - Changed the TOC version to 40200 for the 4.2 patch.

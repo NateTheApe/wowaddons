@@ -2,10 +2,10 @@
 ************************************************************************
 Reputation.lua
 ************************************************************************
-File date: 2011-08-29T03:50:09Z
-File hash: 1839059
-Project hash: de16aef
-Project version: 2.3.0
+File date: 2012-09-18T20:17:55Z
+File hash: 7844475
+Project hash: 9e1f108
+Project version: 2.4.1
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -72,6 +72,32 @@ function addon:InitReputation()
 	AddReputation(1106, "Argent Crusade")
 	AddReputation(1119, "The Sons of Hodir")
 	AddReputation(1156, "The Ashen Verdict")
+	AddReputation(1216, "Shang Xi's Academy")
+	AddReputation(1228, "Forest Hozen")
+	AddReputation(1242, "Pearlfin Jinyu")
+	AddReputation(1269, "Golden Lotus")
+	AddReputation(1270, "Shado-Pan")
+	AddReputation(1271, "Order of the Cloud Serpent")
+	AddReputation(1272, "The Tillers")
+	AddReputation(1273, "Jogu the Drunk")
+	AddReputation(1275, "Ella")
+	AddReputation(1276, "Old Hillpaw")
+	AddReputation(1277, "Chee Chee")
+	AddReputation(1278, "Sho")
+	AddReputation(1279, "Haohan Mudclaw")
+	AddReputation(1280, "Tina Mudclaw")
+	AddReputation(1281, "Gina Mudclaw")
+	AddReputation(1282, "Fish Fellreed")
+	AddReputation(1283, "Farmer Fung")
+	AddReputation(1302, "The Anglers")
+	AddReputation(1337, "The Klaxxi")
+	AddReputation(1341, "The August Celestials")
+	AddReputation(1345, "The Lorewalkers")
+	AddReputation(1351, "The Brewmasters")
+	AddReputation(1352, "Huojin Pandaren")
+	AddReputation(1353, "Tushui Pandaren")
+	AddReputation(1358, "Nat Pagle")
+	AddReputation(1359, "The Black Prince")
 
 	self.InitReputation = nil
 end

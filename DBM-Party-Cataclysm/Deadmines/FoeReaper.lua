@@ -1,7 +1,7 @@
-local mod	= DBM:NewMod("FoeReaper", "DBM-Party-Cataclysm", 2)
+local mod	= DBM:NewMod(91, "DBM-Party-Cataclysm", 2, 63)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 6499 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
 mod:SetCreatureID(43778)
 mod:SetModelID(35606)
 mod:SetZone()
@@ -17,7 +17,7 @@ mod:RegisterEventsInCombat(
 
 local warnOverdrive			= mod:NewSpellAnnounce(88481, 3)
 local warnHarvest			= mod:NewTargetAnnounce(88495, 4)
-local warnEnrage			= mod:NewSpellAnnounce(91720, 4)
+local warnEnrage			= mod:NewSpellAnnounce(88522, 4)
 local warnSpiritStrike		= mod:NewSpellAnnounce(59304, 3)
 
 local specWarnHarvest		= mod:NewSpecialWarningRun(88495)
@@ -62,7 +62,7 @@ function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(88481) then
 		warnOverdrive:Show()
 		timerOverdrive:Start()
-	elseif args:IsSpellID(91720) then
+	elseif args:IsSpellID(88522, 91720) then
 		warnEnrage:Show()
 	end
 end

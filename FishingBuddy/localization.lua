@@ -91,6 +91,7 @@ FishingTranslations["enUS"] = {
 	KEYS_SHIFT_TEXT = "Shift",
 	KEYS_CTRL_TEXT = "Control",
 	KEYS_ALT_TEXT = "Alt",
+	CONFIG_EASYCASTKEYS_INFO = "If a modifier key is specified, then when it is down, regardless of fishing gear.",
 
 	SHOWFISHIES = "Show fish",
 	SHOWFISHIES_INFO = "Display fishing history grouped by fish type.",
@@ -120,7 +121,7 @@ FishingTranslations["enUS"] = {
 	CONFIG_EASYCAST_INFO     = "Enable double-right-click casting.",
 	CONFIG_EASYCAST_INFOD    = "Easy cast is disabled because Fishing Ace! is turned on.",
 	CONFIG_AUTOLOOT_ONOFF	 = "Auto Loot",
-	CONFIG_AUTOLOOT_INFO		  = "If enabled, automatic looting is turned on while fishing.",
+	CONFIG_AUTOLOOT_INFO	 = "If enabled, automatic looting is turned on while fishing.",
 	CONFIG_AUTOLOOT_INFOD    = "Automatic looting is disabled because FishWarden is turned on.",
 	CONFIG_USEACTION_ONOFF	 = "Use Action",
 	CONFIG_USEACTION_INFO	 = "If enabled, #NAME# will look for an action bar button to use for casting.",
@@ -145,7 +146,6 @@ FishingTranslations["enUS"] = {
 	CONFIG_TURNOFFPVP_ONOFF	  = "Turn off PVP",
 	CONFIG_TURNOFFPVP_INFO	  = "If enabled, PVP will be turned off while a fishing pole is equipped.",
 
-
 	CONFIG_ENHANCESOUNDS_ONOFF	= "Enhance fishing sounds",
 	CONFIG_ENHANCESOUNDS_INFO	= "When enabled, maximize sound volume and minimize ambient volume to make the bobber noise more noticeable while fishing.",
 
@@ -159,7 +159,7 @@ FishingTranslations["enUS"] = {
 	CONFIG_TURNONSOUND_INFO   = "If enabled, always turn on sounds while fishing.",
 
 	CONFIG_AUTOOPEN_ONOFF	  = "Open quest items",
-	CONFIG_AUTOOPEN_INFO		  = "If enabled, use a double-click to open up fishing quest items.",
+	CONFIG_AUTOOPEN_INFO	  = "If enabled, use a double-click to open up fishing quest items.",
 
 	CONFIG_FISHINGFLUFF_ONOFF = "Fishing Fun",
 	CONFIG_FISHINGFLUFF_INFO  = "Enable all sorts of fun while you fish.",
@@ -260,6 +260,7 @@ FishingTranslations["enUS"] = {
 
 	THANKS = "Thank you, everyone!",
 	
+	ROLE_TRANSLATE_ITIT = "Italian translation",
 	ROLE_TRANSLATE_ZHTW = "Traditional Chinese translation",
 	ROLE_TRANSLATE_ZHCN = "Simplified Chinese translation",
 	ROLE_TRANSLATE_DEDE = "German translation",

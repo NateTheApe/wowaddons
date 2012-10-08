@@ -1,6 +1,6 @@
 TipTac - An Advanced Tooltip Addon
 ----------------------------------
-TipTac is a tooltip enchancement addon, it allows you to configure various aspects of the tooltip, such as moving where it's shown, the font, the scale of tips, plus a lot more.
+TipTac is a tooltip enchancement addon, it allows you to configure various aspects of the tooltip, such as moving where it's shown, the font, the scale of tips, plus many more features.
 
 To open the option dialog, just use "/tip" without any parameters. Use "/tip anchor" to show the anchor frame and position it as you want.
 
@@ -45,7 +45,7 @@ In this file, you will have to locate "SavedVariables", and change it into "Save
 
 Lacking Features, Ideas & Problems
 ----------------------------------
-- ItemRefTooltip: Does not support "currency" and "archaeology".
+- ItemRefTooltip: Does not support "archaeology". "currency" should be supported now, but need verification.
 - ItemRefTooltip does not position well if scaled below 1.
 - Remove font size delta, add slider for each font size.
 - Add hover tips to "GuildBankMessageFrame".

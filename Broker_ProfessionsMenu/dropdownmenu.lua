@@ -124,7 +124,7 @@ function me.dropdown:ShowMenu(level, value)
 			me.dropdown:AddArrow(me.L["ctrl"].." + "..me.L[button],"ctrlleft")
 		--quicklauncher
 		elseif value == "quicklauncher" then
-			me.dropdown:AddArrow(CREATE,"newlauncher")
+			me.dropdown:AddArrow(NEW,"newlauncher")
 			me.dropdown:AddArrow(DELETE,"deletelauncher")
 		--Tooltips
 		elseif value == "tooltip" then
@@ -147,6 +147,7 @@ function me.dropdown:ShowMenu(level, value)
 		--list trades from an other char
 		else
 			for k,v in me:pairsByKeys(me.save[value].tradelinks) do
+				local name, _, icon = GetSpellInfo(k)
 				info.func = function()
 					if IsShiftKeyDown() then
 						if (not ChatEdit_InsertLink(v) ) then
@@ -164,12 +165,13 @@ function me.dropdown:ShowMenu(level, value)
 					GameTooltip:SetPoint(me:GetTipAnchor2(frame))
 					GameTooltip:ClearLines()
 					GameTooltip:AddLine(value,0,1,0)
-					GameTooltip:AddDoubleLine(GetSpellInfo(k),skill.."/"..maxskill,1,1,0,0,1,0)
+					GameTooltip:AddDoubleLine(name,skill.."/"..maxskill,1,1,0,0,1,0)
+					GameTooltip:AddTexture(icon)
 					GameTooltip:AddLine(" ")
 					GameTooltip:AddLine(me.L["leftclick"]..": |cffffffff"..me.L["linktome"].."|r")
 					GameTooltip:AddLine(me.L["shift"].." + "..me.L["leftclick"]..": |cffffffff"..me.L["linktoother"].."|r")
 				end
-				me.dropdown:AddFunc(GetSpellInfo(k),info.func,_,_,info.tooltipFunc)
+				me.dropdown:AddFunc(name,info.func,icon,nil,info.tooltipFunc)
 			end
 			me.dropdown:AddLine()
 			info.tooltipFunc = function()
@@ -179,7 +181,7 @@ function me.dropdown:ShowMenu(level, value)
 				GameTooltip:ClearLines()
 				GameTooltip:AddLine(me.L["deletechartooltip"])
 			end
-			me.dropdown:AddFunc(DELETE,function() me.save[value]=nil end,_,true,info.tooltipFunc)
+			me.dropdown:AddFunc(DELETE,function() me.save[value]=nil end,nil,true,info.tooltipFunc)
 		end
 	--<<LEVEL 4>>--
 	elseif level == 4 then
@@ -262,7 +264,7 @@ function me.dropdown:ShowFavorites()
 						end
 					end
 					if type=="Create" then
-						GameTooltip:AddDoubleLine(me.L["leftclick"],"|cffffffff"..CREATE.."|r")
+						GameTooltip:AddDoubleLine(me.L["leftclick"],"|cffffffff"..CREATE_PROFESSION.."|r")
 						GameTooltip:AddDoubleLine(me.L["shift"].." + "..me.L["leftclick"],"|cffffffff"..CREATE_ALL.."|r")
 					else
 						GameTooltip:AddDoubleLine(me.L["leftclick"],"|cffffffff"..type.."|r")
@@ -280,7 +282,6 @@ function me.dropdown:ShowFavorites()
 						data = nil
 					end
 					me.save[my].favorites[profid] = data
-					print(format(me.L.deletedfromfavorite,GetSpellLink(vv.id)))
 				else --Craft Item
 					CloseTradeSkill()
 					CastSpellByName(prof)

@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -15,13 +15,13 @@
     required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2011-11-06T13:34:55Z
+    This file was last updated on 2012-09-23T20:33:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -59,6 +59,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -76,7 +77,7 @@ end
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "koKR");
 
 if not L then
-    T._LoadedFiles["koKR.lua"] = "2.7.0.5";
+    T._LoadedFiles["koKR.lua"] = "2.7.2.2";
     return;
 end;
 
@@ -145,6 +146,7 @@ L["DISABLEWARNING"] = [=[Decursive 사용이 중지되었습니다!
 다시 사용하려면, |cFFFFAA44/DCR ENABLE|r를 입력하세요.]=]
 L["DISEASE"] = "질병"
 L["DONOT_BL_PRIO"] = "우선순위 블랙리스트 제외"
+L["DONT_SHOOT_THE_MESSENGER"] = "Decursive가 문제를 간략히 알립니다. 그래서, 메신저와 주소를 쏘지 않도록 문제를 해결합니다." -- Needs review
 L["FAILEDCAST"] = [=[|cFF22FFFF%s %s|r|1으로;로; %s |cFFAA0000치료 실패|r
 |cFF00AAAA%s|r]=]
 L["FOCUSUNIT"] = "주시대상"
@@ -258,12 +260,10 @@ L["OPT_CUSTOM_SPELL_MACRO_TEXT_DESC"] = [=[기본 매크로 문자 편집:
 (조건문과 함께 다른 주문을 사용할 경우를 염두해둘 것)]=]
 L["OPT_CUSTOM_SPELL_MACRO_TOO_LONG"] = "당신의 매크로가 길어서 %d 문자를 제거해야 합니다."
 L["OPT_CUSTOM_SPELL_PRIORITY"] = "주문 우선순위"
-L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = "동일 피해 형식을 여러가지 주문으로 치료하려면, 원하는 주문의 우선순위가 높아야 합니다."
+L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = "동일 피해 형식을 여러가지 주문으로 치료하려면, 원하는 주문의 우선순위가 높아야 합니다." -- Needs review
 L["OPT_CUSTOMSPELLS"] = "사용자 주문"
 L["OPT_CUSTOMSPELLS_DESC"] = "여기 당신의 주문을 추가해 Decursive의 자동 구성설정을 확장할 수 있습니다."
 L["OPT_CUSTOMSPELLS_EFFECTIVE_ASSIGNMENTS"] = "효과적인 주문 할당:"
-L["OPT_CUSTOM_SPELL_STOPCASTING"] = "/시전중지"
-L["OPT_CUSTOM_SPELL_STOPCASTING_DESC"] = "이 주문을 사용하는 다른 주문 진행 중단 (소환수로부터 주문이 되면 선택 안함)"
 L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "사용할 수 없음"
 L["OPT_DEBCHECKEDBYDEF"] = [=[
 기본값으로 설정됨]=]
@@ -451,4 +451,4 @@ L["UNSTABLERELEASE"] = "비안정화판 배포"
 
 
 
-T._LoadedFiles["koKR.lua"] = "2.7.0.5";
+T._LoadedFiles["koKR.lua"] = "2.7.2.2";

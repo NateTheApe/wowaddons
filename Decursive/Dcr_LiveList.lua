@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John Wellesz).
@@ -11,13 +11,13 @@
     To distribute Decursive through other means a special authorization is required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2011-05-13T08:14:12Z
+    This file was last updated on 2012-09-23T20:33:56Z
 
 --]]
 -------------------------------------------------------------------------------
@@ -36,6 +36,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -88,7 +89,7 @@ local select            = _G.select;
 local unpack            = _G.unpack;
 local table             = _G.table;
 local UnitExists        = _G.UnitExists;
-local IsSpellInRange    = _G.IsSpellInRange;
+local IsSpellInRange    = D.IsSpellInRange;
 local UnitClass         = _G.UnitClass;
 local UnitIsFriend      = _G.UnitIsFriend;
 local UnitGUID          = _G.UnitGUID;
@@ -587,4 +588,4 @@ function LiveList:Onclick() -- {{{
     D:Println(L["HLP_LL_ONCLICK_TEXT"]);
 end -- }}}
 
-T._LoadedFiles["Dcr_LiveList.lua"] = "2.7.0.5";
+T._LoadedFiles["Dcr_LiveList.lua"] = "2.7.2.2";

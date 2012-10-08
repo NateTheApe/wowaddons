@@ -69,7 +69,7 @@ ACP:UpdateLocale( {
 	["Version"] = true;
 	["Status"] = true;
 	["Dependencies"] = true;
-	["Embeds"] = true;
+	["Embeds"] = "Optional Deps";
 } )
 --@enddebug@
 
@@ -79,17 +79,15 @@ if (GetLocale() == "enUS") then
 	ACP:UpdateLocale(
 
 {
-	["*** Enabling <%s> %s your UI ***"] = "*** Enabling <%s> %s your UI ***",
-	["*** Unknown Addon <%s> Required ***"] = "*** Unknown Addon <%s> Required ***",
 	["ACP: Some protected addons aren't loaded. Reload now?"] = "ACP: Some protected addons aren't loaded. Reload now?",
 	["Active Embeds"] = "Active Embeds",
-	["Add to current selection"] = "Add to current selection",
 	AddOns = "AddOns",
 	["Addon <%s> not valid"] = "Addon <%s> not valid",
 	["Addons [%s] Loaded."] = "Addons [%s] Loaded.",
+	["Addons [%s] renamed to [%s]."] = "Addons [%s] renamed to [%s].",
 	["Addons [%s] Saved."] = "Addons [%s] Saved.",
 	["Addons [%s] Unloaded."] = "Addons [%s] Unloaded.",
-	["Addons [%s] renamed to [%s]."] = "Addons [%s] renamed to [%s].",
+	["Add to current selection"] = "Add to current selection",
 	Author = "Author",
 	Blizzard_AchievementUI = "Blizzard: Achievement",
 	Blizzard_AuctionUI = "Blizzard: Auction",
@@ -100,8 +98,8 @@ if (GetLocale() == "enUS") then
 	Blizzard_CombatLog = "Blizzard: Combat Log",
 	Blizzard_CombatText = "Blizzard: Combat Text",
 	Blizzard_FeedbackUI = "Blizzard: Feedback",
-	Blizzard_GMSurveyUI = "Blizzard: GM Survey",
 	Blizzard_GlyphUI = "Blizzard: Glyph",
+	Blizzard_GMSurveyUI = "Blizzard: GM Survey",
 	Blizzard_GuildBankUI = "Blizzard: GuildBank",
 	Blizzard_InspectUI = "Blizzard: Inspect",
 	Blizzard_ItemSocketingUI = "Blizzard: Item Socketing",
@@ -119,21 +117,22 @@ if (GetLocale() == "enUS") then
 	Dependencies = "Dependencies",
 	["Disable All"] = "Disable All",
 	["Disabled on reloadUI"] = "Disabled on reloadUI",
-	Embeds = "Embeds",
+	Embeds = "Optional Deps",
 	["Enable All"] = "Enable All",
+	["*** Enabling <%s> %s your UI ***"] = "*** Enabling <%s> %s your UI ***",
 	["Enter the new name for [%s]:"] = "Enter the new name for [%s]:",
-	["LoD Child Enable is now %s"] = "LoD Child Enable is now %s",
 	Load = "Load",
 	["Loadable OnDemand"] = "Loadable OnDemand",
 	Loaded = "Loaded",
 	["Loaded on demand."] = "Loaded on demand.",
+	["LoD Child Enable is now %s"] = "LoD Child Enable is now %s",
 	["Memory Usage"] = "Memory Usage",
 	["No information available."] = "No information available.",
 	Recursive = "Recursive",
 	["Recursive Enable is now %s"] = "Recursive Enable is now %s",
 	Reload = "Reload",
-	["Reload your User Interface?"] = "Reload your User Interface?",
 	ReloadUI = "ReloadUI",
+	["Reload your User Interface?"] = "Reload your User Interface?",
 	["Remove from current selection"] = "Remove from current selection",
 	Rename = "Rename",
 	Save = "Save",
@@ -141,6 +140,7 @@ if (GetLocale() == "enUS") then
 	["Set "] = "Set ",
 	Sets = "Sets",
 	Status = "Status",
+	["*** Unknown Addon <%s> Required ***"] = "*** Unknown Addon <%s> Required ***",
 	["Use SHIFT to override the current enabling of dependancies behaviour."] = "Use SHIFT to override the current enabling of dependancies behaviour.",
 	Version = "Version",
 	["when performing a reloadui."] = "when performing a reloadui.",

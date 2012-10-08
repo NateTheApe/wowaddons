@@ -5,13 +5,13 @@ local PitBull4 = _G.PitBull4
 local L = PitBull4.L
 local PitBull4_LuaTexts = PitBull4:GetModule("LuaTexts")
 
--- Pre 3.2.0 compatability support
-local wow_320 = select(4, GetBuildInfo()) >= 30200
-local GetQuestDifficultyColor
-if not wow_320 then
-	GetQuestDifficultyColor = _G.GetDifficultyColor
-else
-	GetQuestDifficultyColor = _G.GetQuestDifficultyColor
+local mop_500 = select(4,GetBuildInfo()) >= 50000
+
+local UnitIsTappedByAllThreatList = UnitIsTappedByAllThreatList
+if not mop_500 then
+	UnitIsTappedByAllThreatList = function()
+		return false
+	end
 end
 
 -- The ScriptEnv table serves as the environment that the scripts run
@@ -367,7 +367,7 @@ local function HostileColor(unit)
 				-- either enemy or friend, no violance
 				r, g, b = unpack(PitBull4.ReactionColors.civilian)
 			end
-		elseif (UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit)) or UnitIsDead(unit) then
+		elseif (UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit) and not UnitIsTappedByAllThreatList(unit)) or UnitIsDead(unit) then
 			r, g, b = 0.5, 0.5, 0.5 -- TODO: We really need this to be globally configurable. 
 		else
 			local reaction = UnitReaction(unit, "player")
@@ -399,10 +399,21 @@ local function ClassColor(unit)
 end
 ScriptEnv.ClassColor = ClassColor
 
-local function DifficultyColor(unit)
-	local level
-	level = UnitLevel(unit)
+local function Level(unit)
+	if mop_500 and (UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit)) then
+		return UnitBattlePetLevel(unit)
+	end
+	local level = UnitLevel(unit)
 	if level <= 0 then
+		level = '??'
+	end
+	return level
+end
+ScriptEnv.Level = Level
+
+local function DifficultyColor(unit)
+	local level = Level(unit)
+	if level == '??' then
 		level = 99
 	end
 	local color = GetQuestDifficultyColor(level)
@@ -487,16 +498,10 @@ local function ShortClass(arg)
 end
 ScriptEnv.ShortClass = ShortClass
 
-local function Level(unit)
-	local level = UnitLevel(unit)
-	if level <= 0 then
-		level = '??'
-	end
-	return level
-end
-ScriptEnv.Level = Level
-
 local function Creature(unit)
+	if (mop_500 and (UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit))) then
+		return _G["BATTLE_PET_NAME_"..UnitBattlePetType(unit)]..' '..TOOLTIP_BATTLE_PET
+	end
 	return UnitCreatureFamily(unit) or UnitCreatureType(unit) or UNKNOWN
 end
 ScriptEnv.Creature = Creature
@@ -615,7 +620,7 @@ local function DruidForm(unit)
 		return L["Bear"]
 	elseif power == 3 then
 		return L["Cat"]
-	elseif UnitAura(unit,MOONKIN_FORM,SHAPESHIFT) then
+	elseif UnitAura(unit,MOONKIN_FORM) then
 		return L["Moonkin"]
 	elseif UnitAura(unit,TREE_OF_LIFE,SHAPESHIFT) then
 		return L["Tree"]
@@ -623,7 +628,7 @@ local function DruidForm(unit)
 		return L["Travel"]
 	elseif UnitAura(unit,AQUATIC_FORM,SHAPESHIFT) then
 		return L["Aquatic"]
-	elseif UnitAura(unit,SWIFT_FLIGHT_FORM,SHAPESHIFT) or UnitAura(unit,SWIFT_FLIGHT_FORM,SHAPESHFIT) then
+	elseif UnitAura(unit,SWIFT_FLIGHT_FORM,SHAPESHIFT) or UnitAura(unit,FLIGHT_FORM,SHAPESHFIT) then
 		return L["Flight"]
 	end
 end

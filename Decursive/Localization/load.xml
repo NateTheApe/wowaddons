@@ -11,11 +11,12 @@
     <Script file="zhCN.lua"/>
     <Script file="zhTW.lua"/>
     <Script file="ptBR.lua"/>
+    <Script file="itIT.lua"/>
 
     <Script>
         local T = DecursiveRootTable or {};
 
-        T._LoadedFiles["Load.xml"] = "2.7.0.5";
+        T._LoadedFiles["Load.xml"] = "2.7.2.2";
     </Script>
 
 </Ui>

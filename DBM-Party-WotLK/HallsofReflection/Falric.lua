@@ -1,7 +1,7 @@
 local mod = DBM:NewMod("Falric", "DBM-Party-WotLK", 16)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 2153 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(38112)
 mod:SetModelID(30972)
 
@@ -12,19 +12,13 @@ mod:RegisterEvents(
 	"SPELL_AURA_REMOVED"
 )
 
-local warnFear					= mod:NewSpellAnnounce(72452, 3)
+local warnFear					= mod:NewSpellAnnounce(72435, 3)
 local warnImpendingDespair		= mod:NewTargetAnnounce(72426, 3)
-local warnQuiveringStrike		= mod:NewTargetAnnounce(72453, 3)
+local warnQuiveringStrike		= mod:NewTargetAnnounce(72422, 3)
 
-local timerFear					= mod:NewBuffActiveTimer(4, 72452)
+local timerFear					= mod:NewBuffActiveTimer(4, 72435)
 local timerImpendingDespair		= mod:NewTargetTimer(6, 72426)
-local timerQuiveringStrike		= mod:NewTargetTimer(5, 72453)
-
-local lastfear = 0
-
-function mod:OnCombatStart(delay)
-	lastfear = 0
-end
+local timerQuiveringStrike		= mod:NewTargetTimer(5, 72422)
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(72422, 72453) then
@@ -33,10 +27,9 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif args:IsSpellID(72426) then
 		timerImpendingDespair:Start(args.destName)
 		warnImpendingDespair:Show(args.destName)
-	elseif args:IsSpellID(72452, 72435) and GetTime() - lastfear > 2 then
+	elseif args:IsSpellID(72435, 72452) and self:AntiSpam() then
 		warnFear:Show()
 		timerFear:Start()
-		lastfear = GetTime()
 	end
 end
 

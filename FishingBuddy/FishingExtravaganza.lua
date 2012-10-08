@@ -7,7 +7,6 @@ FishingBuddy.Extravaganza = {};
 local Crayon = LibStub("LibCrayon-3.0");
 local FL = LibStub("LibFishing-1.0");
 local LT = LibStub("LibTourist-3.0");
-local Astrolabe = DongleStub("Astrolabe-1.0");
 
 local UPDATETIME_SCHOOLS = 5.0;
 local UPDATETIME_COUNTER = 20.0;
@@ -131,67 +130,6 @@ local function GetFreePoolIcon()
 	return iconcache[pdx];
 end
 
-local lastzone = nil;
-local contestpools = {};
-local function HidePools()
-	for _,pool in ipairs(iconcache) do
-		if (pool.inuse) then
-			Astrolabe:RemoveIconFromMinimap(pool);
-			pool.inuse = nil;
-		end
-	end
-end
-
-local function UpdateIcons()
-	for _,t in ipairs(contestpools) do
-		if (t.icon) then
-			if ( Astrolabe:IsIconOnEdge(t.icon) ) then
-				t.icon.tex:SetVertexColor(1, 1, 1, 0.1);
-			else
-				t.icon.tex:SetVertexColor(1, 1, 1, 0.3);
-			end
-		end
-	end
-end
-
-local function ShowPools(forced)
-	if ( IsContestZone() and GetSettingBool("ShowPools") ) then
-		local zone,_ = FL:GetZoneInfo();
-		if ( forced or not lastzone or lastzone ~= zone ) then
-			lastzone = zone;
-			local kind = CurrentContest.kind;
-			local schools = FishingBuddy.Schools.GetSchools(zone);
-			HidePools();
-			contestpools = {};
-			for idx=1,table.getn(schools) do
-				local t = schools[idx];
-				if ( not kind or t.kind == kind ) then
-					local info = {};
-					info.x = t.x;
-					info.y = t.y;
-					info.icon = GetFreePoolIcon();
-					tinsert(contestpools, info);
-				end
-			end
-			if ( #contestpools > 0 ) then
-				local C, Z, x, y = Astrolabe:GetCurrentPlayerPosition();
-				for idx=1,#contestpools do
-					local t = contestpools[idx];
-					local icon = t.icon;
-					Astrolabe:PlaceIconOnMinimap( icon, C, Z, t.x, t.y );
-					if ( Astrolabe:IsIconOnEdge(icon) ) then
-						icon.tex:SetVertexColor(1, 1, 1, 0.1);
-					else
-						icon.tex:SetVertexColor(1, 1, 1, 0.3);
-					end
-				end
-			end
-			FishingBuddy.contestpools = contestpools;
-			FishingBuddy.Dump(contestpools);
-		end
-	end
-end
-
 -- Should we display the extravaganza message?
 local function IsTime(activate)
 	CurrentContest = nil;
@@ -216,7 +154,6 @@ local function IsTime(activate)
 	if ( CurrentContest ) then
 		if ( activate ) then
 			FishingExtravaganzaFrame:Show();
-			ShowPools();
 		end
 		if ( GetSettingBool("STVPoolsOnly") ) then
 			if ( IsContestZone() ) then
@@ -225,12 +162,8 @@ local function IsTime(activate)
 				FishingBuddy.SetHijackCheck();
 			end
 		end
-		if ( not GetSettingBool("ShowPools") ) then
-			HidePools();
-		end
 		return true;
 	else
-		HidePools();
 		FishingBuddy.SetHijackCheck();
 	end
 	-- return nil;
@@ -266,29 +199,12 @@ ExtravaganzaEvents[FBConstants.ADD_FISHIE_EVT] = function(id, name, ...)
 	end
 end
 
-ExtravaganzaEvents[FBConstants.ADD_SCHOOL_EVT] = function(kind, fishid, zidx, x, y)
-	if ( CurrentContest and kind == CurrentContest.kind and IsContestZone() and GetSettingBool("ShowPools") ) then
-		local icon = GetFreePoolIcon();
-		icon.tex:SetVertexColor(1, 1, 1, 0.2);
-
-		local C, Z, _, _ = Astrolabe:GetCurrentPlayerPosition();
-		local t = {};
-		t.x = x;
-		t.y = y;
-		t.icon = icon;
-		tinsert(contestpools, t);		
-		Astrolabe:PlaceIconOnMinimap( icon, C, Z, t.x, t.y );
-	end
-end
-
 ExtravaganzaEvents[FBConstants.OPT_UPDATE_EVT] = function(changed)
 	IsTime();
-	Astrolabe:CalculateMinimapIconPositions();
 end
 
 ExtravaganzaEvents[FBConstants.FISHING_ENABLED_EVT] = function()
 	IsTime();
-	Astrolabe:CalculateMinimapIconPositions();
 end
 
 -- Handle watching the loot
@@ -333,10 +249,8 @@ FishingBuddy.Extravaganza.OnEvent = function(self, event, ...)
 	elseif ( event == "ZONE_CHANGED_NEW_AREA" or event == "PLAYER_LOGIN" ) then
 		if ( IsContestZone() and IsTime() ) then
 			self:RegisterEvent("CHAT_MSG_YELL");
-			ShowPools();
 		else
 			self:UnregisterEvent("CHAT_MSG_YELL");
-			HidePools();
 		end
 	elseif ( event == "VARIABLES_LOADED" ) then
 		for _,contest in ipairs(Contests) do
@@ -348,7 +262,6 @@ FishingBuddy.Extravaganza.OnEvent = function(self, event, ...)
 		
 		IsTime(true);
 		self:UnregisterEvent("VARIABLES_LOADED");
-		Astrolabe:Register_OnEdgeChanged_Callback(UpdateIcons,1);
 	end
 end
 
@@ -406,7 +319,6 @@ FishingBuddy.Extravaganza.OnUpdate = function(self, elapsed)
 			end
 		end
 	else
-		HidePools();
 		self:Hide();
 	end
 end
@@ -440,42 +352,5 @@ if ( FishingBuddy.Debugging ) then
 		Contests[2].hour = hour;
 		Contests[2].kind = nil;
 		IsTime(true);
-		ShowPools(true);
-	end
-	
-	-- test the extravaganze school marking functions
-	-- need to expand this for 1.9 if we can tell automatically
-	FishingBuddy.Commands["mark"] = {};
-	FishingBuddy.Commands["mark"].func =
-		function(what, ...)
-			if ( what == "reset" ) then
-				FishingBuddy_Info["FishSchools"] = nil;
-			elseif ( what == "debug" ) then
-				local hour,_ = GetGameTime();
-				local weekday, _, _, _ = CalendarGetDate();
-				local zone,_ = FL:GetZoneInfo();
-				local landmass = LT:GetContinent(zone);
-				FishingBuddy.Extravaganza.Debug(weekday, hour, zone, landmass);
-			elseif ( what == "test" ) then
-				local C, Z, x, y = Astrolabe:GetCurrentPlayerPosition();
-				local icon = GetFreePoolIcon();
-				local facing = GetPlayerFacing();
-				if ( facing ) then
-					local zone,_ = FL:GetZoneInfo();
-					local yx, yy = LT:GetZoneYardSize(zone);
-					if ( yx ) then
-						-- let's average the distance and say 15 yards
-						x, y = x * yx, y * yy;
-						x, y = x + math.sin(facing)*15, y + math.cos(facing)*15;
-						-- put them back in non-yard adjusted format
-						x, y = x / yx, y / yy;
-					end
-				end
-				Astrolabe:PlaceIconOnMinimap( icon, C, Z, x, y );
-			else
-				FishingBuddy.Extravaganza.MarkSchool();
-			end
-			return true;
-		end;
-	
+	end	
 end

@@ -2,10 +2,10 @@
 ************************************************************************
 Smelting.lua
 ************************************************************************
-File date: 2012-01-03T06:43:57Z
-File hash: b8a0eff
-Project hash: de16aef
-Project version: 2.3.0
+File date: 2012-09-22T23:33:53Z
+File hash: 413f0e4
+Project hash: 9e1f108
+Project version: 2.4.1
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -131,56 +131,56 @@ function addon:InitSmelting()
 	recipe:SetCraftedItemID(23445)
 	recipe:SetSkillLevels(275, 275, 275, 300, 325)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
 
 	-- Smelt Adamantite -- 29358
 	recipe = AddRecipe(29358, V.TBC, Q.COMMON)
 	recipe:SetCraftedItemID(23446)
 	recipe:SetSkillLevels(325, 325, 325, 332, 340)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
 
 	-- Smelt Eternium -- 29359
 	recipe = AddRecipe(29359, V.TBC, Q.COMMON)
 	recipe:SetCraftedItemID(23447)
 	recipe:SetSkillLevels(350, 350, 350, 357, 365)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
 
 	-- Smelt Felsteel -- 29360
 	recipe = AddRecipe(29360, V.TBC, Q.COMMON)
 	recipe:SetCraftedItemID(23448)
 	recipe:SetSkillLevels(350, 350, 350, 357, 375)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
 
 	-- Smelt Khorium -- 29361
 	recipe = AddRecipe(29361, V.TBC, Q.COMMON)
 	recipe:SetCraftedItemID(23449)
 	recipe:SetSkillLevels(375, 375, 375, 375, 375)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
 
 	-- Smelt Hardened Adamantite -- 29686
 	recipe = AddRecipe(29686, V.TBC, Q.COMMON)
 	recipe:SetCraftedItemID(23573)
 	recipe:SetSkillLevels(375, 375, 375, 375, 375)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
 
 	-- Earth Shatter -- 35750
 	recipe = AddRecipe(35750, V.TBC, Q.COMMON)
 	recipe:SetCraftedItemID(22573)
 	recipe:SetSkillLevels(300, 300, 300, 300, 300)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
 
 	-- Fire Sunder -- 35751
 	recipe = AddRecipe(35751, V.TBC, Q.COMMON)
 	recipe:SetCraftedItemID(22574)
 	recipe:SetSkillLevels(300, 300, 300, 300, 300)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 18779, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 33682, 46357, 52170)
 
 	-- Smelt Hardened Khorium -- 46353
 	recipe = AddRecipe(46353, V.WOTLK, Q.RARE)
@@ -195,28 +195,28 @@ function addon:InitSmelting()
 	recipe:SetCraftedItemID(36916)
 	recipe:SetSkillLevels(350, 350, 350, 362, 375)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 46357, 52170)
 
 	-- Smelt Saronite -- 49258
 	recipe = AddRecipe(49258, V.WOTLK, Q.COMMON)
 	recipe:SetCraftedItemID(36913)
 	recipe:SetSkillLevels(400, 400, 400, 400, 400)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 46357, 52170)
 
 	-- Smelt Titansteel -- 55208
 	recipe = AddRecipe(55208, V.WOTLK, Q.COMMON)
 	recipe:SetCraftedItemID(37663)
 	recipe:SetSkillLevels(450, 450, 450, 450, 450)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 46357, 52170)
 
 	-- Smelt Titanium -- 55211
 	recipe = AddRecipe(55211, V.WOTLK, Q.COMMON)
 	recipe:SetCraftedItemID(41163)
 	recipe:SetSkillLevels(450, 450, 450, 450, 450)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
-	recipe:AddTrainer(3001, 3357, 5513, 8128, 18747, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 46357, 52170)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 18747, 26912, 26962, 26976, 26999, 28698, 33617, 33640, 46357, 52170)
 
 	-- Enchanted Thorium Bar -- 70524
 	recipe = AddRecipe(70524, V.WOTLK, Q.COMMON)
@@ -250,6 +250,20 @@ function addon:InitSmelting()
 	recipe = AddRecipe(84038, V.CATA, Q.COMMON)
 	recipe:SetCraftedItemID(54849)
 	recipe:SetSkillLevels(425, 425, 425, 437, 475)
+	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 16663, 18747, 33617, 33640, 46357, 52170)
+
+	-- Smelt Ghost Iron -- 102165
+	recipe = AddRecipe(102165, V.MOP, Q.COMMON)
+	recipe:SetCraftedItemID(72096)
+	recipe:SetSkillLevels(500, 500, 500, 500, 525)
+	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
+	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 16663, 18747, 33617, 33640, 46357, 52170)
+
+	-- Smelt Trillium -- 102167
+	recipe = AddRecipe(102167, V.MOP, Q.COMMON)
+	recipe:SetCraftedItemID(72095)
+	recipe:SetSkillLevels(600, 600, 600, 600, 600)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOE, F.RBOP)
 	recipe:AddTrainer(3001, 3357, 4254, 5513, 8128, 16663, 18747, 33617, 33640, 46357, 52170)
 

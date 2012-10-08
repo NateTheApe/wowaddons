@@ -149,12 +149,15 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	warnGnoll		= "Gnoll spawned",
-	warnHogger		= "Hogger spawned",
-	specWarnHogger	= "Hogger spawned!"
+	warnGameOverQuest	= "Earned %d out of %d possible points spawned",
+	warnGameOverNoQuest	= "Game ended with a total of %d possible points spawned",
+	warnGnoll			= "Gnoll spawned",
+	warnHogger			= "Hogger spawned",
+	specWarnHogger		= "Hogger spawned!"
 })
 
 L:SetOptionLocalization({
+	warnGameOver	= "Announce total possible points when game ends",
 	warnGnoll		= "Announce when a Gnoll spawns",
 	warnHogger		= "Announce when a Hogger spawns",
 	specWarnHogger	= "Show special warning when a Hogger spawns"
@@ -180,4 +183,41 @@ L = DBM:GetModLocalization("Tonks")
 
 L:SetGeneralLocalization({
 	name = "Tonk Challenge"
+})
+
+-----------------------
+--  Darkmoon Rabbit  --
+-----------------------
+L = DBM:GetModLocalization("Rabbit")
+
+L:SetGeneralLocalization({
+	name = "Darkmoon Rabbit"
+})
+
+--------------------------
+--  Plants Vs. Zombies  --
+--------------------------
+L = DBM:GetModLocalization("PlantsVsZombies")
+
+L:SetGeneralLocalization({
+	name = "Plants Vs. Zombies"
+})
+
+L:SetWarningLocalization({
+	warnTotalAdds	= "Total zombies spawned since last massive wave: %d",
+	specWarnWave	= "Massive Wave!"
+})
+
+L:SetTimerLocalization{
+	timerWave		= "Next Massive Wave"
+}
+
+L:SetOptionLocalization({
+	warnTotalAdds	= "Announce total add spawn count between each massive wave",
+	specWarnWave	= "Show special warning when a Massive Wave begins",
+	timerWave		= "Show timer for next Massive Wave"
+})
+
+L:SetMiscLocalization({
+	MassiveWave		= "A Massive Wave of Zombies is Approaching!"
 })

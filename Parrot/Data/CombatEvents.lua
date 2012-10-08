@@ -47,15 +47,6 @@ local SchoolParser = {
 	[64] = "Arcane"
 }
 
-local EnvironmentalParser = {
-	["DROWNING"] = "Drowning",
-	["FALLING"] = "Falling",
-	["FATIGUE"] = "Fatigue",
-	["FIRE"] = "Fire",
-	["LAVA"] = "Lava",
-	["SLIME"] = "Slime"
-}
-
 local function retrieveAlternatePowerName(self, key)
 	if key == ALTERNATE_POWER_INDEX then
 		return select(10, UnitAlternatePowerInfo("player"))
@@ -68,12 +59,17 @@ local PowerTypeParser = setmetatable({
 		[1] = RAGE,
 		[2] = FOCUS,
 		[3] = ENERGY,
-		[4] = HAPPINESS,
+		[4] = CHI,
 		[5] = RUNES,
 		[6] = RUNIC_POWER,
 		[7] = SOUL_SHARDS,
 		[8] = ECLIPSE,
 		[9] = HOLY_POWER,
+		[11] = DARK_FORCE,
+		[12] = CHI_POWER,
+		[13] = SHADOW_ORBS,
+		[14] = BURNING_EMBERS,
+		[15] = DEMONIC_FURY,
 	}, { __index = retrieveAlternatePowerName, })
 
 -- lookup-table for damage-types
@@ -1094,7 +1090,7 @@ Parrot:RegisterCombatEvent{
 }
 
 local function parseEnvironmentalDamage(info)
-	return EnvironmentalParser[info.environmentalType]
+	return _G["ACTION_ENVIRONMENTAL_DAMAGE_" .. string.upper(info.environmentalType)]
 end
 
 Parrot:RegisterCombatEvent{

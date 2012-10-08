@@ -1,17 +1,13 @@
-## Interface: 40200
+## Interface: 50001
 ## Title: Broker: CPU
 ## Notes: A lightweight Data Broker plugin to visualize AddOn CPU/Memory usage, Framerate, Latency.
 ## Author: Merah
-## Version: 40100
-## X-Website: http://www.wowinterface.com/list.php?skinnerid=92869
+## Version: 50001
+## X-Website: https://brokercpu.googlecode.com
 ## X-Email: ad@heapoverflow.com
 ## X-Category: Miscellaneous, Development Tools
 ## OptionalDeps: LibQTip-1.0, LibDBIcon-1.0
 ## SavedVariables: BROKERCPUDB
-## X-Curse-Packaged-Version: 40200.30
-## X-Curse-Project-Name: Broker_CPU Memory
-## X-Curse-Project-ID: brokercpu
-## X-Curse-Repository-ID: wow/brokercpu/mainline
 
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Always: delayed

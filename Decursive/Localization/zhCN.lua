@@ -1,8 +1,8 @@
 ﻿--[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -15,13 +15,13 @@
     required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2011-11-06T13:34:55Z
+    This file was last updated on 2012-09-23T20:33:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -59,6 +59,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -72,7 +73,7 @@ end
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhCN");
 
 if not L then
-    T._LoadedFiles["zhCN.lua"] = "2.7.0.5";
+    T._LoadedFiles["zhCN.lua"] = "2.7.2.2";
     return;
 end;
 
@@ -93,7 +94,8 @@ L["BINDING_NAME_DCRPRADD"] = "将目标加入优先列表"
 L["BINDING_NAME_DCRPRCLEAR"] = "清空优先列表"
 L["BINDING_NAME_DCRPRLIST"] = "显示优先列表明细条目"
 L["BINDING_NAME_DCRPRSHOW"] = "显示/隐藏优先列表"
-L["BINDING_NAME_DCRSHOW"] = "显示或隐藏 Decursive 状态条"
+L["BINDING_NAME_DCRSHOW"] = [=[显示或隐藏 Decursive 状态条
+（实时列表锚点）]=]
 L["BINDING_NAME_DCRSHOWOPTION"] = "显示选项设置面板"
 L["BINDING_NAME_DCRSKADD"] = "将目标加入忽略列表"
 L["BINDING_NAME_DCRSKCLEAR"] = "清空忽略列表"
@@ -113,9 +115,13 @@ L["CTRL"] = "Ctrl"
 L["CURE_PETS"] = "检测并净化宠物"
 L["CURSE"] = "诅咒"
 L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33请报告此窗口的内容给 Archarodim+DcrReport@teaser.fr|r
-|cFF009999（使用 CTRL+A 选择所有 CTRL+C 复制文本到剪切板）|r
-如果发现 Decursive 任何奇怪的行为也一并报告。]=]
+|cFF009999（使用 Ctrl+A 选择所有 Ctrl+C 复制文本到剪切板）|r
+如果发现 Decursive 任何奇怪的行为也一并报告。
+]=]
 L["DECURSIVE_DEBUG_REPORT"] = "**** |cFFFF0000Decursive 除错报告|r ****"
+L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"] = [=[|cFF11FF33Decursive 崩溃了但是别怕！新版本的 Decursive 已经被检测到了（%s）。只需简单更新。请到 curse.com 并查询“Decursive”'或使用 Curse 客户端，将自动更新全部插件。|r
+|cFFFF1133别浪费时间在汇报臭虫上了，因为可能已被修复了。只需更新 Decursive 来摆脱这些问题！|r
+|cFF11FF33谢谢阅读此消息！|r]=]
 L["DECURSIVE_DEBUG_REPORT_NOTIFY"] = [=[一个除错报告可用！
 输入|cFFFF0000/DCRREPORT|r 查看]=]
 L["DECURSIVE_DEBUG_REPORT_SHOW"] = "除错报告可用！"
@@ -123,16 +129,12 @@ L["DECURSIVE_DEBUG_REPORT_SHOW_DESC"] = "显示作者需要看到的除错报告
 L["DEFAULT_MACROKEY"] = "`"
 L["DEV_VERSION_ALERT"] = [=[您正在使用的是开发版本的 Decursive 。
 
-如果不想参加测试新功能与修复，得到游戏中的除错报告后发送问题给作者，请“不要使用此版本”并从 curse.com 和 wowace.com 下载最新的“稳定”版本。
+如果不想参加测试新功能与修复、得到游戏中的除错报告后发送问题给作者的话，请“不要使用此版本”并从 curse.com 和 wowace.com 下载最新的“稳定”版本。
 
-这条消息只将在版本更新中显示一次
-
-使用开发版本 Decursive 的玩家开始游戏显示此提示。]=]
+这条消息只将在每次版本更新中显示一次]=]
 L["DEV_VERSION_EXPIRED"] = [=[此开发版 Decursive 已过期。
-请从 CURSE.COM 或 WOWACE.COM 下载最新的开发版或使用当前稳定版。谢谢！ ^_^
-此提示每两天显示一次。
-
-说明：当用户使用过期的开发版 Decursive 登录时每次显示。]=]
+请从 CURSE.COM 或 WOWACE.COM 下载最新的开发版或使用当前稳定版。
+此提示每两天显示一次。]=]
 L["DEWDROPISGONE"] = "没有等同于 Ace3 的 DewDrop。Alt+右键点击打开选项面板。"
 L["DISABLEWARNING"] = [=[Decursive 已被禁用！
 
@@ -186,7 +188,7 @@ L["MISSINGUNIT"] = "丢失单位"
 L["NEW_VERSION_ALERT"] = [=[检测到 Decursive 新版本：|cFFEE7722%q|r 发布于|cFFEE7722%s|r！
 
 
-到|cFFFF0000WoWAce.com|r下载！
+到 |cFFFF0000WoWAce.com|r 下载！
 --------]=]
 L["NORMAL"] = "一般"
 L["NOSPELL"] = "没有相关技能"
@@ -245,26 +247,30 @@ L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = [=[勾选此项如想编辑内置宏 
 （---只限高级用户---）]=]
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "伤害类型"
 L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "这个法术是 Decursive 自动配置的一部分。如果这个法术不再正常工作，可以删除或禁用它恢复预设 Decursive 行为。"
+L["OPT_CUSTOM_SPELL_ISPET"] = "宠物技能"
+L["OPT_CUSTOM_SPELL_ISPET_DESC"] = "如果检测到这是一个属于宠物的技能，Decursive 可以检测并施放它。"
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"] = "提示：法术%q没有出现在宏之中，范围和冷却信息将不会匹配……"
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_UNITID_KEYWORD"] = "UNITID 键值缺失。"
 L["OPT_CUSTOM_SPELL_MACRO_TEXT"] = "宏文本："
 L["OPT_CUSTOM_SPELL_MACRO_TEXT_DESC"] = [=[编辑预设的宏文本。
 |cFFFF0000只有2限制：|r
 
--  必须指定目标使用 UNITID 键值，将自动由每个微单元框体的单位 ID 取代。
+- 必须指定目标使用 UNITID 键值，将自动由每个微单元框体的单位 ID 取代。
 
--  可能不会改变宏使用的法术，另外 Decursive 将无法追踪其冷却时间或范围状态。
-（记住，如果你打算使用条件不同的法术）
-]=]
+- 可能不会改变宏使用的法术，另外 Decursive 将无法追踪其冷却时间或范围状态。
+（记住，如果你打算使用条件不同的法术）]=]
 L["OPT_CUSTOM_SPELL_MACRO_TOO_LONG"] = "宏过长，需要移除%d字符。"
 L["OPT_CUSTOM_SPELL_PRIORITY"] = "法术优先级"
-L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = "当有多个法术可以治疗相同类型的伤害，将选择优先级高的。"
+L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = [=[当有多个法术可以治疗相同类型的伤害，将选择优先级高的。
+
+请注意，Decursive 所管理的默认技能有优先级，取值范围从0到9。
+
+因此，如果您给您的自定义法术过低的优先级，它只会选择默认的技能。]=]
 L["OPT_CUSTOMSPELLS"] = "自定义法术"
 L["OPT_CUSTOMSPELLS_DESC"] = [=[这里添加法术扩展 Decursive 的自动配置。
-自定义法术永远拥有更高的优先级并覆盖和替换默认法术（当且仅当你的角色可以使用这些法术）。]=]
+自定义法术永远拥有更高的优先级并覆盖和替换默认法术（当且仅当你的角色可以使用这些法术）。
+]=]
 L["OPT_CUSTOMSPELLS_EFFECTIVE_ASSIGNMENTS"] = "有效法术分配："
-L["OPT_CUSTOM_SPELL_STOPCASTING"] = "/StopCasting"
-L["OPT_CUSTOM_SPELL_STOPCASTING_DESC"] = "使用此法术将打断其它施放法术（如果是宠物法术请反选此项）"
 L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "不可用"
 L["OPT_DEBCHECKEDBYDEF"] = [=[
 
@@ -456,4 +462,4 @@ L["UNSTABLERELEASE"] = "不稳定版本"
 
 
 
-T._LoadedFiles["zhCN.lua"] = "2.7.0.5";
+T._LoadedFiles["zhCN.lua"] = "2.7.2.2";

@@ -420,7 +420,7 @@ end)
 -- Aura Type, Allows filtering by the type of Aura.
 local function aura_type_filter(self, entry)
 	local cfg = PitBull4_Aura:GetFilterDB(self)
-	if cfg.aura_type_list[entry[9]] then
+	if cfg.aura_type_list[tostring(entry[9])] then
 		if cfg.whitelist then
 			return true
 		else
@@ -1041,6 +1041,7 @@ local classes = {
 	'SHAMAN',
 	'WARLOCK',
 	'WARRIOR',
+	'MONK',
 }
 local class_names = {
 	L["Death Knight"],
@@ -1053,6 +1054,7 @@ local class_names = {
 	L["Shaman"],
 	L["Warlock"],
 	L["Warrior"],
+	L["Monk"],
 }
 local races = {
 	'Human',
@@ -1065,6 +1067,9 @@ local races = {
 	'Tauren',
 	'Troll',
 	'BloodElf',
+	'Worgen',
+	'Goblin',
+	'Pandaren',
 }
 local race_names = {
 	L["Human"],
@@ -1077,6 +1082,9 @@ local race_names = {
 	L["Tauren"],
 	L["Troll"],
 	L["Blood Elf"],
+	L["Worgen"],
+	L["Goblin"],
+	L["Pandaren"],
 }
 local function map_filter(self, entry, frame)
 	local filters = PitBull4_Aura.db.profile.global.filters

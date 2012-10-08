@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("BPCouncil", "DBM-Icecrown", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4693 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(37970, 37972, 37973)
 mod:SetModelID(30858)
 mod:SetUsedIcons(7, 8)
@@ -29,7 +29,7 @@ local warnTargetSwitchSoon		= mod:NewAnnounce("WarnTargetSwitchSoon", 2, 70952)
 local warnConjureFlames			= mod:NewCastAnnounce(71718, 2)
 local warnEmpoweredFlamesCast	= mod:NewCastAnnounce(72040, 3)
 local warnEmpoweredFlames		= mod:NewTargetAnnounce(72040, 4)
-local warnGliteringSparks		= mod:NewTargetAnnounce(72798, 2, nil, false)
+local warnGliteringSparks		= mod:NewTargetAnnounce(71807, 2, nil, false)
 local warnShockVortex			= mod:NewTargetAnnounce(72037, 3)				-- 1,5sec cast
 local warnEmpoweredShockVortex	= mod:NewCastAnnounce(72039, 4)					-- 4,5sec cast
 local warnKineticBomb			= mod:NewSpellAnnounce(72053, 3, nil, mod:IsRanged())
@@ -44,7 +44,7 @@ local specWarnShadowPrison		= mod:NewSpecialWarningStack(72999, nil, 6)
 local timerTargetSwitch			= mod:NewTimer(47, "TimerTargetSwitch", 70952)	-- every 46-47seconds
 local timerDarkNucleusCD		= mod:NewCDTimer(10, 71943, nil, false)	-- usually every 10 seconds but sometimes more
 local timerConjureFlamesCD		= mod:NewCDTimer(20, 71718)				-- every 20-30 seconds but never more often than every 20sec
-local timerGlitteringSparksCD	= mod:NewCDTimer(20, 72798)				-- This is pretty nasty on heroic
+local timerGlitteringSparksCD	= mod:NewCDTimer(20, 71807)				-- This is pretty nasty on heroic
 local timerShockVortex			= mod:NewCDTimer(16.5, 72037)			-- Seen a range from 16,8 - 21,6
 local timerKineticBombCD		= mod:NewCDTimer(18, 72053, nil, mod:IsRanged())				-- Might need tweaking
 local timerShadowPrison			= mod:NewBuffActiveTimer(10, 72999)		-- Hard mode debuff
@@ -60,7 +60,6 @@ mod:AddBoolOption("VortexArrow")
 
 local activePrince
 local glitteringSparksTargets	= {}
-local lastVortex
 
 local function warnGlitteringSparksTargets()
 	warnGliteringSparks:Show(table.concat(glitteringSparksTargets, "<, >"))
@@ -74,7 +73,6 @@ function mod:OnCombatStart(delay)
 	timerTargetSwitch:Start(-delay)
 	activePrince = nil
 	table.wipe(glitteringSparksTargets)
-	lastVortex = GetTime()
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Show(12)
 	end
@@ -117,7 +115,7 @@ end
 
 function mod:TrySetTarget()
 	if DBM:GetRaidRank() >= 1 and self.Options.ActivePrinceIcon then
-		for i = 1, GetNumRaidMembers() do
+		for i = 1, DBM:GetGroupMembers() do
 			if UnitGUID("raid"..i.."target") == activePrince then
 				activePrince = nil
 				SetRaidTarget("raid"..i.."target", 8)

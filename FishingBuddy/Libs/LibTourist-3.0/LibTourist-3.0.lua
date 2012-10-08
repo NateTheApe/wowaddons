@@ -1,20 +1,18 @@
 ﻿--[[
 Name: LibTourist-3.0
-Revision: $Rev: 141 $
+Revision: $Rev: 150 $
 Author(s): ckknight (ckknight@gmail.com), Arrowmaster, Odica (maintainer)
 Website: http://ckknight.wowinterface.com/
 Documentation: http://www.wowace.com/addons/libtourist-3-0/
 SVN: svn://svn.wowace.com/wow/libtourist-3-0/mainline/trunk
 Description: A library to provide information about zones and instances.
-Dependencies: LibBabble-Zone-3.0
 License: MIT
 ]]
 
 local MAJOR_VERSION = "LibTourist-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 141 $"):match("(%d+)"))
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 150 $"):match("(%d+)"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
-if not LibStub("LibBabble-Zone-3.0") then error(MAJOR_VERSION .. " requires LibBabble-Zone-3.0.") end
 
 local Tourist, oldLib = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if not Tourist then
@@ -28,19 +26,27 @@ if oldLib then
 	end
 end
 
-function trace(msg)
+local function trace(msg)
 --	DEFAULT_CHAT_FRAME:AddMessage(msg)
 end
 
-local BZ = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
-local BZR = LibStub("LibBabble-Zone-3.0"):GetReverseLookupTable()
+-- Localization tables
+local BZ = {}
+local BZR = {}
 
 local playerLevel = 1
-local _,race = UnitRace("player")
-local isHorde = (race == "Orc" or race == "Troll" or race == "Tauren" or race == "Scourge" or race == "BloodElf" or race == "Goblin")
+
+local isAlliance, isHorde, isNeutral
+do
+	local faction = UnitFactionGroup("player")
+	isAlliance = faction == "Alliance"
+	isHorde = faction == "Horde"
+	isNeutral = not isAlliance and not isHorde
+end
+
 local isWestern = GetLocale() == "enUS" or GetLocale() == "deDE" or GetLocale() == "frFR" or GetLocale() == "esES"
 
-local Kalimdor, Eastern_Kingdoms, Outland, Northrend, The_Maelstrom = GetMapContinents()
+local Kalimdor, Eastern_Kingdoms, Outland, Northrend, The_Maelstrom, Pandaria = GetMapContinents()
 if not Outland then
 	Outland = "Outland"
 end
@@ -50,8 +56,12 @@ end
 if not The_Maelstrom then
 	The_Maelstrom = "The Maelstrom"
 end
+if not Pandaria then
+	Pandaria = "Pandaria"
+end
 
-local Azeroth = BZ["Azeroth"]
+--local Azeroth = BZ["Azeroth"]
+local Azeroth = "Azeroth"
 
 local X_Y_ZEPPELIN = "%s - %s Zeppelin"
 local X_Y_BOAT = "%s - %s Boat"
@@ -105,6 +115,8 @@ local zoneComplexes = {}
 local entrancePortals_zone = {}
 local entrancePortals_x = {}
 local entrancePortals_y = {}
+
+-- HELPER AND LOOKUP FUNCTIONS -------------------------------------------------------------
 
 local function PLAYER_LEVEL_UP(self, level)
 	playerLevel = level or UnitLevel("player")
@@ -160,17 +172,19 @@ end
 function Tourist:GetLevel(zone)
 	if types[zone] == "Battleground" then
 		-- Note: Not all BG's start at level 10, but all BG's support players up to MAX_PLAYER_LEVEL.
-		
+
 		local playerLvl = playerLevel
 		if playerLvl <= lows[zone] then
 			-- Player is too low level to enter the BG -> return the lowest available bracket
 			-- by assuming the player is at the min level required for the BG.
 			playerLvl = lows[zone]
 		end
-	
+
 		-- Find the most suitable bracket
 		if playerLvl >= MAX_PLAYER_LEVEL then
 			return MAX_PLAYER_LEVEL, MAX_PLAYER_LEVEL
+		elseif playerLvl >= 85 then
+			return 85, 89
 		elseif playerLvl >= 80 then
 			return 80, 84
 		elseif playerLvl >= 75 then
@@ -203,7 +217,7 @@ function Tourist:GetLevel(zone)
 			return 10, 14
 		end
 	end
-	
+
 	-- All non-battlegrounds:
 	return lows[zone], highs[zone]
 end
@@ -219,40 +233,72 @@ function Tourist:GetLevelColor(zone)
 		end
 	end
 
+	local midBracket = (low + high) / 2
+
 	if low <= 0 and high <= 0 then
-		-- City or level unknown
+		-- City or level unknown -> White
 		return 1, 1, 1
 	elseif playerLevel == low and playerLevel == high then
+		-- Exact match, one-level bracket -> Yellow
 		return 1, 1, 0
 	elseif playerLevel <= low - 3 then
+		-- Player is three or more levels short of Low -> Red
 		return 1, 0, 0
-	elseif playerLevel <= low then
-		return 1, (playerLevel - low - 3) / -6, 0
-	elseif playerLevel <= (low + high) / 2 then
-		return 1, (playerLevel - low) / (high - low) + 0.5, 0
-	elseif playerLevel <= high then
-		return 2 * (playerLevel - high) / (low - high), 1, 0
-	elseif playerLevel <= high + 3 then
-		local num = (playerLevel - high) / 6
-		return num, 1 - num, num
+	elseif playerLevel < low then
+		-- Player is two or less levels short of Low -> sliding scale between Red and Orange
+		-- Green component goes from 0 to 0.5
+		local greenComponent = (playerLevel - low + 3) / 6
+		return 1, greenComponent, 0
+	elseif playerLevel == low then
+		-- Player is at low, at least two-level bracket -> Orange
+		return 1, 0.5, 0
+	elseif playerLevel < midBracket then
+		-- Player is between low and the middle of the bracket -> sliding scale between Orange and Yellow
+		-- Green component goes from 0.5 to 1
+		local halfBracketSize = (high - low) / 2
+		local posInBracketHalf = playerLevel - low
+		local greenComponent = 0.5 + (posInBracketHalf / halfBracketSize) * 0.5
+		return 1, greenComponent, 0
+	elseif playerLevel == midBracket then
+		-- Player is at the middle of the bracket -> Yellow
+		return 1, 1, 0
+	elseif playerLevel < high then
+		-- Player is between the middle of the bracket and High -> sliding scale between Yellow and Green
+		-- Red component goes from 1 to 0
+		local halfBracketSize = (high - low) / 2
+		local posInBracketHalf = playerLevel - midBracket
+		local redComponent = 1 - (posInBracketHalf / halfBracketSize)
+		return redComponent, 1, 0
+	elseif playerLevel == high then
+		-- Player is at High, at least two-level bracket -> Green
+		return 0, 1, 0
+	elseif playerLevel < high + 3 then
+		-- Player is up to three levels above High -> sliding scale between Green and Gray
+		-- Red and Blue components go from 0 to 0.5
+		-- Green component goes from 1 to 0.5
+		local pos = (playerLevel - high) / 3
+		local redAndBlueComponent = pos * 0.5
+		local greenComponent = 1 - redAndBlueComponent
+		return redAndBlueComponent, greenComponent, redAndBlueComponent
 	else
+		-- Player is at High + 3 or above -> Gray
 		return 0.5, 0.5, 0.5
 	end
 end
 
 function Tourist:GetFactionColor(zone)
-	if factions[zone] == (isHorde and "Alliance" or "Horde") then
-		-- Red
-		return 1, 0, 0
-	elseif factions[zone] == (isHorde and "Horde" or "Alliance") then
-		-- Green
-		return 0, 1, 0
-	elseif factions[zone] == "Sanctuary" then
+	if factions[zone] == "Sanctuary" then
 		-- Blue
 		return 0.41, 0.8, 0.94
 	elseif self:IsPvPZone(zone) then
 		-- Orange
 		return 1, 0.7, 0
+	elseif factions[zone] == (isHorde and "Alliance" or "Horde") then
+		-- Red
+		return 1, 0, 0
+	elseif factions[zone] == (isHorde and "Horde" or "Alliance") then
+		-- Green
+		return 0, 1, 0
 	else
 		-- Yellow
 		return 1, 1, 0
@@ -651,7 +697,7 @@ end
 
 local function zoneIter(_, position)
 	local k = next(zonesInstances, position)
-	while k ~= nil and (types[k] == "Instance" or types[k] == "Battleground" or types[k] == "Arena") do
+	while k ~= nil and (types[k] == "Instance" or types[k] == "Battleground" or types[k] == "Arena" or types[k] == "Complex") do
 		k = next(zonesInstances, k)
 	end
 	return k
@@ -867,6 +913,20 @@ function Tourist:IterateTheMaelstrom()
 	return theMaelstromIter, nil, nil
 end
 
+local function pandariaIter(_, position)
+	local k = next(zonesInstances, position)
+	while k ~= nil and continents[k] ~= Pandaria do
+		k = next(zonesInstances, k)
+	end
+	return k
+end
+function Tourist:IteratePandaria()
+	if initZonesInstances then
+		initZonesInstances()
+	end
+	return pandariaIter, nil, nil
+end
+
 function Tourist:IterateRecommendedZones()
 	return retNormal, recZones, nil
 end
@@ -886,7 +946,7 @@ end
 
 function Tourist:IsZone(zone)
 	local t = types[zone]
-	return t and t ~= "Instance" and t ~= "Battleground" and t ~= "Transport" and t ~= "Arena"
+	return t and t ~= "Instance" and t ~= "Battleground" and t ~= "Transport" and t ~= "Arena" and t ~= "Complex"
 end
 
 function Tourist:GetComplex(zone)
@@ -980,6 +1040,10 @@ function Tourist:IsInTheMaelstrom(zone)
 	return continents[zone] == The_Maelstrom
 end
 
+function Tourist:IsInPandaria(zone)
+	return continents[zone] == Pandaria
+end
+
 function Tourist:GetInstanceGroupSize(instance)
 	return groupSizes[instance] or 0
 end
@@ -994,10 +1058,11 @@ end
 
 function Tourist:GetZoneFromTexture(texture)
 	if not texture then
-		return BZ["Azeroth"]
+--		return BZ["Azeroth"]
+		return "Azeroth"
 	end
 	local zone = textures_rev[texture]
-	if zone then 
+	if zone then
 		return zone
 	else
 		-- Might be phased terrain, look for "_terrain<number>" postfix
@@ -1189,6 +1254,772 @@ function Tourist:IterateBorderZones(zone, zonesOnly)
 	end
 end
 
+function Tourist:GetLookupTable()
+	return BZ
+end
+
+function Tourist:GetReverseLookupTable()
+	return BZR
+end
+
+--------------------------------------------------------------------------------------------------------
+--                                            Localization                                            --
+--------------------------------------------------------------------------------------------------------
+local MapIdLookupTable = {
+	[-1] = "Azeroth",
+	[4] = "Durotar",
+	[9] = "Mulgore",
+	[11] = "Northern Barrens",
+	[13] = "Kalimdor",
+	[14] = "Eastern Kingdoms",
+	[16] = "Arathi Highlands",
+	[17] = "Badlands",
+	[19] = "Blasted Lands",
+	[20] = "Tirisfal Glades",
+	[21] = "Silverpine Forest",
+	[22] = "Western Plaguelands",
+	[23] = "Eastern Plaguelands",
+	[24] = "Hillsbrad Foothills",
+	[26] = "The Hinterlands",
+	[27] = "Dun Morogh",
+	[28] = "Searing Gorge",
+	[29] = "Burning Steppes",
+	[30] = "Elwynn Forest",
+	[32] = "Deadwind Pass",
+	[34] = "Duskwood",
+	[35] = "Loch Modan",
+	[36] = "Redridge Mountains",
+	[37] = "Northern Stranglethorn",
+	[38] = "Swamp of Sorrows",
+	[39] = "Westfall",
+	[40] = "Wetlands",
+	[41] = "Teldrassil",
+	[42] = "Darkshore",
+	[43] = "Ashenvale",
+	[61] = "Thousand Needles",
+	[81] = "Stonetalon Mountains",
+	[101] = "Desolace",
+	[121] = "Feralas",
+	[141] = "Dustwallow Marsh",
+	[161] = "Tanaris",
+	[181] = "Azshara",
+	[182] = "Felwood",
+	[201] = "Un'Goro Crater",
+	[241] = "Moonglade",
+	[261] = "Silithus",
+	[281] = "Winterspring",
+	[301] = "Stormwind City",
+	[321] = "Orgrimmar",
+	[341] = "Ironforge",
+	[362] = "Thunder Bluff",
+	[381] = "Darnassus",
+	[382] = "Undercity",
+	[401] = "Alterac Valley",
+	[443] = "Warsong Gulch",
+	[461] = "Arathi Basin",
+	[462] = "Eversong Woods",
+	[463] = "Ghostlands",
+	[464] = "Azuremyst Isle",
+	[465] = "Hellfire Peninsula",
+	[466] = "Outland",
+	[467] = "Zangarmarsh",
+	[471] = "The Exodar",
+	[473] = "Shadowmoon Valley",
+	[475] = "Blade's Edge Mountains",
+	[476] = "Bloodmyst Isle",
+	[477] = "Nagrand",
+	[478] = "Terokkar Forest",
+	[479] = "Netherstorm",
+	[480] = "Silvermoon City",
+	[481] = "Shattrath City",
+	[482] = "Eye of the Storm",
+	[485] = "Northrend",
+	[486] = "Borean Tundra",
+	[488] = "Dragonblight",
+	[490] = "Grizzly Hills",
+	[491] = "Howling Fjord",
+	[492] = "Icecrown",
+	[493] = "Sholazar Basin",
+	[495] = "The Storm Peaks",
+	[496] = "Zul'Drak",
+	[499] = "Isle of Quel'Danas",
+	[501] = "Wintergrasp",
+	[502] = "The Scarlet Enclave",
+	[504] = "Dalaran",
+	[510] = "Crystalsong Forest",
+	[512] = "Strand of the Ancients",
+	[520] = "The Nexus",
+	[521] = "The Culling of Stratholme",
+	[522] = "Ahn'kahet: The Old Kingdom",
+	[523] = "Utgarde Keep",
+	[524] = "Utgarde Pinnacle",
+	[525] = "Halls of Lightning",
+	[526] = "Halls of Stone",
+	[527] = "The Eye of Eternity",
+	[528] = "The Oculus",
+	[529] = "Ulduar",
+	[530] = "Gundrak",
+	[531] = "The Obsidian Sanctum",
+	[532] = "Vault of Archavon",
+	[533] = "Azjol-Nerub",
+	[534] = "Drak'Tharon Keep",
+	[535] = "Naxxramas",
+	[536] = "The Violet Hold",
+	[539] = "Gilneas",
+	[540] = "Isle of Conquest",
+	[541] = "Hrothgar's Landing",
+	[542] = "Trial of the Champion",
+	[543] = "Trial of the Crusader",
+	[544] = "The Lost Isles",
+	[545] = "Gilneas",
+	[601] = "The Forge of Souls",
+	[602] = "Pit of Saron",
+	[603] = "Halls of Reflection",
+	[604] = "Icecrown Citadel",
+	[605] = "Kezan",
+	[606] = "Mount Hyjal",
+	[607] = "Southern Barrens",
+	[609] = "The Ruby Sanctum",
+	[610] = "Kelp'thar Forest",
+	[611] = "Gilneas City",
+	[613] = "Vashj'ir",
+	[614] = "Abyssal Depths",
+	[615] = "Shimmering Expanse",
+	[626] = "Twin Peaks",
+	[640] = "Deepholm",
+	[673] = "The Cape of Stranglethorn",
+	[677] = "The Battle for Gilneas",
+	[678] = "Gilneas",
+	[679] = "Gilneas",
+	[680] = "Ragefire Chasm",
+	[681] = "The Lost Isles",
+	[682] = "The Lost Isles",
+	[683] = "Mount Hyjal",
+	[684] = "Ruins of Gilneas",
+	[685] = "Ruins of Gilneas City",
+	[686] = "Zul'Farrak",
+	[687] = "The Temple of Atal'Hakkar",
+	[688] = "Blackfathom Deeps",
+	[689] = "Stranglethorn Vale",
+	[690] = "The Stockade",
+	[691] = "Gnomeregan",
+	[692] = "Uldaman",
+	[696] = "Molten Core",
+	[697] = "Zul'Gurub",
+	[699] = "Dire Maul",
+	[700] = "Twilight Highlands",
+	[704] = "Blackrock Depths",
+	[708] = "Tol Barad",
+	[709] = "Tol Barad Peninsula",
+	[710] = "The Shattered Halls",
+	[717] = "Ruins of Ahn'Qiraj",
+	[718] = "Onyxia's Lair",
+	[720] = "Uldum",
+	[721] = "Blackrock Spire",
+	[722] = "Auchenai Crypts",
+	[723] = "Sethekk Halls",
+	[724] = "Shadow Labyrinth",
+	[725] = "The Blood Furnace",
+	[726] = "The Underbog",
+	[727] = "The Steamvault",
+	[728] = "The Slave Pens",
+	[729] = "The Botanica",
+	[730] = "The Mechanar",
+	[731] = "The Arcatraz",
+	[732] = "Mana-Tombs",
+	[733] = "The Black Morass",
+	[734] = "Old Hillsbrad Foothills",
+	[736] = "The Battle for Gilneas",
+	[737] = "The Maelstrom",
+	[747] = "Lost City of the Tol'vir",
+	[748] = "Uldum",
+	[749] = "Wailing Caverns",
+	[750] = "Maraudon",
+	[751] = "The Maelstrom",
+	[752] = "Baradin Hold",
+	[753] = "Blackrock Caverns",
+	[754] = "Blackwing Descent",
+	[755] = "Blackwing Lair",
+	[756] = "The Deadmines",
+	[757] = "Grim Batol",
+	[758] = "The Bastion of Twilight",
+	[759] = "Halls of Origination",
+	[760] = "Razorfen Downs",
+	[761] = "Razorfen Kraul",
+	[762] = "Scarlet Monastery",
+	[763] = "Scholomance",
+	[764] = "Shadowfang Keep",
+	[765] = "Stratholme",
+	[766] = "Temple of Ahn'Qiraj",
+	[767] = "Throne of the Tides",
+	[768] = "The Stonecore",
+	[769] = "The Vortex Pinnacle",
+	[770] = "Twilight Highlands",
+	[772] = "Ahn'Qiraj: The Fallen Kingdom",
+	[773] = "Throne of the Four Winds",
+	[775] = "Hyjal Summit",
+	[776] = "Gruul's Lair",
+	[779] = "Magtheridon's Lair",
+	[780] = "Serpentshrine Cavern",
+	[781] = "Zul'Aman",
+	[782] = "The Eye",
+	[789] = "Sunwell Plateau",
+	[793] = "Zul'Gurub",
+	[795] = "Molten Front",
+	[796] = "Black Temple",
+	[797] = "Hellfire Ramparts",
+	[798] = "Magisters' Terrace",
+	[799] = "Karazhan",
+	[800] = "Firelands",
+	[803] = "The Nexus",
+	[806] = "The Jade Forest",
+	[807] = "Valley of the Four Winds",
+	[808] = "The Wandering Isle",
+	[809] = "Kun-Lai Summit",
+	[810] = "Townlong Steppes",
+	[811] = "Vale of Eternal Blossoms",
+	[813] = "Eye of the Storm",
+	[816] = "Well of Eternity",
+	[819] = "Hour of Twilight",
+	[820] = "End Time",
+	[823] = "Darkmoon Island",
+	[824] = "Dragon Soul",
+	[851] = "Dustwallow Marsh",
+	[856] = "Temple of Kotmogu",
+	[857] = "Krasarang Wilds",
+	[858] = "Dread Wastes",
+	[860] = "Silvershard Mines",
+	[862] = "Pandaria",
+	[864] = "Northshire",
+	[866] = "Coldridge Valley",
+	[867] = "Temple of the Jade Serpent",
+	[871] = "Scarlet Halls",
+	[873] = "The Veiled Stair",
+	[874] = "Scarlet Monastery",
+	[875] = "Gate of the Setting Sun",
+	[876] = "Stormstout Brewery",
+	[877] = "Shado-pan Monastery",
+	[878] = "A Brewing Storm",
+	[879] = "Kun-Lai Summit",
+	[880] = "The Jade Forest",
+	[881] = "Temple of Kotmogu",
+	[882] = "Unga Ingoo",
+	[883] = "Zan'vess",
+	[884] = "Brewmoon Festival",
+	[885] = "Mogu'shan Palace",
+	[886] = "Terrace of Endless Spring",
+	[887] = "Siege of Niuzao Temple",
+	[888] = "Shadowglen",
+	[889] = "Valley of Trials",
+	[890] = "Camp Narache",
+	[891] = "Echo Isles",
+	[892] = "Deathknell",
+	[893] = "Sunstrider Isle",
+	[894] = "Ammen Vale",
+	[895] = "New Tinkertown",
+	[896] = "Mogu'shan Vaults",
+	[897] = "Heart of Fear",
+	[898] = "Scholomance",
+	[899] = "Proving Grounds",
+	[900] = "Crypt of Forgotten Kings",
+	[903] = "Shrine of Two Moons",
+	[905] = "Shrine of Seven Stars",
+	[906] = "Dustwallow Marsh",
+	[907] = "Dustwallow Marsh",
+}
+
+local zoneTranslation = {
+	enUS = {
+		-- Complexes
+		[1941] = "Caverns of Time",
+		[25] = "Blackrock Mountain",
+		[4406] = "The Ring of Valor",
+		[3545] = "Hellfire Citadel",
+		[3905] = "Coilfang Reservoir",
+		[3893] = "Ring of Observance",
+		[3842] = "Tempest Keep",
+		[4024] = "Coldarra",
+		[5695] = "Ahn'Qiraj: The Fallen Kingdom",
+
+		-- Continents
+		[0] = "Eastern Kingdoms",
+		[1] = "Kalimdor",
+		[530] = "Outland",
+		[571] = "Northrend",
+		[5416] = "The Maelstrom",
+		[870] = "Pandaria",
+		["Azeroth"] = "Azeroth",
+
+		-- Transports
+		[72] = "The Dark Portal",
+		[2257] = "Deeprun Tram",
+
+		-- Dungeons
+		[5914] = "Dire Maul (East)",
+		[5913] = "Dire Maul (North)",
+		[5915] = "Dire Maul (West)",
+
+		-- Arenas
+		[559] = "Nagrand Arena",
+		[562] = "Blade's Edge Arena",
+		[572] = "Ruins of Lordaeron",
+		[4378] = "Dalaran Arena",
+
+		-- Other
+		[4298] = "Plaguelands: The Scarlet Enclave",
+		[3508] = "Amani Pass",
+		[3979] = "The Frozen Sea",
+	},
+	deDE = {
+		-- Complexes
+		[1941] = "Höhlen der Zeit",
+		[25] = "Der Schwarzfels",
+		[4406] = "Der Ring der Ehre",
+		[3545] = "Höllenfeuerzitadelle",
+		[3905] = "Der Echsenkessel",
+		[3893] = "Ring der Beobachtung",
+		[3842] = "Festung der Stürme",
+		[4024] = "Kaltarra",
+		[5695] = "Ahn'Qiraj: Das Gefallene Königreich",
+
+		-- Continents
+		[0] = "Östliche Königreiche",
+		[1] = "Kalimdor",
+		[530] = "Scherbenwelt",
+		[571] = "Nordend",
+		[5416] = "Der Mahlstrom",
+		[870] = "Pandaria",
+		["Azeroth"] = "Azeroth",
+
+		-- Transports
+		[72] = "Das Dunkle Portal",
+		[2257] = "Die Tiefenbahn",
+
+		-- Dungeons
+		[5914] = "Düsterbruch - Ost",
+		[5913] = "Düsterbruch - Nord",
+		[5915] = "Düsterbruch - West",
+
+		-- Arenas
+		[559] = "Arena von Nagrand",
+		[562] = "Arena des Schergrats",
+		[572] = "Ruinen von Lordaeron",
+		[4378] = "Arena von Dalaran",
+
+		-- Other
+		[4298] = "Pestländer: Die Scharlachrote Enklave",
+		[3508] = "Amanipass",
+		[3979] = "Die Gefrorene See",
+	},
+	esES = {
+		-- Complexes
+		[1941] = "Cavernas del Tiempo",
+		[25] = "Montaña Roca Negra",
+		[4406] = "El Círculo del Valor",
+		[3545] = "Ciudadela del Fuego Infernal",
+		[3905] = "Reserva Colmillo Torcido",
+		[3893] = "Círculo de la Observancia",
+		[3842] = "El Castillo de la Tempestad",
+		[4024] = "Gelidar",
+		[5695] = "Ahn'Qiraj: El Reino Caído",
+
+		-- Continents
+		[0] = "Reinos del Este",
+		[1] = "Kalimdor",
+		[530] = "Terrallende",
+		[571] = "Rasganorte",
+		[5416] = "La Vorágine",
+		[870] = "Pandaria",
+		["Azeroth"] = "Azeroth",
+
+		-- Transports
+		[72] = "El Portal Oscuro",
+		[2257] = "Tranvía Subterráneo",
+
+		-- Dungeons
+		[5914] = "La Masacre: Este",
+		[5913] = "La Masacre: Norte",
+		[5915] = "La Masacre: Oeste",
+
+		-- Arenas
+		[559] = "Arena de Nagrand",
+		[562] = "Arena Filospada",
+		[572] = "Ruinas de Lordaeron",
+		[4378] = "Arena de Dalaran",
+
+		-- Other
+		[4298] = "Tierras de la Peste: El Enclave Escarlata",
+		[3508] = "Paso de Amani",
+		[3979] = "El Mar Gélido",
+	},
+	esMX = {
+		-- Complexes
+		[1941] = "Cavernas del Tiempo",
+		[25] = "Montaña Roca Negra",
+		[4406] = "El Círculo del Valor",
+		[3545] = "Ciudadela del Fuego Infernal",
+		[3905] = "Reserva Colmillo Torcido",
+		[3893] = "Círculo de la Observancia",
+		[3842] = "El Castillo de la Tempestad",
+		[4024] = "Gelidar",
+		[5695] = "Ahn'Qiraj: El Reino Caído",
+
+		-- Continents
+		[0] = "Reinos del Este",
+		[1] = "Kalimdor",
+		[530] = "Terrallende",
+		[571] = "Rasganorte",
+		[5416] = "La Vorágine",
+		[870] = "Pandaria",
+		["Azeroth"] = "Azeroth",
+
+		-- Transports
+		[72] = "El Portal Oscuro",
+		[2257] = "Tranvía Subterráneo",
+
+		-- Dungeons
+		[5914] = "La Masacre: Este",
+		[5913] = "La Masacre: Norte",
+		[5915] = "La Masacre: Oeste",
+
+		-- Arenas
+		[559] = "Arena de Nagrand",
+		[562] = "Arena Filospada",
+		[572] = "Ruinas de Lordaeron",
+		[4378] = "Arena de Dalaran",
+
+		-- Other
+		[4298] = "Tierras de la Peste: El Enclave Escarlata",
+		[3508] = "Paso de Amani",
+		[3979] = "El Mar Gélido",
+	},
+	frFR = {
+		-- Complexes
+		[1941] = "Grottes du Temps",
+		[25] = "Mont Rochenoire",
+		[4406] = "L’arène des Valeureux",
+		[3545] = "Citadelle des Flammes infernales",
+		[3905] = "Réservoir de Glissecroc",
+		[3893] = "Cercle d’observance",
+		[3842] = "Donjon de la Tempête",
+		[4024] = "Frimarra",
+		[5695] = "Ahn’Qiraj : le royaume Déchu",
+
+		-- Continents
+		[0] = "Royaumes de l'est",
+		[1] = "Kalimdor",
+		[530] = "Outreterre",
+		[571] = "Norfendre",
+		[5416] = "Le Maelström",
+		[870] = "Pandarie",
+		["Azeroth"] = "Azeroth",
+
+		-- Transports
+		[72] = "La porte des Ténèbres",
+		[2257] = "Tram des profondeurs",
+
+		-- Dungeons
+		[5914] = "Haches-Tripes - Est",
+		[5913] = "Haches-Tripes - Nord",
+		[5915] = "Haches-Tripes - Ouest",
+
+		-- Arenas
+		[559] = "Arène de Nagrand",
+		[562] = "Arène des Tranchantes",
+		[572] = "Ruines de Lordaeron",
+		[4378] = "Arène de Dalaran",
+
+		-- Other
+		[4298] = "Maleterres : l’enclave Écarlate",
+		[3508] = "Passage des Amani",
+		[3979] = "La mer Gelée",
+	},
+	itIT = {
+		-- Complexes
+		[1941] = "Caverne del Tempo",
+		[25] = "Massiccio Roccianera",
+		[4406] = "Arena del Valore",
+		[3545] = "Cittadella del Fuoco Infernale",
+		[3905] = "Bacino degli Spiraguzza",
+		[3893] = "Anello dell'Osservanza",
+		[3842] = "Forte Tempesta",
+		[4024] = "Ibernia",
+		[5695] = "Ahn'Qiraj: il Regno Perduto",
+
+		-- Continents
+		[0] = "Regni Orientali",
+		[1] = "Kalimdor",
+		[530] = "Terre Esterne",
+		[571] = "Nordania",
+		[5416] = "Maelstrom",
+		[870] = "Pandaria",
+		["Azeroth"] = "Azeroth",
+
+		-- Transports
+		[72] = "Portale Oscuro",
+		[2257] = "Tram degli Abissi",
+
+		-- Dungeons
+		[5914] = "Maglio Infausto - Est",
+		[5913] = "Maglio Infausto - Nord",
+		[5915] = "Maglio Infausto - Ovest",
+
+		-- Arenas
+		[559] = "Arena di Nagrand",
+		[562] = "Arena di Spinaguzza",
+		[572] = "Rovine di Lordaeron",
+		[4378] = "Arena di Dalaran",
+
+		-- Other
+		[4298] = "Terre Infette: l'Enclave Scarlatta",
+		[3508] = "Passo degli Amani",
+		[3979] = "Mare Ghiacciato",
+	},
+	koKR = {
+		-- Complexes
+		[1941] = "시간의 동굴",
+		[25] = "검은바위 산",
+		[4406] = "용맹의 투기장",
+		[3545] = "지옥불 성채",
+		[3905] = "갈퀴송곳니 저수지",
+		[3893] = "규율의 광장",
+		[3842] = "폭풍우 요새",
+		[4024] = "콜다라",
+		[5695] = "안퀴라즈: 무너진 왕국",
+
+		-- Continents
+		[0] = "동부 왕국",
+		[1] = "칼림도어",
+		[530] = "아웃랜드",
+		[571] = "노스렌드",
+		[5416] = "혼돈의 소용돌이",
+		[870] = "판다리아",
+		["Azeroth"] = "아제로스",
+
+		-- Transports
+		[72] = "어둠의 문",
+		[2257] = "깊은굴 지하철",
+
+		-- Dungeons
+		[5914] = "혈투의 전장 - 동쪽",
+		[5913] = "혈투의 전장 - 북쪽",
+		[5915] = "혈투의 전장 - 서쪽",
+
+		-- Arenas
+		[559] = "나그란드 투기장",
+		[562] = "칼날 산맥 투기장",
+		[572] = "로데론의 폐허",
+		[4378] = "달라란 투기장",
+
+		-- Other
+		[4298] = "동부 역병지대: 붉은십자군 초소",
+		[3508] = "아마니 고개",
+		[3979] = "얼어붙은 바다",
+	},
+	ptBR = {
+		-- Complexes
+		[1941] = "Cavernas do Tempo",
+		[25] = "Montanha Rocha Negra",
+		[4406] = "Ringue dos Valorosos",
+		[3545] = "Cidadela Fogo do Inferno",
+		[3905] = "Reservatório Presacurva",
+		[3893] = "Círculo da Obediência",
+		[3842] = "Bastilha da Tormenta",
+		[4024] = "Gelarra",
+		[5695] = "Ahn'Qiraj: O Reino Derrotado",
+
+		-- Continents
+		[0] = "Reinos do Leste",
+		[1] = "Kalimdor",
+		[530] = "Terralém",
+		[571] = "Nortúndria",
+		[5416] = "Voragem",
+		[870] = "Pandária",
+		["Azeroth"] = "Azeroth",
+
+		-- Transports
+		[72] = "Portal Negro",
+		[2257] = "Metrô Correfundo",
+
+		-- Dungeons
+		[5914] = "Gládio Cruel – Leste",
+		[5913] = "Gládio Cruel – Norte",
+		[5915] = "Gládio Cruel – Oeste",
+
+		-- Arenas
+		[559] = "Arena de Nagrand",
+		[562] = "Arena da Lâmina Afiada",
+		[572] = "Ruínas de Lordaeron",
+		[4378] = "Arena de Dalaran",
+
+		-- Other
+		[4298] = "Terras Pestilentas: Enclave Escarlate",
+		[3508] = "Desfiladeiro Amani",
+		[3979] = "Mar Congelado",
+	},
+	ruRU = {
+		-- Complexes
+		[1941] = "Пещеры Времени",
+		[25] = "Черная гора",
+		[4406] = "Арена Доблести",
+		[3545] = "Цитадель Адского Пламени",
+		[3905] = "Резервуар Кривого Клыка",
+		[3893] = "Ритуальный Круг",
+		[3842] = "Крепость Бурь",
+		[4024] = "Хладарра",
+		[5695] = "Ан'Кираж: Павшее Королевство",
+
+		-- Continents
+		[0] = "Восточные королевства",
+		[1] = "Калимдор",
+		[530] = "Запределье",
+		[571] = "Нордскол",
+		[5416] = "Водоворот",
+		[870] = "Пандария",
+		["Azeroth"] = "Азерот",
+
+		-- Transports
+		[72] = "Темный портал",
+		[2257] = "Подземный поезд",
+
+		-- Dungeons
+		[5914] = "Забытый город – восток",
+		[5913] = "Забытый город – север",
+		[5915] = "Забытый город – запад",
+
+		-- Arenas
+		[559] = "Арена Награнда",
+		[562] = "Арена Острогорья",
+		[572] = "Руины Лордерона",
+		[4378] = "Арена Даларана",
+
+		-- Other
+		[4298] = "Чумные земли: Анклав Алого ордена",
+		[3508] = "Перевал Амани",
+		[3979] = "Ледяное море",
+	},
+	zhCN = {
+		-- Complexes
+		[1941] = "时光之穴",
+		[25] = "黑石山",
+		[4406] = "勇气竞技场",
+		[3545] = "地狱火堡垒",
+		[3905] = "盘牙水库",
+		[3893] = "仪式广场",
+		[3842] = "风暴要塞",
+		[4024] = "考达拉",
+		[5695] = "安其拉：堕落王国",
+
+		-- Continents
+		[0] = "东部王国",
+		[1] = "卡利姆多",
+		[530] = "外域",
+		[571] = "诺森德",
+		[5416] = "大漩涡",
+		[870] = "Pandaria",
+		["Azeroth"] = "艾泽拉斯",
+
+		-- Transports
+		[72] = "黑暗之门",
+		[2257] = "矿道地铁",
+
+		-- Dungeons
+		[5914] = "厄运之槌 - 东",
+		[5913] = "厄运之槌 - 北",
+		[5915] = "厄运之槌 - 西",
+
+		-- Arenas
+		[559] = "纳格兰竞技场",
+		[562] = "刀锋山竞技场",
+		[572] = "洛丹伦废墟",
+		[4378] = "达拉然竞技场",
+
+		-- Other
+		[4298] = "东瘟疫之地：血色领地",
+		[3508] = "阿曼尼小径",
+		[3979] = "冰冻之海",
+	},
+	zhTW = {
+		-- Complexes
+		[1941] = "時光之穴",
+		[25] = "黑石山",
+		[4406] = "勇武競技場",
+		[3545] = "地獄火堡壘",
+		[3905] = "盤牙蓄湖",
+		[3893] = "儀式競技場",
+		[3842] = "風暴要塞",
+		[4024] = "凜懼島",
+		[5695] = "安其拉: 沒落的王朝",
+
+		-- Continents
+		[0] = "東部王國",
+		[1] = "卡林多",
+		[530] = "外域",
+		[571] = "北裂境",
+		[5416] = "大漩渦",
+		[870] = "潘達利亞",
+		["Azeroth"] = "艾澤拉斯",
+
+		-- Transports
+		[72] = "黑暗之門",
+		[2257] = "礦道地鐵",
+
+		-- Dungeons
+		[5914] = "厄運之槌 - 東方",
+		[5913] = "厄運之槌 - 北方",
+		[5915] = "厄運之槌 - 西方",
+
+		-- Arenas
+		[559] = "納葛蘭競技場",
+		[562] = "劍刃競技場",
+		[572] = "羅德隆廢墟",
+		[4378] = "達拉然競技場",
+
+		-- Other
+		[4298] = "東瘟疫之地:血色領區",
+		[3508] = "阿曼尼小徑",
+		[3979] = "冰凍之海",
+	},
+}
+
+local function CreateLocalizedZoneNameLookups()
+	local mapID
+	local localizedZoneName
+
+	for mapID, englishName in pairs(MapIdLookupTable) do
+		-- Get localized map name
+		localizedZoneName = GetMapNameByID(mapID)
+		if localizedZoneName then
+			-- Add combination of English and localized name to lookup tables
+
+			if not BZ[englishName] then
+				BZ[englishName] = localizedZoneName
+			end
+			if not BZR[localizedZoneName] then
+				BZR[localizedZoneName] = englishName
+			end
+		else
+		--trace("! ----- No map for ID "..tostring(mapID).." ("..tostring(englishName)..")")
+		end
+	end
+
+	-- Load from zoneTranslation
+	local GAME_LOCALE = GetLocale()
+	for key, localizedZoneName in pairs(zoneTranslation[GAME_LOCALE]) do
+		local englishName = zoneTranslation["enUS"][key]
+		if not BZ[englishName] then
+			BZ[englishName] = localizedZoneName
+		end
+		if not BZR[localizedZoneName] then
+			BZR[localizedZoneName] = englishName
+		end
+	end
+end
+
+--------------------------------------------------------------------------------------------------------
+--                                            BZ table                                             --
+--------------------------------------------------------------------------------------------------------
+
 do
 	Tourist.frame = oldLib and oldLib.frame or CreateFrame("Frame", MAJOR_VERSION .. "Frame", UIParent)
 	Tourist.frame:UnregisterAllEvents()
@@ -1198,9 +2029,14 @@ do
 		PLAYER_LEVEL_UP(Tourist, ...)
 	end)
 
-	local BOOTYBAY_RATCHET_BOAT = string.format(X_Y_BOAT, BZ["Booty Bay"], BZ["Ratchet"])
-	local MENETHIL_THERAMORE_BOAT = string.format(X_Y_BOAT, BZ["Menethil Harbor"], BZ["Theramore Isle"])
-	local MENETHIL_HOWLINGFJORD_BOAT = string.format(X_Y_BOAT, BZ["Menethil Harbor"], BZ["Howling Fjord"])
+	trace("Tourist: Initializing localized zone names...")
+	CreateLocalizedZoneNameLookups()
+
+	-- TRANSPORT DEFINITIONS ----------------------------------------------------------------
+
+	local BOOTYBAY_RATCHET_BOAT = string.format(X_Y_BOAT, BZ["The Cape of Stranglethorn"], BZ["Northern Barrens"])
+	local MENETHIL_THERAMORE_BOAT = string.format(X_Y_BOAT, BZ["Wetlands"], BZ["Dustwallow Marsh"])
+	local MENETHIL_HOWLINGFJORD_BOAT = string.format(X_Y_BOAT, BZ["Wetlands"], BZ["Howling Fjord"])
 	local DARNASSUS_EXODAR_PORTAL = string.format(X_Y_PORTAL, BZ["Darnassus"], BZ["The Exodar"])
 	local EXODAR_DARNASSUS_PORTAL = string.format(X_Y_PORTAL, BZ["The Exodar"], BZ["Darnassus"])
 	local TELDRASSIL_AZUREMYST_BOAT = string.format(X_Y_BOAT, BZ["Teldrassil"], BZ["Azuremyst Isle"])
@@ -1212,11 +2048,11 @@ do
 	local IRONFORGE_BLASTEDLANDS_PORTAL = string.format(X_Y_PORTAL, BZ["Ironforge"], BZ["Blasted Lands"])
 	local ORGRIMMAR_BOREANTUNDRA_ZEPPELIN = string.format(X_Y_ZEPPELIN, BZ["Orgrimmar"], BZ["Borean Tundra"])
 	local ORGRIMMAR_UNDERCITY_ZEPPELIN = string.format(X_Y_ZEPPELIN, BZ["Orgrimmar"], BZ["Undercity"])
-	local ORGRIMMAR_GROMGOL_ZEPPELIN = string.format(X_Y_ZEPPELIN, BZ["Orgrimmar"], BZ["Grom'gol Base Camp"])
+	local ORGRIMMAR_GROMGOL_ZEPPELIN = string.format(X_Y_ZEPPELIN, BZ["Orgrimmar"], BZ["Northern Stranglethorn"])
 	local ORGRIMMAR_THUNDERBLUFF_ZEPPELIN = string.format(X_Y_ZEPPELIN, BZ["Orgrimmar"], BZ["Thunder Bluff"])
 	local ORGRIMMAR_BLASTEDLANDS_PORTAL = string.format(X_Y_PORTAL, BZ["Orgrimmar"], BZ["Blasted Lands"])
 	local UNDERCITY_HOWLINGFJORD_ZEPPELIN = string.format(X_Y_ZEPPELIN, BZ["Undercity"], BZ["Howling Fjord"])
-	local UNDERCITY_GROMGOL_ZEPPELIN = string.format(X_Y_ZEPPELIN, BZ["Undercity"], BZ["Grom'gol Base Camp"])
+	local UNDERCITY_GROMGOL_ZEPPELIN = string.format(X_Y_ZEPPELIN, BZ["Undercity"], BZ["Northern Stranglethorn"])
 	local UNDERCITY_BLASTEDLANDS_PORTAL = string.format(X_Y_PORTAL, BZ["Undercity"], BZ["Blasted Lands"])
 	local THUNDERBLUFF_BLASTEDLANDS_PORTAL = string.format(X_Y_PORTAL, BZ["Thunder Bluff"], BZ["Blasted Lands"])
 	local SILVERMOON_UNDERCITY_TELEPORT = string.format(X_Y_TELEPORT, BZ["Silvermoon City"], BZ["Undercity"])
@@ -1227,6 +2063,7 @@ do
 	local MOAKI_KAMAGUA_BOAT = string.format(X_Y_BOAT, BZ["Dragonblight"], BZ["Howling Fjord"])
 	local DALARAN_COT_PORTAL = string.format(X_Y_PORTAL, BZ["Dalaran"], BZ["Caverns of Time"])
 	local DALARAN_CRYSTALSONG_TELEPORT = string.format(X_Y_TELEPORT, BZ["Dalaran"], BZ["Crystalsong Forest"])
+	local TWILIGHTHIGHLANDS_ORGRIMMAR_PORTAL = string.format(X_Y_PORTAL, BZ["Twilight Highlands"], BZ["Orgrimmar"])
 	local ORGRIMMAR_TWILIGHTHIGHLANDS_PORTAL = string.format(X_Y_PORTAL, BZ["Orgrimmar"], BZ["Twilight Highlands"])
 	local ORGRIMMAR_MOUNTHYJAL_PORTAL = string.format(X_Y_PORTAL, BZ["Orgrimmar"], BZ["Mount Hyjal"])
 	local ORGRIMMAR_DEEPHOLM_PORTAL = string.format(X_Y_PORTAL, BZ["Orgrimmar"], BZ["Deepholm"])
@@ -1235,6 +2072,7 @@ do
 	local ORGRIMMAR_VASHJIR_PORTAL = string.format(X_Y_PORTAL, BZ["Orgrimmar"], BZ["Vashj'ir"])
 	local ORGRIMMAR_TOLBARAD_PORTAL = string.format(X_Y_PORTAL, BZ["Orgrimmar"], BZ["Tol Barad Peninsula"])
 	local TOLBARAD_ORGRIMMAR_PORTAL = string.format(X_Y_PORTAL, BZ["Tol Barad Peninsula"], BZ["Orgrimmar"])
+	local TWILIGHTHIGHLANDS_STORMWIND_PORTAL = string.format(X_Y_PORTAL, BZ["Twilight Highlands"], BZ["Stormwind City"])
 	local STORMWIND_TWILIGHTHIGHLANDS_PORTAL = string.format(X_Y_PORTAL, BZ["Stormwind City"], BZ["Twilight Highlands"])
 	local STORMWIND_MOUNTHYJAL_PORTAL = string.format(X_Y_PORTAL, BZ["Stormwind City"], BZ["Mount Hyjal"])
 	local STORMWIND_DEEPHOLM_PORTAL = string.format(X_Y_PORTAL, BZ["Stormwind City"], BZ["Deepholm"])
@@ -1255,6 +2093,9 @@ do
 
 
 	local zones = {}
+
+
+	-- CONTINENTS ---------------------------------------------------------------
 
 	zones[BZ["Eastern Kingdoms"]] = {
 		type = "Continent",
@@ -1297,12 +2138,23 @@ do
 		continent = The_Maelstrom,
 	}
 
+	zones[BZ["Pandaria"]] = {
+		type = "Continent",
+		yards = 0.0,   -- TODO
+		x_offset = 0,
+		y_offset = 0,
+		continent = Pandaria,
+	}
+
 	zones[BZ["Azeroth"]] = {
 		type = "Continent",
 		yards = 44531.82907938571,
 		x_offset = 0,
 		y_offset = 0,
 	}
+
+
+	-- TRANSPORTS ---------------------------------------------------------------
 
 	zones[STORMWIND_BOREANTUNDRA_BOAT] = {
 		paths = {
@@ -1422,7 +2274,7 @@ do
 		faction = "Alliance",
 		type = "Transport",
 	}
-	
+
 	zones[EXODAR_DARNASSUS_PORTAL] = {
 		paths = {
 			[BZ["Darnassus"]] = true,
@@ -1430,8 +2282,6 @@ do
 		faction = "Alliance",
 		type = "Transport",
 	}
-
-
 
 
 	zones[MULGORE_DARKMOON_PORTAL] = {
@@ -1624,6 +2474,14 @@ do
 		type = "Transport",
 	}
 
+	zones[TWILIGHTHIGHLANDS_STORMWIND_PORTAL] = {
+		paths = {
+			[BZ["Stormwind City"]] = true,
+		},
+		faction = "Alliance",
+		type = "Transport",
+	}
+
 	zones[STORMWIND_MOUNTHYJAL_PORTAL] = {
 		paths = {
 			[BZ["Mount Hyjal"]] = true,
@@ -1688,6 +2546,14 @@ do
 		type = "Transport",
 	}
 
+	zones[TWILIGHTHIGHLANDS_ORGRIMMAR_PORTAL] = {
+		paths = {
+			[BZ["Orgrimmar"]] = true,
+		},
+		faction = "Horde",
+		type = "Transport",
+	}
+
 	zones[ORGRIMMAR_MOUNTHYJAL_PORTAL] = {
 		paths = {
 			[BZ["Mount Hyjal"]] = true,
@@ -1703,7 +2569,7 @@ do
 		faction = "Horde",
 		type = "Transport",
 	}
-	
+
 	zones[DEEPHOLM_ORGRIMMAR_PORTAL] = {
 		paths = {
 			[BZ["Orgrimmar"]] = true,
@@ -1735,7 +2601,7 @@ do
 		faction = "Horde",
 		type = "Transport",
 	}
-	
+
 	zones[ORGRIMMAR_TOLBARAD_PORTAL] = {
 		paths = {
 			[BZ["Tol Barad Peninsula"]] = true,
@@ -1743,6 +2609,9 @@ do
 		faction = "Horde",
 		type = "Transport",
 	}
+
+
+	-- ZONES, INSTANCES AND COMPLEXES ---------------------------------------------------------
 
 	zones[BZ["Alterac Valley"]] = {
 		low = 45,
@@ -1852,7 +2721,6 @@ do
 		low = 1,
 		high = 10,
 		continent = Eastern_Kingdoms,
-		instances = BZ["The Stockade"],
 		paths = {
 			[BZ["Westfall"]] = true,
 			[BZ["Redridge Mountains"]] = true,
@@ -1882,23 +2750,26 @@ do
 		high = 10,
 		continent = Eastern_Kingdoms,
 		instances = {
-			[BZ["Armory"]] = true,
-			[BZ["Library"]] = true,
-			[BZ["Graveyard"]] = true,
-			[BZ["Cathedral"]] = true,
+--			[BZ["Armory"]] = true,
+--			[BZ["Library"]] = true,
+--			[BZ["Graveyard"]] = true,
+--			[BZ["Cathedral"]] = true,
+			[BZ["Scarlet Monastery"]] = true,
+			[BZ["Scarlet Halls"]] = true,
 		},
 		paths = {
 			[BZ["Western Plaguelands"]] = true,
 			[BZ["Undercity"]] = true,
 			[BZ["Scarlet Monastery"]] = true,
+			[BZ["Scarlet Halls"]] = true,
 			[UNDERCITY_GROMGOL_ZEPPELIN] = true,
 			[ORGRIMMAR_UNDERCITY_ZEPPELIN] = true,
 			[UNDERCITY_HOWLINGFJORD_ZEPPELIN] = true,
 			[BZ["Silverpine Forest"]] = true,
 		},
-		complexes = {
-			[BZ["Scarlet Monastery"]] = true,
-		},
+--		complexes = {
+--			[BZ["Scarlet Monastery"]] = true,
+--		},
 		faction = "Horde",
 		fishing_min = 25,
 	}
@@ -2258,7 +3129,6 @@ do
 		continent = Eastern_Kingdoms,
 		paths = BZ["Silverpine Forest"],
 		groupSize = 5,
---		faction = "Horde",
 		type = "Instance",
 		entrancePortal = { BZ["Silverpine Forest"], 44.80, 67.83 },
 	}
@@ -2285,70 +3155,96 @@ do
 		entrancePortal = { BZ["Dun Morogh"], 24, 38.9 },
 	}
 
-	zones[BZ["Scarlet Monastery"]] = {
-		low = 26,
-		high = 45,
-		continent = Eastern_Kingdoms,
-		instances = {
-			[BZ["Armory"]] = true,
-			[BZ["Library"]] = true,
-			[BZ["Graveyard"]] = true,
-			[BZ["Cathedral"]] = true,
-		},
-		paths = {
-			[BZ["Tirisfal Glades"]] = true,
-			[BZ["Armory"]] = true,
-			[BZ["Library"]] = true,
-			[BZ["Graveyard"]] = true,
-			[BZ["Cathedral"]] = true,
-		},
-		faction = "Horde",
-		fishing_min = 225,
-		type = "Complex",
-	}
+	-- Had to remove the complex 'Scarlet Monastery' because of the new instance with the same name (MoP)
+--	zones[BZ["Scarlet Monastery"]] = {
+--		low = 26,
+--		high = 45,
+--		continent = Eastern_Kingdoms,
+--		instances = {
+--			[BZ["Armory"]] = true,
+--			[BZ["Library"]] = true,
+--			[BZ["Cathedral"]] = true,
+--			[BZ["Graveyard"]] = true,
+--		},
+--		paths = {
+--			[BZ["Tirisfal Glades"]] = true,
+--			[BZ["Armory"]] = true,
+--			[BZ["Library"]] = true,
+--			[BZ["Graveyard"]] = true,
+--			[BZ["Cathedral"]] = true,
+--		},
+--		faction = "Horde",
+--		fishing_min = 225,
+--		type = "Complex",
+--	}
 
-	zones[BZ["Graveyard"]] = {
-		low = 26,
-		high = 36,
+
+	-- Instances Library and Armory have been merged into instance Scarlet Monastery (MoP)
+--	zones[BZ["Library"]] = {
+--		low = 29,
+--		high = 39,
+--		continent = Eastern_Kingdoms,
+--		paths = BZ["Scarlet Monastery"],
+--		groupSize = 5,
+--		type = "Instance",
+--		complex = BZ["Scarlet Monastery"],
+--		entrancePortal = { BZ["Tirisfal Glades"], 85.30, 32.17 },
+--	}
+
+--	zones[BZ["Armory"]] = {
+--		low = 32,
+--		high = 42,
+--		continent = Eastern_Kingdoms,
+--		paths = BZ["Scarlet Monastery"],
+--		groupSize = 5,
+--		type = "Instance",
+--		complex = BZ["Scarlet Monastery"],
+--		entrancePortal = { BZ["Tirisfal Glades"], 85.63, 31.62 },
+--	}
+
+	-- New instance (MoP)
+	zones[BZ["Scarlet Halls"]] = {   -- TODO: check levels
+		low = 28,
+		high = 31,
 		continent = Eastern_Kingdoms,
-		paths = BZ["Scarlet Monastery"],
+		paths = BZ["Tirisfal Glades"],
 		groupSize = 5,
 		type = "Instance",
-		complex = BZ["Scarlet Monastery"],
-		entrancePortal = { BZ["Tirisfal Glades"], 84.88, 30.63 },
+		entrancePortal = { BZ["Tirisfal Glades"], 84.88, 30.63 },  -- TODO: check
 	}
 
-	zones[BZ["Library"]] = {
-		low = 29,
-		high = 39,
-		continent = Eastern_Kingdoms,
-		paths = BZ["Scarlet Monastery"],
-		groupSize = 5,
-		type = "Instance",
-		complex = BZ["Scarlet Monastery"],
-		entrancePortal = { BZ["Tirisfal Glades"], 85.30, 32.17 },
-	}
+	-- Instances Graveyard and Cathedral have been merged into instance Scarlet Monastery (MoP)
+--	zones[BZ["Graveyard"]] = {
+--		low = 26,
+--		high = 36,
+--		continent = Eastern_Kingdoms,
+--		paths = BZ["Scarlet Monastery"],
+--		groupSize = 5,
+--		type = "Instance",
+--		complex = BZ["Scarlet Monastery"],
+--		entrancePortal = { BZ["Tirisfal Glades"], 84.88, 30.63 },
+--	}
 
-	zones[BZ["Armory"]] = {
-		low = 32,
-		high = 42,
-		continent = Eastern_Kingdoms,
-		paths = BZ["Scarlet Monastery"],
-		groupSize = 5,
-		type = "Instance",
-		complex = BZ["Scarlet Monastery"],
-		entrancePortal = { BZ["Tirisfal Glades"], 85.63, 31.62 },
-	}
+--	zones[BZ["Cathedral"]] = {
+--		low = 35,
+--		high = 45,
+--		continent = Eastern_Kingdoms,
+--		paths = BZ["Scarlet Monastery"],
+--		groupSize = 5,
+--		type = "Instance",
+--		complex = BZ["Scarlet Monastery"],
+--		entrancePortal = { BZ["Tirisfal Glades"], 85.35, 30.57 },
+--	}
 
-	zones[BZ["Cathedral"]] = {
-		low = 35,
-		high = 45,
+	-- New instance (MoP)
+	zones[BZ["Scarlet Monastery"]] = {   -- TODO: check levels
+		low = 30,
+		high = 33,
 		continent = Eastern_Kingdoms,
-		paths = BZ["Scarlet Monastery"],
+		paths = BZ["Tirisfal Glades"],
 		groupSize = 5,
 		type = "Instance",
-		complex = BZ["Scarlet Monastery"],
-		entrancePortal = { BZ["Tirisfal Glades"], 85.35, 30.57 },
+		entrancePortal = { BZ["Tirisfal Glades"], 84.88, 30.63 },  -- TODO: check
 	}
 
 	zones[BZ["Uldaman"]] = {
@@ -2870,7 +3766,6 @@ do
 		continent = Kalimdor,
 		paths = BZ["Northern Barrens"],
 		groupSize = 5,
---		faction = "Horde",
 		type = "Instance",
 		fishing_min = 75,
 		entrancePortal = { BZ["Northern Barrens"], 42.1, 66.5 },
@@ -3247,7 +4142,7 @@ do
 		low = 65,
 		high = 68,
 		continent = Outland,
-		instances = 
+		instances =
 		{
 			[BZ["Gruul's Lair"]] = true,
 			[BZ["Blade's Edge Arena"]] = true,
@@ -3575,7 +4470,7 @@ do
 		entrancePortal = { BZ["Isle of Quel'Danas"], 44.3, 45.7 },
 	}
 
-	-- WOTLK Zones
+	-- WOTLK BZ
 
 	zones[BZ["Dalaran"]] = {
 		continent = Northrend,
@@ -3595,8 +4490,6 @@ do
 		faction = "Sanctuary",
 		fishing_min = 525,
 	}
-
-
 
 	zones[BZ["Plaguelands: The Scarlet Enclave"]] = {
 		low = 55,
@@ -3790,7 +4683,7 @@ do
 		fishing_min = 550,
 	}
 
-	zones[BZ["Hrothgar's Landing"]] = { 
+	zones[BZ["Hrothgar's Landing"]] = {
 		low = 77,
 		high = 80,
 		paths = BZ["Icecrown"],
@@ -4044,7 +4937,7 @@ do
 		groupSize = 10,
 		altGroupSize = 25,
 		type = "Instance",
-		entrancePortal = { BZ["Wintergrasp"], 50, 11.2 }, 
+		entrancePortal = { BZ["Wintergrasp"], 50, 11.2 },
 	}
 
 	zones[BZ["The Ruby Sanctum"]] = {
@@ -4073,7 +4966,7 @@ do
 		type = "Battleground",
 		texture = "StrandoftheAncients",
 	}
-	
+
 	zones[BZ["Isle of Conquest"]] = {
 		low = 75,
 		high = 85,
@@ -4098,7 +4991,7 @@ do
 	}
 
 	-- Cataclysm zones
-	
+
 	zones[BZ["Mount Hyjal"]] = {
 		low = 80,
 		high = 82,
@@ -4111,7 +5004,7 @@ do
 		},
 		fishing_min = 575,
 	}
-	
+
 	zones[BZ["Uldum"]] = {
 		low = 83,
 		high = 84,
@@ -4127,7 +5020,7 @@ do
 		},
 		fishing_min = 650,
 	}
-	
+
 	zones[BZ["Ahn'Qiraj: The Fallen Kingdom"]] = {
 		low = 60,
 		high = 63,
@@ -4141,7 +5034,7 @@ do
 		},
 		type = "Complex",
 	}
-	
+
 	zones[BZ["Gilneas"]] = {
 		low = 1,
 		high = 12,
@@ -4190,6 +5083,8 @@ do
 			[BZ["Wetlands"]] = true,
 			[BZ["Grim Batol"]] = true,
 			[BZ["Twin Peaks"]] = true,
+			[TWILIGHTHIGHLANDS_STORMWIND_PORTAL] = true,
+			[TWILIGHTHIGHLANDS_ORGRIMMAR_PORTAL] = true,
 		},
 		fishing_min = 650,
 	}
@@ -4306,7 +5201,6 @@ do
 	}
 
 
-
 --	Patch 4.3 zone
 
 	zones[BZ["Darkmoon Island"]] = {
@@ -4319,10 +5213,7 @@ do
 	}
 
 
-
-
 --	Cataclysm instances
-
 
 	zones[BZ["Firelands"]] = {
 		low = 85,
@@ -4332,7 +5223,7 @@ do
 		groupSize = 10,
 		altGroupSize = 25,
 		type = "Instance",
-		entrancePortal = { BZ["Mount Hyjal"], 47.3, 78.3 }, 
+		entrancePortal = { BZ["Mount Hyjal"], 47.3, 78.3 },
 	}
 
 	zones[BZ["Lost City of the Tol'vir"]] = {
@@ -4520,16 +5411,237 @@ do
 	}
 
 
+--	Mists of Pandaria (MoP) zones
+
+	zones[BZ["The Wandering Isle"]] = {
+		low = 1,
+		high = 10,
+		continent = Pandaria,
+--		fishing_min = 25,
+ 		faction = "Sanctuary",  -- Not contested and not Alliance or Horde -> no PvP -> sanctuary
+	}
+
+	zones[BZ["The Jade Forest"]] = {
+		low = 85,
+		high = 86,
+		continent = Pandaria,
+		instances = {
+			[BZ["Temple of the Jade Serpent"]] = true,
+		},
+		paths = {
+			[BZ["Temple of the Jade Serpent"]] = true,
+			[BZ["Valley of the Four Winds"]] = true,
+		},
+		fishing_min = 650,
+	}
+
+	zones[BZ["Valley of the Four Winds"]] = {
+		low = 86,
+		high = 87,
+		continent = Pandaria,
+		instances = {
+			[BZ["Stormstout Brewery"]] = true,
+		},
+		paths = {
+			[BZ["Stormstout Brewery"]] = true,
+			[BZ["The Jade Forest"]] = true,
+			[BZ["Krasarang Wilds"]] = true,
+			[BZ["The Veiled Stair"]] = true,
+		},
+		fishing_min = 700,
+	}
+
+	zones[BZ["Krasarang Wilds"]] = {
+		low = 86,
+		high = 87,
+		continent = Pandaria,
+		paths = {
+			[BZ["Valley of the Four Winds"]] = true,
+		},
+		fishing_min = 700,
+	}
+
+	zones[BZ["Kun-Lai Summit"]] = {
+		low = 87,
+		high = 88,
+		continent = Pandaria,
+		instances = {
+			[BZ["Shado-pan Monastery"]] = true,
+			[BZ["Mogu'shan Vaults"]] = true,
+		},
+		paths = {
+			[BZ["Shado-pan Monastery"]] = true,
+			[BZ["Mogu'shan Vaults"]] = true,
+			[BZ["Vale of Eternal Blossoms"]] = true,
+			[BZ["The Veiled Stair"]] = true,
+		},
+		fishing_min = 625,
+	}
+
+	zones[BZ["Townlong Steppes"]] = {
+		low = 88,
+		high = 89,
+		continent = Pandaria,
+		instances = {
+			[BZ["Siege of Niuzao Temple"]] = true,
+		},
+		paths = {
+			[BZ["Siege of Niuzao Temple"]] = true,
+			[BZ["Dread Wastes"]] = true,
+		},
+		fishing_min = 700,
+	}
+
+	zones[BZ["Dread Wastes"]] = {
+		low = 87,
+		high = 88,
+		continent = Pandaria,
+		instances = {
+			[BZ["Gate of the Setting Sun"]] = true,
+			[BZ["Heart of Fear"]] = true,
+		},
+		paths = {
+			[BZ["Gate of the Setting Sun"]] = true,
+			[BZ["Heart of Fear"]] = true,
+			[BZ["Townlong Steppes"]] = true
+		},
+		fishing_min = 625,
+	}
+
+	zones[BZ["Vale of Eternal Blossoms"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		instances = {
+			[BZ["Mogu'shan Palace"]] = true,
+		},
+		paths = {
+			[BZ["Mogu'shan Palace"]] = true,
+			[BZ["Kun-Lai Summit"]] = true,
+		},
+		fishing_min = 700,
+	}
+
+	zones[BZ["The Veiled Stair"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		instances = {
+			[BZ["Terrace of Endless Spring"]] = true,
+		},
+		paths = {
+			[BZ["Terrace of Endless Spring"]] = true,
+			[BZ["Valley of the Four Winds"]] = true,
+			[BZ["Kun-Lai Summit"]] = true,
+		},
+		fishing_min = 750,
+	}
+
+
+--	Mists of Pandaria (MoP) instances
+
+	zones[BZ["Temple of the Jade Serpent"]] = {
+		low = 85,
+		high = 86,
+		continent = Pandaria,
+		paths = BZ["The Jade Forest"],
+		groupSize = 5,
+		type = "Instance",
+	--	entrancePortal = { BZ["The Jade Forest"], 47.70, 51.96 },  TODO
+	}
+
+	zones[BZ["Stormstout Brewery"]] = {
+		low = 86,
+		high = 87,
+		continent = Pandaria,
+		paths = BZ["Valley of the Four Winds"],
+		groupSize = 5,
+		type = "Instance",
+	--	entrancePortal = { BZ["Valley of the Four Winds"], 47.70, 51.96 },  TODO
+	}
+
+	zones[BZ["Shado-pan Monastery"]] = {
+		low = 87,
+		high = 90,
+		continent = Pandaria,
+		paths = BZ["Kun-Lai Summit"],
+		groupSize = 5,
+		type = "Instance",
+	--	entrancePortal = { BZ["Kun-Lai Summit"], 47.70, 51.96 },  TODO
+	}
+
+	zones[BZ["Mogu'shan Vaults"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		paths = BZ["Kun-Lai Summit"],
+		groupSize = 10,
+		altGroupSize = 25,
+		type = "Instance",
+	--	entrancePortal = { BZ["Kun-Lai Summit"], 66.2, 49.3 },   TODO
+	}
+
+	zones[BZ["Siege of Niuzao Temple"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		paths = BZ["Townlong Steppes"],
+		groupSize = 5,
+		type = "Instance",
+	--	entrancePortal = { BZ["Townlong Steppes"], 47.70, 51.96 },  TODO
+	}
+
+	zones[BZ["Mogu'shan Palace"]] = {
+		low = 85,
+		high = 86,
+		continent = Pandaria,
+		paths = BZ["Vale of Eternal Blossoms"],
+		groupSize = 5,
+		type = "Instance",
+	--	entrancePortal = { BZ["Vale of Eternal Blossoms"], 47.70, 51.96 },  TODO
+	}
+
+	zones[BZ["Gate of the Setting Sun"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		paths = BZ["Dread Wastes"],
+		groupSize = 5,
+		type = "Instance",
+	--	entrancePortal = { BZ["Dread Wastes"], 47.70, 51.96 },  TODO
+	}
+
+	zones[BZ["Heart of Fear"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		paths = BZ["Dread Wastes"],
+		groupSize = 10,
+		altGroupSize = 25,
+		type = "Instance",
+	--	entrancePortal = { BZ["Dread Wastes"], 66.2, 49.3 },   TODO
+	}
+
+	zones[BZ["Terrace of Endless Spring"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		paths = BZ["The Veiled Stair"],
+		groupSize = 10,
+		altGroupSize = 25,
+		type = "Instance",
+	--	entrancePortal = { BZ["The Veiled Stair"], 66.2, 49.3 },   TODO
+	}
 
 
 
-
-
-
+--------------------------------------------------------------------------------------------------------
+--                                                CORE                                                --
+--------------------------------------------------------------------------------------------------------
 	local continentNames = { GetMapContinents() }
 	local doneZones = {}
 	local zoneIDs = {}
-	
+
 	-- Lookup for zones that are on a sub-continent map and therefore have no own highlight on the continent map
 	-- Value is the name of the sub-continent map that will be searched instead of the continent map
 	local searchMaps = {}
@@ -4538,24 +5650,24 @@ do
 	searchMaps[BZ["Abyssal Depths"]] = BZ["Vashj'ir"]
 	searchMaps[BZ["Kelp'thar Forest"]] = BZ["Vashj'ir"]
 	searchMaps[BZ["Shimmering Expanse"]] = BZ["Vashj'ir"]
-	
+
 	-- The submaps have different sizes than the continent maps -> use (measured) value
 	-- in order to get a porpoer yards value for the zone maps.
 	local submapContinentYards = {}
 	submapContinentYards[BZ["Stranglethorn Vale"]] = 6600
 	submapContinentYards[BZ["Vashj'ir"]] = 6975
-	
+
 	-- Hack:
 	-- For the zones below, UpdateMapHighlight() does not return name and map data for the city icon on the continent map
 	-- Use hardcoded values as default; will be overwritten once the UpdateMapHighlight bug has been fixed - if ever
 	-- Note: the city highlights/icons on the zone maps can't be used because these return the name but no map data
 	-- TODO: determine values!
-	
+
 	local kalimdorYards = zones[BZ["Kalimdor"]].yards
 	local eastkingYards = zones[BZ["Eastern Kingdoms"]].yards
 	local northrendYards = zones[BZ["Northrend"]].yards
 	local maelstromYards = zones[BZ["The Maelstrom"]].yards
-	
+
 	zones[BZ["Orgrimmar"]].yards = 1739.375
 	zones[BZ["Orgrimmar"]].x_offset = 0 * kalimdorYards
 	zones[BZ["Orgrimmar"]].y_offset = 0 * kalimdorYards * 2/3
@@ -4595,36 +5707,33 @@ do
 	zones[BZ["Deepholm"]].x_offset = 0 * maelstromYards
 	zones[BZ["Deepholm"]].y_offset = 0 * maelstromYards * 2/3
 	zones[BZ["Deepholm"]].texture = "Deepholm"
-	
+
 	zones[BZ["Gilneas"]].yards = 3145.83325195312
 	zones[BZ["Gilneas"]].x_offset = 0 * eastkingYards
 	zones[BZ["Gilneas"]].y_offset = 0 * eastkingYards * 2/3
 	zones[BZ["Gilneas"]].texture = "Gilneas"
-	
+
 	-- end hack
 
-
-	
 	trace("Tourist: Initializing zones...")
-	
+
 	for continentID, continentName in ipairs(continentNames) do
 		SetMapZoom(continentID)
 		if zones[continentName] then
 			zones[continentName].texture = GetMapInfo()
 		end
 		local zoneNames = { GetMapZones(continentID) }
-		local continentYards = zones[continentName].yards
-		
+		local continentYards = zones[continentName] and zones[continentName].yards or 0
+
 		-- First, build a collection of zone IDs to be able to lookup a zone ID for SetMapZoom() in case we need to 'dig deeper'
 		for _ = 1, #zoneNames do
 			zoneIDs[zoneNames[_]] = _
 		end
-		
-		
+
 		for _ = 1, #zoneNames do
 			local x, y
 			local name, fileName, texPctX, texPctY, texX, texY, scrollX, scrollY
-			
+
 			-- Some zones are not directly accessible from the continent map and have to be searched for on a zone map
 			local searchMap, zoneID
 			searchMap = searchMaps[zoneNames[_]]
@@ -4639,8 +5748,8 @@ do
 					--trace( "continentYards for "..tostring(searchMap).." = "..tostring(continentYards) )
 				end
 			end
-			
-			local scansDone = 0	
+
+			local scansDone = 0
 			repeat
 				scansDone = scansDone + 1
 				if scansDone >= 10000 then
@@ -4677,10 +5786,10 @@ do
 				end
 			else
 				-- UpdateMapHighlight did not return anything
-				-- See hack, above					
+				-- See hack, above
 				trace("! Tourist: Highlight not found for "..tostring(continentName).."["..tostring(_).."] = "..tostring(zoneNames[_]))
-			end 
-			
+			end
+
 			if zoneID then
 				-- Revert map to current continent map for next zoneName lookup
 				SetMapZoom(continentID)
@@ -4688,10 +5797,10 @@ do
 			end
 		end
 	end
-	
+
 	SetMapToCurrentZone()
 
-	for k,v in pairs(zones) do	
+	for k,v in pairs(zones) do
 		lows[k] = v.low or 0
 		highs[k] = v.high or 0
 		continents[k] = v.continent or UNKNOWN
@@ -4720,7 +5829,7 @@ do
 	end
 	zones = nil
 
-	trace("Tourist: Zones initialized.")
+	trace("Tourist: BZ initialized.")
 
 	PLAYER_LEVEL_UP(Tourist)
 end

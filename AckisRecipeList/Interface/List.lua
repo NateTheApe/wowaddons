@@ -21,7 +21,6 @@ local LibStub	= _G.LibStub
 local addon	= LibStub("AceAddon-3.0"):GetAddon(private.addon_name)
 local L		= LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local BFAC	= LibStub("LibBabble-Faction-3.0"):GetLookupTable()
-local BZ	= LibStub("LibBabble-Zone-3.0"):GetLookupTable()
 local QTip	= LibStub("LibQTip-1.0")
 local Dialog	= LibStub("LibDialog-1.0")
 
@@ -154,7 +153,7 @@ function private.InitializeListFrame()
 	ScrollBar:EnableMouseWheel(true)
 	ScrollBar:SetOrientation("VERTICAL")
 
-	ScrollBar:SetThumbTexture("Interface\\Buttons\\UI-ScrollBar-Knob")
+	ScrollBar:SetThumbTexture([[Interface\Buttons\UI-ScrollBar-Knob]])
 	ScrollBar:SetMinMaxValues(0, 1)
 	ScrollBar:SetValueStep(1)
 
@@ -219,7 +218,7 @@ function private.InitializeListFrame()
 	ScrollBar:SetScript("OnValueChanged", function(self, value)
 		local min_val, max_val = self:GetMinMaxValues()
 		local current_tab = MainPanel.tabs[MainPanel.current_tab]
-		local member = "profession_" .. MainPanel.profession .. "_scroll_value"
+		local member = "profession_" .. MainPanel.current_profession .. "_scroll_value"
 
 		current_tab[member] = value
 
@@ -269,7 +268,7 @@ function private.InitializeListFrame()
 
 		-- First, check if this is a "modified" click, and react appropriately
 		if clicked_line.recipe_id and _G.IsModifierKeyDown() then
-			local profession_recipes = private.profession_recipe_list[private.ORDERED_PROFESSIONS[MainPanel.profession]]
+			local profession_recipes = private.profession_recipe_list[private.ORDERED_PROFESSIONS[MainPanel.current_profession]]
 
 			if _G.IsControlKeyDown() then
 				if _G.IsShiftKeyDown() then
@@ -401,6 +400,14 @@ function private.InitializeListFrame()
 		highlight_texture:SetPoint("BOTTOMRIGHT", -2, 1)
 		cur_entry:SetHighlightTexture(highlight_texture)
 
+		local emphasis_texture = cur_entry:CreateTexture(nil, "BORDER")
+		emphasis_texture:SetTexture([[Interface\QUESTFRAME\Ui-QuestLogTitleHighlight]])
+		emphasis_texture:SetVertexColor(1, 0.61, 0)
+		emphasis_texture:SetBlendMode("ADD")
+		emphasis_texture:SetPoint("TOPLEFT", 2, 0)
+		emphasis_texture:SetPoint("BOTTOMRIGHT", -2, 1)
+		cur_entry.emphasis_texture = emphasis_texture
+
 		local label = cur_entry:CreateFontString(nil, "ARTWORK")
 		label:SetPoint("LEFT", cur_entry, "LEFT", 7, 0)
 		label:SetPoint("RIGHT", cur_entry, "RIGHT", -7, 0)
@@ -498,13 +505,6 @@ function private.InitializeListFrame()
 		local obtain_filters	= filter_db.obtain
 		local general_filters	= filter_db.general
 
-		local V = private.GAME_VERSIONS
-		local EXPANSION_FILTERS = {
-			[V.ORIG]	= "expansion0",
-			[V.TBC]		= "expansion1",
-			[V.WOTLK]	= "expansion2",
-			[V.CATA]	= "expansion3",
-		}
 
 		local Q = private.ITEM_QUALITIES
 		local QUALITY_FILTERS = {
@@ -536,18 +536,19 @@ function private.InitializeListFrame()
 		}
 
 		local SOFT_FILTERS = {
+			["achievement"]	= { flag = COMMON1.ACHIEVEMENT,	field = "common1",	sv_root = obtain_filters },
+			["discovery"]	= { flag = COMMON1.DISC,	field = "common1",	sv_root = obtain_filters },
+			["instance"]	= { flag = COMMON1.INSTANCE,	field = "common1",	sv_root = obtain_filters },
+			["mobdrop"]	= { flag = COMMON1.MOB_DROP,	field = "common1",	sv_root = obtain_filters },
+			["pvp"]		= { flag = COMMON1.PVP,		field = "common1",	sv_root = obtain_filters },
+			["quest"]	= { flag = COMMON1.QUEST,	field = "common1",	sv_root = obtain_filters },
+			["raid"]	= { flag = COMMON1.RAID,	field = "common1",	sv_root = obtain_filters },
+			["retired"]	= { flag = COMMON1.RETIRED,	field = "common1",	sv_root = general_filters },
+			["reputation"]	= { flag = COMMON1.REPUTATION,	field = "common1",	sv_root = obtain_filters},
+			["seasonal"]	= { flag = COMMON1.SEASONAL,	field = "common1",	sv_root = obtain_filters },
 			["trainer"]	= { flag = COMMON1.TRAINER,	field = "common1",	sv_root = obtain_filters },
 			["vendor"]	= { flag = COMMON1.VENDOR,	field = "common1",	sv_root = obtain_filters },
-			["instance"]	= { flag = COMMON1.INSTANCE,	field = "common1",	sv_root = obtain_filters },
-			["raid"]	= { flag = COMMON1.RAID,	field = "common1",	sv_root = obtain_filters },
-			["seasonal"]	= { flag = COMMON1.SEASONAL,	field = "common1",	sv_root = obtain_filters },
-			["quest"]	= { flag = COMMON1.QUEST,	field = "common1",	sv_root = obtain_filters },
-			["pvp"]		= { flag = COMMON1.PVP,		field = "common1",	sv_root = obtain_filters },
 			["worlddrop"]	= { flag = COMMON1.WORLD_DROP,	field = "common1",	sv_root = obtain_filters },
-			["mobdrop"]	= { flag = COMMON1.MOB_DROP,	field = "common1",	sv_root = obtain_filters },
-			["discovery"]	= { flag = COMMON1.DISC,	field = "common1",	sv_root = obtain_filters },
-			["achievement"]	= { flag = COMMON1.ACHIEVEMENT,	field = "common1",	sv_root = obtain_filters },
-			["retired"]	= { flag = COMMON1.RETIRED,	field = "common1",	sv_root = general_filters },
 		}
 
 		local REP1 = private.REP_FLAGS_WORD1
@@ -595,24 +596,55 @@ function private.InitializeListFrame()
 			[REP2.RAMKAHEN]			= "ramkahen",
 			[REP2.EARTHEN_RING]		= "earthenring",
 			[REP2.THERAZANE]		= "therazane",
+			[REP2.FORESTHOZEN]		= "foresthozen",
+			[REP2.GOLDENLOTUS]		= "goldenlotus",
+			[REP2.HUOJINPANDAREN]		= "huojinpandaren",
+			[REP2.CLOUDSERPENT]		= "cloudserpent",
+			[REP2.PEARLFINJINYU]		= "pearlfinjinyu",
+			[REP2.SHADOPAN]			= "shadopan",
+			[REP2.ANGLERS]			= "anglers",
+			[REP2.AUGUSTCELESTIALS]		= "augustcelestials",
+			[REP2.BREWMASTERS]		= "brewmasters",
+			[REP2.KLAXXI]			= "klaxxi",
+			[REP2.LOREWALKERS]		= "lorewalkers",
+			[REP2.TILLERS]			= "tillers",
+			[REP2.TUSHUIPANDAREN]		= "tushuipandaren",
+			[REP2.BLACKPRINCE]		= "blackprince",
+			[REP2.SHANGXIACADEMY]		= "shangxiacademy",
 		}
 
 		local CLASS1 = private.CLASS_FLAGS_WORD1
 		local CLASS_FILTERS = {
-			["deathknight"]	= CLASS1.DK,
-			["druid"]	= CLASS1.DRUID,
-			["hunter"]	= CLASS1.HUNTER,
-			["mage"]	= CLASS1.MAGE,
-			["paladin"]	= CLASS1.PALADIN,
-			["priest"]	= CLASS1.PRIEST,
-			["shaman"]	= CLASS1.SHAMAN,
-			["rogue"]	= CLASS1.ROGUE,
-			["warlock"]	= CLASS1.WARLOCK,
-			["warrior"]	= CLASS1.WARRIOR,
+			[CLASS1.DK]		= "deathknight",
+			[CLASS1.DRUID]		= "druid",
+			[CLASS1.HUNTER]		= "hunter",
+			[CLASS1.MAGE]		= "mage",
+			[CLASS1.PALADIN]	= "paladin",
+			[CLASS1.PRIEST]		= "priest",
+			[CLASS1.SHAMAN]		= "shaman",
+			[CLASS1.ROGUE]		= "rogue",
+			[CLASS1.WARLOCK]	= "warlock",
+			[CLASS1.WARRIOR]	= "warrior",
+			[CLASS1.MONK]		= "monk",
 		}
 
+		-- Returns true if any of the filter flags are turned on.
+		local function HasEnabledFlag(filters, bitfield, name_field)
+			if not bitfield then
+				return true
+			end
+
+			for flag, name in pairs(filters) do
+				if bit.band(bitfield, flag) == flag then
+					if name_field[name] then
+						return true
+					end
+				end
+			end
+			return false
+		end
+
 		---Scans a specific recipe to determine if it is to be displayed or not.
-		-- For flag info see comments at start of file in comments
 		local function CanDisplayRecipe(recipe)
 			if addon.db.profile.exclusionlist[recipe.spell_id] and not addon.db.profile.ignoreexclusionlist then
 				return false
@@ -644,7 +676,7 @@ function private.InitializeListFrame()
 			end
 
 			-- Expansion filters.
-			if not obtain_filters[EXPANSION_FILTERS[private.GAME_VERSIONS[recipe.genesis]]] then
+			if not obtain_filters[private.EXPANSION_FILTERS[private.GAME_VERSIONS[recipe.genesis]]] then
 				return false
 			end
 
@@ -659,7 +691,7 @@ function private.InitializeListFrame()
 			end
 
 			-------------------------------------------------------------------------------
-			-- Check the hard filter flags
+			-- Check the hard filter flags.
 			-------------------------------------------------------------------------------
 			for filter, data in pairs(private.HARD_FILTERS) do
 				local bitfield = recipe.flags[data.field]
@@ -670,64 +702,20 @@ function private.InitializeListFrame()
 			end
 
 			-------------------------------------------------------------------------------
-			-- Check the reputation filter flags - _all_ of the pertinent reputation or
-			-- class flags must be toggled off or the recipe is still shown.
-			-------------------------------------------------------------------------------
-			local toggled_off, toggled_on = 0, 0
-
-			for flag, name in pairs(REP_FILTERS) do
-				local bitfield = recipe.flags.reputation1
-
-				if bitfield and bit.band(bitfield, flag) == flag then
-					if filter_db.rep[name] then
-						toggled_on = toggled_on + 1
-					else
-						toggled_off = toggled_off + 1
-					end
-				end
-			end
-
-			if toggled_off > 0 and toggled_on == 0 then
+			-- Check the reputation filter flags.
+			------------------------------------------------------------------------------
+			if not HasEnabledFlag(REP_FILTERS, recipe.flags.reputation1, filter_db.rep) then
 				return false
 			end
-			toggled_off, toggled_on = 0, 0
 
-			for flag, name in pairs(REP_FILTERS_2) do
-				local bitfield = recipe.flags.reputation2
-
-				if bitfield and bit.band(bitfield, flag) == flag then
-					if filter_db.rep[name] then
-						toggled_on = toggled_on + 1
-					else
-						toggled_off = toggled_off + 1
-					end
-				end
-			end
-
-			if toggled_off > 0 and toggled_on == 0 then
+			if not HasEnabledFlag(REP_FILTERS_2, recipe.flags.reputation2, filter_db.rep) then
 				return false
 			end
 
 			-------------------------------------------------------------------------------
 			-- Check the class filter flags
 			-------------------------------------------------------------------------------
-			local class_filters = filter_db.classes
-
-			toggled_off, toggled_on = 0, 0
-
-			for class, flag in pairs(CLASS_FILTERS) do
-				local bitfield = recipe.flags.class1
-
-				if bitfield and bit.band(bitfield, flag) == flag then
-					if class_filters[class] then
-						toggled_on = toggled_on + 1
-					else
-						toggled_off = toggled_off + 1
-					end
-				end
-			end
-
-			if toggled_off > 0 and toggled_on == 0 then
+			if not HasEnabledFlag(CLASS_FILTERS, recipe.flags.class1, filter_db.classes) then
 				return false
 			end
 
@@ -743,9 +731,6 @@ function private.InitializeListFrame()
 					return true
 				end
 			end
-
-			-- If we get here it means that no flags matched our values
-			return false
 		end
 
 		function ListFrame:Initialize(expand_mode)
@@ -758,7 +743,7 @@ function private.InitializeListFrame()
 			-- Update recipe filters.
 			-------------------------------------------------------------------------------
 			local general_filters = addon.db.profile.filters.general
-			local profession_recipes = private.profession_recipe_list[private.ORDERED_PROFESSIONS[MainPanel.profession]]
+			local profession_recipes = private.profession_recipe_list[private.ORDERED_PROFESSIONS[MainPanel.current_profession]]
 			local recipes_known, recipes_known_filtered = 0, 0
 			local recipes_total, recipes_total_filtered = 0, 0
 
@@ -829,7 +814,7 @@ function private.InitializeListFrame()
 			-- Initialize the expand button and entries for the current tab.
 			-------------------------------------------------------------------------------
 			local current_tab = MainPanel.tabs[addon.db.profile.current_tab]
-			local expanded_button = current_tab["expand_button_"..MainPanel.profession]
+			local expanded_button = current_tab["expand_button_"..MainPanel.current_profession]
 
 			if expanded_button then
 				MainPanel.expand_button:Expand(current_tab)
@@ -879,6 +864,7 @@ function private.InitializeListFrame()
 			entry:SetScript("OnEnter", nil)
 			entry:SetScript("OnLeave", nil)
 			entry:SetWidth(LIST_ENTRY_WIDTH)
+			entry.emphasis_texture:Hide()
 			entry:Disable()
 
 			state.string_index = 0
@@ -967,7 +953,7 @@ function private.InitializeListFrame()
 		else
 			local max_val = num_entries - NUM_RECIPE_LINES
 			local current_tab = MainPanel.tabs[MainPanel.current_tab]
-			local scroll_value = current_tab["profession_"..MainPanel.profession.."_scroll_value"] or 0
+			local scroll_value = current_tab["profession_"..MainPanel.current_profession.."_scroll_value"] or 0
 
 			scroll_value = math.max(0, math.min(scroll_value, max_val))
 			offset = scroll_value
@@ -1008,6 +994,10 @@ function private.InitializeListFrame()
 			end
 			local cur_container = cur_state.container
 			local cur_button = self.entry_buttons[button_index]
+
+			if cur_entry.emphasized then
+				cur_button.emphasis_texture:Show()
+			end
 
 			if cur_entry.type == "header" or cur_entry.type == "entry" then
 				cur_state:SetPoint("TOPLEFT", cur_container, "TOPLEFT", 0, 0)
@@ -1243,7 +1233,7 @@ function private.InitializeListFrame()
 	end
 
 	local function ExpandWorldDropData(entry_index, entry_type, parent_entry, identifier, recipe_id, hide_location, hide_type)
-		local drop_location = type(identifier) == "string" and SetTextColor(CATEGORY_COLORS["location"], BZ[identifier])
+		local drop_location = type(identifier) == "string" and SetTextColor(CATEGORY_COLORS["location"], identifier)
 
 		if drop_location then
 			local recipe_item_id = private.recipe_list[recipe_id]:RecipeItemID()
@@ -1350,7 +1340,7 @@ function private.InitializeListFrame()
 		local current_entry = self.entries[orig_index]
 		local expand_all = expand_mode == "deep"
 		local current_tab = MainPanel.tabs[MainPanel.current_tab]
-		local prof_name = private.ORDERED_PROFESSIONS[MainPanel.profession]
+		local prof_name = private.ORDERED_PROFESSIONS[MainPanel.current_profession]
 		local profession_recipes = private.profession_recipe_list[prof_name]
 
 		-- Entry_index is the position in self.entries that we want to expand. Since we are expanding the current entry, the return
@@ -1706,7 +1696,7 @@ do
 			end
 		end,
 		[A.WORLD_DROP] = function(recipe_id, identifier, location, acquire_info, addline_func)
-			local drop_location = type(identifier) == "string" and BZ[identifier] or _G.UNKNOWN
+			local drop_location = type(identifier) == "string" and identifier or _G.UNKNOWN
 
 			if location and drop_location ~= location then
 				return
@@ -1880,6 +1870,9 @@ do
 		end
 		InitializeTooltips(recipe.spell_id)
 
+		if not acquire_tip then
+			return
+		end
 		acquire_tip:AddHeader()
 		acquire_tip:SetCell(1, 1, "|c"..select(4, _G.GetItemQualityColor(recipe.quality))..recipe.name, "CENTER", 2)
 
@@ -1896,20 +1889,22 @@ do
 
 		-- Add in skill level requirement, colored correctly
 		local skill_level = private.current_profession_scanlevel
+		local color_type
 
 		if recipe.skill_level > skill_level then
-			ttAdd(0, -1, false, ("%s:"):format(_G.SKILL_LEVEL), BASIC_COLORS["normal"], recipe.skill_level, private.DIFFICULTY_COLORS["impossible"])
+			color_type = "impossible"
 		elseif skill_level >= recipe.trivial_level then
-			ttAdd(0, -1, false, ("%s:"):format(_G.SKILL_LEVEL), BASIC_COLORS["normal"], recipe.skill_level, private.DIFFICULTY_COLORS["trivial"])
+			color_type = "trivial"
 		elseif skill_level >= recipe.easy_level then
-			ttAdd(0, -1, false, ("%s:"):format(_G.SKILL_LEVEL), BASIC_COLORS["normal"], recipe.skill_level, private.DIFFICULTY_COLORS["easy"])
+			color_type = "easy"
 		elseif skill_level >= recipe.medium_level then
-			ttAdd(0, -1, false, ("%s:"):format(_G.SKILL_LEVEL), BASIC_COLORS["normal"], recipe.skill_level, private.DIFFICULTY_COLORS["medium"])
+			color_type = "medium"
 		elseif skill_level >= recipe.optimal_level then
-			ttAdd(0, -1, false, ("%s:"):format(_G.SKILL_LEVEL), BASIC_COLORS["normal"], recipe.skill_level, private.DIFFICULTY_COLORS["optimal"])
+			color_type = "optimal"
 		else
-			ttAdd(0, -1, false, ("%s:"):format(_G.SKILL_LEVEL), BASIC_COLORS["normal"], recipe.skill_level, private.DIFFICULTY_COLORS["trivial"])
+			color_type = "trivial"
 		end
+		ttAdd(0, -1, false, ("%s:"):format(_G.SKILL_LEVEL), BASIC_COLORS["normal"], recipe.skill_level, private.DIFFICULTY_COLORS[color_type])
 		acquire_tip:AddSeparator()
 
 		for flag, label in pairs(BINDING_FLAGS) do
@@ -1942,7 +1937,7 @@ do
 			ttAdd(0, -1, 0, L["CTRL_CLICK"], HINT_COLOR)
 			ttAdd(0, -1, 0, L["SHIFT_CLICK"], HINT_COLOR)
 
-			if not NON_COORD_ACQUIRES[acquire_id] and (_G.TomTom or _G.Cartographer_Waypoints) and (addon.db.profile.worldmap or addon.db.profile.minimap) then
+			if not NON_COORD_ACQUIRES[acquire_id] and _G.TomTom and (addon.db.profile.worldmap or addon.db.profile.minimap) then
 				ttAdd(0, -1, 0, L["CTRL_SHIFT_CLICK"], HINT_COLOR)
 			end
 		end

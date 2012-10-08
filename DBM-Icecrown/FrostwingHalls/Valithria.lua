@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Valithria", "DBM-Icecrown", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4502 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(36789)
 mod:SetModelID(30318)
 mod:SetUsedIcons(8)
@@ -20,21 +20,21 @@ mod:RegisterEvents(
 )
 
 local warnCorrosion			= mod:NewAnnounce("WarnCorrosion", 2, 70751, false)
-local warnGutSpray			= mod:NewTargetAnnounce(71283, 3, nil, mod:IsTank() or mod:IsHealer())
-local warnManaVoid			= mod:NewSpellAnnounce(71741, 2, nil, mod:IsManaUser())
+local warnGutSpray			= mod:NewTargetAnnounce(70633, 3, nil, mod:IsTank() or mod:IsHealer())
+local warnManaVoid			= mod:NewSpellAnnounce(71179, 2, nil, mod:IsManaUser())
 local warnSupression		= mod:NewSpellAnnounce(70588, 3)
 local warnPortalSoon		= mod:NewSoonAnnounce(72483, 2, nil)
 local warnPortal			= mod:NewSpellAnnounce(72483, 3, nil)
 local warnPortalOpen		= mod:NewAnnounce("WarnPortalOpen", 4, 72483)
 
-local specWarnLayWaste		= mod:NewSpecialWarningSpell(71730)
-local specWarnManaVoid		= mod:NewSpecialWarningMove(71741)
+local specWarnLayWaste		= mod:NewSpecialWarningSpell(69325)
+local specWarnManaVoid		= mod:NewSpecialWarningMove(71179)
 
 local timerLayWaste			= mod:NewBuffActiveTimer(12, 69325)
 local timerNextPortal		= mod:NewCDTimer(46.5, 72483, nil)
 local timerPortalsOpen		= mod:NewTimer(10, "TimerPortalsOpen", 72483)
 local timerHealerBuff		= mod:NewBuffActiveTimer(40, 70873)
-local timerGutSpray			= mod:NewTargetTimer(12, 71283, nil, mod:IsTank() or mod:IsHealer())
+local timerGutSpray			= mod:NewTargetTimer(12, 70633, nil, mod:IsTank() or mod:IsHealer())
 local timerCorrosion		= mod:NewTargetTimer(6, 70751, nil, false)
 local timerBlazingSkeleton	= mod:NewTimer(50, "TimerBlazingSkeleton", 17204)
 local timerAbom				= mod:NewTimer(50, "TimerAbom", 43392)--Experimental
@@ -44,7 +44,6 @@ local berserkTimer		= mod:NewBerserkTimer(420)
 mod:AddBoolOption("SetIconOnBlazingSkeleton", true)
 
 local GutSprayTargets = {}
-local spamSupression = 0
 local BlazingSkeletonTimer = 60
 local AbomSpawn = 0
 local AbomTimer = 60
@@ -115,7 +114,7 @@ end
 
 function mod:TrySetTarget()
 	if DBM:GetRaidRank() >= 1 then
-		for i = 1, GetNumRaidMembers() do
+		for i = 1, DBM:GetGroupMembers() do
 			if UnitGUID("raid"..i.."target") == blazingSkeleton then
 				blazingSkeleton = nil
 				SetRaidTarget("raid"..i.."target", 8)
@@ -137,10 +136,9 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(71741) then--Mana Void
+	if args:IsSpellID(71179, 71741) then--Mana Void
 		warnManaVoid:Show()
-	elseif args:IsSpellID(70588) and GetTime() - spamSupression > 5 then--Supression
-		spamSupression = GetTime()
+	elseif args:IsSpellID(70588) and self:AntiSpam(5, 1) then--Supression
 		warnSupression:Show(args.destName)
 	end
 end
@@ -174,16 +172,12 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-do 
-	local lastVoid = 0
-	function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-		if (spellId == 71806 or spellId == 71743 or spellId == 72029 or spellId == 72030) and destGUID == UnitGUID("player") and GetTime() - lastVoid > 2 then		-- Mana Void
-			specWarnManaVoid:Show()
-			lastVoid = GetTime()
-		end
+function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
+	if (spellId == 71806 or spellId == 71743 or spellId == 72029 or spellId == 72030) and destGUID == UnitGUID("player") and self:AntiSpam(2, 2) then		-- Mana Void
+		specWarnManaVoid:Show()
 	end
-	mod.SPELL_MISSED = mod.SPELL_DAMAGE
 end
+mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
 function mod:UNIT_TARGET()
 	if blazingSkeleton then

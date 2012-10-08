@@ -151,12 +151,15 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
+	warnGameOverQuest	= "Has ganado %d puntos de %d puntos posibles",
+	warnGameOverNoQuest	= "El juego terminó con un total de %d puntos posibles",
 	warnGnoll		= "Sale un Gnoll",
 	warnHogger		= "Sale Hogger",
 	specWarnHogger	= "¡Sale Hogger!"
 })
 
 L:SetOptionLocalization({
+	warnGameOver	= "Anunciar total de puntos posibles al terminar el juego",
 	warnGnoll		= "Anunciar cuando sale un Gnoll",
 	warnHogger		= "Anunciar cuando sale un Hogger",
 	specWarnHogger	= "Mostrar aviso especial cuando sale un Hogger"
@@ -183,3 +186,32 @@ L = DBM:GetModLocalization("Tonks")
 L:SetGeneralLocalization({
 	name = "Combate de tonques"
 })
+
+--------------------------
+--  Plants Vs. Zombies  --
+--------------------------
+L = DBM:GetModLocalization("PlantsVsZombies")
+
+L:SetGeneralLocalization({
+	name = "Flores de paz vs Necrófagos"
+})
+
+L:SetWarningLocalization({
+	warnTotalAdds	= "Total de zombies que han salido des de la ultima oleada masiva: %d",
+	specWarnWave	= "¡Oleada masiva!"
+})
+
+L:SetTimerLocalization{
+	timerWave		= "Siguiente oleada masiva"
+}
+
+L:SetOptionLocalization({
+	warnTotalAdds	= "Anunciar total de zombies que han salido entre cada oleada masiva",
+	specWarnWave	= "Mostrar aviso especial cuando una empieza una Oleada Masiva",
+	timerWave		= "Mostrar tiempo para la siguiente Oleada Masiva"
+})
+
+L:SetMiscLocalization({
+	MassiveWave		= "A Massive Wave of Zombies is Approaching!"--translate
+})
+

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Hodir", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4663 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(32845)
 mod:SetModelID(28743)
 mod:SetUsedIcons(7, 8)
@@ -29,10 +29,10 @@ local timerFrozenBlows		= mod:NewBuffActiveTimer(20, 63512)
 local timerFlashFrCD		= mod:NewCDTimer(50, 61968)
 local timerAchieve			= mod:NewAchievementTimer(179, 3182, "TimerSpeedKill")
 
+local yellStormCloud		= mod:NewYell(65133)
 local soundFlashFreeze		= mod:NewSound(61968)
 
 mod:AddBoolOption("SetIconOnStormCloud")
-mod:AddBoolOption("YellOnStormCloud", true, "announce")
 
 local stormCloudIcon
 
@@ -59,9 +59,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		warnStormCloud:Show(args.destName)
 		if args:IsPlayer() then
 			specWarnStormCloud:Show()
-			if self.Options.YellOnStormCloud then
-				SendChatMessage(L.YellCloud, "SAY")
-			end
+			yellStormCloud:Yell()
 		end
 		if self.Options.SetIconOnStormCloud then
 			self:SetIcon(args.destName, stormCloudIcon)
@@ -82,12 +80,8 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-do 
-	local lastbitingcold = 0
-	function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-		if (spellId == 62038 or spellId == 62188) and destGUID == UnitGUID("player") and time() - lastbitingcold > 4 then
-			specWarnBitingCold:Show()
-			lastbitingcold = time()
-		end
+function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if (spellId == 62038 or spellId == 62188) and destGUID == UnitGUID("player") and self:AntiSpam(4) then
+		specWarnBitingCold:Show()
 	end
 end

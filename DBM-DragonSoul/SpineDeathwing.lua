@@ -1,9 +1,10 @@
 local mod	= DBM:NewMod(318, "DBM-DragonSoul", nil, 187)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7306 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 27 $"):sub(12, -3))
 mod:SetCreatureID(53879)
 mod:SetModelID(35268)
+mod:SetModelSound("sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKEVENT_01.OGG", "sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKSLAY_01.OGG")
 mod:SetZone()
 mod:SetUsedIcons(6, 5, 4, 3, 2, 1)
 
@@ -26,25 +27,26 @@ mod:RegisterEventsInCombat(
 )
 
 local warnAbsorbedBlood		= mod:NewStackAnnounce(105248, 2)
-local warnResidue			= mod:NewCountAnnounce("ej4057", 3, nil, false) -- maybe info frame will be better. (temporarly added)
-local warnGrip				= mod:NewTargetAnnounce(109459, 4)
+local warnResidue			= mod:NewCountAnnounce("ej4057", 3, nil, false)--This is HIGHLY inaccurate in 5.x, i do not know why right now. I'll actually log fight next week
+local warnGrip				= mod:NewTargetAnnounce(105490, 4)
 local warnNuclearBlast		= mod:NewCastAnnounce(105845, 4)
 local warnSealArmor			= mod:NewCastAnnounce(105847, 4)
 local warnAmalgamation		= mod:NewSpellAnnounce("ej4054", 3, 106005)--Amalgamation spawning, give temp icon.
 
 local specWarnRoll			= mod:NewSpecialWarningSpell("ej4050", nil, nil, nil, true)--The actual roll
 local specWarnTendril		= mod:NewSpecialWarning("SpecWarnTendril")--A personal warning for you only if you're not gripped 3 seconds after roll started
-local specWarnGrip			= mod:NewSpecialWarningSpell(109459, mod:IsDps())
+local specWarnGrip			= mod:NewSpecialWarningSpell(105490, mod:IsDps())
 local specWarnNuclearBlast	= mod:NewSpecialWarningRun(105845, mod:IsMelee())
 local specWarnSealArmor		= mod:NewSpecialWarningSpell(105847, mod:IsDps())
 local specWarnAmalgamation	= mod:NewSpecialWarningSpell("ej4054", false)
 
 local timerSealArmor		= mod:NewCastTimer(23, 105847)
 local timerBarrelRoll		= mod:NewCastTimer(5, "ej4050")
-local timerGripCD			= mod:NewNextTimer(32, 109457)
+local timerGripCD			= mod:NewNextTimer(32, 105490)
 local timerDeathCD			= mod:NewCDTimer(8.5, 106199)--8.5-10sec variation.
 
 local countdownRoll			= mod:NewCountdown(5, "ej4050")
+local countdownGrip			= mod:NewCountdown(32, 105490, false)--Can get confusing if used with roll countdown. This is off by default but can be turned on by someone willing to sort out the confusion on their own.
 
 local soundNuclearBlast		= mod:NewSound(105845, nil, mod:IsMelee())
 
@@ -56,12 +58,12 @@ mod:AddBoolOption("ShowShieldInfo", false)--on 25 man this is quite frankly a sp
 local gripTargets = {}
 local gripIcon = 6
 local corruptionActive = {}
-local residueCount = 0
+local residueNum = 0
+local residueDebug = false
 local diedOozeGUIDS = {}
-local resurrectedOozeTime = {}
 
 local function checkTendrils()
-	if not UnitDebuff("player", GetSpellInfo(109454)) and not UnitIsDeadOrGhost("player") then
+	if not UnitDebuff("player", GetSpellInfo(105563)) and not UnitIsDeadOrGhost("player") then
 		specWarnTendril:Show()
 	end
 end
@@ -79,36 +81,20 @@ local function showGripWarning()
 end
 
 local function warningResidue()
-	warnResidue:Cancel()
-	if residueCount > 2 and residueCount < 16 then -- announce 9 stacks (ready to eat blood!), sometimes it can be missing 2~3 stacks, announce to 15 stacks.
-		warnResidue:Schedule(1.25, residueCount)
-	end
-end
-
-local function saveDiedOoze(GUID)
---	print(GUID, "saved")
-	diedOozeGUIDS[GUID] = true
-	resurrectedOozeTime[GUID] = GetTime()
-end
-
-local function removeResurrectedOozeTime(GUID)
-	if resurrectedOozeTime[GUID] then
-		resurrectedOozeTime[GUID] = nil
+	--http://mysticalos.com/residue_bug.jpeg (screen shot is from using OLD code, it does not work here. I got it up to -10)
+	if residueNum >= 0 then -- (better to warn 0 on heroic)
+		warnResidue:Show(residueNum)
 	end
 end
 
 local function checkOozeResurrect(GUID)
-	-- GUID contains creature id, not needed CID check.
-	if diedOozeGUIDS[GUID] then
-		 -- sometimes residue Count reduces 2 or more from 1 GUID. To prevent this, we use time check.
-		if GetTime() - (resurrectedOozeTime[GUID] or 0) > 2 then--It is an ooze that died earlier. We check destination damage to detect oozes faster if they take damage before they do damage.
-			resurrectedOozeTime[GUID] = GetTime()
-			diedOozeGUIDS[GUID] = nil --Remove it
-			residueCount = residueCount - 1 --Reduce count
-			warningResidue()
-			mod:Schedule(2, removeResurrectedOozeTime, GUID) -- Remove time save table after 2 sec.
---			print ("ooze_revived", GUID, residueCount)
-		end
+	-- set min resurrect time to 5 sec. (guessed)
+	if diedOozeGUIDS[GUID] and GetTime() - diedOozeGUIDS[GUID] > 5 then
+		residueNum = residueNum - 1
+		diedOozeGUIDS[GUID] = nil
+		mod:Unschedule(warningResidue)
+		mod:Schedule(1.25, warningResidue)
+		if residueDebug then print("revived", residueNum) end
 	end
 end
 
@@ -117,9 +103,10 @@ do
 	local plasmaTargets = {}
 	local healed = {}
 	
-	function mod:SPELL_HEAL(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId, spellName, spellSchool, amount, overheal, absorbed)
+	function mod:SPELL_HEAL(_, _, _, _, destGUID, _, _, _, _, _, _, _, _, absorbed)
 		if plasmaTargets[destGUID] then
 			healed[destGUID] = healed[destGUID] + (absorbed or 0)
+			DBM.BossHealth:Update()
 		end
 	end
 	mod.SPELL_PERIODIC_HEAL = mod.SPELL_HEAL
@@ -166,12 +153,11 @@ function mod:OnCombatStart(delay)
 	table.wipe(gripTargets)
 	table.wipe(corruptionActive)
 	table.wipe(diedOozeGUIDS)
-	table.wipe(resurrectedOozeTime)
 	if self.Options.ShowShieldInfo then
 		clearPlasmaVariables()
 	end
 	gripIcon = 6
-	residueCount = 0
+	residueNum = 0
 end
 
 function mod:OnCombatEnd()
@@ -185,7 +171,7 @@ function mod:SPELL_CAST_START(args)
 		warnNuclearBlast:Show()
 		specWarnNuclearBlast:Show()
 		soundNuclearBlast:Play()
-	elseif args:IsSpellID(105847, 105848) then -- Maybe related to positions?
+	elseif args:IsSpellID(105847, 105848) then--This still has 2 spellids, since it's locational, location based IDs did NOT get crunched.
 		warnSealArmor:Show()
 		specWarnSealArmor:Show()
 		if self:IsDifficulty("lfr25") then
@@ -198,8 +184,14 @@ function mod:SPELL_CAST_START(args)
 			corruptionActive[args.sourceGUID] = 0
 			if self:IsDifficulty("normal25", "heroic25") then
 				timerGripCD:Start(16, args.sourceGUID)
+				if #corruptionActive < 2 then--because using countdowns with more then 1 will be noisy not informative.
+					countdownGrip:Start(16, args.sourceGUID)
+				end
 			else
 				timerGripCD:Start(nil, args.sourceGUID)
+				if #corruptionActive < 2 then--because using countdowns with more then 1 will be noisy not informative.
+					countdownGrip:Start(32, args.sourceGUID)
+				end
 			end
 		end
 		corruptionActive[args.sourceGUID] = corruptionActive[args.sourceGUID] + 1
@@ -213,41 +205,44 @@ end
 
 -- not needed guid check. This is residue creation step.
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(105219, 109371, 109372, 109373) then 
-		residueCount = residueCount + 1
-		warningResidue()
---		print ("ooze_dies", args.sourceGUID, residueCount)
-		self:Schedule(5, saveDiedOoze, args.sourceGUID)-- save died ooze guid. sometimes SPELL_DAMAGE, SWING_DAMAGE event appears after ooze died. so we delays build died ooze table.
+	if args:IsSpellID(105219) then 
+		residueNum = residueNum + 1
+		diedOozeGUIDS[args.sourceGUID] = GetTime()
+		self:Unschedule(warningResidue)
+		self:Schedule(1.25, warningResidue)
+		if residueDebug then print("created", residueNum) end
+	elseif args:IsSpellID(105248) and diedOozeGUIDS[args.sourceGUID] then
+		residueNum = residueNum - 1
+		diedOozeGUIDS[args.sourceGUID] = nil
+		self:Unschedule(warningResidue)
+		self:Schedule(1.25, warningResidue)
+		if residueDebug then print("absorbed", residueNum) end
 	end
 end
 
 --Damage event that indicates an ooze is taking damage
 --we check its GUID to see if it's a resurrected ooze and if so remove it from table.
---oozes do not fires SPELL_DAMAGE event from source. so track SPELL_DAMAGE event only from dest.
-function mod:SPELL_DAMAGE(sourceGUID, _, _, _, destGUID, _, _, _, spellId)
-	if spellId == 105219 or spellId == 109371 or spellId == 109372 or spellId == 109373 then return end
-	checkOozeResurrect(destGUID)
+--for WoW 5.x priest spell, Shadow Word: Pain (spellid = 124464) fires spell_damage event. (this is damage over time spell, but combat log records this spell as SPELL_DAMAGE event. not SPELL_PERIODIC_DAMAGE)
+--this cause bad revive check, so only source SPELL_DAMAGE (fires when ooze dies again) and SWING_DAMAGE event will resolve this.
+--although this change causes slow revive check, it will be better than shows bad residue count.
+function mod:SPELL_DAMAGE(sourceGUID, _, _, _, destGUID)
+	checkOozeResurrect(sourceGUID)
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
 function mod:SWING_DAMAGE(sourceGUID, _, _, _, destGUID)
-	checkOozeResurrect(destGUID)
 	checkOozeResurrect(sourceGUID)
 end
 mod.SWING_MISSED = mod.SWING_DAMAGE
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(105248) then
-		--Need to check raw logs later to see if these have sourceGUIDs.
-		--if so remove em from table to reduce table size
-		--although it own't break anything not removing em.
-		residueCount = residueCount - 1
---		print ("ooze_absorbed", residueCount)
 		warnAbsorbedBlood:Cancel()--Just a little anti spam
-		warnAbsorbedBlood:Schedule(1.25, args.destName, args.amount or 1)
-	elseif args:IsSpellID(105490, 109457, 109458, 109459) then
+		warnAbsorbedBlood:Schedule(1.25, args.destName, 1)
+	elseif args:IsSpellID(105490) then
 		gripTargets[#gripTargets + 1] = args.destName
 		timerGripCD:Cancel(args.sourceGUID)
+		countdownGrip:Cancel(args.sourceGUID)
 		if corruptionActive[args.sourceGUID] then
 			corruptionActive[args.sourceGUID] = nil
 		end
@@ -260,7 +255,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		self:Unschedule(showGripWarning)
 		self:Schedule(0.3, showGripWarning)
-	elseif args:IsSpellID(105479, 109362, 109363, 109364) then
+	elseif args:IsSpellID(105479) then
 		if self.Options.ShowShieldInfo then
 			setPlasmaTarget(args.destGUID, args.destName)
 		end
@@ -269,23 +264,21 @@ end
 
 function mod:SPELL_AURA_APPLIED_DOSE(args)
 	if args:IsSpellID(105248) then
-		residueCount = residueCount - 1
-		warnResidue:Cancel()
 		warnAbsorbedBlood:Cancel()--Just a little anti spam
 		if args.amount == 9 then
 			warnAbsorbedBlood:Show(args.destName, 9)
 		else
-			warnAbsorbedBlood:Schedule(2, args.destName, args.amount)
+			warnAbsorbedBlood:Schedule(1.25, args.destName, args.amount)
 		end
 	end
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(105490, 109457, 109458, 109459) then
+	if args:IsSpellID(105490) then
 		if self.Options.SetIconOnGrip then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(105479, 109362, 109363, 109364) then
+	elseif args:IsSpellID(105479) then
 		if self.Options.ShowShieldInfo then
 			clearPlasmaTarget(args.destGUID, args.destName)
 		end
@@ -303,8 +296,8 @@ function mod:RAID_BOSS_EMOTE(msg)
 		timerBarrelRoll:Start()
 		countdownRoll:Start(5)
 		if self.Options.InfoFrame and not DBM.InfoFrame:IsShown() then
-			DBM.InfoFrame:SetHeader(L.NoDebuff:format(GetSpellInfo(109454)))
-			DBM.InfoFrame:Show(5, "playergooddebuff", 109454)
+			DBM.InfoFrame:SetHeader(L.NoDebuff:format(GetSpellInfo(105563)))
+			DBM.InfoFrame:Show(5, "playergooddebuff", 105563)
 		end
 	elseif msg == L.DLevels or msg:find(L.DLevels) then
 		self:Unschedule(checkTendrils)
@@ -319,6 +312,7 @@ function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
 	if cid == 53891 or cid == 56162 or cid == 56161 then
 		timerGripCD:Cancel(args.sourceGUID)
+		countdownGrip:Cancel(args.sourceGUID)
 		warnAmalgamation:Schedule(4.5)--4.5-5 seconds after corruption dies.
 		specWarnAmalgamation:Schedule(4.5)
 		if self:IsDifficulty("heroic10", "heroic25") then

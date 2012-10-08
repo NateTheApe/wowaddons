@@ -250,6 +250,13 @@ function dataobj:OnEnter()
 	tooltip:SetCell(y, 2, _G.LFDMicroButton.tooltipText)
 	tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, _G.LFDMicroButton)
 
+	if _G.CompanionsMicroButton then
+		local y, x = tooltip:AddLine()
+		tooltip:SetCell(y, 1, path.."mounts.tga", myProvider)
+		tooltip:SetCell(y, 2, _G.CompanionsMicroButton.tooltipText)
+		tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, _G.CompanionsMicroButton)
+	end
+	
 	if _G.EJMicroButton then
 		local y, x = tooltip:AddLine()
 		tooltip:SetCell(y, 1, path.."journal.tga", myProvider)

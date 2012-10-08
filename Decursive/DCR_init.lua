@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John Wellesz).
@@ -11,13 +11,13 @@
     To distribute Decursive through other means a special authorization is required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2012-01-15T18:56:52Z
+    This file was last updated on 2012-09-23T20:33:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -35,6 +35,7 @@ if not T._FatalError then
         whileDead = 1,
         hideOnEscape = 1,
         showAlert = 1,
+        preferredIndex = 3,
     }; -- }}}
     T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -45,7 +46,7 @@ if not T._LoadedFiles or not T._LoadedFiles["enUS.lua"] then
     return;
 end
 
-T.Dcr         = LibStub("AceAddon-3.0"):NewAddon("Decursive", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0");
+T.Dcr         = LibStub("AceAddon-3.0"):NewAddon("Decursive", "AceConsole-3.0", "AceEvent-3.0", "LibShefkiTimer-1.0", "AceHook-3.0");
 --[===[@debug@
 --Dcr = T.Dcr; -- needed until we get rid of the xml based UI.
 --@end-debug@]===]
@@ -53,7 +54,7 @@ T.Dcr         = LibStub("AceAddon-3.0"):NewAddon("Decursive", "AceConsole-3.0", 
 local D = T.Dcr;
 
 D.name = "Decursive";
-D.version = "2.7.0.5";
+D.version = "2.7.2.2";
 D.author = "John Wellesz";
 
 D.L         = LibStub("AceLocale-3.0"):GetLocale("Decursive", true);
@@ -126,6 +127,7 @@ DC.CLASS_SHAMAN      = 'SHAMAN';
 DC.CLASS_WARLOCK     = 'WARLOCK';
 DC.CLASS_WARRIOR     = 'WARRIOR';
 DC.CLASS_DEATHKNIGHT = 'DEATHKNIGHT';
+DC.CLASS_MONK        = 'MONK';
 
 DC.MyClass = "NOCLASS";
 DC.MyName = "NONAME";
@@ -242,7 +244,7 @@ function D:VersionWarnings()
     alpha = true;
     --@end-alpha@]===]
 
-    if (("2.7.0.5"):lower()):find("beta") or ("2.7.0.5"):find("RC") or ("2.7.0.5"):find("Candidate") or alpha then
+    if (("2.7.2.2"):lower()):find("beta") or ("2.7.2.2"):find("RC") or ("2.7.2.2"):find("Candidate") or alpha then
 
         D.RunningADevVersion = true;
 
@@ -255,7 +257,7 @@ function D:VersionWarnings()
                 DC.DevVersionExpired = true;
                 -- Display the expiration notice only once evry 48 hours
                 if time() - self.db.global.LastExpirationAlert > 48 * 3600  then
-                    StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.0.5|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_EXPIRED"] .. "|r");
+                    StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.2.2|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_EXPIRED"] .. "|r");
 
                     self.db.global.LastExpirationAlert = time();
                 end
@@ -265,16 +267,16 @@ function D:VersionWarnings()
 
         end
 
-        if self.db.global.NonRealease ~= "2.7.0.5" then
-            self.db.global.NonRealease = "2.7.0.5";
-            StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.0.5|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_ALERT"] .. "|r");
+        if self.db.global.NonRealease ~= "2.7.2.2" then
+            self.db.global.NonRealease = "2.7.2.2";
+            StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.2.2|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_ALERT"] .. "|r");
         end
     end
 
     --[===[@debug@
     fromCheckOut = true;
     if time() - self.db.global.LastChekOutAlert > 24 * 3600  then
-        StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.0.5|r\n\n" .. "|cFFFFAA66" .. 
+        StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.2.2|r\n\n" .. "|cFFFFAA66" .. 
         [[
         |cFFFF0000You're using an unpackaged version of Decursive.|r
         Decursive is not meant to be used this way.
@@ -312,7 +314,7 @@ function D:VersionWarnings()
         if D.db.global.NewerVersionDetected > D.VersionTimeStamp and D.db.global.NewerVersionName ~= D.version then -- it's still newer than this one
             if time() - D.db.global.NewerVersionAlert > 3600 * 24 * 4 then -- it's been more than 4 days since the new version alert was shown
                 if not D.db.global.NewVersionsBugMeNot then -- the user did not disable new version alerts
-                    StaticPopup_Show ("Decursive_Notice_Frame", "|cff55ff55Decursive version: 2.7.0.5|r\n\n" .. "|cFF55FFFF" .. (L["NEW_VERSION_ALERT"]):format(D.db.global.NewerVersionName or "none", date("%Y-%m-%d", D.db.global.NewerVersionDetected)) .. "|r");
+                    StaticPopup_Show ("Decursive_Notice_Frame", "|cff55ff55Decursive version: 2.7.2.2|r\n\n" .. "|cFF55FFFF" .. (L["NEW_VERSION_ALERT"]):format(D.db.global.NewerVersionName or "none", date("%Y-%m-%d", D.db.global.NewerVersionDetected)) .. "|r");
                     D.db.global.NewerVersionAlert = time();
                 end
             end
@@ -500,7 +502,7 @@ function D:OnInitialize() -- Called on ADDON_LOADED -- {{{
             Pet = true,
         },
         -- Warlock
-        [DS["PET_DOOM_CAST"]]               = {
+        [DS["PET_DOOM_CAST"]]               = { -- WARNING this will be overwritten by priests' dispel magic
             Types = {DC.MAGIC, DC.ENEMYMAGIC},
             Better = 1,
             Pet = true,
@@ -508,10 +510,137 @@ function D:OnInitialize() -- Called on ADDON_LOADED -- {{{
     }; -- }}}
 
 
-    -- WoW 4.0 changes {{{
 
-    --https://docs.google.com/document/pub?id=13GLsRWUA4pMQ0EAV2FWkmJvDNQTeIcivO8XtP0iZ-tA
-    if T._tocversion >= 40000 then
+    if T._tocversion >= 50000 then
+
+        -- Monks
+        DC.SpellsToUse[DS["SPELL_DETOX"]]               = {
+            Types = {DC.DISEASE, DC.POISON},
+            Better = 2,
+            Pet = false,
+
+            EnhancedBy = DS["PASSIVE_INTERNAL_MEDICINE"],
+            EnhancedByCheck = function ()
+                return (GetSpellBookItemInfo(DS["PASSIVE_INTERNAL_MEDICINE"])) and true or false;
+            end,
+            Enhancements = {
+                Types = {DC.MAGIC, DC.DISEASE, DC.POISON},
+            }
+        };
+
+        -- Monks
+        DC.SpellsToUse[DS["SPELL_DIFFUSEMAGIC"]]               = {
+            Types = {DC.MAGIC},
+            Better = 0,
+            Pet = false,
+            OnPlayerOnly = {
+                [DC.MAGIC]  = true,
+            },
+        };
+
+        -- Paladins
+        DC.SpellsToUse[DS["SPELL_CLEANSE"]]               = {
+            Types = {DC.DISEASE, DC.POISON},
+            Better = 2,
+            Pet = false,
+
+            EnhancedBy = DS["PASSIVE_SACRED_CLEANSING"], -- http://www.wowhead.com/talent#srrrdkdz
+            EnhancedByCheck = function ()
+                return (GetSpellBookItemInfo(DS["PASSIVE_SACRED_CLEANSING"])) and true or false;
+            end,
+            Enhancements = {
+                Types = {DC.MAGIC, DC.DISEASE, DC.POISON},
+            }
+            
+        };
+        -- Shaman
+        DC.SpellsToUse[DS["CLEANSE_SPIRIT"]]              = {
+            Types = {DC.CURSE},
+            Better = 3,
+            Pet = false,
+        };
+
+        -- Shaman resto
+        DC.SpellsToUse[DS["PURIFY_SPIRIT"]]              = {
+            -- BUG in MOP BETA (2012-07-08): /spew GetSpellBookItemInfo('Purify Spirit') == nil while /spew (GetSpellInfo('Cleanse Spirit')) == 'Purify Spirit'
+            Types = {DC.CURSE, DC.MAGIC},
+            Better = 4,
+            Pet = false,
+        };
+
+        -- Warlocks (Imp)
+        DC.SpellsToUse[DS["SPELL_SINGE_MAGIC"]]         = {
+            Types = {DC.MAGIC},
+            Better = 0,
+            Pet = true,
+        };
+
+        -- Warlocks (Imp singe magic ability when used with Grimoire of Sacrifice)
+        DC.SpellsToUse[DS["SPELL_COMMAND_DEMON"]]         = {
+            Types = {}, -- does nothing by default
+            Better = 1, -- the Imp takes time to disappear when sacrificed, during that interlude, Singe Magic is still there
+            Pet = false,
+
+            EnhancedBy = true,
+            EnhancedByCheck = function ()
+                return (GetSpellInfo(DS["SPELL_COMMAND_DEMON"]) == DS["SPELL_SINGE_MAGIC"]);
+            end,
+            Enhancements = {
+                Types = {DC.MAGIC},
+            }
+        };
+
+        -- Warlock
+        DC.SpellsToUse[DS["SPELL_FEAR"]]    = {
+            Types = {DC.CHARMED},
+            Better = 0,
+            Pet = false,
+        };
+        -- Warlocks
+        DC.SpellsToUse[DS["PET_FEL_CAST"]]              = {
+            Types = {DC.ENEMYMAGIC},
+            Better = 0,
+            Pet = true,
+        };
+        -- Mages
+        DC.SpellsToUse[DS["SPELL_POLYMORPH"]]      = {
+            Types = {DC.CHARMED},
+            Better = 0,
+            Pet = false,
+        };
+
+        -- Druids (Balance Feral Guardian)
+        DC.SpellsToUse[DS["SPELL_REMOVE_CORRUPTION"]]      = {
+            Types = {DC.POISON, DC.CURSE},
+            Better = 0,
+            Pet = false,
+
+        };
+
+        -- Druids (Restoration)
+        DC.SpellsToUse[DS["SPELL_NATURES_CURE"]]      = {
+            Types = {DC.MAGIC, DC.POISON, DC.CURSE},
+            Better = 1,
+            Pet = false,
+        };
+
+        -- Priests (global)
+        DC.SpellsToUse[DS["SPELL_DISPELL_MAGIC"]]         = {
+            Types = {DC.ENEMYMAGIC},
+            Better = 0,
+            Pet = false,
+        };
+
+        -- Priests (Discipline, Holy)
+        DC.SpellsToUse[DS["SPELL_PURIFY"]]         = {
+            Types = {DC.MAGIC, DC.DISEASE},
+            Better = 0,
+            Pet = false,
+        };
+
+    -- WoW 4.0 changes {{{
+        --https://docs.google.com/document/pub?id=13GLsRWUA4pMQ0EAV2FWkmJvDNQTeIcivO8XtP0iZ-tA
+    elseif T._tocversion >= 40000  then
         -- Paladins
         DC.SpellsToUse[DS["SPELL_CLEANSE"]]               = {
             Types = {DC.DISEASE, DC.POISON},
@@ -616,7 +745,7 @@ function D:OnInitialize() -- Called on ADDON_LOADED -- {{{
         };
 
         -- old WoW 3.5 for compatibilty with China {{{
-    else 
+    elseif T._tocversion < 40000 then
          -- Priests -- XXX to be removed
         DC.SpellsToUse[DS["SPELL_ABOLISH_DISEASE"]]       = {
             Types = {DC.DISEASE},
@@ -743,9 +872,15 @@ function D:OnEnable() -- called after PLAYER_LOGIN -- {{{
     self:RegisterEvent("PLAYER_REGEN_ENABLED","LeaveCombat");
 
     -- Raid/Group changes events
-    self:RegisterEvent("PARTY_MEMBERS_CHANGED", D.GroupChanged, D);
     self:RegisterEvent("PARTY_LEADER_CHANGED", D.GroupChanged, D);
-    self:RegisterEvent("RAID_ROSTER_UPDATE", D.GroupChanged, D);
+
+    if DC.MOP then
+        self:RegisterEvent("GROUP_ROSTER_UPDATE", D.GroupChanged, D);
+    else
+        self:RegisterEvent("PARTY_MEMBERS_CHANGED", D.GroupChanged, D);
+        self:RegisterEvent("RAID_ROSTER_UPDATE", D.GroupChanged, D);
+    end
+
     self:RegisterEvent("PLAYER_FOCUS_CHANGED");
 
     -- Player pet detection event (used to find pet spells)
@@ -762,7 +897,7 @@ function D:OnEnable() -- called after PLAYER_LOGIN -- {{{
 
     self:RegisterMessage("DECURSIVE_TALENTS_AVAILABLE");
 
-    D:ScheduleRepeatedCall("ScheduledTasks", D.ScheduledTasks, 0.2, D);
+    D:ScheduleRepeatedCall("ScheduledTasks", D.ScheduledTasks, 0.3, D);
 
     -- Configure specific profile dependent data
     D:SetConfiguration();
@@ -790,6 +925,7 @@ function D:SetConfiguration()
     D.DcrFullyInitialized = false;
     D:CancelDelayedCall("Dcr_LLupdate");
     D:CancelDelayedCall("Dcr_MUFupdate");
+    D:CancelDelayedCall("Dcr_ScanEverybody");
 
     D.Groups_datas_are_invalid = true;
     D.Status = {};
@@ -861,6 +997,7 @@ function D:SetConfiguration()
 
     if D.profile.ShowDebuffsFrame then
         self:ScheduleRepeatedCall("Dcr_MUFupdate", self.DebuffsFrame_Update, self.profile.DebuffsFrameRefreshRate, self);
+        self:ScheduleRepeatedCall("Dcr_ScanEverybody", self.ScanEveryBody, 1, self);
     end
 
     D.DcrFullyInitialized = true; -- everything should be OK
@@ -908,6 +1045,7 @@ function D:OnDisable() -- When the addon is disabled by Ace
         whileDead = 1,
         hideOnEscape = false,
         showAlert = 1,
+        preferredIndex = 3,
     }; -- }}}
 
     LibStub("AceConfigRegistry-3.0"):NotifyChange(D.name);
@@ -1066,18 +1204,21 @@ function D:ReConfigure() --{{{
         return;
     end
 
+    local GetSpellBookItemInfo = _G.GetSpellBookItemInfo;
     local GetSpellInfo = _G.GetSpellInfo;
 
     local Reconfigure = false;
     for spellName, spell in SpellIterator() do
         -- Do we have that spell?
-        if GetSpellInfo(spellName) then -- yes
+        if (not spell.Pet and GetSpellInfo(spellName)) or (spell.Pet and GetSpellBookItemInfo(spellName)) then -- yes
             -- We had it but it's been disabled
             if spell.Disabled and D.Status.FoundSpells[spellName] then
+                D:Debug("D:ReConfigure:", spellName, 'has been disabled');
                 Reconfigure = true;
                 break;
                 -- is it new?
             elseif not spell.Disabled and not D.Status.FoundSpells[spellName] then -- yes
+                D:Debug("D:ReConfigure:", spellName, 'is new');
                 Reconfigure = true;
                 break;
             elseif spell.EnhancedBy then -- it's not new but there is an enhancement available...
@@ -1090,11 +1231,13 @@ function D:ReConfigure() --{{{
 
                 if spell.EnhancedByCheck() then -- we have it now
                     if not D.Status.FoundSpells[spellName][3] then -- but not then :)
+                        D:Debug("D:ReConfigure:", spellName, 'has an enhancement that was not available b4');
                         Reconfigure = true;
                         break;
                     end
                 else -- we do no not
                     if D.Status.FoundSpells[spellName][3] then -- but we used to :'(
+                        D:Debug("D:ReConfigure:", spellName, 'had an enhancement that is no longer available');
                         Reconfigure = true;
                         break;
                     end
@@ -1102,6 +1245,7 @@ function D:ReConfigure() --{{{
             end
 
         elseif D.Status.FoundSpells[spellName] then -- we don't have it anymore...
+            D:Debug("D:ReConfigure:", spellName, 'is no longer available');
             Reconfigure = true;
             break;
         end
@@ -1135,6 +1279,7 @@ function D:Configure() --{{{
     CuringSpells[DC.CHARMED]    = false;
 
     local Type, _;
+    local GetSpellBookItemInfo = _G.GetSpellBookItemInfo;
     local GetSpellInfo = _G.GetSpellInfo;
     local Types = {};
     local OnPlayerOnly = false;
@@ -1144,9 +1289,9 @@ function D:Configure() --{{{
 
     for spellName, spell in SpellIterator() do
         if not spell.Disabled then
-            self:Debug("trying spell", spellName);
+            -- self:Debug("trying spell", spellName);
             -- Do we have that spell?
-            if GetSpellInfo(spellName) then -- yes
+            if (not spell.Pet and GetSpellInfo(spellName)) or (spell.Pet and GetSpellBookItemInfo(spellName)) then -- yes (both API because of MOP bug with Purify Spirit)
                 Types = spell.Types;
                 OnPlayerOnly = false;
                 IsEnhanced = false;
@@ -1177,12 +1322,16 @@ function D:Configure() --{{{
                     end
                 end
 
+                if spell.OnPlayerOnly then
+                    OnPlayerOnly = spell.OnPlayerOnly;
+                end
+
                 -- register it
+                self.Status.FoundSpells[spellName] = {spell.Pet, "", IsEnhanced, spell.Better, spell.MacroText};
                 for _, Type in pairs (Types) do
 
                     if not CuringSpells[Type] or spell.Better > self.Status.FoundSpells[CuringSpells[Type]][4] then  -- we did not already registered this spell or it's not the best spell for this type
 
-                        self.Status.FoundSpells[spellName] = {spell.Pet, "", IsEnhanced, spell.Better, spell.MacroText};
                         CuringSpells[Type] = spellName;
 
                         if OnPlayerOnly and OnPlayerOnly[Type] then
@@ -1221,6 +1370,7 @@ function D:GetSpellsTranslations(FromDIAG)
 
     local Spells = {};
 
+    -- /spew DecursiveRootTable._C.DS
 
     Spells = {
         ["SPELL_POLYMORPH"]             = {     118,                                     },
@@ -1230,23 +1380,22 @@ function D:GetSpellsTranslations(FromDIAG)
         ["SPELL_ABOLISH_DISEASE"]       = {     552,                                     },
         ["SPELL_PURIFY"]                = {     1152,                                    }, -- paladins
         ["SPELL_CLEANSE"]               = {     4987,                                    },
-        ["SPELL_DISPELL_MAGIC"]         = {     527, 988,                                },
+        ["SPELL_DISPELL_MAGIC"]         = {     527,                                     },
         ["SPELL_CURE_TOXINS"]           = {     526,                                     }, -- shamans
         ["SPELL_CURE_POISON"]           = {     8946,                                    },
         ["SPELL_ABOLISH_POISON"]        = {     2893,                                    }, -- removed in WoW 4.0
-        ["SPELL_REMOVE_LESSER_CURSE"]   = {     475,                                     }, -- Mages
         ["SPELL_REMOVE_CURSE"]          = {     2782,                                    }, -- Druids/Mages
         ['SPELL_TRANQUILIZING_SHOT']    = {     19801,                                   },
         ['SPELL_HEX']                   = {     51514,                                   }, -- shamans
         ['SPEC_ABSOLUTION']             = {     33167,                                   }, -- Priests
         ["CLEANSE_SPIRIT"]              = {     51886,                                   },
-        ["SPELL_PURGE"]                 = {     370, 8012,                               },
-        ["PET_FEL_CAST"]                = {     19505, 19731, 19734, 19736, 27276, 27277,},
+        ["SPELL_PURGE"]                 = {     370,                                     },
+        ["PET_FEL_CAST"]                = {     19505,                                   },
         ["SPELL_FEAR"]                  = {     5782                                     },
-        ["PET_DOOM_CAST"]               = {     527, 988,                                },
-        ["CURSEOFTONGUES"]              = {     1714, 11719,                             },
+        ["PET_DOOM_CAST"]               = {     527,                                     },
+        ["CURSEOFTONGUES"]              = {     1714,                                    },
         ["DCR_LOC_SILENCE"]             = {     15487,                                   },
-        ["DCR_LOC_MINDVISION"]          = {     2096, 10909,                             },
+        ["DCR_LOC_MINDVISION"]          = {     2096,                                    },
         ["DREAMLESSSLEEP"]              = {     15822,                                   },
         ["GDREAMLESSSLEEP"]             = {     24360,                                   },
         ["MDREAMLESSSLEEP"]             = {     28504,                                   },
@@ -1261,16 +1410,19 @@ function D:GetSpellsTranslations(FromDIAG)
         ["DELUSIONOFJINDO"]             = {     24306,                                   },
         ["MUTATINGINJECTION"]           = {     28169,                                   },
         ['Phase Shift']                 = {     4511,                                    },
-        ['Banish']                      = {     710, 18647,                              },
+        ['Banish']                      = {     710,                                     },
         ['Frost Trap Aura']             = {     13810,                                   },
         ['Arcane Blast']                = {     30451,                                   },
-        ['Prowl']                       = {     5215, 6783, 9913, 24450,                 },
-        ['Stealth']                     = {     1784, 1785, 1786, 1787,                  },
+        ['Prowl']                       = {     5215,   24450,                           },
+        ['Stealth']                     = {     1784,                                    },
+        ['Camouflage']                  = {     51755,                                   },
         ['Shadowmeld']                  = {     58984,                                   },
         ['Invisibility']                = {     66,                                      },
         ['Lesser Invisibility']         = {     7870,                                    },
-        ['Ice Armor']                   = {     7302, 7320, 10219, 10220, 27124,         },
-        ['Unstable Affliction']         = {     30108, 30404, 30405,                     },
+        ['Ice Armor']                   = {     7302,                                    },
+        ['Unstable Affliction']         = {     30108,                                   },
+        ['Vampiric Touch']              = {     34914,                                   },
+        ['Flame Shock']                 = {     8050,                                    },
         ['Dampen Magic']                = {     604,                                     },
         ['Amplify Magic']               = {     1008,                                    },
         ['TALENT_BODY_AND_SOUL']        = {     64129, 65081,                            },
@@ -1280,7 +1432,7 @@ function D:GetSpellsTranslations(FromDIAG)
         --['STALVAN_CURSE']             = {     3105,                                    }, --temp to test
     };
 
-    -- WoW 4.0 compatibility fix
+    -- WoW 4.0 compatibility fixes
     if T._tocversion >= 40000 then
         Spells["SPELL_REMOVE_CURSE"]         = {     475,                                   }; -- Druids/Mages
         Spells["SPELL_REMOVE_CORRUPTION"]    = {     2782,                                  };
@@ -1303,10 +1455,36 @@ function D:GetSpellsTranslations(FromDIAG)
         
     end
 
-    DC.ttest = Spells;
+    if T._tocversion >= 50000 then
+        Spells["SPEC_ABSOLUTION"]       = nil;
+        Spells["CURSEOFTONGUES"]        = nil;
+        Spells["SPELL_PURIFY"]          = {527}; -- = Spells["SPELL_DISPELL_MAGIC"];
+        Spells["SPELL_DISPELL_MAGIC"]   = {528}; -- = Spells["SPELL_CURE_DISEASE"];
+        Spells["SPELL_CURE_DISEASE"]    = nil;
+        Spells["PET_DOOM_CAST"]         = nil; -- disappeared a long time ago
+        Spells["PURIFY_SPIRIT"]         = {77130}; -- resto shaman
+        Spells["TALENT_IMPROVED_CLEANSE_SPIRIT"] = nil; -- resto shaman
+        Spells["TALENT_SACRED_CLEANSING"]    = nil;
+        Spells["PASSIVE_SACRED_CLEANSING"]    = {53551};
+        Spells["PASSIVE_INTERNAL_MEDICINE"]    = {115451};
+        Spells["TALENT_NATURES_CURE"]    = nil;
+        Spells["SPELL_NATURES_CURE"]    = {88423};
+        Spells["SHROUD_OF_CONCEALMENT"]    = {115834}; -- rogue
+        Spells["SPELL_DETOX"]    = {115450}; -- monk
+        Spells["SPELL_DIFFUSEMAGIC"]    = {122783}; -- monk
+
+        Spells["SPELL_COMMAND_DEMON"]    = {119898}; -- warlock
+        Spells['Greater Invisibility']         = {110959};
+
+        DS["SPELL_CURE_DISEASE"]        = '_LOST SPELL_';
+        DS["PET_DOOM_CAST"]             = '_LOST SPELL_';
+    end    
 
     -- Note to self: The truth is not unique, there can be several truths. The world is not binary. (self revelation on 2011-02-25)
 
+    --[===[@debug@
+    local dubs = {};
+    --@end-debug@]===]
     local alpha = false;
     --[===[@alpha@
     alpha = true;
@@ -1318,9 +1496,18 @@ function D:GetSpellsTranslations(FromDIAG)
 
             if _ == 1 then
                 DS[Sname] = (GetSpellInfo(Sid));
+                --[===[@debug@
+                if FromDIAG and DS[Sname] then
+                    if not dubs[DS[Sname]] then
+                        dubs[DS[Sname]] = {Sname};
+                    else
+                        dubs[DS[Sname]][#dubs[DS[Sname]] + 1] = Sname;
+                    end
+                end
+                --@end-debug@]===]
                 if not DS[Sname] then
                     if random (1, 15000) == 2323 or FromDIAG then
-                        D:AddDebugText("SpellID:", Sid, "no longer exists. This was supposed to represent the spell", Sname);
+                        D:AddDebugText("SpellID:|cffff0000", Sid, "no longer exists.|r This was supposed to represent the spell", Sname);
                         D:errln("SpellID:", Sid, "no longer exists. This was supposed to represent the spell", Sname);
                     end
                     DS[Sname] = "_LOST SPELL_";
@@ -1328,16 +1515,16 @@ function D:GetSpellsTranslations(FromDIAG)
             elseif FromDIAG then
                 if (GetSpellInfo(Sid)) and DS[Sname] ~= (GetSpellInfo(Sid)) then
 
-                    D:AddDebugText("Spell IDs", Sids[1] , "and", Sid, "have different translations:", DS[Sname], "and", (GetSpellInfo(Sid)) );
+                    D:AddDebugText("|cffff0000Spell IDs", Sids[1] , "and", Sid, "have different translations:|r", DS[Sname], "and", (GetSpellInfo(Sid)) );
 
                     D:errln("Spell IDs", Sids[1] , "and", Sid, "have different translations:", DS[Sname], "and", (GetSpellInfo(Sid)) );
 
                     D:errln("Please report this to ARCHARODIM+DcrReport@teaser.fr");
 
                     ok = false;
-                elseif not DS[Sname] then
+                elseif not (GetSpellInfo(Sid)) then
 
-                    D:AddDebugText("SpellID:", Sid, "no longer exist. This was supposed to represent the spell", Sname);
+                    D:AddDebugText("SpellID:|cffff0000", Sid, "no longer exist.|r This was supposed to represent the spell", Sname);
 
                     D:errln("SpellID:", Sid, "no longer exists. This was supposed to represent the spell", Sname);
                 end
@@ -1345,6 +1532,21 @@ function D:GetSpellsTranslations(FromDIAG)
 
         end
     end
+
+    --[===[@debug@
+    if FromDIAG then
+        for spell, ids in pairs(dubs) do
+            if #ids > 1 then
+                local dub = "";
+
+                for _, id in ipairs(ids) do
+                    dub = dub .. ", " .. id;
+                end
+                D:AddDebugText("|cffffAA22dubs found for", spell, ':|r ', dub);
+            end
+        end
+    end
+    --@end-debug@]===]
 
     return ok;
 
@@ -1463,9 +1665,9 @@ function D:LocalizeBindings ()
 
 end
 
-D.Revision = "0d453a0";
-D.date = "2012-02-05T17:48:12Z";
-D.version = "2.7.0.5";
+D.Revision = "38ef630";
+D.date = "2012-10-07T20:46:09Z";
+D.version = "2.7.2.2";
 do
 
     if D.date ~= "@project".."-date-iso@" then
@@ -1484,7 +1686,7 @@ do
 
 end
 
-T._LoadedFiles["DCR_init.lua"] = "2.7.0.5";
+T._LoadedFiles["DCR_init.lua"] = "2.7.2.2";
 
 -------------------------------------------------------------------------------
 
@@ -1499,34 +1701,34 @@ Simple replacements
 @project-revision@
     Turns into the highest revision of the entire project in integer form. e.g. 1234
     Note: does not work for git
-adc748d00be265256d2c50ecc7180ba19173d8f9
+6532a27d25af7fb702549fe2c3263dd022482ace
     Turns into the hash of the file in hex form. e.g. 106c634df4b3dd4691bf24e148a23e9af35165ea
     Note: does not work for svn
-0d453a0557af4ea6f1a308fd740270899ae187b9
+38ef6300c99f679a10d87a1af4d989287a0c8762
     Turns into the hash of the entire project in hex form. e.g. 106c634df4b3dd4691bf24e148a23e9af35165ea
     Note: does not work for svn
-adc748d
+6532a27
     Turns into the abbreviated hash of the file in hex form. e.g. 106c63 Note: does not work for svn
-0d453a0
+38ef630
     Turns into the abbreviated hash of the entire project in hex form. e.g. 106c63
     Note: does not work for svn
 Archarodim
     Turns into the last author of the file. e.g. ckknight
 Archarodim
     Turns into the last author of the entire project. e.g. ckknight
-2012-01-15T18:56:52Z
+2012-09-23T20:33:56Z
     Turns into the last changed date (by UTC) of the file in ISO 8601. e.g. 2008-05-01T12:34:56Z
-2012-02-05T17:48:12Z
+2012-10-07T20:46:09Z
     Turns into the last changed date (by UTC) of the entire project in ISO 8601. e.g. 2008-05-01T12:34:56Z
-20120115185652
+20120923203356
     Turns into the last changed date (by UTC) of the file in a readable integer fashion. e.g. 20080501123456
-20120205174812
+20121007204609
     Turns into the last changed date (by UTC) of the entire project in a readable integer fashion. e.g. 2008050123456
 @file-timestamp@
     Turns into the last changed date (by UTC) of the file in POSIX timestamp. e.g. 1209663296
 @project-timestamp@
     Turns into the last changed date (by UTC) of the entire project in POSIX timestamp. e.g. 1209663296
-2.7.0.5
+2.7.2.2
     Turns into an approximate version of the project. The tag name if on a tag, otherwise it's up to the repo.
     :SVN returns something like "r1234"
     :Git returns something like "v0.1-873fc1"

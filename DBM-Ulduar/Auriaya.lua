@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Auriaya", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4662 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 
 mod:SetCreatureID(33515)--34014--Add this (kitties) to pull detection when it can be ignored in kill
 mod:SetModelID(28651)
@@ -48,11 +48,9 @@ mod:AddBoolOption("HealthFrame", true)
 
 local isFeared			= false
 local catLives = 9
-local antiSpam = 0
 
 function mod:OnCombatStart(delay)
 	catLives = 9
-	antiSpam = 0
 	enrageTimer:Start(-delay)
 	timerNextFear:Start(40-delay)
 	timerNextSonic:Start(60-delay)
@@ -115,10 +113,9 @@ function mod:UNIT_DIED(args)
 	end
 end
 
-function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 64459 or spellId == 64675) and destGUID == UnitGUID("player") and GetTime() - antiSpam > 3 then -- Feral Defender Void Zone
+function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if (spellId == 64459 or spellId == 64675) and destGUID == UnitGUID("player") and self:AntiSpam(3) then -- Feral Defender Void Zone
 		specWarnVoid:Show()
-		antiSpam = GetTime()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE

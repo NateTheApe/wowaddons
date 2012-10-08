@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- Constants.lua
 -------------------------------------------------------------------------------
--- File date: 2012-01-10T10:23:23Z
--- File hash: 624980b
--- Project hash: de16aef
--- Project version: 2.3.0
+-- File date: 2012-09-22T19:53:05Z
+-- File hash: 4092b2e
+-- Project hash: 9e1f108
+-- Project version: 2.4.1
 -------------------------------------------------------------------------------
 -- Please see http://www.wowace.com/addons/arl/ for more information.
 -------------------------------------------------------------------------------
@@ -15,6 +15,8 @@
 -- Upvalued Lua API
 -------------------------------------------------------------------------------
 local _G = getfenv(0)
+
+local pairs = _G.pairs
 
 -------------------------------------------------------------------------------
 -- AddOn namespace.
@@ -54,13 +56,27 @@ private.PROFESSION_SPELL_IDS = {
 
 private.LOCALIZED_PROFESSION_NAMES = {}
 
-for name, spell_id in _G.pairs(private.PROFESSION_SPELL_IDS) do
+for name, spell_id in pairs(private.PROFESSION_SPELL_IDS) do
 	private.LOCALIZED_PROFESSION_NAMES[name] = _G.GetSpellInfo(spell_id)
 end
 
 -- Special case for Runeforging is needed because the French translation is non-conforming.
 if _G.GetLocale() == "frFR" then
 	private.LOCALIZED_PROFESSION_NAMES.RUNEFORGING = "Runeforger"
+end
+
+-- This is needed due to Pandaren cooking spells.
+private.PROFESSION_NAME_MAP = {
+	[_G.GetSpellInfo(124694)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Grill
+	[_G.GetSpellInfo(125584)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Wok
+	[_G.GetSpellInfo(125586)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Pot
+	[_G.GetSpellInfo(125587)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Steamer
+	[_G.GetSpellInfo(125588)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Oven
+	[_G.GetSpellInfo(125589)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Brew
+}
+
+for name, localized_name in pairs(private.LOCALIZED_PROFESSION_NAMES) do
+	private.PROFESSION_NAME_MAP[localized_name] = localized_name
 end
 
 private.PROFESSION_LABELS = {
@@ -75,7 +91,7 @@ private.PROFESSION_LABELS = {
 	"leatherworking",	-- 9
 	"runeforging",		-- 10
 	"smelting",		-- 11
-	"tailoring"	,	-- 12
+	"tailoring",		-- 12
 }
 
 private.ORDERED_PROFESSIONS = {
@@ -100,18 +116,18 @@ for index = 1, #private.ORDERED_PROFESSIONS do
 end
 
 private.PROFESSION_TEXTURES = {
-	"alchemy",	-- 1
-	"blacksmith",	-- 2
-	"cooking",	-- 3
-	"enchant",	-- 4
-	"engineer",	-- 5
-	"firstaid",	-- 6
-	"inscribe",	-- 7
-	"jewel",	-- 8
-	"leather",	-- 9
-	"runeforge",	-- 10
-	"smelting",	-- 11
-	"tailor",	-- 12
+	[[Trade_Alchemy]],			-- 01 (Alchemy)
+	[[Trade_BlackSmithing]],		-- 02 (Blacksmithing)
+	[[INV_Misc_Food_15]],			-- 03 (Cooking)
+	[[Trade_Engraving]],			-- 04 (Enchinting)
+	[[Trade_Engineering]],			-- 05 (Engineering)
+	[[Spell_Holy_SealOfSacrifice]],		-- 06 (First Aid)
+	[[INV_Inscription_Tradeskill01]],	-- 07 (Inscription)
+	[[INV_Misc_Gem_01]],			-- 08 (Jewelcrafting)
+	[[Trade_LeatherWorking]],		-- 09 (Leatherworking)
+	[[Spell_DeathKnight_FrozenRuneWeapon]],	-- 10 (Runeforging)
+	[[Spell_Fire_FlameBlades]],		-- 11 (Smelting)
+	[[Trade_Tailoring]],			-- 12 (Tailoring)
 }
 
 -------------------------------------------------------------------------------
@@ -140,12 +156,19 @@ private.GAME_VERSION_NAMES = {
 	[2] = "TBC",
 	[3] = "WOTLK",
 	[4] = "CATA",
+	[5] = "MOP",
 }
 
 private.GAME_VERSIONS = {}
 
 for index = 1, #private.GAME_VERSION_NAMES do
 	private.GAME_VERSIONS[private.GAME_VERSION_NAMES[index]] = index
+end
+
+private.EXPANSION_FILTERS = {}
+
+for index = 1, #private.GAME_VERSION_NAMES do
+	private.EXPANSION_FILTERS[index] = ("expansion%d"):format(index - 1)
 end
 
 -------------------------------------------------------------------------------
@@ -176,6 +199,7 @@ private.COMMON_FLAGS_WORD1 = {
 	HEALER		= 0x00200000,	-- 22
 	CASTER		= 0x00400000,	-- 23
 	ACHIEVEMENT	= 0x00800000,	-- 24
+	REPUTATION	= 0x01000000,	-- 25
 }
 
 -------------------------------------------------------------------------------
@@ -192,6 +216,7 @@ private.CLASS_FLAGS_WORD1 = {
 	ROGUE	= 0x00000080,	-- 8
 	WARLOCK	= 0x00000100,	-- 9
 	WARRIOR	= 0x00000200,	-- 10
+	MONK	= 0x00000400,	-- 11
 }
 
 -------------------------------------------------------------------------------
@@ -243,6 +268,21 @@ private.REP_FLAGS_WORD2 = {
 	RAMKAHEN		= 0x00000010,	-- 5
 	EARTHEN_RING		= 0x00000020,	-- 6
 	THERAZANE		= 0x00000040,	-- 7
+	FORESTHOZEN		= 0X00000080,	-- 8
+	GOLDENLOTUS		= 0X00000100,	-- 9
+	HUOJINPANDAREN		= 0X00000200,	-- 10
+	CLOUDSERPENT		= 0X00000400,	-- 11
+	PEARLFINJINYU		= 0X00000800,	-- 12
+	SHADOPAN		= 0X00001000,	-- 13
+	ANGLERS			= 0X00002000,	-- 14
+	AUGUSTCELESTIALS	= 0X00004000,	-- 15
+	BREWMASTERS		= 0X00008000,	-- 16
+	KLAXXI			= 0X00010000,	-- 17
+	LOREWALKERS		= 0X00020000,	-- 18
+	TILLERS			= 0X00040000,	-- 19
+	TUSHUIPANDAREN		= 0X00080000,	-- 20
+	BLACKPRINCE		= 0X00100000,	-- 21
+	SHANGXIACADEMY		= 0x00200000,	-- 22
 }
 
 -------------------------------------------------------------------------------
@@ -272,7 +312,7 @@ private.FLAG_MEMBERS = {
 private.FILTER_STRINGS = {}
 
 for index = 1, #private.FLAG_WORDS do
-	for flag_name in _G.pairs(private.FLAG_WORDS[index]) do
+	for flag_name in pairs(private.FLAG_WORDS[index]) do
 		private.FILTER_STRINGS[#private.FILTER_STRINGS + 1] = flag_name
 	end
 end
@@ -368,9 +408,9 @@ private.ITEM_FILTER_TYPES = {
 	INSCRIPTION_MATERIALS = true,
 	INSCRIPTION_MINOR_GLYPH = true,
 	INSCRIPTION_OFF_HAND = true,
-	INSCRIPTION_PRIME_GLYPH = true,
-	INSCRIPTION_RELIC = true,
+	INSCRIPTION_STAFF = true,
 	INSCRIPTION_SCROLL = true,
+	INSCRIPTION_PET = true,
 	-------------------------------------------------------------------------------
 	-- Jewelcrafting
 	-------------------------------------------------------------------------------
@@ -389,6 +429,8 @@ private.ITEM_FILTER_TYPES = {
 	JEWELCRAFTING_GEM_PURPLE = true,
 	JEWELCRAFTING_GEM_RED = true,
 	JEWELCRAFTING_GEM_YELLOW = true,
+	JEWELCRAFTING_MOUNT = true,
+	JEWELCRAFTING_PET = true,
 	-------------------------------------------------------------------------------
 	-- Leatherworking
 	-------------------------------------------------------------------------------
@@ -522,13 +564,244 @@ private.FACTION_STRINGS = {
 	[1174]	= "WILDHAMMER",
 	[1177]	= "WARDENS",
 	[1178]	= "HELLSCREAM",
+	[1216]	=  "SHANGXIACADEMY",
+	[1228]	=  "FORESTHOZEN",
+	[1242]	=  "PEARLFINJINYU",
+	[1269]	=  "GOLDENLOTUS",
+	[1270]	=  "SHADOPAN",
+	[1271]	=  "CLOUDSERPENT",
+	[1272]	=  "TILLERS",
+	[1273]	=  "JOGU_THE_DRUNK",
+	[1275]	=  "ELLA",
+	[1276]	=  "OLD_HILLPAW",
+	[1277]	=  "CHEE_CHEE",
+	[1278]	=  "SHO",
+	[1279]	=  "HAOHAN_MUDCLAW",
+	[1280]	=  "TINA_MUDCLAW",
+	[1281]	=  "GINA_MUDCLAW",
+	[1282]	=  "FISH_FELLREED",
+	[1283]	=  "FARMER_FUNG",
+	[1302]	=  "ANGLERS",
+	[1337]	=  "KLAXXI",
+	[1341]	=  "AUGUSTCELESTIALS",
+	[1345]	=  "LOREWALKERS",
+	[1351]	=  "BREWMASTERS",
+	[1352]	=  "HUOJINPANDAREN",
+	[1353]	=  "TUSHUIPANDAREN",
+	[1358]	=  "NAT_PAGLE",
+	[1359]	=  "BLACKPRINCE",
 }
 
 private.FACTION_IDS = {}
 
-for id, name in _G.pairs(private.FACTION_STRINGS) do
+for id, name in pairs(private.FACTION_STRINGS) do
 	private.FACTION_IDS[name] = id
 end
+
+-------------------------------------------------------------------------------
+-- Zones.
+-------------------------------------------------------------------------------
+private.ZONE_NAMES = {
+	DUROTAR = _G.GetMapNameByID(4),
+	MULGORE = _G.GetMapNameByID(9),
+	NORTHERN_BARRENS = _G.GetMapNameByID(11),
+	ARATHI_HIGHLANDS = _G.GetMapNameByID(16),
+	BADLANDS = _G.GetMapNameByID(17),
+	BLASTED_LANDS = _G.GetMapNameByID(19),
+	TIRISFAL_GLADES = _G.GetMapNameByID(20),
+	SILVERPINE_FOREST = _G.GetMapNameByID(21),
+	WESTERN_PLAGUELANDS = _G.GetMapNameByID(22),
+	EASTERN_PLAGUELANDS = _G.GetMapNameByID(23),
+	HILLSBRAD_FOOTHILLS = _G.GetMapNameByID(24),
+	THE_HINTERLANDS = _G.GetMapNameByID(26),
+	DUN_MOROGH = _G.GetMapNameByID(27),
+	SEARING_GORGE = _G.GetMapNameByID(28),
+	BURNING_STEPPES = _G.GetMapNameByID(29),
+	ELWYNN_FOREST = _G.GetMapNameByID(30),
+	DEADWIND_PASS = _G.GetMapNameByID(32),
+	DUSKWOOD = _G.GetMapNameByID(34),
+	LOCH_MODAN = _G.GetMapNameByID(35),
+	REDRIDGE_MOUNTAINS = _G.GetMapNameByID(36),
+	NORTHERN_STRANGLETHORN = _G.GetMapNameByID(37),
+	SWAMP_OF_SORROWS = _G.GetMapNameByID(38),
+	WESTFALL = _G.GetMapNameByID(39),
+	WETLANDS = _G.GetMapNameByID(40),
+	TELDRASSIL = _G.GetMapNameByID(41),
+	DARKSHORE = _G.GetMapNameByID(42),
+	ASHENVALE = _G.GetMapNameByID(43),
+	THOUSAND_NEEDLES = _G.GetMapNameByID(61),
+	STONETALON_MOUNTAINS = _G.GetMapNameByID(81),
+	DESOLACE = _G.GetMapNameByID(101),
+	FERALAS = _G.GetMapNameByID(121),
+	TANARIS = _G.GetMapNameByID(161),
+	AZSHARA = _G.GetMapNameByID(181),
+	FELWOOD = _G.GetMapNameByID(182),
+	UNGORO_CRATER = _G.GetMapNameByID(201),
+	MOONGLADE = _G.GetMapNameByID(241),
+	SILITHUS = _G.GetMapNameByID(261),
+	WINTERSPRING = _G.GetMapNameByID(281),
+	STORMWIND_CITY = _G.GetMapNameByID(301),
+	ORGRIMMAR = _G.GetMapNameByID(321),
+	IRONFORGE = _G.GetMapNameByID(341),
+	THUNDER_BLUFF = _G.GetMapNameByID(362),
+	DARNASSUS = _G.GetMapNameByID(381),
+	UNDERCITY = _G.GetMapNameByID(382),
+	EVERSONG_WOODS = _G.GetMapNameByID(462),
+	GHOSTLANDS = _G.GetMapNameByID(463),
+	AZUREMYST_ISLE = _G.GetMapNameByID(464),
+	HELLFIRE_PENINSULA = _G.GetMapNameByID(465),
+	ZANGARMARSH = _G.GetMapNameByID(467),
+	THE_EXODAR = _G.GetMapNameByID(471),
+	SHADOWMOON_VALLEY = _G.GetMapNameByID(473),
+	BLADES_EDGE_MOUNTAINS = _G.GetMapNameByID(475),
+	BLOODMYST_ISLE = _G.GetMapNameByID(476),
+	NAGRAND = _G.GetMapNameByID(477),
+	TEROKKAR_FOREST = _G.GetMapNameByID(478),
+	NETHERSTORM = _G.GetMapNameByID(479),
+	SILVERMOON_CITY = _G.GetMapNameByID(480),
+	SHATTRATH_CITY = _G.GetMapNameByID(481),
+	BOREAN_TUNDRA = _G.GetMapNameByID(486),
+	DRAGONBLIGHT = _G.GetMapNameByID(488),
+	GRIZZLY_HILLS = _G.GetMapNameByID(490),
+	HOWLING_FJORD = _G.GetMapNameByID(491),
+	ICECROWN = _G.GetMapNameByID(492),
+	SHOLAZAR_BASIN = _G.GetMapNameByID(493),
+	THE_STORM_PEAKS = _G.GetMapNameByID(495),
+	ZULDRAK = _G.GetMapNameByID(496),
+	ISLE_OF_QUELDANAS = _G.GetMapNameByID(499),
+	WINTERGRASP = _G.GetMapNameByID(501),
+	DALARAN = _G.GetMapNameByID(504),
+	THE_NEXUS = _G.GetMapNameByID(520),
+	AHNKAHET_THE_OLD_KINGDOM = _G.GetMapNameByID(522),
+	UTGARDE_KEEP = _G.GetMapNameByID(523),
+	UTGARDE_PINNACLE = _G.GetMapNameByID(524),
+	HALLS_OF_LIGHTNING = _G.GetMapNameByID(525),
+	HALLS_OF_STONE = _G.GetMapNameByID(526),
+	THE_OCULUS = _G.GetMapNameByID(528),
+	ULDUAR = _G.GetMapNameByID(529),
+	AZJOL_NERUB = _G.GetMapNameByID(533),
+	DRAKTHARON_KEEP = _G.GetMapNameByID(534),
+	THE_VIOLET_HOLD = _G.GetMapNameByID(536),
+	GILNEAS = _G.GetMapNameByID(539),
+	TRIAL_OF_THE_CRUSADER = _G.GetMapNameByID(543),
+	ICECROWN_CITADEL = _G.GetMapNameByID(604),
+	MOUNT_HYJAL = _G.GetMapNameByID(606),
+	SOUTHERN_BARRENS = _G.GetMapNameByID(607),
+	VASHJIR = _G.GetMapNameByID(613),
+	DEEPHOLM = _G.GetMapNameByID(640),
+	THE_CAPE_OF_STRANGLETHORN = _G.GetMapNameByID(673),
+	THE_TEMPLE_OF_ATALHAKKAR = _G.GetMapNameByID(687),
+	GNOMEREGAN = _G.GetMapNameByID(691),
+	ULDAMAN = _G.GetMapNameByID(692),
+	MOLTEN_CORE = _G.GetMapNameByID(696),
+	DIRE_MAUL = _G.GetMapNameByID(699),
+	BLACKROCK_DEPTHS = _G.GetMapNameByID(704),
+	THE_SHATTERED_HALLS = _G.GetMapNameByID(710),
+	RUINS_OF_AHNQIRAJ = _G.GetMapNameByID(717),
+	ONYXIAS_LAIR = _G.GetMapNameByID(718),
+	ULDUM = _G.GetMapNameByID(720),
+	BLACKROCK_SPIRE = _G.GetMapNameByID(721),
+	AUCHENAI_CRYPTS = _G.GetMapNameByID(722),
+	SETHEKK_HALLS = _G.GetMapNameByID(723),
+	SHADOW_LABYRINTH = _G.GetMapNameByID(724),
+	THE_STEAMVAULT = _G.GetMapNameByID(727),
+	THE_SLAVE_PENS = _G.GetMapNameByID(728),
+	THE_BOTANICA = _G.GetMapNameByID(729),
+	THE_MECHANAR = _G.GetMapNameByID(730),
+	THE_ARCATRAZ = _G.GetMapNameByID(731),
+	MANA_TOMBS = _G.GetMapNameByID(732),
+	THE_BLACK_MORASS = _G.GetMapNameByID(733),
+	OLD_HILLSBRAD_FOOTHILLS = _G.GetMapNameByID(734),
+	WAILING_CAVERNS = _G.GetMapNameByID(749),
+	BLACKWING_LAIR = _G.GetMapNameByID(755),
+	THE_DEADMINES = _G.GetMapNameByID(756),
+	RAZORFEN_DOWNS = _G.GetMapNameByID(760),
+	STRATHOLME = _G.GetMapNameByID(765),
+	TWILIGHT_HIGHLANDS = _G.GetMapNameByID(770),
+	AHNQIRAJ_THE_FALLEN_KINGDOM = _G.GetMapNameByID(772),
+	HYJAL_SUMMIT = _G.GetMapNameByID(775),
+	SERPENTSHRINE_CAVERN = _G.GetMapNameByID(780),
+	TEMPEST_KEEP = _G.GetMapNameByID(782),
+	SUNWELL_PLATEAU = _G.GetMapNameByID(789),
+	BLACK_TEMPLE = _G.GetMapNameByID(796),
+	MAGISTERS_TERRACE = _G.GetMapNameByID(798),
+	KARAZHAN = _G.GetMapNameByID(799),
+	FIRELANDS = _G.GetMapNameByID(800),
+	VALLEY_OF_THE_FOUR_WINDS = _G.GetMapNameByID(807),
+	TOWNLONG_STEPPES = _G.GetMapNameByID(810),
+	VALE_OF_ETERNAL_BLOSSOMS = _G.GetMapNameByID(811),
+	DRAGON_SOUL = _G.GetMapNameByID(824),
+	DUSTWALLOW_MARSH = _G.GetMapNameByID(851),
+	KRASARANG_WILDS = _G.GetMapNameByID(857),
+	DREAD_WASTES = _G.GetMapNameByID(858),
+	THE_VEILED_STAIR = _G.GetMapNameByID(873),
+	KUN_LAI_SUMMIT = _G.GetMapNameByID(879),
+	THE_JADE_FOREST = _G.GetMapNameByID(880),
+	HEART_OF_FEAR = _G.GetMapNameByID(897),
+	SCHOLOMANCE = _G.GetMapNameByID(898),
+	SHRINE_OF_TWO_MOONS = _G.GetMapNameByID(903),
+	SHRINE_OF_SEVEN_STARS = _G.GetMapNameByID(905),
+}
+
+do
+	local continent_names = { _G.GetMapContinents() }
+
+	private.ZONE_NAMES["KALIMDOR"] = continent_names[1]
+	private.ZONE_NAMES["EASTERN_KINGDOMS"] = continent_names[2]
+	private.ZONE_NAMES["OUTLAND"] = continent_names[3]
+	private.ZONE_NAMES["NORTHREND"] = continent_names[4]
+	private.ZONE_NAMES["THE_MAELSTROM"] = continent_names[5]
+	private.ZONE_NAMES["PANDARIA"] = continent_names[6]
+end
+
+private.ZONE_LABELS_FROM_NAME = {}
+
+for label, name in pairs(private.ZONE_NAMES) do
+	private.ZONE_LABELS_FROM_NAME[name] = label
+end
+
+-------------------------------------------------------------------------------
+-- Boss names.
+-------------------------------------------------------------------------------
+private.BOSS_NAMES = {
+	LORD_ROCCOR = _G.EJ_GetEncounterInfo(370),
+	PYROMANCER_LOREGRAIN = _G.EJ_GetEncounterInfo(373),
+	GOLEM_LORD_ARGELMACH = _G.EJ_GetEncounterInfo(379),
+	RIBBLY_SCREWSPIGOT = _G.EJ_GetEncounterInfo(382),
+	PLUGGER_SPAZZRING = _G.EJ_GetEncounterInfo(383),
+	QUARTERMASTER_ZIGRIS = _G.EJ_GetEncounterInfo(393),
+	SOLAKAR_FLAMEWREATH = _G.EJ_GetEncounterInfo(398),
+	GENERAL_DRAKKISATH = _G.EJ_GetEncounterInfo(401),
+	MAGISTER_KALENDRIS = _G.EJ_GetEncounterInfo(408),
+	MEKGINEER_THERMAPLUGG = _G.EJ_GetEncounterInfo(422),
+	BALNAZZAR = _G.EJ_GetEncounterInfo(449),
+	MALEKI_THE_PALLID = _G.EJ_GetEncounterInfo(453),
+	PRIESTESS_DELRISSA = _G.EJ_GetEncounterInfo(532),
+	KAELTHAS_SUNSTRIDER = _G.EJ_GetEncounterInfo(533),
+	NEXUS_PRINCE_SHAFFAR = _G.EJ_GetEncounterInfo(537),
+	CAPTAIN_SKARLOC = _G.EJ_GetEncounterInfo(539),
+	EPOCH_HUNTER = _G.EJ_GetEncounterInfo(540),
+	DARKWEAVER_SYTH = _G.EJ_GetEncounterInfo(541),
+	BLACKHEART_THE_INCITER = _G.EJ_GetEncounterInfo(545),
+	MURMUR = _G.EJ_GetEncounterInfo(547),
+	DALLIAH_THE_DOOMSAYER = _G.EJ_GetEncounterInfo(549),
+	HIGH_BOTANIST_FREYWINN = _G.EJ_GetEncounterInfo(559),
+	THORNGRIN_THE_TENDER = _G.EJ_GetEncounterInfo(560),
+	WARP_SPLINTER = _G.EJ_GetEncounterInfo(562),
+	MECHANO_LORD_CAPACITUS = _G.EJ_GetEncounterInfo(563),
+	NETHERMANCER_SEPETHREA = _G.EJ_GetEncounterInfo(564),
+	PATHALEON_THE_CALCULATOR = _G.EJ_GetEncounterInfo(565),
+	GRAND_WARLOCK_NETHEKURSE = _G.EJ_GetEncounterInfo(566),
+	MEKGINEER_STEAMRIGGER = _G.EJ_GetEncounterInfo(574),
+	WARLORD_KALITHRESH = _G.EJ_GetEncounterInfo(575),
+	HERALD_VOLAZJ = _G.EJ_GetEncounterInfo(584),
+	LOKEN = _G.EJ_GetEncounterInfo(600),
+	LEY_GUARDIAN_EREGOS = _G.EJ_GetEncounterInfo(625),
+	INGVAR_THE_PLUNDERER = _G.EJ_GetEncounterInfo(640),
+	KING_YMIRON = _G.EJ_GetEncounterInfo(644),
+	JANDICE_BAROV = _G.EJ_GetEncounterInfo(663),
+	DARKMASTER_GANDLING = _G.EJ_GetEncounterInfo(684),
+}
 
 -------------------------------------------------------------------------------
 -- Colors.
@@ -586,16 +859,4 @@ private.CATEGORY_COLORS = {
 	["location"]	= "ffecc1",
 	["repname"]	= "6a9ad9",
 
-}
-
--- Listing of recipes which overwrite other recipes when you learn them.
--- For example, when you learn Darkglow Embroidery Rank 2 (75175),
--- you no longer know Darkglow Embroidery Rank 1 (55769)
-
-private.SPELL_OVERWRITE_MAP = {
-	-------------------------------------------------------------------------------
-	-- Tailoring
-	-------------------------------------------------------------------------------
-	[75175] = 55769,	[75172] = 55642,	[75178] = 55777,
-	[75154] = 56034,	[75155] = 56039,
 }

@@ -3,6 +3,9 @@
 local FL = LibStub("LibFishing-1.0");
 local LT = LibStub("LibTourist-3.0");
 
+-- 5.0.4 has a problem with a global "_" (see some for loops below)
+local _
+
 FishingBuddy.Schools = {};
 
 local SCHOOLS = {};

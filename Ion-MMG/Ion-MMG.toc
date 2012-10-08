@@ -1,0 +1,14 @@
+﻿## Interface: 40300
+## Title: Ion: Macaroon Macro Grabber
+## Author: Maul
+## Version: Hydrogen-1
+## Notes: Helps to import macros from Macaroon to Ion
+## DefaultState: enabled
+## OptionalDeps: Ion, Macaroon
+## SavedVariables: IonMMGGDB
+## X-Child-Of: Ion
+## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved..
+## X-Email: trinityui@live.com
+
+Ion-MMG.lua
+Ion-MMG.xml

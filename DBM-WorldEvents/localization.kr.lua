@@ -85,7 +85,7 @@ L:SetWarningLocalization({
 L:SetOptionLocalization({
 	specWarnBrew			= "$spell:47376 특수 경고 보기",
 	specWarnBrewStun		= "$spell:47340 특수 경고 보기",
-	YellOnBarrel			= "$spell:51413 주문의 영향을 받은 경우 외치기"
+	YellOnBarrel			= "$spell:51413 주문의 영향을 받은 경우 대화로 알리기"
 })
 
 L:SetMiscLocalization{
@@ -151,12 +151,15 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	warnGnoll		= "놀 등장",
-	warnHogger		= "들창코 놀 등장",
-	specWarnHogger	= "들창코 놀 등장!"
+	warnGameOverQuest	= "게임 종료. 획득 점수 %d 점, 획득 가능한 최대 점수 : %d 점",
+	warnGameOverNoQuest	= "게임 종료. 획득 가능한 최대 점수 : %d 점",
+	warnGnoll			= "놀 등장",
+	warnHogger			= "들창코 놀 등장",
+	specWarnHogger		= "들창코 놀 등장!"
 })
 
 L:SetOptionLocalization({
+	warnGameOver	= "획득 가능한 최대 점수에 대해 알림",
 	warnGnoll		= "놀 등장 알림",
 	warnHogger		= "들창코 놀 등장 알림",
 	specWarnHogger	= "들창코 놀 득장 특수 경고 보기"
@@ -184,3 +187,39 @@ L:SetGeneralLocalization({
 	name = "통통 전차 게임"
 })
 
+-----------------------
+--  Darkmoon Rabbit  --
+-----------------------
+L = DBM:GetModLocalization("Rabbit")
+
+L:SetGeneralLocalization({
+	name = "다크문 토끼"
+})
+
+--------------------------
+--  Plants Vs. Zombies  --
+--------------------------
+L = DBM:GetModLocalization("PlantsVsZombies")
+
+L:SetGeneralLocalization({
+	name = "평온초 대 구울"
+})
+
+L:SetWarningLocalization({
+	warnTotalAdds	= "총공격 전까지 생성된 적 수 : %d",
+	specWarnWave	= "총공격!"
+})
+
+L:SetTimerLocalization{
+	timerWave		= "다음 총공격"
+}
+
+L:SetOptionLocalization({
+	warnTotalAdds	= "각 총공격시마다 이전 단계에 생성된 적 수 보기",
+	specWarnWave	= "총공격 시작시 특수 경고 보기",
+	timerWave		= "다음 총공격 바 표시"
+})
+
+L:SetMiscLocalization({
+	MassiveWave		= "좀비의 총공격이 시작됐습니다!"
+})

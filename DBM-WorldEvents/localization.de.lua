@@ -150,12 +150,15 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	warnGnoll		= "Gnoll erschienen",
-	warnHogger		= "Hogger erschienen",
-	specWarnHogger	= "Hogger erschienen!"
+	warnGameOverQuest	= "Es wurden %d von insgesamt %d erreichbaren Punkten erzielt.",
+	warnGameOverNoQuest	= "Spielende. Es waren insgesamt %d Punkte erreichbar.",
+	warnGnoll			= "Gnoll erschienen",
+	warnHogger			= "Hogger erschienen",
+	specWarnHogger		= "Hogger erschienen!"
 })
 
 L:SetOptionLocalization({
+	warnGameOver	= "Verkünde nach dem Spielende die insgesamt erreichbaren Punkte",
 	warnGnoll		= "Zeige Warnung, wenn ein Gnoll erscheint",
 	warnHogger		= "Zeige Warnung, wenn ein Hogger erscheint",
 	specWarnHogger	= "Zeige Spezialwarnung, wenn ein Hogger erscheint"
@@ -181,4 +184,32 @@ L = DBM:GetModLocalization("Tonks")
 
 L:SetGeneralLocalization({
 	name = "Panzergeneral"
+})
+
+--------------------------
+--  Plants Vs. Zombies  --
+--------------------------
+L = DBM:GetModLocalization("PlantsVsZombies")
+
+L:SetGeneralLocalization({
+	name = "Pflanzen gegen Zombies"
+})
+
+L:SetWarningLocalization({
+	warnTotalAdds	= "Anzahl erschienener Zombies seit letzter Riesiger Welle: %d",
+	specWarnWave	= "Riesige Welle!"
+})
+
+L:SetTimerLocalization{
+	timerWave		= "Nächste Riesige Welle"
+}
+
+L:SetOptionLocalization({
+	warnTotalAdds	= "Verkünde die Anzahl der erschienenen Zombies zwischen jeder Riesigen Welle",
+	specWarnWave	= "Zeige Spezialwarnung, wenn eine Riesige Welle beginnt",
+	timerWave		= "Zeige Zeit bis nächste Riesige Welle"
+})
+
+L:SetMiscLocalization({
+	MassiveWave		= "Eine riesige Zombiewelle nähert sich!" --needs to be verified (video-captured translation)
 })

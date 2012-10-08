@@ -1,12 +1,14 @@
 local mod	= DBM:NewMod("Sindragosa", "DBM-Icecrown", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4685 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(36853)
 --mod:SetModelID(30362)--Does not scale correctly
-mod:RegisterCombat("combat")
-mod:SetMinSyncRevision(3712)
 mod:SetUsedIcons(3, 4, 5, 6, 7, 8)
+--mod:SetMinSyncRevision(3712)
+mod:SetMinSyncRevision(7)--Could break if someone is running out of date version with higher revision
+
+mod:RegisterCombat("combat")
 
 mod:RegisterEvents(
 	"SPELL_CAST_START",
@@ -27,7 +29,7 @@ local warnChilledtotheBone		= mod:NewAnnounce("WarnChilledtotheBone", 2, 70106, 
 local warnMysticBuffet			= mod:NewAnnounce("WarnMysticBuffet", 2, 70128, false)
 local warnFrostBeacon			= mod:NewTargetAnnounce(70126, 4)
 local warnBlisteringCold		= mod:NewSpellAnnounce(70123, 3)
-local warnFrostBreath			= mod:NewSpellAnnounce(71056, 2, nil, mod:IsTank() or mod:IsHealer())
+local warnFrostBreath			= mod:NewSpellAnnounce(69649, 2, nil, mod:IsTank() or mod:IsHealer())
 local warnUnchainedMagic		= mod:NewTargetAnnounce(69762, 2, nil, not mod:IsMelee())
 
 local specWarnUnchainedMagic	= mod:NewSpecialWarningYou(69762)
@@ -39,7 +41,7 @@ local specWarnBlisteringCold	= mod:NewSpecialWarningRun(70123)
 
 local timerNextAirphase			= mod:NewTimer(110, "TimerNextAirphase", 43810)
 local timerNextGroundphase		= mod:NewTimer(45, "TimerNextGroundphase", 43810)
-local timerNextFrostBreath		= mod:NewNextTimer(22, 71056, nil, mod:IsTank() or mod:IsHealer())
+local timerNextFrostBreath		= mod:NewNextTimer(22, 69649, nil, mod:IsTank() or mod:IsHealer())
 local timerNextBlisteringCold	= mod:NewCDTimer(67, 70123)
 local timerNextBeacon			= mod:NewNextTimer(16, 70126)
 local timerBlisteringCold		= mod:NewCastTimer(6, 70123)
@@ -72,7 +74,6 @@ local unchainedIcons = 7
 local playerUnchained = false
 local playerBeaconed = false
 local activeBeacons	= false
-local lastfail
 
 local function ClearBeaconTargets()
 	table.wipe(beaconIconTargets)
@@ -83,21 +84,19 @@ end
 
 do
 	local function sort_by_group(v1, v2)
-		return DBM:GetRaidSubgroup(UnitName(v1)) < DBM:GetRaidSubgroup(UnitName(v2))
+		return DBM:GetRaidSubgroup(DBM:GetUnitFullName(v1)) < DBM:GetRaidSubgroup(DBM:GetUnitFullName(v2))
 	end
 	function mod:SetBeaconIcons()
-		if DBM:GetRaidRank() > 0 then
-			table.sort(beaconIconTargets, sort_by_group)
-			local beaconIcons = 8
-			for i, v in ipairs(beaconIconTargets) do
-				if self.Options.AnnounceFrostBeaconIcons and IsRaidLeader() then
-					SendChatMessage(L.BeaconIconSet:format(beaconIcons, UnitName(v)), "RAID")
-				end
-				self:SetIcon(UnitName(v), beaconIcons)
-				beaconIcons = beaconIcons - 1
+		table.sort(beaconIconTargets, sort_by_group)
+		local beaconIcons = 8
+		for i, v in ipairs(beaconIconTargets) do
+			if self.Options.AnnounceFrostBeaconIcons and DBM:GetRaidRank() > 0 then
+				SendChatMessage(L.BeaconIconSet:format(beaconIcons, DBM:GetUnitFullName(v)), "RAID")
 			end
-			self:Schedule(8, ClearBeaconTargets)
+			self:SetIcon(v, beaconIcons)
+			beaconIcons = beaconIcons - 1
 		end
+		self:Schedule(8, ClearBeaconTargets)
 	end
 end
 
@@ -161,7 +160,6 @@ function mod:OnCombatStart(delay)
 	playerBeaconed = false
 	phase = 1
 	activeBeacons = false
-	lastfail = GetTime()
 end
 
 function mod:OnCombatEnd()
@@ -256,8 +254,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			end
 		end
 		if args:IsDestTypePlayer() then
-			if self.Options.AchievementCheck and DBM:GetRaidRank() > 0 and not warnedfailed and GetTime() - lastfail > 3 then
-				lastfail = GetTime()
+			if self.Options.AchievementCheck and DBM:GetRaidRank() > 0 and not warnedfailed and self:AntiSpam(3) then
 				if (args.amount or 1) == 5 then
 					SendChatMessage(L.AchievementWarning:format(args.destName), "RAID")
 				elseif (args.amount or 1) > 5 then

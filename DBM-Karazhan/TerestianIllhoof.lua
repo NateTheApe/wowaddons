@@ -1,14 +1,9 @@
 local mod	= DBM:NewMod("TerestianIllhoof", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 311 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 399 $"):sub(12, -3))
 mod:SetCreatureID(15688)
 mod:SetModelID(11343)
-
-mod:SetBossHealthInfo(
-	15688, L.name,
-	17229, L.Kilrek
-)
 
 mod:RegisterCombat("yell", L.DBM_TI_YELL_PULL)
 --mod:RegisterCombat("combat", 15688)
@@ -34,8 +29,6 @@ local timerSacrifice	= mod:NewTargetTimer(30, 30115)
 local timerSacrificeCD	= mod:NewNextTimer(43, 30115)
 
 local berserkTimer		= mod:NewBerserkTimer(600)
-
-mod:AddBoolOption("HealthFrame", true)
 
 function mod:OnCombatStart(delay)
 	berserkTimer:Start(-delay)

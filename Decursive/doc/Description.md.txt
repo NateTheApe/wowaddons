@@ -137,3 +137,5 @@ Unless you want to help testing unstable code you should download the versions c
 [youtubeplaylist]: http://www.youtube.com/view_play_list?p=BAC83C82EDE3FD24
 [GoodYoutube1]: http://www.youtube.com/watch?v=Q0OqxD3Svqo
 
+[mop]: http://www.2072productions.com/images/ah-mop-75x75-11-4-11.jpg "Mist of Pandaria Beta"
+

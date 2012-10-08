@@ -527,7 +527,7 @@ L:SetGeneralLocalization({
 
 L:SetWarningLocalization({
 	warnBirds	= "곧 안주의 혈족",
-	warnStoned	= "%s returned to stone"
+	warnStoned	= "돌로 돌아옴 : %s"
 })
 
 L:SetTimerLocalization({
@@ -535,7 +535,7 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	warnBirds	= "안주의 혈족 사전 경고 보기",
-	warnStoned	= "Show warning for spirits returning to stone"
+	warnStoned	= "영혼이 돌로 되돌아 올때 알림 표시"
 })
 
 L:SetMiscLocalization({
@@ -1102,7 +1102,7 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Discharge		= "억제할 수... 없다."
+	Discharge		= "억제할 수... 없다..."
 })
 
 --------------------------
@@ -1125,7 +1125,7 @@ L:SetOptionLocalization({
 
 L:SetMiscLocalization({
 	DelrissaPull	= "저들을 밟아줘라.",
-	DelrissaEnd		= "뭔가... 잘못됐어."
+	DelrissaEnd		= "뭔가... 잘못됐어..."
 })
 
 ------------------------------------
@@ -1138,14 +1138,12 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	specwarnPyroblast	= "불덩이 작렬 - 차단"
 })
 
 L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	specwarnPyroblast	= "불덩이 작렬 시전에 대한 특수 경고 보기"
 })
 
 L:SetMiscLocalization({

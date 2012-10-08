@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("GeneralVezax", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4693 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(33271)
 mod:SetModelID(28548)
 mod:SetUsedIcons(7, 8)
@@ -34,19 +34,17 @@ local timerSaroniteVapors		= mod:NewNextTimer(30, 63322)
 local timerLifeLeech			= mod:NewTargetTimer(10, 63276)
 local timerHardmode				= mod:NewTimer(189, "hardmodeSpawn")
 
-mod:AddBoolOption("YellOnLifeLeech", true, "announce")
-mod:AddBoolOption("YellOnShadowCrash", true, "announce")
+local yellLifeLeech				= mod:NewYell(63276)
+local yellShadowCrash			= mod:NewYell(62660)
 mod:AddBoolOption("SetIconOnShadowCrash", true)
 mod:AddBoolOption("SetIconOnLifeLeach", true)
 mod:AddBoolOption("CrashArrow")
 
-local lastCrash
 
 function mod:OnCombatStart(delay)
 	timerEnrage:Start(-delay)
 	timerHardmode:Start(-delay)
 	timerNextSurgeofDarkness:Start(-delay)
-	lastCrash = GetTime()
 end
 
 function mod:SPELL_CAST_START(args)
@@ -77,7 +75,7 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:ShadowCrashTarget()
-	local targetname = self:GetBossTarget()
+	local targetname = self:GetBossTarget(33271)
 	if not targetname then return end
 	if self.Options.SetIconOnShadowCrash then
 		self:SetIcon(targetname, 8, 10)
@@ -85,9 +83,7 @@ function mod:ShadowCrashTarget()
 	warnShadowCrash:Show(targetname)
 	if targetname == UnitName("player") then
 		specWarnShadowCrash:Show(targetname)
-		if self.Options.YellOnShadowCrash then
-			SendChatMessage(L.YellCrash, "SAY")
-		end
+		yellShadowCrash:Yell()
 	elseif targetname then
 		local uId = DBM:GetRaidUnitId(targetname)
 		if uId then
@@ -119,9 +115,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		timerLifeLeech:Start(args.destName)
 		if args:IsPlayer() then
 			specWarnLifeLeechYou:Show()
-			if self.Options.YellOnLifeLeech then
-				SendChatMessage(L.YellLeech, "SAY")
-			end
+			yellLifeLeech:Yell()
 		else
 			local uId = DBM:GetRaidUnitId(args.destName)
 			if uId then

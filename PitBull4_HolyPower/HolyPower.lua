@@ -11,7 +11,13 @@ end
 
 -- CONSTANTS ----------------------------------------------------------------
 
-local MAX_HOLY_POWER = assert(_G.MAX_HOLY_POWER)
+local mop_500 = select(4,GetBuildInfo()) >= 50000
+
+local HOLY_POWER_FULL = HOLY_POWER_FULL
+if not mop_500 then
+	HOLY_POWER_FULL = MAX_HOLY_POWER
+end
+assert(HOLY_POWER_FULL)
 local SPELL_POWER_HOLY_POWER = assert(_G.SPELL_POWER_HOLY_POWER)
 
 local STANDARD_SIZE = 15
@@ -20,7 +26,7 @@ local SPACING = 3
 
 local HALF_STANDARD_SIZE = STANDARD_SIZE / 2
 
-local CONTAINER_WIDTH = STANDARD_SIZE * MAX_HOLY_POWER + BORDER_SIZE * 2 + SPACING * (MAX_HOLY_POWER - 1)
+local CONTAINER_WIDTH = STANDARD_SIZE * HOLY_POWER_FULL + BORDER_SIZE * 2 + SPACING * (HOLY_POWER_FULL - 1)
 local CONTAINER_HEIGHT = STANDARD_SIZE + BORDER_SIZE * 2
 
 -----------------------------------------------------------------------------
@@ -95,7 +101,7 @@ function PitBull4_HolyPower:ClearFrame(frame)
 		return false
 	end
 	
-	for i = 1, MAX_HOLY_POWER do
+	for i = 1, 5 do
 		container[i] = container[i]:Delete()
 	end
 	container.bg = container.bg:Delete()
@@ -104,10 +110,27 @@ function PitBull4_HolyPower:ClearFrame(frame)
 	return true
 end
 
+local function update_container_size(container, vertical, max_holy_power)
+	local width = STANDARD_SIZE * max_holy_power + BORDER_SIZE * 2 + SPACING * (max_holy_power - 1)
+	if not vertical then
+		container:SetWidth(width)
+		container:SetHeight(CONTAINER_HEIGHT)
+		container.height = 1
+	else
+		container:SetWidth(CONTAINER_HEIGHT)
+		container:SetHeight(width)
+		container.height = width / CONTAINER_HEIGHT
+	end
+	container.max_holy_power = max_holy_power
+end
+
 function PitBull4_HolyPower:UpdateFrame(frame)
 	if frame.unit ~= "player" or player_level < PALADINPOWERBAR_SHOW_LEVEL then
 		return self:ClearFrame(frame)
 	end
+
+	local db = self:GetLayoutDB(frame)
+	local vertical = db.vertical
 	
 	local container = frame.HolyPower
 	if not container then
@@ -115,15 +138,13 @@ function PitBull4_HolyPower:UpdateFrame(frame)
 		frame.HolyPower = container
 		container:SetFrameLevel(frame:GetFrameLevel() + 13)
 		
-		local db = self:GetLayoutDB(frame)
-		local vertical = db.vertical
-		
 		local point, attach
-		for i = 1, MAX_HOLY_POWER do
+		for i = 1, 5 do
 			local holy_icon = PitBull4.Controls.MakeHolyIcon(container, i)
 			container[i] = holy_icon
-			holy_icon:UpdateTexture(db.active_color, db.inactive_color)
 			holy_icon:ClearAllPoints()
+			holy_icon:UpdateColors(db.active_color, db.inactive_color)
+			holy_icon:UpdateTexture()
 			if not vertical then
 				holy_icon:SetPoint("CENTER", container, "LEFT", BORDER_SIZE + (i - 1) * (SPACING + STANDARD_SIZE) + HALF_STANDARD_SIZE, 0)
 			else
@@ -131,16 +152,8 @@ function PitBull4_HolyPower:UpdateFrame(frame)
 			end
 		end
 		
-		if not vertical then
-			container:SetWidth(CONTAINER_WIDTH)
-			container:SetHeight(CONTAINER_HEIGHT)
-			container.height = 1
-		else
-			container:SetWidth(CONTAINER_HEIGHT)
-			container:SetHeight(CONTAINER_WIDTH)
-			container.height = CONTAINER_WIDTH / CONTAINER_HEIGHT
-		end
-		
+		update_container_size(container, vertical, 3)
+
 		local bg = PitBull4.Controls.MakeTexture(container, "BACKGROUND")
 		container.bg = bg
 		bg:SetTexture(unpack(db.background_color))
@@ -148,11 +161,20 @@ function PitBull4_HolyPower:UpdateFrame(frame)
 	end
 	
 	local num_holy_power = UnitPower("player", SPELL_POWER_HOLY_POWER)
-	for i = 1, MAX_HOLY_POWER do
+	local max_holy_power = UnitPowerMax("player", SPELL_POWER_HOLY_POWER)
+	if max_holy_power ~= container.max_holy_power then
+		update_container_size(container, vertical, max_holy_power)
+	end
+	for i = 1, 5 do
 		local holy_icon = container[i]
-		if i <= num_holy_power then
+		holy_icon:UpdateColors(db.active_color, db.inactive_color)
+		if i > max_holy_power then
+			holy_icon:Hide()
+		elseif i <= num_holy_power then
+			holy_icon:Show()
 			holy_icon:Activate()
 		else
+			holy_icon:Show()
 			holy_icon:Deactivate()
 		end
 	end

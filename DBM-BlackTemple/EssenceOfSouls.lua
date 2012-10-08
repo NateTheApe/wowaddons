@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Souls", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 375 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 399 $"):sub(12, -3))
 mod:SetCreatureID(23420)
 mod:SetModelID(21483)
 mod:SetZone()
@@ -54,7 +54,6 @@ local warnSpiteTargets = {}
 local lastFixate = false
 local drainIcon = 8
 local spiteIcon = 8
-local soulSpam = 0
 
 local function showDrain()
 	warnDrain:Show(table.concat(warnDrainTargets, "<, >"))
@@ -70,7 +69,6 @@ end
 
 function mod:OnCombatStart(delay)
 	lastFixate = false
-	soulSpam = 0
 	table.wipe(warnSpiteTargets)
 	timerNextEnrage:Start(47-delay)
 	warnEnrageSoon:Schedule(42-delay)
@@ -125,16 +123,15 @@ function mod:SPELL_CAST_START(args)
 	elseif args:IsSpellID(41426) then
 		warnShockCast:Show()
 		if self:GetUnitCreatureId("target") == 23419 or self:GetUnitCreatureId("focus") == 23419 then
-			specWarnShock:Show()
+			specWarnShock:Show(args.sourceName)
 		end
 	end
 end
 
 function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if spellId == 41545 and GetTime() - soulSpam >= 3 then
+	if spellId == 41545 and self:AntiSpam(3) then
 		warnSoul:Show()
 		timerNextSoul:Start()
-		soulSpam = GetTime()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE

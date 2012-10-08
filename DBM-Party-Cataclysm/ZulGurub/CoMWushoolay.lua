@@ -1,8 +1,7 @@
-local mod	= DBM:NewMod("CoMWushoolay", "DBM-Party-Cataclysm", 11)
---local mod	= DBM:NewMod(606, "DBM-Party-Cataclysm", 11, 76)
+local mod	= DBM:NewMod(180, "DBM-Party-Cataclysm", 11, 76)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 5749 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
 mod:SetCreatureID(52286)
 mod:SetModelID(37831)
 mod:SetZone()
@@ -19,7 +18,7 @@ local warnRod			= mod:NewCastAnnounce(96698, 4)
 
 local specWarnRush		= mod:NewSpecialWarningYou(96697)--Assumed target scanning even works here, if it doesn't mod will be broken.
 local specWarnRushNear	= mod:NewSpecialWarningClose(96697)--Assumed target scanning even works here, if it doesn't mod will be broken.
-local specWarnCloud		= mod:NewSpecialWarningMove(96711)
+local specWarnCloud		= mod:NewSpecialWarningMove(96710)
 
 local timerRushCD		= mod:NewNextTimer(25, 96697)
 
@@ -59,7 +58,7 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(96711) and args:IsPlayer() then
+	if args:IsSpellID(96710, 96711) and args:IsPlayer() then
 		specWarnCloud:Show()
 	end
 end

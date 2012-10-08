@@ -1128,6 +1128,7 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			local countText = _G[button:GetName() .. "Counts"]
 
 			local buttonExpand = _G[button:GetName() .. "Expand"]
+			local skillRankBar = _G[button:GetName() .. "SubSkillRankBar"]						
 
 			buttonText:SetText("")
 			levelText:SetText("")
@@ -1137,6 +1138,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 			countText:Hide()
 			countText:SetWidth(10)
 
+			skillRankBar:Hide()
+			
 --			buttonText:SetPoint("LEFT", levelText, "RIGHT", skill.depth*8-8, 0)
 			levelText:SetWidth(skill.depth*8+20)
 
@@ -1185,6 +1188,8 @@ function Skillet:internal_UpdateTradeSkillWindow()
 
 			if skill.subGroup then
 				if SkillButtonNameEdit.originalButton ~= buttonText then
+					local _, _, _, _, _, _,_,showProgressBar, currentRank,maxRank,startingRank  = GetTradeSkillInfo(skillIndex)
+					
 					buttonText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 					countText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, textAlpha)
 
@@ -1207,11 +1212,22 @@ function Skillet:internal_UpdateTradeSkillWindow()
 					button.skill = skill
 
 					button:UnlockHighlight() -- headers never get highlighted
-					buttonExpand:Show()
+					buttonExpand:Show()					
 
-					local button_width = button:GetTextWidth()
+					local rankBarWidth = 0					
+					if ( showProgressBar ) then
+						skillRankBar:Show();
+						skillRankBar:SetMinMaxValues(startingRank,maxRank);
+						skillRankBar:SetValue(currentRank);
+						skillRankBar.currentRank = currentRank;
+						skillRankBar.maxRank = maxRank;
+						skillRankBar.Rank:SetText(currentRank.."/"..maxRank);
+						rankBarWidth = 60;
+					end					
+					
+					local button_width = button:GetTextWidth()				
 
---					while button_width > max_text_width - skill.depth*8 do
+--					while button_width > max_text_width - skill.depth*8 - rankBarWidth do
 --						text = string.sub(text, 0, -2)
 --						buttonText:SetText(text .. "..")
 --						button_width = button:GetTextWidth()
@@ -1552,15 +1568,15 @@ function Skillet:SkillButton_OnEnter(button)
 
 		if altlink and IsAltKeyDown() then
 			tip:SetHyperlink(altlink)
-		else
+		elseif link then
 			tip:SetHyperlink(link)
 		end
 
 		if IsShiftKeyDown() then
 			if recipe.itemID == 0 then
-				Tooltip_ShowCompareItem(tip, GetInventoryItemLink("player", recipe.slot), "left")
+				Skillet:Tooltip_ShowCompareItem(tip, GetInventoryItemLink("player", recipe.slot), "left")
 			else
-				Tooltip_ShowCompareItem(tip, link, "left")
+				Skillet:Tooltip_ShowCompareItem(tip, link, "left")
 			end
 		end
 	else
@@ -1679,7 +1695,7 @@ function Skillet:SetTradeSkillToolTip(skillIndex)
 			GameTooltip:SetHyperlink("enchant:"..recipe.spellID)				-- doesn't create an item, just tell us about the recipe
 
 			if IsShiftKeyDown() then
-				Tooltip_ShowCompareItem(GameTooltip, GetInventoryItemLink("player", recipe.slot), "left")
+				Skillet:Tooltip_ShowCompareItem(GameTooltip, GetInventoryItemLink("player", recipe.slot), "left")
 			end
 		end
 	end

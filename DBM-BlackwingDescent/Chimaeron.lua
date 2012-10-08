@@ -1,8 +1,7 @@
---local mod	= DBM:NewMod(172, "DBM-BlackwingDescent", nil, 73)
-local mod	= DBM:NewMod("Chimaeron", "DBM-BlackwingDescent")
+local mod	= DBM:NewMod(172, "DBM-BlackwingDescent", nil, 73)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 6621 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 21 $"):sub(12, -3))
 mod:SetCreatureID(43296)
 mod:SetModelID(33308)
 mod:SetZone()
@@ -43,7 +42,7 @@ local timerBreak			= mod:NewTargetTimer(60, 82881)
 local timerBreakCD			= mod:NewNextTimer(15, 82881)--Also double attack CD
 local timerMassacre			= mod:NewCastTimer(4, 82848)
 local timerMassacreNext		= mod:NewNextTimer(30, 82848)
-local timerCausticSlime		= mod:NewNextTimer(19, 88915)--always 19 seconds after massacre.
+local timerCausticSlime		= mod:NewNextTimer(19, 82935)--always 19 seconds after massacre.
 local timerFailure			= mod:NewBuffActiveTimer(26, 88853)
 local timerFailureNext		= mod:NewNextTimer(25, 88853)
 
@@ -78,18 +77,16 @@ end
 
 do
 	local function sort_by_group(v1, v2)
-		return DBM:GetRaidSubgroup(UnitName(v1)) < DBM:GetRaidSubgroup(UnitName(v2))
+		return DBM:GetRaidSubgroup(DBM:GetUnitFullName(v1)) < DBM:GetRaidSubgroup(DBM:GetUnitFullName(v2))
 	end
 	function mod:SetSlimeIcons()
-		if DBM:GetRaidRank() > 0 then
-			table.sort(slimeTargetIcons, sort_by_group)
-			local slimeIcon = 8
-			for i, v in ipairs(slimeTargetIcons) do
-				self:SetIcon(UnitName(v), slimeIcon, 3)
-				slimeIcon = slimeIcon - 1
-			end
-			self:Schedule(1.5, ClearSlimeTargets)--Table wipe delay so if icons go out too early do to low fps or bad latency, when they get new target on table, resort and reapplying should auto correct teh icon within .2-.4 seconds at most.
+		table.sort(slimeTargetIcons, sort_by_group)
+		local slimeIcon = 8
+		for i, v in ipairs(slimeTargetIcons) do
+			self:SetIcon(v, slimeIcon, 3)
+			slimeIcon = slimeIcon - 1
 		end
+		self:Schedule(1.5, ClearSlimeTargets)--Table wipe delay so if icons go out too early do to low fps or bad latency, when they get new target on table, resort and reapplying should auto correct teh icon within .2-.4 seconds at most.
 	end
 end
 
@@ -98,7 +95,6 @@ function mod:OnCombatStart(delay)
 	timerBreakCD:Start(4.5-delay)
 	prewarnedPhase2 = false
 	botOffline = false
-	slimeIcon = 8
 	massacreCast = 0
 	phase2 = false
 	table.wipe(slimeTargets)
@@ -140,7 +136,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			table.insert(slimeTargetIcons, DBM:GetRaidUnitId(args.destName))
 			self:UnscheduleMethod("SetSlimeIcons")
 			if self:LatencyCheck() then--lag can fail the icons so we check it before allowing.
-				self:ScheduleMethod(0.5, "SetSlimeIcons")--Still seems touchy and .3 is too fast even on a 70ms connection in rare cases so back to .4
+				self:ScheduleMethod(0.5, "SetSlimeIcons")--Still seems touchy and .3 is too fast even on a 70ms connection in rare cases so back to .5
 			end
 		end
 		self:Unschedule(showSlimeWarning)

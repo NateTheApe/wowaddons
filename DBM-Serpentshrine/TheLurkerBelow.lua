@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("LurkerBelow", "DBM-Serpentshrine")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 386 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
 mod:SetCreatureID(21217)
 mod:SetModelID(20216)
 mod:SetZone()
@@ -29,12 +29,10 @@ local timerSpoutCD		= mod:NewCDTimer(50, 37433)
 local timerSpout		= mod:NewCastTimer(22, 37433)
 local timerWhirlCD		= mod:NewCDTimer(17, 37363)
 
-local whirlSpam = 0
-
 function mod:CheckDive()
 	local foundIt
 	self:ScheduleMethod(0.5, "CheckDive")
-	for i = 1, GetNumRaidMembers() do
+	for i = 1, DBM:GetGroupMembers() do
 		if UnitName("raid"..i.."target") == L.name then
 			foundIt = true
 			break
@@ -51,8 +49,6 @@ function mod:CheckDive()
 end
 
 function mod:OnCombatStart(delay)
-	submerged = false
-	whirlSpam = 0
 	timerWhirlCD:Start(17-delay)
 	timerSpoutCD:Start(37-delay)
 	warnSubmergeSoon:Schedule(80)
@@ -60,10 +56,9 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if spellId == 37363 and GetTime() - whirlSpam >= 10 then
+	if spellId == 37363 and self:AntiSpam(10) then
 		warnWhirl:Show()
 		timerWhirlCD:Start()
-		whirlSpam = GetTime()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE

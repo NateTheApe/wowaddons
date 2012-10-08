@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John Wellesz).
@@ -11,26 +11,44 @@
     To distribute Decursive through other means a special authorization is required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2012-02-05T17:48:12Z
+    This file was last updated on 2012-10-07T15:16:48Z
 --]]
 -------------------------------------------------------------------------------
 
+
+
+
+local _G                = _G;
+local GetFramerate      = _G.GetFramerate;
+local GetNetStats       = _G.GetNetStats;
+local GetRealZoneText   = _G.GetRealZoneText;
+local tostring          = _G.tostring;
+local tonumber          = _G.tonumber;
+local select            = _G.select;
+local table             = _G.table;
+local GetTime           = _G.GetTime;
+local strjoin           = _G.strjoin;
+local GetCVarBool       = _G.GetCVarBool;
 
 local addonName, T = ...;
 DecursiveRootTable = T; -- needed until we get rid of the xml based UI.
 
 DecursiveInstallCorrupted     = false;
 
-T._C = {};
-local DC = T._C;
+T._C                    = {};
+T._DebugTextTable       = {};
+T._DebugText            = "";
 
-DC.StartTime = GetTime();
+local DC                = T._C;
+local DebugTextTable    =  T._DebugTextTable;
+local Reported          = {};
+
 
 if DecursiveInEmbeddedMode == nil then
     T._EmbeddedMode = "unknown";
@@ -56,6 +74,7 @@ T._LoadedFiles = {
     ["zhCN.lua"]                = false,
     ["ruRU.lua"]                = false,
     ["ptBR.lua"]                = false,
+    ["itIT.lua"]                = false,
     
     ["Dcr_opt.lua"]             = false,
     ["Dcr_Events.lua"]          = false,
@@ -72,6 +91,7 @@ T._LoadedFiles = {
     
 };
 
+
 -- This self diagnostic functionality is here to give clear instructions to the
 -- user when something goes wrong with the Ace shared libraries or when a
 -- Decursive file could not be loaded.
@@ -87,8 +107,11 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = false,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
+
+DC.StartTime = GetTime();
 
 -- Decursive LUA error manager and debug reporting functions {{{
 
@@ -110,7 +133,6 @@ local function tostring_args(a1, ...)
         return tostring(a1), tostring_args(...)
 end
 
-T._DebugText = "";
 -- inspired from BugSack
 function T._DebugFrameOnTextChanged(frame)
     if frame:GetText() ~= T._DebugText then
@@ -124,12 +146,8 @@ function T._DebugFrameOnTextChanged(frame)
     end
 end
 
-T._DebugTextTable = {};
-local DebugTextTable = T._DebugTextTable;
-local Reported = {};
-local GetFramerate = _G.GetFramerate;
-local GetNetStats = _G.GetNetStats;
-local GetRealZoneText = _G.GetRealZoneText;
+
+
 function T._AddDebugText(a1, ...)
 
     if T.Dcr.Debug then
@@ -158,15 +176,18 @@ local AddDebugText = T._AddDebugText;
 
 -- The error handler
 
+-- used to prevent loops if our own error handler crashes
 local IsReporting = false;
 
 T._NonDecursiveErrors = 0;
+T._TaintingAccusations = 0;
 T._ErrorLimitStripped = false;
 
-local type = _G.type;
+local InCombatLockdown  = _G.InCombatLockdown;
 function T._onError(event, errorObject)
     local errorm = errorObject.message;
     local mine = false;
+    local taintingAccusation = false;
 
     if not IsReporting
         and ( T._CatchAllErrors
@@ -176,24 +197,46 @@ function T._onError(event, errorObject)
         or ( (errorm:lower()):find("decursive%.")) -- for Aceconfig
         ) then
 
-        T._CatchAllErrors = false; -- Errors are unacceptable so one is enough, no need to get all subsequent errors.
-        IsReporting = true;
-        AddDebugText(errorObject.message, "\n|cff00aa00STACK:|r\n", errorObject.stack, "\n|cff00aa00LOCALS:|r\n", errorObject.locals);
-
-        if T.Dcr and T.Dcr.Debug then
-            T.Dcr:Debug("Lua error recorded");
+        if errorm:find("ADDON_ACTION_FORBIDDEN") or errorm:find("ADDON_ACTION_BLOCKED") then
+            taintingAccusation = true;
         end
-        IsReporting = false;
-        mine = true;
+
+        if not taintingAccusation or T._EmbeddedMode == false then -- if we are having this while we're not emebedding anything then it does matters
+            T._CatchAllErrors = false; -- Errors are unacceptable so one is enough, no need to get all subsequent errors.
+            IsReporting = true;
+            AddDebugText(errorObject.message, "\n|cff00aa00STACK:|r\n", errorObject.stack, "\n|cff00aa00LOCALS:|r\n", errorObject.locals);
+
+            if T.Dcr and T.Dcr.Debug then
+                T.Dcr:Debug("Lua error recorded");
+            end
+            IsReporting = false;
+            mine = true;
+        else
+            T._NonDecursiveErrors = T._NonDecursiveErrors + 1;
+            T._TaintingAccusations = T._TaintingAccusations + 1;
+            T.Dcr:Debug("False tainting accusation put under the carpet");
+            return; -- bury it under the carpet since it's blaming the wrong add-on and misleading the users.
+        end
     else
         T._NonDecursiveErrors = T._NonDecursiveErrors + 1;
     end
 
-    if not mine and GetCVarBool("scriptErrors") then
+    if not mine and not T._BugSackLoaded and GetCVarBool("scriptErrors") then
         if not _G.DEBUGLOCALS_LEVEL then
-            _G.LoadAddOn("Blizzard_DebugTools");
+            if not InCombatLockdown() then
+                _G.LoadAddOn("Blizzard_DebugTools");
+            else
+                if T.Dcr.AddDelayedFunctionCall then
+                    T.Dcr:AddDelayedFunctionCall('Load_Blizzard_DebugTools', _G.LoadAddOn, 'Blizzard_DebugTools');
+
+                    T.Dcr:Debug("Blizzard_DebugTools load has been delayed because InCombatLockdown");
+                else
+                    T.Dcr:Debug("Blizzard_DebugTools load has been cancelled because InCombatLockdown");
+                end
+                return;
+            end
         end
-        _G.DEBUGLOCALS_LEVEL = 12; -- XXX must be set to the right value to get the correct stack and locals
+        _G.DEBUGLOCALS_LEVEL = 12; -- XXX must be set to the right value to get the correct stack and locals. This is why we need to load Blizzard_DebugTools ourselves... That sucks... 
 
         -- forward the error to the default Blizzad error displayer
         if _G._ERRORMESSAGE then
@@ -208,17 +251,6 @@ function T._onError(event, errorObject)
            
             T.Dcr:Debug("Lua error forwarded");
 
-            -- Blizzard bug HotFix
-            ---[=[
-            if ScriptErrorsFrameScrollFrameText then
-                if not ScriptErrorsFrameScrollFrameText.cursorOffset then
-                    ScriptErrorsFrameScrollFrameText.cursorOffset = 0;
-                    T._BDT_HotFix1_applyed = true;
-                    print("Decursive |cFF00FF00HotFix to Blizzard_DebugTools:|r |cFFFF0000ScriptErrorsFrameScrollFrameText.cursorOffset was nil (check for Lua errors using BugGrabber and BugSack)|r");
-                end
-            end
-            --]=]
-
             _G._ERRORMESSAGE( errorm );
         end
     else
@@ -229,10 +261,24 @@ end
 
 local ProperErrorHandler = false;
 
-local version, build, date, tocversion = GetBuildInfo();
+local _, _, _, tocversion = GetBuildInfo();
 
 T._CatchAllErrors = false;
 T._tocversion = tocversion;
+DC.MOP = (tocversion >= 50000);
+
+-- MOP compatibility layer functions
+local IsInRaid;
+local GetNumGroupMembers;
+if not DC.MOP then
+    IsInRaid = function() return GetNumRaidMembers() and true; end
+else
+    IsInRaid = _G.IsInRaid;
+    GetNumGroupMembers = _G.GetNumGroupMembers;
+end
+DC.GetNumRaidMembers = (not DC.MOP) and _G.GetNumRaidMembers or function()
+    return IsInRaid() and GetNumGroupMembers() or 0;
+end
 
 function T._DecursiveErrorHandler(err, ...)
 
@@ -240,26 +286,15 @@ function T._DecursiveErrorHandler(err, ...)
         return;
     end
 
-    -- Blizzard bug HotFix
-    ---[=[
-    if ScriptErrorsFrameScrollFrameText then
-        if not ScriptErrorsFrameScrollFrameText.cursorOffset then
-            ScriptErrorsFrameScrollFrameText.cursorOffset = 0;
-            T._BDT_HotFix1_applyed = true;
-            if ( GetCVarBool("scriptErrors") ) then
-                print("Decursive |cFF00FF00HotFix to Blizzard_DebugTools:|r |cFFFF0000ScriptErrorsFrameScrollFrameText.cursorOffset was nil (check for Lua errors using BugGrabber and BugSack)|r");
-            end
-        end
-    end
-    --]=]
-
     err = tostring(err);
 
     --A check to see if the error is happening inside the Blizzard 'debug' tool himself...
     if (err:lower()):find("blizzard_debugtools") then
+        --[===[@alpha@
         if ( GetCVarBool("scriptErrors") ) then
             print (("|cFFFF0000%s|r"):format(err));
         end
+        --@end-alpha@]===]
         return;
     end
 
@@ -294,11 +329,13 @@ function T._TooManyErrors()
         return;
     end
 
-    if not WarningDisplayed and T.Dcr and T.Dcr.L and not (#DebugTextTable > 0) then -- if we can and should display the alert
+    if not WarningDisplayed and T.Dcr and T.Dcr.L and not (#DebugTextTable > 0 or T._TaintingAccusations > 10) then -- if we can and should display the alert
         T.Dcr:Print(T.Dcr:ColorText((T.Dcr.L["TOO_MANY_ERRORS_ALERT"]):format(T._NonDecursiveErrors), "FFFF0000"));
         T.Dcr:Print(T.Dcr:ColorText(T.Dcr.L["DONT_SHOOT_THE_MESSENGER"], "FFFF9955"));
         WarningDisplayed = true;
     end
+
+    T.Dcr:Debug("Error handler disabled");
 end
 
 function T._HookErrorHandler()
@@ -307,8 +344,9 @@ function T._HookErrorHandler()
         local name, _, _, enabled = GetAddOnInfo("BugSack")
 
         if name and enabled then
-            T._BugGrabberEmbeded = false;
-            return
+            T._BugSackLoaded = true;
+        else
+            T._BugSackLoaded = false;
         end
 
         BUGGRABBER_SUPPRESS_THROTTLE_CHAT = true; -- for people using an older version of BugGrabber. There is no way to know...
@@ -353,6 +391,7 @@ StaticPopupDialogs["Decursive_Notice_Frame"] = {
     whileDead = 1,
     hideOnEscape = false,
     showAlert = 1,
+    preferredIndex = 3,
 }; -- }}}
 
 
@@ -420,7 +459,8 @@ do
             ["AceAddon-3.0"] = 11,
             ["AceConsole-3.0"] = 7,
             ["AceEvent-3.0"] = 3,
-            ["AceTimer-3.0"] = 6,
+            --["AceTimer-3.0"] = 6,
+            ["LibShefkiTimer-1.0"] = 3,
             ["AceHook-3.0"] = 5,
             ["AceDB-3.0"] = 22,
             ["AceDBOptions-3.0"] = 12,
@@ -429,12 +469,12 @@ do
 
             ["AceGUI-3.0"] = 33,
             ["AceConfig-3.0"] = 2,
-            ["AceConfigRegistry-3.0"] = 13,
-            ["AceConfigCmd-3.0"] = 12,
-            ["AceConfigDialog-3.0"] = 54,
+            ["AceConfigRegistry-3.0"] = 14,
+            ["AceConfigCmd-3.0"] = 13,
+            ["AceConfigDialog-3.0"] = 57,
 
             ["LibDataBroker-1.1"] = 4,
-            ["LibDBIcon-1.0"] = 24, --not updated for WoW 4.3
+            ["LibDBIcon-1.0"] = 25, --not updated for WoW 4.3
             ["LibQTip-1.0"] = 38,
             ["CallbackHandler-1.0"] = 6,
         };
@@ -583,4 +623,4 @@ do
 end
 
 
-T._LoadedFiles["Dcr_DIAG.lua"] = "2.7.0.5";
+T._LoadedFiles["Dcr_DIAG.lua"] = "2.7.2.2";

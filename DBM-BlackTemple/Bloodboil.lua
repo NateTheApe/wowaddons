@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Bloodboil", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 363 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 410 $"):sub(12, -3))
 mod:SetCreatureID(22948)
 mod:SetModelID(21443)
 mod:SetZone()
@@ -22,7 +22,7 @@ local specWarnBlood		= mod:NewSpecialWarningYou(42005)
 local specWarnRage		= mod:NewSpecialWarningYou(40604)
 
 local timerBlood		= mod:NewCDTimer(10, 42005)
-local timerRage			= mod:NewCDTimer(57, 40604)
+local timerRage			= mod:NewCDTimer(52, 40604)
 local timerRageEnd		= mod:NewTimer(28, "TimerRageEnd", 38739)
 
 local berserkTimer		= mod:NewBerserkTimer(600)
@@ -32,7 +32,7 @@ local warnBloodTargets = {}
 local function nextRage()
 	warnRageEnd:Show()
 	timerRage:Start()
-	warnRageSoon:Schedule(52)
+	warnRageSoon:Schedule(47)
 	timerBlood:Start(11.5)
 	table.wipe(warnBloodTargets)
 end
@@ -64,7 +64,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnBlood:Show()
 		end
 	elseif args:IsSpellID(40604) then
-		warnRage:Show(args.DestName)
+		warnRage:Show(args.destName)
 		timerBlood:Cancel()
 		timerRageEnd:Start()
 		self:Schedule(28, nextRage)

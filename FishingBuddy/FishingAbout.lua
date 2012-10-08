@@ -10,6 +10,12 @@ credits[FBConstants.ROLE_TRANSLATE_ZHTW] = {
 	["Whocare"] = { "bahamut, an influential gamer forum in Taiwan 11/24/2007", },
 	["smartdavislin"] = { "Version 1.0.2 (CurseForge)", },
 	["Andyca"] = { "Version 1.0.7a (CurseForge)" },
+	["zhTW"] = { "Version 1.0.9e (CurseForge)", },
+};
+
+credits[FBConstants.ROLE_TRANSLATE_ITIT] = {
+	["bER92"] = { "Version 1.0.9f (CurseForge)" },
+	["Impaler"] = { "Version 1.0.9f (CurseForge)" },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_ZHCN] = {
@@ -26,18 +32,23 @@ credits[FBConstants.ROLE_TRANSLATE_DEDE] = {
 	["blackrat"] = { "Version 0.8.1d", },
 	["RustyXXL"] = { "Version 1.0.4 (CurseForge)", },
 	["Ithilrandir"] = { "Version 1.0.5 (CurseForge)", },
-	["DirtyHarryGermany"] = { "Version 1.0.7h (CurseForge)", },
+	["DirtyHarryGermany"] = { "Version 1.0.7h (CurseForge)", "Version 1.0.9e (CurseForge)", },
+	["Freydis88"] = { "Version 1.0.9e (CurseForge)", },
+	["Frontiii"] = { "Version 1.0.9e (CurseForge)", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_FRFR] = {
 	["krogh"] = { "Version  0.8.7", },
 	["Corwin Whitehorn"] = { "Version  0.8.5", },
+	["PierrotIV"] = { "Version 1.0.9e (CurseForge)", },
+	["boidan01"] = { "Version 1.0.9e (CurseForge)", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_ESES] = {
 	["Fili"] = { "Version 0.8.6b", "Version  0.9.7d", },
 	["Valdesca"] = { "Version 0.9.9e6", },
 	["Winderfind Drakkari"] = { "Version 1.0.7a" },
+	["jmaister"] = { "Version 1.0.9e (CurseForge)", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_KOKR] = {

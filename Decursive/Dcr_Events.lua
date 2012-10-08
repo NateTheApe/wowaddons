@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John Wellesz).
@@ -11,13 +11,13 @@
     To distribute Decursive through other means a special authorization is required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2011-12-13T20:59:27Z
+    This file was last updated on 2012-09-23T20:33:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -35,6 +35,7 @@ if not T._FatalError then
         whileDead = 1,
         hideOnEscape = 1,
         showAlert = 1,
+        preferredIndex = 3,
     }; -- }}}
     T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -72,7 +73,8 @@ local table             = _G.table;
 local UnitCreatureFamily= _G.UnitCreatureFamily;
 local UnitFactionGroup  = _G.UnitFactionGroup;
 local IsInInstance      = _G.IsInInstance;
-local GetNumRaidMembers = _G.GetNumRaidMembers;
+local GetNumRaidMembers = DC.GetNumRaidMembers;
+local GetNumPartyMembers= DC.MOP and _G.GetNumSubgroupMembers or _G.GetNumPartyMembers;
 local GetGuildInfo      = _G.GetGuildInfo;
 local InCombatLockdown  = _G.InCombatLockdown;
 local PlaySoundFile     = _G.PlaySoundFile;
@@ -191,7 +193,7 @@ function D:UpdatePlayerPet () -- {{{
         if (curr_petType) then D:Debug ("|cFF0066FFPet name changed:",curr_petType,"|r"); else D:Debug ("|cFF0066FFNo more pet!|r"); end; -- debug info only
 
         last_petType = curr_petType;
-        D:Configure();
+        D:ReConfigure(); -- might no longer be required in MoP since spell changed event is more reliable
     else
         D:Debug ("|cFFAA66FFNo change in Pet Type",curr_petType,"|r");
     end
@@ -248,29 +250,31 @@ local LastScanAllTime = 0;
 D.Status.MaxConcurentUpdateDebuff = 0;
 function D:ScheduledTasks() -- {{{
 
-    if not D.DcrFullyInitialized then
-        D:Debug("|cFFFF0000D:ScheduledTasks aborted, init uncomplete!|r");
+    if not self.DcrFullyInitialized then
+        self:Debug("|cFFFF0000D:ScheduledTasks aborted, init uncomplete!|r");
         return;
     end
 
+    local status = self.Status;
+
     -- clean up the blacklist
-    for unit in pairs(self.Status.Blacklisted_Array) do
-        self.Status.Blacklisted_Array[unit] = self.Status.Blacklisted_Array[unit] - 0.1;
-        if (self.Status.Blacklisted_Array[unit] < 0) then
-            self.Status.Blacklisted_Array[unit] = nil; -- remove it from the BL
+    for unit in pairs(status.Blacklisted_Array) do
+        status.Blacklisted_Array[unit] = status.Blacklisted_Array[unit] - 0.3;
+        if (status.Blacklisted_Array[unit] < 0) then
+            status.Blacklisted_Array[unit] = nil; -- remove it from the BL
         end
     end
 
-    if (self.Status.Combat and not InCombatLockdown()) then -- just in case...
-        D:LeaveCombat();
+    if status.Combat and not InCombatLockdown() then -- just in case...
+        self:LeaveCombat();
     end
 
-    if (not InCombatLockdown() and self.Status.DelayedFunctionCallsCount > 0) then
-        for Id, FuncAndArgs in pairs (self.Status.DelayedFunctionCalls) do
-            D:Debug("Running post combat command", Id);
+    if (not InCombatLockdown() and status.DelayedFunctionCallsCount > 0) then
+        for Id, FuncAndArgs in pairs (status.DelayedFunctionCalls) do
+            self:Debug("Running post combat command", Id);
             local DidSmth = FuncAndArgs.func(unpack(FuncAndArgs.args));
-            self.Status.DelayedFunctionCalls[Id] = nil; -- remove it from the list
-            self.Status.DelayedFunctionCallsCount = self.Status.DelayedFunctionCallsCount - 1;
+            status.DelayedFunctionCalls[Id] = nil; -- remove it from the list
+            status.DelayedFunctionCallsCount = status.DelayedFunctionCallsCount - 1;
             if (DidSmth) then
                 break;
             end
@@ -278,17 +282,20 @@ function D:ScheduledTasks() -- {{{
     end
 
 
-    if D.DebuffUpdateRequest > D.Status.MaxConcurentUpdateDebuff then
-        D.Status.MaxConcurentUpdateDebuff = D.DebuffUpdateRequest;
+    if self.DebuffUpdateRequest > status.MaxConcurentUpdateDebuff then
+        status.MaxConcurentUpdateDebuff = self.DebuffUpdateRequest;
     end
 
+    self.DebuffUpdateRequest = 0;
+
     -- Rescan all only if the MUF are used else we don't care at all...
+    --[=[
     if self.profile.ShowDebuffsFrame and GetTime() - LastScanAllTime > 1 then
         self:ScanEveryBody();
         LastScanAllTime =  GetTime();
     end
+    --]=]
 
-    D.DebuffUpdateRequest = 0;
 
 end --}}}
 
@@ -394,7 +401,7 @@ end
 
 function D:SPELLS_CHANGED()
     D:Debug("|cFFFF0000Spells were changed, scheduling a reconfiguration check|r");
-    self:ScheduleDelayedCall("Dcr_ReConfigureSlow", self.ReConfigure, 15, self);
+    self:ScheduleDelayedCall("Dcr_ReConfigure", self.ReConfigure, 4, self); -- used to be 15s changed to 4 to be more reaactive for warlocks
 end
 
 function D:PLAYER_TALENT_UPDATE()
@@ -431,7 +438,7 @@ local SeenUnitEventsCOMBAT = {};
 
 do
     local FAR           = DC.FAR;
-    local UnitAura      = _G.UnitAura;
+    local UnitDebuff    = _G.UnitDebuff;
     local UnitGUID      = _G.UnitGUID;
     local UnitIsCharmed = _G.UnitIsCharmed;
     local time          = _G.time;
@@ -506,7 +513,7 @@ do
                 end
 
                 -- get out of here if this is just about a fucking buff, combat log event manager handles those... unless there is no debuff because the last was removed
-                if not UnitAura(UnitID, 1, "HARMFUL") and not self.MicroUnitF.UnitToMUF[UnitID].IsDebuffed then
+                if not UnitDebuff(UnitID, 1) and not self.MicroUnitF.UnitToMUF[UnitID].IsDebuffed then
                     --self:Debug(UnitID, " |cFFFF7711has no debuff|r (UNIT_AURA)");
                     return;
                 end
@@ -628,7 +635,7 @@ do -- Combat log event handling {{{1
                         if AuraEvents[event] == 1 then
                             self.Stealthed_Units[UnitID] = true;
                         else
-                            if self.debug then D:Debug("STEALTH LOST: ", UnitID, spellNAME); end
+                            if self.debug then self:Debug("STEALTH LOST: ", UnitID, spellNAME); end
                             self.Stealthed_Units[UnitID] = false;
                         end
                         self.MicroUnitF:UpdateMUFUnit(UnitID);
@@ -636,14 +643,14 @@ do -- Combat log event handling {{{1
                 else
 
                     --[===[@debug@
-                    if self.debug then D:Debug("Debuff, UnitId: ", UnitID, spellNAME, event, time() + (GetTime() % 1), timestamp, "destName:", destName, destFlags, band (destFlags, FRIENDLY_TARGET) == FRIENDLY_TARGET); end
+                    if self.debug then self:Debug("Debuff, UnitId: ", UnitID, spellNAME, event, time() + (GetTime() % 1), timestamp, "destName:", destName, destFlags, band (destFlags, FRIENDLY_TARGET) == FRIENDLY_TARGET); end
                     --@end-debug@]===]
 
                     if self.profile.ShowDebuffsFrame then
                         self.MicroUnitF:UpdateMUFUnit(UnitID);
 
                     elseif not self.profile.HideLiveList then
-                        if self.debug then D:Debug("(LiveList) Registering delayed GetDebuff for ", destName); end
+                        if self.debug then self:Debug("(LiveList) Registering delayed GetDebuff for ", destName); end
                         self.LiveList:DelayedGetDebuff(UnitID);
                     end
 
@@ -656,7 +663,7 @@ do -- Combat log event handling {{{1
 
             if self.Status.TargetExists and band (destFlags, FRIENDLY_TARGET) == FRIENDLY_TARGET then -- {{{3 -- warning: this test is not triggered by the dumy debuff
 
-                if self.debug then D:Debug("A Target got something (source=", sourceName, "sFlags:", D:NumToHexStr(sourceFlags), "(dest=|cFF00AA00", destName, "dFlags:", D:NumToHexStr(destFlags), "|r, |cffff0000", event, "|r, |cFF00AAAA", spellNAME, "|r", auraTYPE_failTYPE); end
+                if self.debug then self:Debug("A Target got something (source=", sourceName, "sFlags:", self:NumToHexStr(sourceFlags), "(dest=|cFF00AA00", destName, "dFlags:", self:NumToHexStr(destFlags), "|r, |cffff0000", event, "|r, |cFF00AAAA", spellNAME, "|r", auraTYPE_failTYPE); end
 
                 self.LiveList:DelayedGetDebuff("target");
 
@@ -665,7 +672,7 @@ do -- Combat log event handling {{{1
                         if AuraEvents[event] == 1 then
                             self.Stealthed_Units["target"] = true;
                         else
-                            if self.debug then D:Debug("TARGET STEALTH LOST: ", "target", spellNAME); end
+                            if self.debug then self:Debug("TARGET STEALTH LOST: ", "target", spellNAME); end
                             self.Stealthed_Units["target"] = false;
                         end
                     end
@@ -677,13 +684,13 @@ do -- Combat log event handling {{{1
 
             if self.Status.ClickCastingWIP then
                 self.Status.ClickedMF.CastingSpell = spellNAME;
-                D:Debug("clickcastWIP caught: ", spellNAME);
+                self:Debug("clickcastWIP caught: ", spellNAME);
             end
 
 
             if event == "SPELL_CAST_SUCCESS" then
 
-                if self.debug then self:Debug(L["SUCCESSCAST"], spellNAME, (select(2, GetSpellInfo(spellID))), D:MakePlayerName(destName)); end
+                if self.debug then self:Debug(L["SUCCESSCAST"], spellNAME, (select(2, GetSpellInfo(spellID))), self:MakePlayerName(destName)); end
 
                 --self:Debug("|cFFFF0000XXXXX|r |cFF11FF11Updating color of clicked frame|r");
                 self:ScheduleDelayedCall("Dcr_UpdatePC"..self.Status.ClickedMF.CurrUnit, self.Status.ClickedMF.Update, 1, self.Status.ClickedMF);
@@ -700,10 +707,10 @@ do -- Combat log event handling {{{1
 
             end
 
-            if event == "SPELL_CAST_FAILED" and not D.Status.ClickedMF.SPELL_CAST_SUCCESS then
+            if event == "SPELL_CAST_FAILED" and not self.Status.ClickedMF.SPELL_CAST_SUCCESS then
                 destName = self:PetUnitName( self.Status.ClickedMF.CurrUnit, true);
 
-                D:Println(L["FAILEDCAST"], spellNAME, (select(2, GetSpellInfo(spellID))), D:MakePlayerName(destName), auraTYPE_failTYPE);
+                self:Println(L["FAILEDCAST"], spellNAME, (select(2, GetSpellInfo(spellID))), self:MakePlayerName(destName), auraTYPE_failTYPE);
 
                 if (auraTYPE_failTYPE == SPELL_FAILED_LINE_OF_SIGHT or auraTYPE_failTYPE == SPELL_FAILED_BAD_TARGETS) then
 
@@ -721,21 +728,21 @@ do -- Combat log event handling {{{1
                 end
                 self.Status.ClickedMF = false;
 
-            elseif event == "SPELL_MISSED" or event == "SPELL_DISPEL_FAILED" then -- XXX to test
+            elseif event == "SPELL_MISSED" or event == "SPELL_DISPEL_FAILED" then
                 destName = self:PetUnitName( self.Status.ClickedMF.CurrUnit, true);
 
-                D:Println(L["FAILEDCAST"], spellNAME, (select(2, GetSpellInfo(spellID))), D:MakePlayerName(destName), auraTYPE_failTYPE);
+                self:Println(L["FAILEDCAST"], spellNAME, (select(2, GetSpellInfo(spellID))), self:MakePlayerName(destName), auraTYPE_failTYPE);
                 PlaySoundFile(DC.FailedSound, "Master");
                 self.Status.ClickedMF = false;
                 --[===[@alpha@
-                D:AddDebugText("sanitycheck ", event, spellNAME);
+                -- self:AddDebugText("sanitycheck ", event, spellNAME); -- It works!
                 --@end-alpha@]===]
             end
             --  }}}
             --[===[@debug@
         elseif self.debug and event then
 
-            --D:Debug("event:", event, "self.Status.ClickedMF.CastingSpell", self.Status.ClickedMF and self.Status.ClickedMF.CastingSpell, "band(sourceFlags, ME) ~= 0", band(sourceFlags, ME) ~= 0, "self.Status.ClickCastingWIP", self.Status.ClickCastingWIP);
+            --self:Debug("event:", event, "self.Status.ClickedMF.CastingSpell", self.Status.ClickedMF and self.Status.ClickedMF.CastingSpell, "band(sourceFlags, ME) ~= 0", band(sourceFlags, ME) ~= 0, "self.Status.ClickCastingWIP", self.Status.ClickCastingWIP);
 
 
             --@end-debug@]===]
@@ -919,8 +926,8 @@ do
     -- Warning this part is not very optimized, fortunately it's just sugar, I'm probably the only one using it :p
 
     local MAX_RAID_MEMBERS = _G.MAX_RAID_MEMBERS;
-    local GetNumRaidMembers = _G.GetNumRaidMembers;
-    local GetNumPartyMembers = _G.GetNumPartyMembers;
+    local GetNumRaidMembers = GetNumRaidMembers;
+    local GetNumPartyMembers = GetNumPartyMembers;
     local GetRaidRosterInfo = _G.GetRaidRosterInfo;
 
     local Name_To_Unit = {};
@@ -1032,33 +1039,51 @@ end
 
 do
 
+    local UnitLevel          = _G.UnitLevel;
     local GetNumTalentPoints = _G.GetNumTalentPoints;
-    local GetUnspentTalentPoints = _G.GetUnspentTalentPoints;
-    local UnitLevel = _G.UnitLevel;
+    --local GetNumTalentPoints = DC.MOP and function () return math.floor(UnitLevel("player") / 15) end or _G.GetNumTalentPoints;
 
-    --[===[@alpha@
-    local GetTalentInfo = _G.GetTalentInfo;
-    -- Sanity check, to make sure GetTalentInfo() and GetNumTalentPoints() agree
-    local function CheckTalentsAvaibility_thebadway() -- {{{
-        local talentfound = 0;
+    local GetTalentInfo      = _G.GetTalentInfo;
 
-        -- let's check the five first talents of each tree
-        for tree=1,3 do
-            for talent=1,5 do
-                talentfound = (select(5, GetTalentInfo(tree,talent)));
-                if talentfound ~=0 then  return true end
+    local function CheckTalentsAvaibility_MOP() -- {{{
+
+
+        if not (UnitGUID("player")) then
+            return false;
+        end
+
+        local playerLevel = UnitLevel("player");
+
+        -- no talents before level 15, so if we know the level (>0) and it's
+        -- <15, we know there is no talent.
+        if playerLevel > 0 and playerLevel < 15 then
+            return true;
+        end
+
+        -- if we know that there are unspet talents, it means we can check for
+        -- them
+        if GetNumUnspentTalents() then
+            return true;
+        end
+
+        -- else, let's check for the first 3 talents, one of them ought to be
+        -- 'available' (6th returned value of GetTalentInfo) if not selected.
+        for talent=1,3 do
+            if (select(6, GetTalentInfo(talent))) then
+                return true;
             end
         end
 
+        -- then, if none of the above succeeded, talents aren't ready to be
+        -- polled.
         return false;
-    end --}}}
-    --@end-alpha@]===]
 
-    local function CheckTalentsAvaibility() -- {{{
+    end -- }}}
 
-        local unspentTalentPoints = GetUnspentTalentPoints();
-        local totalTalentPoints = GetNumTalentPoints();
+    local function CheckTalentsAvaibility_preMOP() -- {{{
+
         local playerLevel = UnitLevel("player");
+        local totalTalentPoints = GetNumTalentPoints();
 
         if playerLevel > 0 and playerLevel < 10 then
             return true;
@@ -1066,40 +1091,33 @@ do
 
         if totalTalentPoints ~= 0 then
             -- Talents are available
-            --[===[@alpha@
-            if totalTalentPoints ~= unspentTalentPoints and not CheckTalentsAvaibility_thebadway() then
-                -- no talent detected by GetTalentInfo() --> sanity check failed
-                D:AddDebugText("CheckTalentsAvaibility(): Sanity check failed: GetNumTalentPoints() said 'yes' but GetNumTalentPoints() said 'no', totalTalentPoints=", totalTalentPoints, "unspentTalentPoints=", unspentTalentPoints);
-            end
-            --@end-alpha@]===]
-
             return true;
         else
             -- Talents are not available
-            --[===[@alpha@
-            if CheckTalentsAvaibility_thebadway() then
-                -- talents detected by GetTalentInfo() --> sanity check failed
-                D:AddDebugText("CheckTalentsAvaibility(): Sanity check failed: GetNumTalentPoints() said 'no' but GetNumTalentPoints() said 'yes', totalTalentPoints=", totalTalentPoints, "unspentTalentPoints=", unspentTalentPoints);
-            end
-            --@end-alpha@]===]
-
             return false;
         end
     end -- }}}
 
+
+    local CheckTalentsAvaibility = DC.MOP and CheckTalentsAvaibility_MOP or CheckTalentsAvaibility_preMOP;
+
     --[===[@alpha@
     local player_is_almost_alive = false; -- I'm trying to figure out why sometimes talents are not detected while PLAYER_ALIVE event fired
     --@end-alpha@]===]
+ 
     local function PollTalentsAvaibility() -- {{{
+
         D:Debug("Polling talents...");
+
         if CheckTalentsAvaibility() then
+
+            D:Debug("Talents found");
             -- remove the timer
             D:CancelDelayedCall("PollTalents");
             -- dispatch event
             D:SendMessage("DECURSIVE_TALENTS_AVAILABLE");
-            D:Debug("Talents found");
 
-            --[===[@debug@
+            --[===[@alpha@
             if player_is_almost_alive then
                 D:AddDebugText("StartTalentAvaibilityPolling(): Talents were not available after PLAYER_ALIVE was fired, test was made", player_is_almost_alive, "seconds after PLAYER_ALIVE fired. Sucess happened", GetTime() - T.PLAYER_IS_ALIVE, "secondes after PLAYER_ALIVE fired");
             end
@@ -1107,7 +1125,7 @@ do
             if T.PLAYER_IS_ALIVE and not player_is_almost_alive then
                 player_is_almost_alive = GetTime() - T.PLAYER_IS_ALIVE;
             end
-            --@end-debug@]===]
+            --@end-alpha@]===]
         end
     end -- }}}
 
@@ -1122,6 +1140,6 @@ do
     end
 end
 
-T._LoadedFiles["Dcr_Events.lua"] = "2.7.0.5";
+T._LoadedFiles["Dcr_Events.lua"] = "2.7.2.2";
 
 -- The Great Below

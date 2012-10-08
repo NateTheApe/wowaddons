@@ -217,7 +217,7 @@ do
 			else
 				-- just some hack to add support for boss unit ids
 				local found = false
-				for i = 1, 4 do -- are there really just boss1 to boss4? everyone seems to be assuming this...
+				for i = 1, 5 do -- are there really just boss1 to boss4? everyone seems to be assuming this...
 					id = "boss"..i
 					if getCIDfromGUID(UnitGUID(id)) == cId then
 						found = true
@@ -227,8 +227,8 @@ do
 				end
 				if not found then
 					-- check target and raid/party targets
-					local uId = ((GetNumRaidMembers() == 0) and "party") or "raid"
-					for i = 0, math.max(GetNumRaidMembers(), GetNumPartyMembers()) do
+					local uId = (IsInRaid() and "raid") or "party"
+					for i = 0, math.max(GetNumGroupMembers(), GetNumSubgroupMembers()) do
 						id = (i == 0 and "target") or uId..i.."target"
 						if getCIDfromGUID(UnitGUID(id or "")) == cId then
 							targetCache[cId] = id
@@ -255,7 +255,7 @@ do
 				targetGuidCache[guid] = "focus"
 			else
 				local found = false
-				for i = 1, 4 do -- are there really just boss1 to boss4? everyone seems to be assuming this...
+				for i = 1, 5 do -- are there really just boss1 to boss4? everyone seems to be assuming this...
 					id = "boss"..i
 					if UnitGUID(id) == guid then
 						found = true
@@ -265,8 +265,8 @@ do
 				end
 				if not found then
 				-- check target and raid/party targets
-					local uId = ((GetNumRaidMembers() == 0) and "party") or "raid"
-					for i = 0, math.max(GetNumRaidMembers(), GetNumPartyMembers()) do
+					local uId = (IsInRaid() and "raid") or "party"
+					for i = 0, math.max(GetNumGroupMembers(), GetNumSubgroupMembers()) do
 						id = (i == 0 and "target") or uId..i.."target"
 						if UnitGUID(id or "") == guid then
 							targetGuidCache[guid] = id
@@ -360,7 +360,7 @@ end
 -- for now: using this ugly code here instead of ugly code in all boss mods that make use of multi-cId health bars
 
 -- hack to support shared health bosses
-local function addBoss(name, ...) -- name, cId1, cId2, ..., cIdN, name
+local function addBoss(self, name, ...) -- name, cId1, cId2, ..., cIdN, name
 	if not anchor or not anchor:IsShown() then
 		return
 	end
@@ -372,7 +372,7 @@ end
 function bossHealth:AddBoss(...)
 	-- copy the name to the front of the arg list
 	-- note: name is now twice in the arg list but we can't really fix that in an efficient way (this is handled in createBar()
-	return addBoss(select(select("#", ...), ...), ...)
+	return addBoss(self, select(select("#", ...), ...), ...)
 end
 
 -- just pass any of the creature IDs for shared health bosses
@@ -427,4 +427,9 @@ function bossHealth:UpdateSettings()
 	for i, v in ipairs(bars) do
 		updateBarStyle(v, i)
 	end
+end
+
+function bossHealth:Update()
+	if not anchor or not anchor:IsShown() then return end
+	updateFrame(self, 0.5)
 end

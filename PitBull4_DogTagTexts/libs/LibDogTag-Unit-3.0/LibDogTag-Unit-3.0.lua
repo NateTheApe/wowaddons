@@ -1,23 +1,34 @@
 --[[
 Name: LibDogTag-3.0
-Revision: $Rev: 203 $
+Revision: $Rev: 238 $
 Author: Cameron Kenneth Knight (ckknight@gmail.com)
 Website: http://www.wowace.com/
 Description: A library to provide a markup syntax
 ]]
- 
+
 local MAJOR_VERSION = "LibDogTag-Unit-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 203 $"):match("%d+")) or 0
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 238 $"):match("%d+")) or 0
 
 if MINOR_VERSION > _G.DogTag_Unit_MINOR_VERSION then
 	_G.DogTag_Unit_MINOR_VERSION = MINOR_VERSION
 end
+
+local select, type, pairs, ipairs, next, setmetatable = select, type, pairs, ipairs, next, setmetatable
+local UnitIsUnit, UnitName, UnitGUID, UnitMana, UnitExists =
+	  UnitIsUnit, UnitName, UnitGUID, UnitMana, UnitExists
 
 DogTag_Unit_funcs[#DogTag_Unit_funcs+1] = function(DogTag_Unit, DogTag)
 
 local L = DogTag_Unit.L
 local newList = DogTag.newList
 local del = DogTag.del
+
+local wow_ver = select(4, GetBuildInfo())
+local wow_500 = wow_ver >= 50000
+local PartyChangedEvent = "PARTY_MEMBERS_CHANGED"
+if wow_500 then
+	PartyChangedEvent = "GROUP_ROSTER_UPDATE"
+end
 
 local frame
 if DogTag_Unit.oldLib and DogTag_Unit.oldLib.frame then
@@ -41,23 +52,23 @@ local function fireEventForDependents(event, unit, ...)
 	end
 end
 frame:RegisterAllEvents()
-frame:SetScript("OnEvent", function(this, event, ...)
-	fireEventForDependents(event, ...)
-	if (...) == "target" then
+frame:SetScript("OnEvent", function(this, event, unit, ...)
+	fireEventForDependents(event, unit, ...)
+	if unit == "target" then
 	 	if UnitIsUnit("mouseover", "target") then
-			DogTag:FireEvent(event, "mouseover", select(2, ...))
-			fireEventForDependents(event, "mouseover", select(2, ...))
+			DogTag:FireEvent(event, "mouseover", ...)
+			fireEventForDependents(event, "mouseover", ...)
 		end
-		DogTag:FireEvent(event, "playertarget", select(2, ...))
-		fireEventForDependents(event, "playertarget", select(2, ...))
-	elseif (...) == "pet" then
-		DogTag:FireEvent(event, "playerpet", select(2, ...))
-		fireEventForDependents(event, "playerpet", select(2, ...))
-	elseif type((...)) == "string" then
-	 	local num = (...):match("^partypet(%d)$")
+		DogTag:FireEvent(event, "playertarget", ...)
+		fireEventForDependents(event, "playertarget", ...)
+	elseif unit == "pet" then
+		DogTag:FireEvent(event, "playerpet", ...)
+		fireEventForDependents(event, "playerpet", ...)
+	elseif type(unit) == "string" then
+	 	local num = unit:match("^partypet(%d)$")
 		if num then
-			DogTag:FireEvent(event, "party" .. num .. "pet", select(2, ...))
-			fireEventForDependents(event, "party" .. num .. "pet", select(2, ...))
+			DogTag:FireEvent(event, "party" .. num .. "pet", ...)
+			fireEventForDependents(event, "party" .. num .. "pet", ...)
 		end
 	end
 end)
@@ -107,7 +118,9 @@ setmetatable(UnitToLocale, {__index=function(self, unit)
 end})
 DogTag.UnitToLocale = UnitToLocale
 
-local IsLegitimateUnit = { player = true, target = true, focus = true, pet = true, playerpet = true, mouseover = true, npc = true, NPC = true, vehicle = true }
+-- [""] = true added 8/26 by Cybeloras. TellMeWhen icons (which implement DogTag) don't always check a unit, in which case they fall back on "", not "player".
+-- Falling back on "player" (in TellMeWhen) is counter-intuitive. Falling back on "" doesn't seem to cause any issues.
+local IsLegitimateUnit = { [""] = true, player = true, target = true, focus = true, pet = true, playerpet = true, mouseover = true, npc = true, NPC = true, vehicle = true }
 DogTag.IsLegitimateUnit = IsLegitimateUnit
 local IsNormalUnit = { player = true, target = true, focus = true, pet = true, playerpet = true, mouseover = true }
 local WACKY_UNITS = { targettarget = true, playertargettarget = true, targettargettarget = true, playertargettargettarget = true, pettarget = true, playerpettarget = true, pettargettarget = true, playerpettargettarget = true }
@@ -161,12 +174,12 @@ local function getBestUnit(guid)
 	if not guid then
 		return nil
 	end
-	
+
 	local guidToUnits__guid = guidToUnits[guid]
 	if not guidToUnits__guid then
 		return nil
 	end
-	
+
 	for unit in pairs(guidToUnits__guid) do
 		if IsNormalUnit[unit] and unit ~= "mouseover" then
 			return unit
@@ -177,11 +190,11 @@ end
 local function calculateBestUnit(unit)
 	local bestUnit = getBestUnit(UnitGUID(unit))
 	local oldBestUnit = wackyUnitToBestUnit[unit]
-	
+
 	if bestUnit == oldBestUnit then
 		return
 	end
-	
+
 	wackyUnitToBestUnit[unit] = bestUnit
 	local normalUnitsWackyDependents__oldBestUnit = normalUnitsWackyDependents[oldBestUnit]
 	if normalUnitsWackyDependents__oldBestUnit then
@@ -209,12 +222,14 @@ local function refreshGUID(unit)
 	unitToGUID[unit] = guid
 	if oldGuid then
 		local guidToUnits_oldGuid = guidToUnits[oldGuid]
-		guidToUnits_oldGuid[unit] = nil
-		if not next(guidToUnits_oldGuid) then
-			guidToUnits[oldGuid] = del(guidToUnits_oldGuid)
+		if guidToUnits_oldGuid then
+			guidToUnits_oldGuid[unit] = nil
+			if not next(guidToUnits_oldGuid) then
+				guidToUnits[oldGuid] = del(guidToUnits_oldGuid)
+			end
 		end
 	end
-	
+
 	if guid then
 		local guidToUnits_guid = guidToUnits[guid]
 		if not guidToUnits_guid then
@@ -223,7 +238,7 @@ local function refreshGUID(unit)
 		end
 		guidToUnits_guid[unit] = true
 	end
-	
+
 	for wackyUnit in pairs(WACKY_UNITS) do
 		if wackyUnitToBestUnit[wackyUnit] == unit or unitToGUID[wackyUnit] == guid then
 			calculateBestUnit(wackyUnit)
@@ -236,12 +251,12 @@ local function PARTY_MEMBERS_CHANGED()
 		local guid = unitToGUID[unit]
 		refreshGUID(unit)
 		local newGUID = unitToGUID[unit]
-		if guid ~= unitGUID then
+		if guid ~= newGUID then
 			DogTag:FireEvent("UnitChanged", unit)
 		end
 	end
 end
-DogTag:AddEventHandler("Unit", "PARTY_MEMBERS_CHANGED", PARTY_MEMBERS_CHANGED)
+DogTag:AddEventHandler("Unit", PartyChangedEvent, PARTY_MEMBERS_CHANGED)
 DogTag:AddEventHandler("Unit", "PLAYER_ENTERING_WORLD", PARTY_MEMBERS_CHANGED)
 
 PARTY_MEMBERS_CHANGED()
@@ -289,10 +304,17 @@ DogTag:AddCompilationStep("Unit", "start", function(t, ast, kwargTypes, extraKwa
 		t[#t+1] = "\n"
 		t[#t+1] = [=[return ("Bad unit: %q"):format(]=]
 		t[#t+1] = extraKwargs["unit"][1]
-		t[#t+1] = [=[), nil;]=]
+		t[#t+1] = [=[ or tostring(]=]
+		t[#t+1] = extraKwargs["unit"][1]
+		t[#t+1] = [=[)), nil;]=]
 		t[#t+1] = "\n"
 		t[#t+1] = [=[end;]=]
 		t[#t+1] = "\n"
+
+
+		-- I really don't see this point to this.
+		-- It just prevents users from using custom tags that override the unit specified by the kwargs passed to AddFontString.
+		-- So I commented it out.
 		t[#t+1] = [=[if ]=]
 		t[#t+1] = extraKwargs["unit"][1]
 		t[#t+1] = [=[ ~= "player" and not UnitExists(]=]
@@ -310,6 +332,8 @@ DogTag:AddCompilationStep("Unit", "start", function(t, ast, kwargTypes, extraKwa
 		t[#t+1] = [=[, nil;]=]
 		t[#t+1] = "\n"
 		t[#t+1] = [=[end;]=]
+
+
 		t[#t+1] = "\n"
 	end
 end)
@@ -337,7 +361,7 @@ DogTag:AddCompilationStep("Unit", "tag", function(ast, t, tag, tagData, kwargs, 
 			t[#t+1] = "\n"
 			t[#t+1] = [=[return ]=]
 			t[#t+1] = [=[("Bad unit: %q"):format(tostring(]=]
-			t[#t+1] = compiledKwargs["unit"][1]	
+			t[#t+1] = compiledKwargs["unit"][1]
 			t[#t+1] = [=[));]=]
 			t[#t+1] = "\n"
 			t[#t+1] = [=[end;]=]
@@ -364,7 +388,7 @@ DogTag:AddCompilationStep("Unit", "tag", function(ast, t, tag, tagData, kwargs, 
 			t[#t+1] = "\n"
 			t[#t+1] = [=[return ]=]
 			t[#t+1] = [=[("Bad unit: %q"):format(tostring(]=]
-			t[#t+1] = compiledKwargs["other"][1]	
+			t[#t+1] = compiledKwargs["other"][1]
 			t[#t+1] = [=[));]=]
 			t[#t+1] = "\n"
 			t[#t+1] = [=[end;]=]
@@ -453,7 +477,7 @@ DogTag:AddTimerHandler("Unit", function(num, currentTime)
 		return
 	end
 	nextRefreshGUIDsTime = currentTime + 15
-	
+
 	PARTY_MEMBERS_CHANGED()
 end, 1)
 
@@ -485,7 +509,7 @@ DogTag:AddTimerHandler("Unit", function(num, currentTime)
 			end
 		end
 	end
-	
+
 	if predictedPower then
 		-- Fire FastPower event for units representing player or pet.
 		local playerPower = UnitMana("player")
@@ -498,7 +522,7 @@ DogTag:AddTimerHandler("Unit", function(num, currentTime)
 				end
 			end
 		end
-		
+
 		local petPower = UnitMana("pet")
 		if petPower ~= lastPetPower then
 			lastPetPower = petPower
@@ -530,7 +554,7 @@ end, 9)
 DogTag:AddCompilationStep("Unit", "tagevents", function(ast, t, u, tag, tagData, kwargs, extraKwargs, compiledKwargs, events, returns)
 	if compiledKwargs["unit"] then
 		events["UnitChanged#$unit"] = true
-		events["PARTY_MEMBERS_CHANGED"] = true
+		events[PartyChangedEvent] = true
 		events["PLAYER_ENTERING_WORLD"] = true
 		local kwargs_unit = kwargs["unit"]
 		if (type(kwargs_unit) ~= "table" or kwargs_unit[1] ~= "kwarg" or kwargs_unit[2] ~= "unit") and kwargs_unit ~= extraKwargs and (type(kwargs_unit) ~= "string" or not IsNormalUnit[kwargs_unit]) then

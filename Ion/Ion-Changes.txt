@@ -1,0 +1,8 @@
+Hydrogen-2
+-Now scans profession spells
+-Tentatively enabling/disabling of the Blizzard Main Bar should work
+-Blizzard ExtraAction button should now only show if the Blizzard Bar is used
+-Moved localization to one file
+
+Hydrogen-1
+-Initial beta release

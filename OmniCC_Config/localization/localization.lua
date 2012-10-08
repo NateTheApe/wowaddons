@@ -16,6 +16,7 @@ L.FontOutline = "Font Outline"
 L.Outline_NONE = NONE
 L.Outline_OUTLINE = "Thin"
 L.Outline_THICKOUTLINE = "Thick"
+L.Outline_OUTLINEMONOCHROME = "Monochrome"
 
 L.MinDuration = "Minimum duration to display text"
 L.MinSize = "Minimum size to display text"

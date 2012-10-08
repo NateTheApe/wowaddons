@@ -1,9 +1,12 @@
 local MAJOR_VERSION = "LibDogTag-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 215 $"):match("%d+")) or 0
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 251 $"):match("%d+")) or 0
 
 if MINOR_VERSION > _G.DogTag_MINOR_VERSION then
 	_G.DogTag_MINOR_VERSION = MINOR_VERSION
 end
+
+local type, error, math, next, pairs, ipairs, select, rawget, setmetatable, _G, assert =
+	  type, error, math, next, pairs, ipairs, select, rawget, setmetatable, _G, assert
 
 -- #AUTODOC_NAMESPACE DogTag
 
@@ -14,6 +17,7 @@ local fixNamespaceList = DogTag.fixNamespaceList
 local memoizeTable = DogTag.memoizeTable
 local select2 = DogTag.select2
 local kwargsToKwargTypes = DogTag.kwargsToKwargTypes
+local kwargsToKwargTypesWithTableCache = DogTag.kwargsToKwargTypesWithTableCache
 local codeToFunction, codeEvaluationTime, evaluate, fsToKwargs, fsToFrame, fsToNSList, fsToCode,  updateFontString, updateFontStrings
 local fsNeedUpdate, fsNeedQuickUpdate
 local _clearCodes
@@ -33,7 +37,7 @@ DogTag_funcs[#DogTag_funcs+1] = function()
 	_clearCodes = DogTag._clearCodes
 end
 
-local EventHandlers
+local EventHandlers, TimerHandlers
 
 if DogTag.oldLib then
 	fsNeedUpdate = DogTag.oldLib.fsNeedUpdate
@@ -87,7 +91,7 @@ end
 DogTag.codeToEventList = codeToEventList
 
 DogTag.callback_num = 0
-local callbackToNSList, callbackToKwargs, callbackToFunction, callbackToCode
+local callbackToNSList, callbackToKwargs, callbackToFunction, callbackToCode, callbackToExtraArg
 if DogTag.oldLib and DogTag.oldLib.callbackToNSList then
 	local oldLib = DogTag.oldLib
 	DogTag.callback_num = oldLib.callback_num
@@ -135,7 +139,7 @@ else
 end
 local callbackToKwargTypes = {}
 for uid, kwargs in pairs(callbackToKwargs) do
-	callbackToKwargTypes[uid] = kwargsToKwargTypes[kwargs]
+	callbackToKwargTypes[uid] = kwargsToKwargTypesWithTableCache[kwargs]
 end
 
 DogTag.callbackToNSList = callbackToNSList
@@ -197,8 +201,10 @@ function DogTag:AddCallback(code, callback, nsList, kwargs, extraArg)
 		error(("Bad argument #5 to `AddCallback'. Expected %q, got %q."):format("table", type(kwargs)), 2)
 	end
 	
+	kwargs = memoizeTable(deepCopy(kwargs or false))
+	
 	nsList = fixNamespaceList[nsList]
-	local kwargTypes = kwargsToKwargTypes[kwargs]
+	local kwargTypes = kwargsToKwargTypesWithTableCache[kwargs]
 	local codeToEventList_nsList_kwargTypes = codeToEventList[nsList][kwargTypes]
 	local eventList = codeToEventList_nsList_kwargTypes[code]
 	if eventList == nil then
@@ -209,8 +215,6 @@ function DogTag:AddCallback(code, callback, nsList, kwargs, extraArg)
 	
 	local uid = DogTag.callback_num + 1
 	DogTag.callback_num = uid
-	
-	kwargs = memoizeTable(deepCopy(kwargs or false))
 	
 	callbackToNSList[uid] = nsList
 	callbackToKwargs[uid] = kwargs
@@ -411,7 +415,6 @@ local function OnEvent(this, event, ...)
 			end
 		end
 		if good then
-			good = true
 			if multiArg then
 				good = false
 				for i, v in ipairs(multiArg) do
@@ -420,6 +423,8 @@ local function OnEvent(this, event, ...)
 						good = false
 					elseif v == arg then
 						good = true
+					elseif tonumber(v) and type(arg) == "number" then
+						good = tonumber(v) == arg
 					elseif v:match("^%$") then
 						good = kwargs[v:sub(2)] == arg
 					elseif v:match("^%[.*%]$") then
@@ -445,6 +450,8 @@ local function OnEvent(this, event, ...)
 								good = false
 							elseif v == arg then
 								good = true
+							elseif tonumber(v) and type(arg) == "number" then
+								good = tonumber(v) == arg
 							elseif v:match("^%$") then
 								good = kwargs[v:sub(2)] == arg
 							elseif v:match("^%[.*%]$") then
@@ -475,8 +482,10 @@ local function OnEvent(this, event, ...)
 end
 frame:SetScript("OnEvent", OnEvent)
 
-local GetMilliseconds
 local GetTime = _G.GetTime
+--[[
+-- I'm sorry, but this shit is just stupidly wasteful of CPU time.
+local GetMilliseconds
 if DogTag_DEBUG then
 	function GetMilliseconds()
 		return math.floor(GetTime() * 1000 + 0.5)
@@ -485,7 +494,7 @@ else
 	function GetMilliseconds()
 		return GetTime() * 1000
 	end
-end
+end]]
 
 local nextTime = 0
 local nextUpdateTime = 0
@@ -495,7 +504,7 @@ local num = 0
 local function OnUpdate(this, elapsed)
 	_clearCodes()
 	num = num + 1
-	local currentTime = GetMilliseconds()
+	local currentTime = GetTime()
 	local oldMouseover = DogTag.__lastMouseover
 	local newMouseover = GetMouseFocus()
 	DogTag.__lastMouseover = newMouseover
@@ -508,20 +517,19 @@ local function OnUpdate(this, elapsed)
 		end
 	end
 	if currentTime >= nextTime then
-		local currentTime_1000 = currentTime/1000
 		DogTag:FireEvent("FastUpdate")
 		if currentTime >= nextUpdateTime then
-			nextUpdateTime = currentTime + 150
+			nextUpdateTime = currentTime + 0.15
 			DogTag:FireEvent("Update")
 		end
 		if currentTime >= nextSlowUpdateTime then
-			nextSlowUpdateTime = currentTime + 10000
+			nextSlowUpdateTime = currentTime + 10
 			DogTag:FireEvent("SlowUpdate")
 		end
 		if currentTime >= nextCacheInvalidationTime then
-			nextCacheInvalidationTime = currentTime + 15000
+			nextCacheInvalidationTime = currentTime + 15
 			if not InCombatLockdown() then
-				local oldTime = currentTime_1000 - 180
+				local oldTime = currentTime - 180
 				for nsList, codeToFunction_nsList in pairs(codeToFunction) do
 					for kwargTypes, codeToFunction_nsList_kwargTypes in pairs(codeToFunction_nsList) do
 						if kwargTypes ~= 1 then
@@ -558,13 +566,13 @@ local function OnUpdate(this, elapsed)
 				end
 			end
 		end
-		nextTime = currentTime + 50
+		nextTime = currentTime + 0.05
 		for i = 1, 9 do
 			for ns, data in pairs(TimerHandlers) do
 				local data_i = data[i]
 				if data_i then
 					for func in pairs(data_i) do
-						func(num, currentTime_1000)
+						func(num, currentTime)
 					end
 				end
 			end
@@ -575,11 +583,23 @@ local function OnUpdate(this, elapsed)
 			fsNeedUpdate[fs] = nil
 		end
 	end
-	local finish_time = GetTime() + 1/1000
+	
+	-- debugprofilestop is used now instead of GetTime because
+	-- GetTime isn't updated until each frame is drawn. (recent change, WoW 4.3.0 i think?)
+	-- Since this whole process takes place within one frame,
+	-- GetTime will have the same value throughout.
+	-- debugprofilestop is always updated (unless some jerkface resets it with debugprofilestart), so we have to use it instead
+	
+	-- Don't define this until we loop through at least one frame
+	-- so that we don't call debugprofilestop unless we need to:
+	local finish_time --= debugprofilestop() + 10
 	local num = 0
+	
 	for fs in pairs(fsNeedQuickUpdate) do
 		num = num + 1
-		if num%10 == 0 and GetTime() >= finish_time then
+		if not finish_time then
+			finish_time = debugprofilestop() + 10 -- 10 as in 10 miliseconds
+		elseif num%20 == 0 and debugprofilestop() >= finish_time then
 			break
 		end
 		updateFontString(fs)

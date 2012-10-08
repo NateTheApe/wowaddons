@@ -18,7 +18,7 @@ local MAJOR = "LibToast-1.0"
 
 _G.assert(LibStub, MAJOR .. " requires LibStub")
 
-local MINOR = 1 -- Should be manually increased
+local MINOR = 7 -- Should be manually increased
 local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then
@@ -35,10 +35,18 @@ lib.active_toasts = lib.active_toasts or {}
 lib.toast_heap = lib.toast_heap or {}
 lib.button_heap = lib.button_heap or {}
 
+lib.sink_icons = lib.sink_icons or {}
+lib.sink_template = lib.sink_template or {} -- Cheating here, since users can only use strings.
+lib.registered_sink = lib.registered_sink
+lib.addon_names = lib.addon_names or {}
+lib.addon_objects = lib.addon_objects or {}
+
 -----------------------------------------------------------------------
 -- Variables.
 -----------------------------------------------------------------------
 local current_toast
+local internal_call
+local calling_object
 
 -----------------------------------------------------------------------
 -- Constants.
@@ -89,6 +97,7 @@ local DEFAULT_TEXT_COLORS = {
     g = 0.518,
     b = 0.541
 }
+
 local TOAST_BUTTONS = {
     primary_button = true,
     secondary_button = true,
@@ -123,6 +132,36 @@ local SIBLING_OFFSET_Y = {
     BOTTOMRIGHT = 10,
     BOTTOMLEFT = 10,
 }
+
+local L_TOAST = "Toast"
+local L_TOAST_DESC = "Shows messages in a toast window."
+
+local LOCALE = _G.GetLocale()
+
+if LOCALE == "esMX" or LOCALE == "esES" then
+    L_TOAST = "Información emergente"
+    L_TOAST_DESC = "Muestra mensajes de información en una ventana emergente"
+elseif LOCALE == "frFR" then
+    L_TOAST_DESC = "Montrer les messages dans une fenêtre \"toast\"."
+elseif LOCALE == "deDE" then
+    L_TOAST_DESC = "Zeigt Nachrichten in einem Toast-Fenster"
+elseif LOCALE == "itIT" then
+    -- Nothing yet.
+elseif LOCALE == "koKR" then
+    -- Nothing yet.
+elseif LOCALE == "ptBR" then
+    L_TOAST = "Brinde"
+    L_TOAST_DESC = "Mostrar mensagems em uma janela externa"
+elseif LOCALE == "ruRU" then
+    L_TOAST = "Всплывающее"
+    L_TOAST_DESC = "Показывать сообщения во всплывающем окне"
+elseif LOCALE == "zhCN" then
+    L_TOAST = "弹出窗口"
+    L_TOAST_DESC = "在弹出窗口显示信息。"
+elseif LOCALE == "zhTW" then
+    L_TOAST = "彈出視窗"
+    L_TOAST_DESC = "在彈出視窗顯示訊息。"
+end
 
 -----------------------------------------------------------------------
 -- Settings functions.
@@ -167,13 +206,61 @@ local function ToastHasFloatingIcon()
     return _G.Toaster and _G.Toaster:FloatingIcon()
 end
 
-local function ToastsAreSuppressed()
-    return _G.Toaster and _G.Toaster:HideToasts()
+local function ToastsAreSuppressed(source_addon)
+    return _G.Toaster and (_G.Toaster:HideToasts() or _G.Toaster:HideToastsFromSource(source_addon))
+end
+
+local function ToastsAreMuted(source_addon)
+    return _G.Toaster and (_G.Toaster:MuteToasts() or _G.Toaster:MuteToastsFromSource(source_addon))
 end
 
 -----------------------------------------------------------------------
 -- Helper functions.
 -----------------------------------------------------------------------
+local function CallingObject()
+    return calling_object
+end
+
+local function StringValue(input)
+    local input_type = _G.type(input)
+
+    if input_type == "function" then
+        local output = input()
+
+        if _G.type(output) ~= "string" or output == "" then
+            return
+        end
+        return output
+    elseif input_type == "string" then
+        return input
+    end
+end
+
+if not lib.templates[lib.sink_template] then
+    lib.templates[lib.sink_template] = function(toast, ...)
+        local calling_object = CallingObject()
+        toast:SetTitle(StringValue(lib.addon_names[calling_object]))
+        toast:SetText(...)
+        toast:SetIconTexture(StringValue(lib.sink_icons[calling_object]))
+    end
+end
+
+local function _positionToastIcon(toast)
+    toast.icon:ClearAllPoints()
+
+    if ToastHasFloatingIcon() then
+        local lower_point = ToastSpawnPoint():lower()
+
+        if lower_point:find("right") then
+            toast.icon:SetPoint("TOPRIGHT", toast, "TOPLEFT", -5, -10)
+        elseif lower_point:find("left") then
+            toast.icon:SetPoint("TOPLEFT", toast, "TOPRIGHT", 5, -10)
+        end
+    else
+        toast.icon:SetPoint("TOPLEFT", toast, "TOPLEFT", 10, -10)
+    end
+end
+
 local function _reclaimButton(button)
     button:Hide()
     button:ClearAllPoints()
@@ -194,6 +281,7 @@ local function _reclaimToast(toast)
     toast.is_persistent = nil
     toast.template_name = nil
     toast.payload = nil
+    toast.sound_file = nil
     toast:Hide()
 
     _G.UIFrameFadeRemoveFrame(toast)
@@ -211,23 +299,11 @@ local function _reclaimToast(toast)
         table.remove(active_toasts, remove_index):ClearAllPoints()
     end
     local spawn_point = ToastSpawnPoint()
-    local lower_point = spawn_point:lower()
-    local floating_icon = ToastHasFloatingIcon()
 
     for index = 1, #active_toasts do
         local indexed_toast = active_toasts[index]
         indexed_toast:ClearAllPoints()
-        indexed_toast.icon:ClearAllPoints()
-
-        if floating_icon then
-            if lower_point:find("right") then
-                indexed_toast.icon:SetPoint("TOPRIGHT", indexed_toast, "TOPLEFT", -5, -10)
-            elseif lower_point:find("left") then
-                indexed_toast.icon:SetPoint("TOPLEFT", indexed_toast, "TOPRIGHT", 5, -10)
-            end
-        else
-            indexed_toast.icon:SetPoint("TOPLEFT", indexed_toast, "TOPLEFT", 5, -10)
-        end
+        _positionToastIcon(indexed_toast)
 
         if index == 1 then
             indexed_toast:SetPoint(spawn_point, _G.UIParent, spawn_point, OFFSET_X[spawn_point], OFFSET_Y[spawn_point])
@@ -269,8 +345,8 @@ local function _acquireToast()
         toast:Hide()
 
         local toast_icon = toast:CreateTexture(nil, "BORDER")
-        toast_icon:SetWidth(DEFAULT_ICON_SIZE)
-        toast_icon:SetHeight(DEFAULT_ICON_SIZE)
+
+        toast_icon:SetSize(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
         toast.icon = toast_icon
 
         local title = toast:CreateFontString(nil, "BORDER", "FriendsFont_Normal")
@@ -322,9 +398,13 @@ local function _acquireToast()
             endAlpha = 0,
         }
     end
-    toast:SetWidth(DEFAULT_TOAST_WIDTH)
-    toast:SetHeight(DEFAULT_TOAST_HEIGHT)
+    toast:SetSize(DEFAULT_TOAST_WIDTH, DEFAULT_TOAST_HEIGHT)
     toast:SetBackdrop(DEFAULT_TOAST_BACKDROP)
+
+    if _G.Toaster then
+        local icon_size = _G.Toaster:IconSize()
+        toast.icon:SetSize(icon_size, icon_size)
+    end
     return toast
 end
 
@@ -332,31 +412,42 @@ end
 -- Library methods.
 -----------------------------------------------------------------------
 function lib:Register(template_name, constructor, is_unique)
+    local is_lib = (self == lib)
+
     if _G.type(template_name) ~= "string" or template_name == "" then
-        error(METHOD_USAGE_FORMAT:format("Register", "template_name must be a non-empty string"), 2)
+        error(METHOD_USAGE_FORMAT:format(is_lib and "Register" or "RegisterToast", "template_name must be a non-empty string"), 2)
     end
 
     if _G.type(constructor) ~= "function" then
-        error(METHOD_USAGE_FORMAT:format("Register", "constructor must be a function"), 2)
+        error(METHOD_USAGE_FORMAT:format(is_lib and "Register" or "RegisterToast", "constructor must be a function"), 2)
     end
-    self.templates[template_name] = constructor
-    self.unique_templates[template_name] = is_unique or nil
+    lib.templates[template_name] = constructor
+    lib.unique_templates[template_name] = is_unique or nil
 end
 
 function lib:Spawn(template_name, ...)
-    if not template_name or _G.type(template_name) ~= "string" or template_name == "" then
-        error(METHOD_USAGE_FORMAT:format("Spawn", "template_name must be a non-empty string"), 2)
+    local is_lib = (self == lib)
+
+    if not template_name or (not internal_call and (_G.type(template_name) ~= "string" or template_name == "")) then
+        error(METHOD_USAGE_FORMAT:format(is_lib and "Spawn" or "SpawnToast", "template_name must be a non-empty string"), 2)
     end
 
-    if not self.templates[template_name] then
-        error(METHOD_USAGE_FORMAT:format("Spawn", ("\"%s\" does not match a registered template"):format(template_name)), 2)
+    if not lib.templates[template_name] then
+        error(METHOD_USAGE_FORMAT:format(is_lib and "Spawn" or "SpawnToast", ("\"%s\" does not match a registered template"):format(template_name)), 2)
+    end
+    local source_addon
+
+    if self == lib then
+        source_addon = _G.select(3, ([[\]]):split(_G.debugstack(2)))
+    else
+        source_addon = lib.addon_names[self] or _G.UNKNOWN
     end
 
-    if ToastsAreSuppressed() then
+    if ToastsAreSuppressed(source_addon) then
         return
     end
 
-    if self.unique_templates[template_name] then
+    if lib.unique_templates[template_name] then
         for index = 1, #active_toasts do
             if active_toasts[index].template_name == template_name then
                 return
@@ -365,6 +456,7 @@ function lib:Spawn(template_name, ...)
     end
     current_toast = _acquireToast()
     current_toast.template_name = template_name
+    current_toast.source = source_addon
 
     -----------------------------------------------------------------------
     -- Reset defaults.
@@ -372,11 +464,13 @@ function lib:Spawn(template_name, ...)
     current_toast.title:SetText(nil)
     current_toast.text:SetText(nil)
     current_toast.icon:SetTexture(nil)
+    current_toast.icon:SetTexCoord(0, 1, 0, 1)
 
     -----------------------------------------------------------------------
     -- Run constructor.
     -----------------------------------------------------------------------
-    self.templates[template_name](toast_proxy, ...)
+    calling_object = self
+    lib.templates[template_name](toast_proxy, ...)
 
     if not current_toast.title:GetText() and not current_toast.text:GetText() and not current_toast.icon:GetTexture() then
         _reclaimToast(current_toast)
@@ -408,23 +502,9 @@ function lib:Spawn(template_name, ...)
         fade_in_info.finishedFunc = nil
         fade_in_info.finishedArg1 = nil
     end
-    local spawn_point = ToastSpawnPoint()
-    local lower_point = spawn_point:lower()
-    local floating_icon = ToastHasFloatingIcon()
+    _positionToastIcon(current_toast)
 
-    current_toast.icon:ClearAllPoints()
-
-    if floating_icon then
-        if lower_point:find("right") then
-            current_toast.icon:SetPoint("TOPRIGHT", current_toast, "TOPLEFT", -5, -10)
-        elseif lower_point:find("left") then
-            current_toast.icon:SetPoint("TOPLEFT", current_toast, "TOPRIGHT", 5, -10)
-        end
-    else
-        current_toast.icon:SetPoint("TOPLEFT", current_toast, "TOPLEFT", 5, -10)
-    end
-
-    if floating_icon or not current_toast.icon:GetTexture() then
+    if ToastHasFloatingIcon() or not current_toast.icon:GetTexture() then
         current_toast.title:SetPoint("TOPLEFT", current_toast, "TOPLEFT", 10, -10)
     else
         current_toast.title:SetPoint("TOPLEFT", current_toast, "TOPLEFT", current_toast.icon:GetWidth() + 15, -10)
@@ -450,6 +530,8 @@ function lib:Spawn(template_name, ...)
     -----------------------------------------------------------------------
     -- Anchor and spawn.
     -----------------------------------------------------------------------
+    local spawn_point = ToastSpawnPoint()
+
     if #active_toasts > 0 then
         current_toast:SetPoint(spawn_point, active_toasts[#active_toasts], SIBLING_ANCHORS[spawn_point], 0, SIBLING_OFFSET_Y[spawn_point])
     else
@@ -457,6 +539,50 @@ function lib:Spawn(template_name, ...)
     end
     active_toasts[#active_toasts + 1] = current_toast
     _G.UIFrameFade(current_toast, fade_in_info)
+
+    if current_toast.sound_file and not ToastsAreMuted(source_addon) then
+        _G.PlaySoundFile(current_toast.sound_file)
+    end
+end
+
+function lib:DefineSink(display_name, texture_path)
+    local is_lib = (self == lib)
+    local path_type = _G.type(texture_path)
+    local display_type = _G.type(display_name)
+
+    if texture_path and (path_type ~= "function" and (path_type ~= "string" or texture_path == "")) then
+        error(METHOD_USAGE_FORMAT:format(is_lib and "DefineSink" or "DefineSinkToast", "texture_path must be a non-empty string, a function that returns one, or nil"), 2)
+    end
+    local source_addon = _G.select(3, ([[\]]):split(_G.debugstack(2)))
+    lib.addon_objects[display_name] = self
+
+    if display_name and (display_type ~= "function" and (display_type ~= "string" or display_name == "")) then
+        error(METHOD_USAGE_FORMAT:format(is_lib and "DefineSink" or "DefineSinkToast", "display_name must be a non-empty string, a function that returns one, or nil"), 2)
+    end
+    lib.sink_icons[self] = texture_path
+    lib.addon_names[self] = display_name
+
+    if not lib.registered_sink then
+        local LibSink = LibStub("LibSink-2.0")
+
+        if not LibSink then
+            return
+        end
+        LibSink:RegisterSink("LibToast-1.0", L_TOAST, L_TOAST_DESC, function(source, text, ...)
+            internal_call = true
+            local func
+
+            if source.SpawnToast then
+                func = source.SpawnToast
+            else
+                source = lib
+                func = lib.Spawn
+            end
+            func(source, lib.sink_template, text)
+            internal_call = nil
+        end)
+        lib.registered_sink = true
+    end
 end
 
 -----------------------------------------------------------------------
@@ -501,6 +627,10 @@ end
 
 function toast_proxy:SetIconTexture(texture)
     current_toast.icon:SetTexture(texture)
+end
+
+function toast_proxy:SetIconTexCoord(...)
+    current_toast.icon:SetTexCoord(...)
 end
 
 local _initializedToastButton
@@ -608,4 +738,33 @@ end
 
 function toast_proxy:MakePersistent()
     current_toast.is_persistent = true
+end
+
+function toast_proxy:SetSoundFile(file_path)
+    current_toast.sound_file = file_path
+end
+
+-----------------------------------------------------------------------
+-- Embed handling.
+-----------------------------------------------------------------------
+lib.embeds = lib.embeds or {}
+
+local mixins = {
+    "DefineSink",
+    "Register",
+    "Spawn",
+}
+
+function lib:Embed(target)
+    lib.embeds[target] = true
+
+    for index = 1, #mixins do
+        local method = mixins[index]
+        target[method .. "Toast"] = lib[method]
+    end
+    return target
+end
+
+for addon in pairs(lib.embeds) do
+    lib:Embed(addon)
 end

@@ -1,7 +1,7 @@
 Reforgenator = LibStub("AceAddon-3.0"):NewAddon("Reforgenator", "AceConsole-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Reforgenator", false)
 local RI = LibStub("LibReforgingInfo-1.0")
-local version = "1.3.13"
+local version = "1.4.7"
 
 -- There isn't really a "spirit" combat rating, but it will simplify
 -- some things if we pretend there is one
@@ -79,10 +79,11 @@ function Invert(list)
     return invertedList
 end
 
-local ReforgeModel = {}
+ReforgeModel = {}
 
 function ReforgeModel:new()
-    local result = {
+    local result = 
+	{
         ak = '',
         class = '',
         statWeights = {},
@@ -98,13 +99,16 @@ function Reforgenator:OnEnable()
     self:Print("v" .. version .. " loaded")
 end
 
-local options = {
+local options = 
+{
     type = 'group',
     name = "Reforgenator",
     handler = Reforgenator,
     desc = "Calculate what to reforge",
-    args = {
-        useMinimap = {
+    args = 
+	{
+        useMinimap = 
+		{
             name = "Use minimap button",
             desc = "Show a button on the minimap",
             type = "toggle",
@@ -123,7 +127,8 @@ local options = {
                 return not Reforgenator.db.profile.minimap.hide
             end,
         },
-        verbose = {
+        verbose = 
+		{
             name = "Verbose reforging",
             desc = "Emit detail information during reforging to chat window",
             type = "toggle",
@@ -133,17 +138,31 @@ local options = {
             get = function(info)
                 return Reforgenator.db.profile.verbose.emit
             end,
-        }
+        },
+		Money = 
+		{
+            name = "Reforging Cost",
+            desc = "Provide details on the cost of Reforging",
+            type = "toggle",
+            set = function(info, val)
+                Reforgenator.db.profile.verbose.money = val
+            end,
+            get = function(info)
+				return Reforgenator.db.profile.verbose.money
+            end,
+        },
     },
 }
 
 local nextAvailableSequence = 1
-local modelOptions = {
+local modelOptions = 
+{
     type = 'group',
     args = {},
 }
 
-local builtInModelOptions = {
+local builtInModelOptions = 
+{
     type = 'group',
     args = {},
 }
@@ -151,7 +170,8 @@ local builtInModelOptions = {
 local createName = ''
 local className = ''
 local sourceName = ''
-local addOptions = {
+local addOptions = 
+{
     type = 'group',
     name = 'Add new model',
     handler = Reforgenator,
@@ -159,37 +179,50 @@ local addOptions = {
     args = {}
 }
 
-local defaults = {
-    profile = {
-        minimap = {
+local defaults = 
+{
+    profile = 
+	{
+        minimap = 
+		{
             hide = false,
         },
-        verbose = {
+        verbose = 
+		{
             emit = false,
         },
+		Money =
+		{
+			hide = false,
+		},
     },
-    global = {
+    global = 
+	{
         nextModelID = 1,
     }
 }
 
-local help_options = {
+local help_options = 
+{
     type = 'group',
     name = 'Help',
-    args = {
-        header = {
+    args = 
+	{
+        header = 
+		{
             type = 'header',
             name = 'Help',
         },
-        help = {
+        help = 
+		{
             type = 'description',
             name = [=[|cffffd200What do all the caps mean?
 |r
-|cffffd200MeleeHitCap|r: the melee hit cap, normally 8% but is affected by various modifiers.
-|cffffd200SpellHitCap|r: the spell hit cap, normally 17% but is affected by various modifiers.
-|cffffd200DWHitCap|r: the dual-wield hit cap, normally 27% but is affected by various modifiers.
-|cffffd200RangedHitCap|r: the ranged hit cap, normally 8% but is affected by various modifiers.
-|cffffd200ExpertiseSoftCap|r: the expertise soft cap where dodge is pushed off the attack table. Normally 26 but is appected by various modifiers.
+|cffffd200MeleeHitCap|r: the melee hit cap, normally 7.5% but is affected by various modifiers.
+|cffffd200SpellHitCap|r: the spell hit cap, normally 15% but is affected by various modifiers.
+|cffffd200DWHitCap|r: the dual-wield hit cap, normally 26.5% but is affected by various modifiers.
+|cffffd200RangedHitCap|r: the ranged hit cap, normally 7.5% but is affected by various modifiers.
+|cffffd200ExpertiseSoftCap|r: the expertise soft cap where dodge is pushed off the attack table. Normally 26 but is affected by various modifiers.
 |cffffd200ExpertiseHardCap|r: the expertise hard cap where parry is pushed off the attack table. Currently 55 for 4.0.3.
 |cffffd200MaximumPossible|r: reforge to get as much of this stat as is possible.
 |cffffd2001SecGCD|r: the value of haste rating necessary to reduce the GCD to one second.
@@ -231,7 +264,8 @@ If you need another rule and have a link to a theorycrafting post, open a ticket
     }
 }
 
-local profileOptions = {
+local profileOptions = 
+{
     name = "Profiles",
     type = "group",
     childGroups = "tab",
@@ -271,7 +305,8 @@ function Reforgenator:OnInitialize()
     ACD:AddToBlizOptions('Reforgenator built-in models', 'Built-in models', 'Reforgenator')
 
     local broker = LibStub:GetLibrary("LibDataBroker-1.1", true)
-    local ldbButton = broker:NewDataObject("Reforgenator", {
+    local ldbButton = broker:NewDataObject("Reforgenator", --This goes From here************
+	{
         type = "launcher",
         icon = "Interface\\Icons\\INV_Misc_EngGizmos_06",
         text = "Reforgenator",
@@ -287,7 +322,8 @@ function Reforgenator:OnInitialize()
             tooltip:AddLine("|cffffff00" .. "left-click to figure out what to reforge")
             tooltip:AddLine("|cffffff00" .. "right-click to configure")
         end
-    })
+    })														-- To here********************
+	
     Reforgenator.minimapIcon = LibStub("LibDBIcon-1.0")
     Reforgenator.minimapIcon:Register("Reforgenator", ldbButton, Reforgenator.db.profile.minimap)
 
@@ -302,20 +338,27 @@ function Reforgenator:OnInitialize()
 
     tinsert(UISpecialFrames, "ReforgenatorPanel")
 end
-
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
 function Reforgenator:InitializeConstants()
     Reforgenator.constants = {}
     local c = Reforgenator.constants
 
-    c.INVENTORY_SLOTS = {
+    c.INVENTORY_SLOTS = 
+	{
         "HeadSlot", "NeckSlot", "ShoulderSlot", "BackSlot",
         "ChestSlot", "ShirtSlot", "TabardSlot", "WristSlot", "HandsSlot",
         "WaistSlot", "LegsSlot", "FeetSlot", "Finger0Slot", "Finger1Slot",
         "Trinket0Slot", "Trinket1Slot", "MainHandSlot", "SecondaryHandSlot",
-        "RangedSlot"
+        --"RangedSlot"															      --Ranged slot causes an error so comment it out
     }
 
-    c.ORDERED_ITEM_STATS = {
+    c.ORDERED_ITEM_STATS = 
+	{
         [1] = "ITEM_MOD_CRIT_RATING_SHORT",
         [2] = "ITEM_MOD_DODGE_RATING_SHORT",
         [3] = "ITEM_MOD_EXPERTISE_RATING_SHORT",
@@ -328,7 +371,8 @@ function Reforgenator:InitializeConstants()
 
     c.ITEM_STATS = Set(c.ORDERED_ITEM_STATS)
 
-    c.STAT_CAPS = {
+    c.STAT_CAPS = 
+	{
         ["MeleeHitCap"] = function(m) return Reforgenator:CalculateMeleeHitCap(m) end,
         ["SpellHitCap"] = function(m) return Reforgenator:CalculateSpellHitCap(m) end,
         ["DWHitCap"] = function(m) return Reforgenator:CalculateDWMeleeHitCap(m) end,
@@ -344,7 +388,8 @@ function Reforgenator:InitializeConstants()
         ["12.5% Haste"] = function(m) return Reforgenator:CalculateHolySoftHasteCap(m) end,
     }
 
-    c.RATING_NAMES = {
+    c.RATING_NAMES = 
+	{
         [CR_CRIT_MELEE] = "Melee Crit Rating",
         [CR_CRIT_RANGED] = "Ranged Crit Rating",
         [CR_CRIT_SPELL] = "Spell Crit Rating",
@@ -364,60 +409,79 @@ function Reforgenator:InitializeConstants()
 
     --
     -- These rating taken from http://elitistjerks.com/f15/t29453-combat_ratings_level_85_cataclysm/
-    local HIT_RATING_CONVERSIONS = {
+	-- [0] = Vanilla [1] = BC [2] = Wrath [3] = Cata  [4] MOP
+	-- Returns value based on Game version from GetExpansionLevel()
+    local HIT_RATING_CONVERSIONS = 
+	{
         [0] = 9.37931,
         [1] = 14.7905,
         [2] = 30.7548,
         [3] = 120.109,
+		[4] = 340,						-- Tennative Setting as per discussion
     }
-    local SPELL_HIT_RATING_CONVERSIONS = {
+    local SPELL_HIT_RATING_CONVERSIONS = 
+	{
         [0] = 8,
         [1] = 12.6154,
         [2] = 26.232,
         [3] = 102.446,
+		[4] = 255,						-- Tennative Setting as per discussion
     }
-    local EXP_RATING_CONVERSIONS = {
+    local EXP_RATING_CONVERSIONS = 
+	{
         [0] = 2.34483,
         [1] = 3.69761,
         [2] = 7.68869,
         [3] = 30.0272,
+		[4] = 340,						-- Tennative Setting as per discussion
     }
-    local HASTE_RATING_CONVERSIONS = {
+    local HASTE_RATING_CONVERSIONS = 
+	{
         [0] = 10,
         [1] = 15.7692,
         [2] = 32.79,
         [3] = 128.05701,
+		[4] = 425,						-- Tennative Setting as per discussion
     }
-    local MASTERY_RATING_CONVERSIONS = {
+    local MASTERY_RATING_CONVERSIONS = 
+	{
         [0] = 14,
         [1] = 22.0769,
         [2] = 45.906,
         [3] = 179.28,
+		[4] = 600,						-- Tennative Setting as per discussion
     }
 
-    local CRIT_RATING_CONVERSIONS = {
+    local CRIT_RATING_CONVERSIONS = 
+	{
         [0] = 14,
         [1] = 22.0769,
         [2] = 45.906,
         [3] = 179.28,
+		[4] = 700,						-- Tennative 
     }
 
-    local PARRY_RATING_CONVERSIONS = {
+    local PARRY_RATING_CONVERSIONS = 
+	{
         [0] = 13.8,
         [1] = 21.76154,
         [2] = 45.25019,
         [3] = 176.7189,
+		[4] = 1035,						-- Tennative 
     }
 
-    local DODGE_RATING_CONVERSIONS = {
+    local DODGE_RATING_CONVERSIONS = 
+	{
         [0] = 13.8,
         [1] = 21.76154,
         [2] = 45.25019,
         [3] = 176.7189,
+		[4] = 1035,						-- Tennative 
     }
 
-    local gameVersion = GetAccountExpansionLevel()
-    c.RATING_CONVERSIONS = {
+    local gameVersion = GetExpansionLevel()
+    c.RATING_CONVERSIONS = 
+	{
         meleeHit = HIT_RATING_CONVERSIONS[gameVersion],
         spellHit = SPELL_HIT_RATING_CONVERSIONS[gameVersion],
         expertise = EXP_RATING_CONVERSIONS[gameVersion],
@@ -429,57 +493,67 @@ function Reforgenator:InitializeConstants()
         ["ITEM_MOD_DODGE_RATING_SHORT"] = DODGE_RATING_CONVERSIONS[gameVersion],
     }
 
-    c.REFORGING_TARGET_LEVELS = {
+    c.REFORGING_TARGET_LEVELS = 
+	{
         [1] = "Reforge for heroics",
         [2] = "Reforge for raiding",
         [3] = "Reforge for PvP",
     }
 
-    c.MELEE_HIT_CAP_BY_TARGET_LEVEL = {
+    c.MELEE_HIT_CAP_BY_TARGET_LEVEL = 
+	{
         [1] = 6,
-        [2] = 8,
-        [3] = 5,
+        [2] = 7.5,												
+        [3] = 3,
     }
 
-    c.DW_HIT_CAP_BY_TARGET_LEVEL = {
+    c.DW_HIT_CAP_BY_TARGET_LEVEL = 
+	{
         [1] = 25,
-        [2] = 27,
-        [3] = 24,
+        [2] = 26.5,
+        [3] = 22,
     }
 
-    c.EXP_SOFT_CAP_BY_TARGET_LEVEL = {
-        [1] = 24,
-        [2] = 26,
-        [3] = 20,
-    }
-
-    c.EXP_HARD_CAP_BY_TARGET_LEVEL = {
-        [1] = 24,
-        [2] = 55,
-        [3] = 20,
-    }
-
-    c.SPELL_HIT_CAP_BY_TARGET_LEVEL = {
+    c.EXP_SOFT_CAP_BY_TARGET_LEVEL = 
+	{
         [1] = 6,
-        [2] = 17,
-        [3] = 4,
+        [2] = 7.5,
+        [3] = 3,
     }
 
-    c.AVOIDANCE_K = {
+    c.EXP_HARD_CAP_BY_TARGET_LEVEL = 
+	{
+        [1] = 6,
+        [2] = 7.5,
+        [3] = 3,
+    }
+
+    c.SPELL_HIT_CAP_BY_TARGET_LEVEL = 
+	{
+        [1] = 12,
+        [2] = 15,												
+        [3] = 6,
+    }
+
+    c.AVOIDANCE_K = 
+	{
         ["WARRIOR"] = 0.9560,
         ["PALADIN"] = 0.9560,
         ["DEATHKNIGHT"] = 0.9560,
         ["DRUID"] = 0.9720,
     }
 
-    c.AVOIDANCE_C = {
-        ["ITEM_MOD_PARRY_RATING_SHORT"] = {
+    c.AVOIDANCE_C = 
+	{
+        ["ITEM_MOD_PARRY_RATING_SHORT"] = 
+		{
             ["WARRIOR"] = 0.01523660,
             ["PALADIN"] = 0.01523660,
             ["DEATHKNIGHT"] = 0.01523660,
         },
 
-        ["ITEM_MOD_DODGE_RATING_SHORT"] = {
+        ["ITEM_MOD_DODGE_RATING_SHORT"] = 
+		{
             ["WARRIOR"] = 0.01523660,
             ["PALADIN"] = 0.01523660,
             ["DEATHKNIGHT"] = 0.01523660,
@@ -513,7 +587,8 @@ function Reforgenator:MigrateOldModels()
             v.useSpellHit = nil
         end
 
-        local map = {
+        local map = 
+		{
             ["ITEM_MOD_HIT_RATING_SHORT"] = CR_HIT_MELEE,
             ["ITEM_MOD_CRIT_RATING_SHORT"] = CR_CRIT_MELEE,
             ["ITEM_MOD_HASTE_RATING_SHORT"] = CR_HASTE_MELEE,
@@ -598,7 +673,8 @@ end
 function Reforgenator:ModelToModelOption(modelName, model)
     local c = Reforgenator.constants
 
-    local option = {
+    local option = 
+	{
         type = 'group',
         name = modelName,
         handler = Reforgenator,
@@ -607,12 +683,14 @@ function Reforgenator:ModelToModelOption(modelName, model)
 
     local seq = 1
 
-    option.args['class'] = {
+    option.args['class'] = 
+	{
         type = 'select',
         name = 'Class',
         desc = 'Class this model applies to',
         order = seq,
-        values = {
+        values = 
+		{
             ["WARRIOR"] = 'Warrior',
             ["DEATHKNIGHT"] = 'Death knight',
             ["PALADIN"] = 'Paladin',
@@ -716,7 +794,8 @@ function Reforgenator:ModelToModelOption(modelName, model)
 		return
 	    end
 
-	    local pawnMap = {
+	    local pawnMap = 
+		{
 		["CritRating"] = "ITEM_MOD_CRIT_RATING_SHORT",
 		["DodgeRating"] = "ITEM_MOD_DODGE_RATING_SHORT",
 		["ExpertiseRating"] = "ITEM_MOD_EXPERTISE_RATING_SHORT",
@@ -742,14 +821,16 @@ function Reforgenator:ModelToModelOption(modelName, model)
     }
 
     for i=1,6 do
-        option.args["h" .. i] = {
+        option.args["h" .. i] = 
+		{
             type = 'header',
             name = 'Rule #' .. i,
             order = seq,
         }
         seq = seq + 1
 
-        option.args['rating' .. i] = {
+        option.args['rating' .. i] = 
+		{
             type = 'select',
             name = 'Rating',
             desc = 'Reforge to get this rating to the specified cap',
@@ -783,7 +864,8 @@ function Reforgenator:ModelToModelOption(modelName, model)
             arr[k2] = v2
         end
 
-        option.args['cap' .. i] = {
+        option.args['cap' .. i] = 
+		{
             type = 'select',
             name = 'Cap',
             desc = "Desired value for the stat we're currently reforging",
@@ -813,7 +895,8 @@ function Reforgenator:ModelToModelOption(modelName, model)
             arr[k2] = k2
         end
 
-        option.args['userdata' .. i] = {
+        option.args['userdata' .. i] = 
+		{
             type = 'input',
             name = 'Values',
             desc = 'Value, or list of values, to reforge to',
@@ -857,7 +940,8 @@ function Reforgenator:ModelToModelOption(modelName, model)
         }
         seq = seq + 1
 
-        option.args['hard' .. i] = {
+        option.args['hard' .. i] = 
+		{
             type = 'toggle',
             name = 'Force greater than?',
             desc = 'Check this to force the addon to go over the cap rather than closest to the cap',
@@ -879,7 +963,8 @@ function Reforgenator:ModelToModelOption(modelName, model)
         }
         seq = seq + 1
 
-        option.args['preferSpirit' .. i] = {
+        option.args['preferSpirit' .. i] = 
+		{
             type = 'toggle',
             name = 'Prefer spirit?',
             desc = 'Check this to specify you prefer spirit for spell hit if possible',
@@ -903,14 +988,16 @@ function Reforgenator:ModelToModelOption(modelName, model)
         seq = seq + 1
     end
 
-    option.args.notesHeader = {
+    option.args.notesHeader = 
+	{
         type = 'header',
         name = 'Notes',
         order = seq,
     }
     seq = seq + 1
 
-    option.args.notes = {
+    option.args.notes = 
+	{
         type = 'input',
         multiline = true,
         name = 'Notes',
@@ -930,14 +1017,16 @@ function Reforgenator:ModelToModelOption(modelName, model)
     seq = seq + 1
 
     if not model.readOnly then
-        option.args.maintHeader = {
+        option.args.maintHeader = 
+		{
             type = 'header',
             name = 'Maintenance',
             order = seq,
         }
         seq = seq + 1
 
-        option.args.deleteButton = {
+        option.args.deleteButton = 
+		{
             type = 'execute',
             name = 'Delete',
             desc = 'Delete this model',
@@ -962,8 +1051,10 @@ function Reforgenator:InitializeAddOptions()
     local name, nameEN = UnitClass("player")
     className = nameEN
 
-    addOptions.args = {
-        name = {
+    addOptions.args = 
+	{
+        name = 
+		{
             order = 1,
             type = 'input',
             name = 'Model name',
@@ -983,18 +1074,22 @@ function Reforgenator:InitializeAddOptions()
                 return true
             end
         },
-        emptyGroup = {
+        emptyGroup = 
+		{
             order = 2,
             type = 'group',
             name = 'Empty model',
             desc = 'Create a new empty model',
-            args = {
-                class = {
+            args = 
+			{
+                class = 
+				{
                     order = 1,
                     type = 'select',
                     name = 'Class',
                     desc = 'Class the model applies to',
-                    values = {
+                    values = 
+					{
                         ["WARRIOR"] = 'Warrior',
                         ["DEATHKNIGHT"] = 'Death knight',
                         ["PALADIN"] = 'Paladin',
@@ -1009,7 +1104,8 @@ function Reforgenator:InitializeAddOptions()
                     get = function() return className end,
                     set = function(info, key) className = key end,
                 },
-                doEet = {
+                doEet = 
+				{
                     order = 2,
                     type = 'execute',
                     name = 'Create model',
@@ -1035,13 +1131,16 @@ function Reforgenator:InitializeAddOptions()
                 },
             },
         },
-        copyGroup = {
+        copyGroup = 
+		{
             order = 3,
             type = 'group',
             name = 'Copy existing model',
             desc = 'Copy an existing model',
-            args = {
-                source = {
+            args = 
+			{
+                source = 
+				{
                     order = 1,
                     type = 'select',
                     name = 'Source',
@@ -1050,7 +1149,8 @@ function Reforgenator:InitializeAddOptions()
                     get = function() return sourceName end,
                     set = function(info, key) sourceName = key end,
                 },
-                doEet = {
+                doEet = 
+				{
                     order = 2,
                     type = 'execute',
                     name = 'Create model',
@@ -1228,7 +1328,7 @@ function Reforgenator:ModelEditorScrollbar_Update()
 end
 
 function Reforgenator:GetPlayerKey()
-    return GetUnitName("player") .. "-" .. GetRealmName() .. "/" .. GetActiveTalentGroup(false, false)
+    return GetUnitName("player") .. "-" .. GetRealmName() .. "/" .. GetActiveSpecGroup(false, false)
 end
 
 function Reforgenator:ModelSelection_OnInitialize()
@@ -1297,7 +1397,7 @@ function Reforgenator:SandboxSelection_OnInitialize()
     local info = UIDropDownMenu_CreateInfo()
     info.text = "Leave reforged items alone"
     info.func = function(self)
-        local talentGroup = GetActiveTalentGroup(false, false)
+        local talentGroup = GetActiveSpecGroup(false, false)
         Reforgenator.db.char.useSandbox[talentGroup] = nil
         UIDropDownMenu_SetSelectedName(ReforgenatorPanel_SandboxSelection, self.value)
         Reforgenator:ShowState()
@@ -1308,7 +1408,7 @@ function Reforgenator:SandboxSelection_OnInitialize()
 
     info.text = "Consider reforging anything"
     info.func = function(self)
-        local talentGroup = GetActiveTalentGroup(false, false)
+        local talentGroup = GetActiveSpecGroup(false, false)
         Reforgenator.db.char.useSandbox[talentGroup] = true
         UIDropDownMenu_SetSelectedName(ReforgenatorPanel_SandboxSelection, self.value)
         Reforgenator:ShowState()
@@ -1326,7 +1426,7 @@ function Reforgenator:SandboxSelection_OnShow()
     UIDropDownMenu_Initialize(ReforgenatorPanel_SandboxSelection, func)
     UIDropDownMenu_SetWidth(ReforgenatorPanel_SandboxSelection, 230)
 
-    local talentGroup = GetActiveTalentGroup(false, false)
+    local talentGroup = GetActiveSpecGroup(false, false)
     if db.char.useSandbox[talentGroup] then
         UIDropDownMenu_SetSelectedID(ReforgenatorPanel_SandboxSelection, 2)
     else
@@ -1348,7 +1448,7 @@ function Reforgenator:TargetLevelSelection_OnInitialize()
     for k,v in ipairs(c.REFORGING_TARGET_LEVELS) do
         info.text = v
         info.func = function(self)
-            local talentGroup = GetActiveTalentGroup(false, false)
+            local talentGroup = GetActiveSpecGroup(false, false)
             Reforgenator.db.char.targetLevelSelection[talentGroup] = k
             UIDropDownMenu_SetSelectedName(ReforgenatorPanel_TargetLevelSelection, self.value)
             Reforgenator:ShowState()
@@ -1367,7 +1467,7 @@ function Reforgenator:TargetLevelSelection_OnShow()
     UIDropDownMenu_Initialize(ReforgenatorPanel_TargetLevelSelection, func)
     UIDropDownMenu_SetWidth(ReforgenatorPanel_TargetLevelSelection, 230)
 
-    local talentGroup = GetActiveTalentGroup(false, false)
+    local talentGroup = GetActiveSpecGroup(false, false)
     local selected = Reforgenator.db.char.targetLevelSelection
     UIDropDownMenu_SetSelectedID(ReforgenatorPanel_TargetLevelSelection, selected[talentGroup] or 2)
 end
@@ -1468,28 +1568,36 @@ function PlayerModel:new()
         primaryTab = 0,
         race = "",
         statEffectMap = {
-            ["ITEM_MOD_CRIT_RATING_SHORT"] = {
+            ["ITEM_MOD_CRIT_RATING_SHORT"] = 
+			{
                 CR_CRIT_MELEE, CR_CRIT_RANGED, CR_CRIT_SPELL,
             },
-            ["ITEM_MOD_DODGE_RATING_SHORT"] = {
+            ["ITEM_MOD_DODGE_RATING_SHORT"] = 
+			{
                 CR_DODGE,
             },
-            ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = {
+            ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 
+			{
                 CR_EXPERTISE,
             },
-            ["ITEM_MOD_HASTE_RATING_SHORT"] = {
+            ["ITEM_MOD_HASTE_RATING_SHORT"] = 
+			{
                 CR_HASTE_MELEE, CR_HASTE_RANGED, CR_HASTE_SPELL,
             },
-            ["ITEM_MOD_HIT_RATING_SHORT"] = {
+            ["ITEM_MOD_HIT_RATING_SHORT"] = 
+			{
                 CR_HIT_MELEE, CR_HIT_RANGED, CR_HIT_SPELL,
             },
-            ["ITEM_MOD_MASTERY_RATING_SHORT"] = {
+            ["ITEM_MOD_MASTERY_RATING_SHORT"] = 
+			{
                 CR_MASTERY,
             },
-            ["ITEM_MOD_PARRY_RATING_SHORT"] = {
+            ["ITEM_MOD_PARRY_RATING_SHORT"] = 
+			{
                 CR_PARRY,
             },
-            ["ITEM_MOD_SPIRIT_SHORT"] = {
+            ["ITEM_MOD_SPIRIT_SHORT"] = 
+			{
                 CR_SPIRIT,
             },
         },
@@ -1534,26 +1642,38 @@ end
 function PlayerModel:isEnhShaman()
     return self.className == "SHAMAN" and self.primaryTab == 2
 end
-
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
 function Reforgenator:GetPlayerModel()
     local playerModel = PlayerModel:new()
 
     local function getPrimaryTab()
-        local primary = {
-            tab = nil,
-            points = 0,
-            isUnlocked = true
+        local primary = 
+		{
+            tab = 1,
+           -- points = 0,
+            --role = ' '
+			
         }
-        for i=1,GetNumTalentTabs() do
-            local _, _, _, _, points, _, _, isUnlocked = GetTalentTabInfo(i)
-            if points > primary.points then
-                primary = {
-                    tab = i,
-                    points = points,
-                    isUnlocked = isUnlocked
-                }
-            end
-        end
+		local currentSpec = GetSpecialization()
+			--local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or "None"
+			print("Your current spec:", currentSpec)
+		
+      --  for i=1,GetNumSpecializations() do												--5.04 API change GetNumTalentTabs ? GetNumSpecializations
+      --      local _, _, _, _, points,  role = GetSpecializationInfo(i)		--5.04 API change GetTalentTabInfo ? GetSpecializationInfo
+      --      if points > primary.points then
+      --          primary = 
+	--			{
+    ----                tab = i,
+      --              points = points,
+      --              role = role
+      --          }
+      --      end
+      --  end
 
         return primary.tab
     end
@@ -1575,7 +1695,7 @@ function Reforgenator:GetPlayerModel()
     playerModel.primaryTab = getPrimaryTab()
     playerModel.race = select(2, UnitRace("player"))
     playerModel.mainHandWeaponType = getMainHandWeaponType()
-    playerModel.talentGroup = GetActiveTalentGroup(false, false)
+    playerModel.talentGroup = GetActiveSpecGroup(false, false)
 
     self:Explain("level=" .. UnitLevel("player"))
     self:Explain("className=" .. playerModel.className)
@@ -1583,7 +1703,8 @@ function Reforgenator:GetPlayerModel()
     self:Explain("race=" .. playerModel.race)
     self:Explain("mainHandWeaponType=" .. playerModel.mainHandWeaponType)
 
-    local interestingRatings = {
+    local interestingRatings = 
+	{
         CR_HIT_MELEE, CR_HIT_RANGED, CR_HIT_SPELL,
         CR_EXPERTISE, CR_MASTERY, CR_DODGE, CR_PARRY,
         CR_CRIT_MELEE, CR_CRIT_RANGED, CR_CRIT_SPELL,
@@ -1623,31 +1744,31 @@ function Reforgenator:GetPlayerModel()
             playerModel.spiritHitConversionRate = 1
         end
     end
+-- ************************************************************8 This block needs to be rewritten as all talents have changed drastically
+    --if playerModel.className == "PRIEST" then
+    --    local points = select(5, GetTalentInfo(3, 7))
+    --    self:Explain("talent points in Twisted Faith=" .. points)
+    --    pointsOutOf2(points)
+   -- end
 
-    if playerModel.className == "PRIEST" then
-        local points = select(5, GetTalentInfo(3, 7))
-        self:Explain("talent points in Twisted Faith=" .. points)
-        pointsOutOf2(points)
-    end
+   -- if playerModel.className == "SHAMAN" then
+   --     local points = select(5, GetTalentInfo(1, 7))
+   --     self:Explain("talent points in Elemental Precision=" .. points)
+   --     pointsOutOf3(points)
+   -- end
 
-    if playerModel.className == "SHAMAN" then
-        local points = select(5, GetTalentInfo(1, 7))
-        self:Explain("talent points in Elemental Precision=" .. points)
-        pointsOutOf3(points)
-    end
+   -- if playerModel.className == "PALADIN" then
+   --     local points = select(5, GetTalentInfo(1, 11))
+   --     self:Explain("talent points in Enlightened Judgements=" .. points)
+   --     pointsOutOf2(points)
+   -- end
 
-    if playerModel.className == "PALADIN" then
-        local points = select(5, GetTalentInfo(1, 11))
-        self:Explain("talent points in Enlightened Judgements=" .. points)
-        pointsOutOf2(points)
-    end
-
-    if playerModel.className == "DRUID" then
-        local points = select(5, GetTalentInfo(1, 6))
-        self:Explain("talent points in Balance of Power=" .. points)
-        pointsOutOf2(points)
-    end
-
+    --if playerModel.className == "DRUID" then
+    --    local points = select(5, GetTalentInfo(1, 6))
+    --    self:Explain("talent points in Balance of Power=" .. points)
+    --    pointsOutOf2(points)
+    --end
+--****************************************************************************8  End block 
     self:Explain("spiritHitConversionRate=" .. to_string(playerModel.spiritHitConversionRate))
     if playerModel.spiritHitConversionRate then
         playerModel.statEffectMap["ITEM_MOD_SPIRIT_SHORT"] = {
@@ -1657,7 +1778,12 @@ function Reforgenator:GetPlayerModel()
 
     return playerModel
 end
-
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
 function Reforgenator:CalculateHitMods(playerModel)
     local c = Reforgenator.constants
     local K = c.RATING_CONVERSIONS.meleeHit
@@ -1674,21 +1800,21 @@ function Reforgenator:CalculateHitMods(playerModel)
     if playerModel:isFuryWarrior() then
         self:Explain("3% to hit for being Fury warrior due to Precision")
         reduction = reduction + (3 * K)
-    end
+   end
 
-    -- Rogues get varying amounts based on Precision talent
-    if playerModel.className == "ROGUE" then
-        local pointsInPrecision = select(5, GetTalentInfo(2, 3))
-        self:Explain((2 * pointsInPrecision) .. "% to hit for being Rogue with Precision talent")
-        reduction = reduction + (K * 2 * pointsInPrecision)
-    end
+    -- Rogues get varying amounts based on Precision talent        ***** uses GetTalentInfo which changed in 5.04
+   -- if playerModel.className == "ROGUE" then
+   ----     local pointsInPrecision = select(5, GetTalentInfo(2, 3))
+   --     self:Explain((2 * pointsInPrecision) .. "% to hit for being Rogue with Precision talent")
+   --     reduction = reduction + (K * 2 * pointsInPrecision)
+   -- end
 
-    -- Frost DKs get varying amounts if they're DW and have Nerves of Cold Steel
-    if playerModel.className == "DEATHKNIGHT" and playerModel.mainHandWeaponType:sub(1, 10) ~= "Two-handed" then
-        local pointsInNoCS = select(5, GetTalentInfo(2, 3))
-        self:Explain((pointsInNoCS) .. "% to hit for being DW DK with Nerves of Cold Steel talent")
-        reduction = reduction + (K * pointsInNoCS)
-    end
+    -- Frost DKs get varying amounts if they're DW and have Nerves of Cold Steel   ***** uses GetTalentInfo which changed in 5.04
+   -- if playerModel.className == "DEATHKNIGHT" and playerModel.mainHandWeaponType:sub(1, 10) ~= "Two-handed" then
+   --     local pointsInNoCS = select(5, GetTalentInfo(2, 3))
+   --     self:Explain((pointsInNoCS) .. "% to hit for being DW DK with Nerves of Cold Steel talent")
+   --     reduction = reduction + (K * pointsInNoCS)
+   -- end
 
     self:Explain("hit rating modification = " .. reduction)
     return reduction
@@ -1745,7 +1871,12 @@ function Reforgenator:CalculateRangedHitCap(playerModel)
 
     return hitCap
 end
-
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
 function Reforgenator:CalculateSpellHitCap(playerModel)
     local c = Reforgenator.constants
     local K = c.RATING_CONVERSIONS.spellHit
@@ -1762,11 +1893,11 @@ function Reforgenator:CalculateSpellHitCap(playerModel)
     end
 
     -- Rogues get varying amounts based on Precision talent
-    if playerModel.className == "ROGUE" then
-        local pointsInPrecision = select(5, GetTalentInfo(2, 3))
-        self:Explain((2 * pointsInPrecision) .. "% to hit for being Rogue with Precision talent")
-        hitCap = hitCap - (K * 2 * pointsInPrecision)
-    end
+   -- if playerModel.className == "ROGUE" then
+   --     local pointsInPrecision = select(5, GetTalentInfo(2, 3))
+   --     self:Explain((2 * pointsInPrecision) .. "% to hit for being Rogue with Precision talent")
+   --     hitCap = hitCap - (K * 2 * pointsInPrecision)
+   -- end
 
     -- Death Knights get 9% spell hit from Runic Focus
     if playerModel.className == "DEATHKNIGHT" then
@@ -1779,7 +1910,12 @@ function Reforgenator:CalculateSpellHitCap(playerModel)
 
     return hitCap
 end
-
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
 function Reforgenator:ExpertiseMods(playerModel)
     local c = Reforgenator.constants
     local K = c.RATING_CONVERSIONS.expertise
@@ -1843,11 +1979,11 @@ function Reforgenator:ExpertiseMods(playerModel)
         end
     end
 
-    if playerModel.className == "SHAMAN" then
-        local pointsInUnleashedRage = select(5, GetTalentInfo(2, 16))
-        self:Explain("+" .. (4 * pointsInUnleashedRage) .. "expertise for being Shaman with Unleashed Rage talent")
-        reduction = reduction + (4 * pointsInUnleashedRage * K)
-    end
+  --  if playerModel.className == "SHAMAN" then
+  --      local pointsInUnleashedRage = select(5, GetTalentInfo(2, 16))
+  --      self:Explain("+" .. (4 * pointsInUnleashedRage) .. "expertise for being Shaman with Unleashed Rage talent")
+  --      reduction = reduction + (4 * pointsInUnleashedRage * K)
+  --  end
 
     self:Explain("expertise rating modification = " .. reduction)
     return reduction
@@ -1880,7 +2016,12 @@ function Reforgenator:CalculateExpertiseHardCap(playerModel)
     self:Explain("target expertise rating = " .. expertiseCap)
     return expertiseCap
 end
-
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
 function Reforgenator:HasteTo1SecGCD(playerModel)
     local c = Reforgenator.constants
     local K = c.RATING_CONVERSIONS.haste
@@ -1890,17 +2031,17 @@ function Reforgenator:HasteTo1SecGCD(playerModel)
 
     local reduction = 0
 
-    if playerModel.className == "PRIEST" then
-        local pointsInDarkness = select(5, GetTalentInfo(3, 1))
-        self:Explain((pointsInDarkness) .. "% spell haste for being Priest with Darkenss talent")
-        reduction = reduction + (pointsInDarkness * K)
-    end
+   --- if playerModel.className == "PRIEST" then
+   --     local pointsInDarkness = select(5, GetTalentInfo(3, 1))
+   --     self:Explain((pointsInDarkness) .. "% spell haste for being Priest with Darkenss talent")
+   --     reduction = reduction + (pointsInDarkness * K)
+    --end
 
-    if playerModel.className == "DRUID" then
-        local moonkinForm = select(5, GetTalentInfo(1, 8))
-        self:Explain((5 * moonkinForm) .. "% spell haste for being Druid with moonkin form")
-        reduction = reduction + (moonkinForm * 5 * K)
-    end
+    --if playerModel.className == "DRUID" then
+    --    local moonkinForm = select(5, GetTalentInfo(1, 8))
+    --    self:Explain((5 * moonkinForm) .. "% spell haste for being Druid with moonkin form")
+    --    reduction = reduction + (moonkinForm * 5 * K)
+   -- end
 
     if playerModel.race == "Goblin" then
         self:Explain("1% haste for being a Goblin")
@@ -1915,7 +2056,12 @@ end
 function Reforgenator:CalculateMaximumValue(playerModel)
     return 9999
 end
-
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
 function Reforgenator:CalculateFrostSoftCritCap(playerModel)
     local c = Reforgenator.constants
     local K = c.RATING_CONVERSIONS.crit
@@ -1925,18 +2071,23 @@ function Reforgenator:CalculateFrostSoftCritCap(playerModel)
 
     local reduction = 0
 
-    if playerModel.className == "MAGE" then
-        local pointsInPiercingIce = select(5, GetTalentInfo(3, 2))
-        self:Explain((pointsInPiercingIce) .. "% to crit for being Mage with Piercing Ice talent")
-        reduction = reduction + (K * pointsInPiercingIce)
-    end
+   -- if playerModel.className == "MAGE" then
+    --    local pointsInPiercingIce = select(5, GetTalentInfo(3, 2))
+    --    self:Explain((pointsInPiercingIce) .. "% to crit for being Mage with Piercing Ice talent")
+   --     reduction = reduction + (K * pointsInPiercingIce)
+  --  end
 
     critCap = math.ceil(critCap - reduction)
 
     self:Explain("calculated target crit rating = " .. critCap)
     return critCap
 end
-
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
+--****************************************************************************************
 function Reforgenator:CalculateFireSoftHasteCap(playerModel)
     local c = Reforgenator.constants
     local K = c.RATING_CONVERSIONS.haste
@@ -1945,11 +2096,11 @@ function Reforgenator:CalculateFireSoftHasteCap(playerModel)
 
     local reduction = 0
 
-    if playerModel.className == "MAGE" then
-        local pointsInNP = select(5, GetTalentInfo(1, 3))
-        self:Explain((pointsInNP) .. "% to haste for being Mage with Netherwind Presence talent")
-        reduction = reduction + (K * pointsInNP)
-    end
+   -- if playerModel.className == "MAGE" then
+   --     local pointsInNP = select(5, GetTalentInfo(1, 3))
+   --     self:Explain((pointsInNP) .. "% to haste for being Mage with Netherwind Presence talent")
+  --      reduction = reduction + (K * pointsInNP)
+   -- end
 
     hasteCap = math.ceil(hasteCap - reduction)
 
@@ -1973,1212 +2124,6 @@ function Reforgenator:CalculateHolySoftHasteCap(playerModel)
     return hasteCap
 end
 
-function Reforgenator:BloodDKModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.2,
-        ["ITEM_MOD_DODGE_RATING_SHORT"] = 1,
-        ["ITEM_MOD_PARRY_RATING_SHORT"] = 1,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 0.4,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 0.2,
-    }
-
-    model.notes = 'http://elitistjerks.com/f72/t110102-blood_dk_endgame_tanking_4_x/ http://pwnwear.com/forum/collected-theorycraft-thread-t900.html http://pwnwear.com/forum/post15917.html#p15917'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:BearModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_DODGE_RATING_SHORT"] = 0.98,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 0.42,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 0.25,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.22,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 0.13,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 0.02,
-    }
-
-    model.notes = 'http://elitistjerks.com/f73/t127444-feral_bear_cataclysm_4_3_dragon_soul/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_DODGE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:ProtPallyModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_DODGE_RATING_SHORT"] = 1.0,
-        ["ITEM_MOD_PARRY_RATING_SHORT"] = 1.0,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.0,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 0.04,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 0.02,
-    }
-
-    model.notes = 'http://elitistjerks.com/f76/t126438-prot_4_3_send_me_my_way/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:ProtWarriorModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_PARRY_RATING_SHORT"] = 1.03,
-        ["ITEM_MOD_DODGE_RATING_SHORT"] = 1.00,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.00,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 0.04,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 0.02,
-    }
-    
-    model.notes = 'http://elitistjerks.com/f81/t110350-cataclysm_warrior_faq_4_2_read_while_patching_before_posting/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:BeastMasterHunterModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 1.65,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.60,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.42,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.20,
-    }
-
-    model.notes = 'http://elitistjerks.com/f74/t110880-cataclysm_beast_mastery_4_3_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_RANGED,
-            cap = "RangedHitCap"
-        },
-        {
-            rating = CR_CRIT_RANGED,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_RANGED,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:MarksmanshipHunterModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 3.49,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.66,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.61,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.38,
-    }
-
-    model.notes = 'http://elitistjerks.com/f74/t112408-cataclysm_marksmanship_updated_4_1_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_RANGED,
-            cap = "RangedHitCap"
-        },
-        {
-            rating = CR_CRIT_RANGED,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_RANGED,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:SurvivalHunterModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 3.19,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.37,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.33,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.27,
-    }
-
-    model.notes = 'http://elitistjerks.com/f74/t110723-cataclysm_survival_hunter/#Stats'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_RANGED,
-            cap = "RangedHitCap"
-        },
-        {
-            rating = CR_CRIT_RANGED,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_RANGED,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:BoomkinModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_SPIRIT_SHORT"] = 2.4,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.4,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 2.15,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.45,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.87,
-    }
-
-    model.notes = 'http://elitistjerks.com/f73/t110353-balance_cataclysm_4_3_dragon_soul/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "MaximumPossible",
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_SPELL,
-            cap = "MaximumPossible",
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:FuryModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 2.47,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.47,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.98,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.57,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.37,
-    }
-
-    model.notes = 'http://elitistjerks.com/f81/t110350-cataclysm_warrior_faq_4_2_read_while_patching_before_posting/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HIT_MELEE,
-            cap = "DWHitCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:SMFuryModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 3.2,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 2.29,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 2.02,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.33,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.24,
-    }
-
-    model.notes = 'http://elitistjerks.com/f81/t110350-cataclysm_warrior_faq_4_2_read_while_patching_before_posting/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HIT_MELEE,
-            cap = "DWHitCap"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:ArmsModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 1.46,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.34,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 0.9,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 0.8,
-    }
-
-    model.notes = 'http://elitistjerks.com/f81/t110350-cataclysm_warrior_faq_4_2_read_while_patching_before_posting/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap",
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap",
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible",
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible",
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible",
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:CombatRogueModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.46,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 2.13,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.87,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.51,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.18,
-    }
-
-    model.notes = 'http://elitistjerks.com/f78/t111329-combat_guide_cata_12_01_2011_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible",
-        },
-        {
-            rating = CR_HIT_MELEE,
-            cap = "DWHitCap"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:AssassinationRogueModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 1.75,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.30,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.20,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 1.1,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.9,
-    }
-
-    model.notes = 'http://elitistjerks.com/f78/t110134-assassination_guide_cata_12_01_2011_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_HIT_MELEE,
-            cap = "DWHitCap"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:SubtletyRogueModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 1.40,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.35,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 1.15,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.1,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 0.9,
-    }
-
-    model.notes = 'http://elitistjerks.com/f78/t119013-cataclysm_subtlety_compendium/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HIT_MELEE,
-            cap = "DWHitCap"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:CatModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.291,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.291,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.291,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 1.24,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 1.24,
-    }
-
-    model.notes = 'http://elitistjerks.com/f73/t127445-feral_cat_cataclysm_4_3_dragon_soul/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:AffWarlockModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.78,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 2.32,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.79,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.24,
-    }
-
-    model.notes = 'http://elitistjerks.com/f80/t112939-affliction_cataclysm_4_3_release/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "MaximumPossible",
-        },
-        {
-            rating = CR_CRIT_SPELL,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:DestroWarlockModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.83,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 2.08,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.40,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.40,
-    }
-
-    model.notes = 'http://elitistjerks.com/f80/t111390-destruction_cataclysm_4_3_release/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_SPELL,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:DemoWarlockModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 3.74,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 2.57,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 2.37,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.95,
-    }
-
-    model.notes = 'http://elitistjerks.com/f80/t110366-demonology_cataclysm_4_3_release/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_SPELL,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:TwoHandFrostDKModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.26,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 1.75,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.40,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.37,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.34,
-    }
-
-    model.notes = 'http://elitistjerks.com/f72/t125291-frost_dps_winter_discontent_4_3_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:DWFrostDKModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.14,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.58,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 1.51,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.33,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.09,
-    }
-
-    model.notes = 'http://elitistjerks.com/f72/t125291-frost_dps_winter_discontent_4_3_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:MasterfrostDKModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 2.32,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.22,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 2.15,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 2.06,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.73,
-    }
-
-    model.notes = 'http://elitistjerks.com/f72/t125291-frost_dps_winter_discontent_4_3_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:UnholyDKModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 3.0,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.89,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.85,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.55,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 0.99,
-    }
-
-    model.notes = 'http://elitistjerks.com/f72/t125292-unholy_dps_my_friend_misery_4_3_0_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:ArcaneMageModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 3.21,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.4,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.34,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.28,
-    }
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_SPELL,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:FrostMageModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 3.08,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.97,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.61,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.43,
-    }
-
-    model.notes = 'http://www.mmo-champion.com/threads/820907-Mage-The-Ultimate-Guide-to-Frost'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_CRIT_SPELL,
-            cap = "23.34% Crit"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:FireMageModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 3.44,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 2.21,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 2.01,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.42,
-    }
-
-    model.notes = 'http://elitistjerks.com/f75/t110326-cataclysm_fire_mage_compendium/#Gearing_a_Fire_Mage'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "15% Haste"
-        },
-        {
-            rating = CR_CRIT_SPELL,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:RetPallyModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 1.77,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 1.30,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.13,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.98,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 0.79,
-    }
-
-    model.notes = 'http://elitistjerks.com/f76/t110342-retribution_concordance_4_3_voice_dps/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_MELEE,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_MELEE,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:ShadowPriestModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 2,
-        ["ITEM_MOD_SPIRIT_SHORT"] = 1.95,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 1.95,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.70,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.60,
-    }
-
-    model.notes = 'http://elitistjerks.com/f77/t124358-shadow_priest_pve_guide_4_3_updated/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "1SecGCD"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_CRIT_SPELL,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:ElementalModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_SPIRIT_SHORT"] = 2.70,
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 2.70,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.73,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 1.62,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.11,
-    }
-
-    model.notes = 'http://elitistjerks.com/f79/t110309-elemental_cataclysm_discussion_patch_4_3_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "1SecGCD"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:EnhancementModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_HIT_RATING_SHORT"] = 4.0,
-        ["ITEM_MOD_EXPERTISE_RATING_SHORT"] = 2.80,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 2.35,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 1.54,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 1.37,
-    }
-
-    model.notes = 'http://elitistjerks.com/f79/t127416-enhancement_4_3_least_your_old_axe_good_transmog/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HIT_MELEE,
-            cap = "MeleeHitCap"
-        },
-        {
-            rating = CR_EXPERTISE,
-            cap = "ExpertiseSoftCap"
-        },
-        {
-            rating = CR_HIT_SPELL,
-            cap = "SpellHitCap"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:RestoDruidModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_SPIRIT_SHORT"] = 0.75,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 0.65,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 0.60,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.50,
-    }
-
-    model.notes = 'http://elitistjerks.com/f73/t110354-resto_cataclysm_4_3_dragon_soul/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_MASTERY,
-            cap = "Maintain",
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "Fixed",
-            userdata = { 916, 2005 },
-        },
-        {
-            rating = CR_SPIRIT,
-            cap = "MaximumPossible",
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:DiscPriestModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_SPIRIT_SHORT"] = 0.80,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 0.60,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 0.50,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.40,
-    }
-
-    model.notes = 'http://elitistjerks.com/f77/t127522-4_3_discipline_priest_compendium/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "Fixed",
-            userdata = 3241
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:HolyPriestModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_SPIRIT_SHORT"] = 0.80,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 0.75,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 0.70,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.50,
-    }
-
-    model.notes = 'http://elitistjerks.com/f77/t110245-cataclysm_holy_priest_compendium/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_SPIRIT,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "12.5% Haste",
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "MaximumPossible"
-        },
-    }
-
-    return model
-end
-
-function Reforgenator:RestoShamanModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_SPIRIT_SHORT"] = 0.65,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 0.60,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 0.55,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.40,
-    }
-
-    model.notes = 'http://elitistjerks.com/f79/t121202-resto_raiding_4_1_updating_4_3_a/'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_SPIRIT,
-            cap = "Fixed",
-            userdata = 2800,
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "12.5% Haste",
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible",
-        },
-    }
-
-    return model
-end
-
--- TODO
-function Reforgenator:HolyPallyModel()
-    local model = ReforgeModel:new()
-    model.readOnly = true
-    model.statWeights = {
-        ["ITEM_MOD_SPIRIT_SHORT"] = 0.75,
-        ["ITEM_MOD_HASTE_RATING_SHORT"] = 0.40,
-        ["ITEM_MOD_CRIT_RATING_SHORT"] = 0.35,
-        ["ITEM_MOD_MASTERY_RATING_SHORT"] = 0.30,
-    }
-
-    model.notes = 'http://elitistjerks.com/f76/t110847-%5Bholy%5Dcataclysm_holy_compendium/ http://www.bandagespec.com/2011/02/on-haste-crit-and-other-secondary-stats.html'
-
-    model.reforgeOrder = {
-        {
-            rating = CR_SPIRIT,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_HASTE_SPELL,
-            cap = "MaximumPossible"
-        },
-        {
-            rating = CR_MASTERY,
-            cap = "MaximumPossible"
-        },
-	{
-	    rating = CR_CRIT_SPELL,
-            cap = "MaximumPossible"
-	},
-    }
-
-    return model
-end
-
 function Reforgenator:LoadDefaultModels()
     local models = Reforgenator.db.global.models
     if models ~= nil then
@@ -3198,14 +2143,14 @@ function Reforgenator:LoadDefaultModels()
     self:LoadModel(self:BloodDKModel(), 'DK, blood', 'DEATHKNIGHT/1', 'DEATHKNIGHT')
     self:LoadModel(self:TwoHandFrostDKModel(), 'DK, 2H frost', '2HFrost', 'DEATHKNIGHT')
     self:LoadModel(self:DWFrostDKModel(), 'DK, DW frost', 'DWFrost', 'DEATHKNIGHT')
-    self:LoadModel(self:MasterfrostDKModel(), 'DK, Masterfrost', 'Masterfrost', 'DEATHKNIGHT')
+    --self:LoadModel(self:MasterfrostDKModel(), 'DK, Masterfrost', 'Masterfrost', 'DEATHKNIGHT')  --gone for now
     self:LoadModel(self:UnholyDKModel(), 'DK, unholy', 'DEATHKNIGHT/3', 'DEATHKNIGHT')
 
-    self:LoadModel(self:BoomkinModel(), 'Druid, boomkin', 'DRUID/1', 'DRUID')
-    self:LoadModel(self:CatModel(), 'Druid, feral cat', nil, 'DRUID')
-    self:LoadModel(self:BearModel(), 'Druid, feral bear', 'DRUID/2', 'DRUID')
-    self:LoadModel(self:RestoDruidModel(), 'Druid, restoration', 'DRUID/3', 'DRUID')
-
+    self:LoadModel(self:BalanceModel(), 'Druid, Balance', 'DRUID/1', 'DRUID')
+	self:LoadModel(self:FeralModel(), 'Druid, Feral', 'DRUID/2', 'DRUID')
+    self:LoadModel(self:GuardianModel(), 'Druid, Guardian', 'DRUID/3', 'DRUID')
+    self:LoadModel(self:RestoDruidModel(), 'Druid, Restoration', 'DRUID/4', 'DRUID')
+	
     self:LoadModel(self:BeastMasterHunterModel(), 'Hunter, BM', 'HUNTER/1', 'HUNTER')
     self:LoadModel(self:MarksmanshipHunterModel(), 'Hunter, MM', 'HUNTER/2', 'HUNTER')
     self:LoadModel(self:SurvivalHunterModel(), 'Hunter, SV', 'HUNTER/3', 'HUNTER')
@@ -3340,7 +2285,8 @@ function Reforgenator:ShowState()
         return
     end
 
-    local REFORGE_ID_MAP = {
+    local REFORGE_ID_MAP = 
+	{
         [1] = "ITEM_MOD_SPIRIT_SHORT",
         [2] = "ITEM_MOD_DODGE_RATING_SHORT",
         [3] = "ITEM_MOD_PARRY_RATING_SHORT",
@@ -3558,7 +2504,8 @@ function Reforgenator:GetBestReforge(playerModel, item, stat, excessRating, stat
 
             local gain = delta * (statWeights[stat] or 0) * self:CalculateScalingFromDR(playerModel, stat)
 
-            entry = {
+            entry = 
+			{
                 ["stat"] = k,
                 ["cost"] = cost,
                 ["gain"] = gain,
@@ -3612,7 +2559,8 @@ function Reforgenator:GetBestReforge(playerModel, item, stat, excessRating, stat
 
     self:Debug("### " .. candidates[1].stat .. " is best reforgable stat")
 
-    return {
+    return 
+	{
         item = item,
         reforgeFrom = candidates[1].stat,
         reforgeTo = stat,

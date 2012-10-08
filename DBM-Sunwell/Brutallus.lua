@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Brutallus", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 387 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
 mod:SetCreatureID(24882)
 mod:SetModelID(22711)
 mod:SetMinSyncRevision(358)--Block bad pulls from old versions
@@ -33,12 +33,10 @@ local berserkTimer		= mod:NewBerserkTimer(360)
 mod:AddBoolOption("BurnIcon", true)
 mod:AddBoolOption("BurnWhisper", true, "announce")
 
-local lastBurn = 8
-local burnTime = 0
+local burnIcon = 8
 
 function mod:OnCombatStart(delay)
-	lastBurn = 8
-	burnTime = 0
+	burnIcon = 8
 	timerBurnCD:Start(-delay)
 	timerStompCD:Start(-delay)
 	berserkTimer:Start(-delay)
@@ -48,20 +46,15 @@ function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(46394) then
 		warnBurn:Show(args.destName)
 		timerBurn:Start(args.destName)
-		local firstBurn = false
-		if GetTime() - burnTime >= 19 then
-			burnTime = GetTime()
-			firstBurn = true
-		end
-		if firstBurn then
+		if self:AntiSpam(19) then
 			timerBurnCD:Start()
 		end
 		if self.Options.BurnIcon then
-			self:SetIcon(args.destName, lastBurn)
-			if lastBurn == 1 then
-				lastBurn = 8
+			self:SetIcon(args.destName, burnIcon)
+			if burnIcon == 1 then
+				burnIcon = 8
 			else
-				lastBurn = lastBurn - 1
+				burnIcon = burnIcon - 1
 			end
 		end
 		if IsRaidLeader() and self.Options.BurnWhisper then
@@ -94,11 +87,7 @@ end
 function mod:SPELL_MISSED(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
 	if spellId == 46394 then
 		warnBurn:Show("MISSED")
-		if GetTime() - burnTime >= 19 then
-			burnTime = GetTime()
-			firstBurn = true
-		end
-		if firstBurn then
+		if self:AntiSpam(19) then
 			timerBurnCD:Start()
 		end
 	end

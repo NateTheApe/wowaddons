@@ -4,6 +4,9 @@ FishingBuddy.OutfitManager = {};
 local Crayon = LibStub("LibCrayon-3.0");
 local FL = LibStub("LibFishing-1.0");
 
+-- 5.0.4 has a problem with a global "_" (see some for loops below)
+local _
+
 -- Inferred from Draznar's Fishing FAQ
 local Accessories = {
 	[19944] = { ["n"] = "Nat Pagle's Fish Terminator", ["score"] = 30, },
@@ -66,7 +69,7 @@ local PoleCheck = nil;
 -- update the watcher when we're done switching outfits
 FishingBuddy.OutfitManager.WaitForUpdate =
 	function(self)
-		local hasPole = FL:IsFishingPole();
+		local hasPole = FL:IsFishingGear();
 		if ( hasPole == PoleCheck ) then
 			FishingOutfitUpdateFrame:Hide();
 			FishingBuddy.API.FishingMode("OutfitManager");

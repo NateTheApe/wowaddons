@@ -2,6 +2,9 @@
 
 FishingBuddy.WatchFrame = {};
 
+-- 5.0.4 has a problem with a global "_" (see some for loops below)
+local _
+
 local MAX_FISHINGWATCH_LINES = 1;
 local WATCHDRAGGER_SHOW_DELAY = 0.5;
 
@@ -367,14 +370,13 @@ local function BuildCurrentData(zone, subzone, zidx, sidx)
 end
 
 local function HandleZoneChange()
-FishingBuddy.Debug("HandleZoneChanged");
 	if ( not FishingBuddy.IsLoaded() ) then
 		return;
 	end
 	fishsort = nil
 	fishdata = nil;
 	FishingBuddy.WatchUpdate();
-	if ( FL:IsFishingPole() and TotalTimeFishing ) then
+	if ( FL:IsFishingGear() and TotalTimeFishing ) then
 		TotalTimeFishing = TotalTimeFishing + ZoneFishingTime;
 		ZoneFishingTime = 0;
 		FishingBuddy.SetSetting("TotalTimeFishing", TotalTimeFishing);
@@ -497,7 +499,7 @@ end
 -- Fish watcher functions
 local function NoShow()
 	local GSB = FishingBuddy.GetSettingBool;
-	return (not GSB("WatchFishies") or (GSB("WatchOnlyWhenFishing") and not FL:IsFishingPole()));
+	return (not GSB("WatchFishies") or (GSB("WatchOnlyWhenFishing") and not FL:IsFishingGear()));
 end
 
 local function UpdateTimerLine()
@@ -622,7 +624,6 @@ local function WatchUpdate()
 	local noshow = NoShow();
 
 	if ( noshow ) then
-FishingBuddy.Debug("Watcher: noshow");
 		if ( FishingWatchFrame:IsVisible() ) then
 			HideDraggerFrame();
 			FishingWatchFrame:Hide();

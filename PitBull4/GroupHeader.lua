@@ -73,11 +73,16 @@ function PitBull4:SwapGroupTemplate(group)
 	local old_header = self.name_to_header[group]
 	local group_db = PitBull4.db.profile.groups[group]
 
+	if not group_db.enabled then
+		return
+	end
+
 	old_header.group_db = deep_copy(group_db)
 	old_header.group_db.enabled = false
 	old_header:RefreshGroup()
 	old_header:UpdateShownState()
-
+	old_header:RecheckConfigMode()
+	
 	local new_name
 	if group_db.use_pet_header then
 		new_name = "PitBull4_PetGroups_"..group
@@ -89,6 +94,7 @@ function PitBull4:SwapGroupTemplate(group)
 	if not new_header then
 		-- Doesn't exist so make it.
 		self:MakeGroupHeader(group)
+		new_header = _G[new_name]
 	else
 		-- already exists so jump through the hoops to reactive it.
 		self.name_to_header[group] = new_header
@@ -97,7 +103,7 @@ function PitBull4:SwapGroupTemplate(group)
 		new_header:UpdateShownState()
 	end
 		
-	self:RecheckConfigMode()
+	new_header:RecheckConfigMode()
 end
 PitBull4.SwapGroupTemplate = PitBull4:OutOfCombatWrapper(PitBull4.SwapGroupTemplate)
 
@@ -328,6 +334,15 @@ function GroupHeader:RefreshGroup(dont_refresh_children)
 	local force_show = self.force_show
 	self:UnforceShow()
 	
+	-- Wipe all the points on the member frames before doing
+	-- the work below.  SecureGroupHeader's code does not
+	-- do this for us as it should so if you change directions
+	-- the frames can break since they'll end up with conflicting
+	-- anchors.
+	for _, member in self:IterateMembers() do
+		member:ClearAllPoints()
+	end
+
 	local enabled = group_db.enabled
 	local unit_group = group_db.unit_group
 	local party_based = unit_group:sub(1, 5) == "party"
@@ -528,11 +543,37 @@ function GroupHeader:InitialConfigFunction(frame)
 	frame:_RefreshLayout() -- Normally protected by an OutOfCombatWrapper
 end
 
+local function should_show_header(config_mode, header)
+	if not config_mode then
+		return false
+	end
+	
+	if config_mode == "solo" then
+		return header.show_solo
+	end
+	
+	if config_mode == "party" and header.super_unit_group ~= "party" then
+		return false
+	end
+	
+	return true
+end
+
+function GroupHeader:RecheckConfigMode()
+	if self.group_db.enabled and should_show_header(PitBull4.config_mode, self) then
+		self:ForceShow()
+	else
+		self:UnforceShow()
+	end
+end
+
 --- Force unit frames to be created on the group header, even if those units don't exist.
--- Note: this is a hack to get around a Blizzard bug preventing frames from being initialized properly while in combat.
 -- @usage header:ForceUnitFrameCreation()
 function GroupHeader:ForceUnitFrameCreation()
 	local num = self:GetMaxUnits()
+	if self[num] then
+		return
+	end
 	local rehide = false
 	local maxColumns = self:GetAttribute("maxColumns")
 	local unitsPerColumn = self:GetAttribute("unitsPerColumn")
@@ -578,38 +619,37 @@ local function hook_SecureGroupHeader_Update()
 		if not self.force_show then
 			return
 		end
-		if in_force_show then
-			return
+		if not in_force_show then
+			self:RecheckConfigMode()
 		end
-		self:AssignFakeUnitIDs()
-		PitBull4:RecheckConfigMode()
+		PitBull4:ScheduleTimer(self.ApplyConfigModeState, 0, self)
 	end
 	hooksecurefunc("SecureGroupHeader_Update", hook)
 	hooksecurefunc("SecureGroupPetHeader_Update", hook)
 end
 
--- utility function for AssignFakeUnitIDs
+-- utility function for ApplyConfigModeState
 local function fill_table(tbl, ...)
-	wipe(tbl)
 	for i = 1, select('#', ...), 1 do
 		local key = select(i, ...)
-		key = tonumber(key) or key
-		tbl[key] = true
+		key = tonumber(key) or strtrim(key)
+		tbl[key] = i 
 	end
 end
 
--- utility function for AssignFakeUnitIDs
+-- utility function for ApplyConfigModeState
 local function double_fill_table(tbl, ...)
 	fill_table(tbl, ...)
 	for i = 1, select('#', ...), 1 do
-		tbl[i] = select(i, ...)
+		local key = select(i, ...)
+		tbl[i] = strtrim(key)
 	end
 end
 
--- utility function for AssignFakeUnitIDs, it doctors
+-- utility function for ApplyConfigModeState, it doctors
 -- up some data so don't reuse this elsewhere
-local function get_group_roster_info(super_unit_group, index, sort_dir, group_by)
-	local unit, name, subgroup, class_name, role
+local function get_group_roster_info(super_unit_group, index)
+	local unit, name, subgroup, class_name, role, _
 	if super_unit_group == "raid" then
 		unit = "raid"..index
 		name, _, subgroup, _, _, class_name, _, _, _, role = GetRaidRosterInfo(index)
@@ -620,7 +660,10 @@ local function get_group_roster_info(super_unit_group, index, sort_dir, group_by
 			unit = "player"
 		end
 		if UnitExists(unit) then
-			name = UnitName(unit)
+			name, server = UnitName(unit)
+			if (server and server ~= "") then
+				name = name.."-"..server
+			end
 			_, class_name = UnitClass(unit)
 			-- The UnitInParty and UnitInRaid checks are an ugly workaround for thee 
 			-- You are not in a party bug that Blizzard created.
@@ -637,36 +680,122 @@ local function get_group_roster_info(super_unit_group, index, sort_dir, group_by
 
 	-- return some bogus data to get our fake unit ids to sort where we want.
 	if not name then
-		name = (sort_dir == "DESC" and "!" or "~")..string.format("%02d",index)
-		subgroup = '!' 
+		name = string.format("~%02d",index)
+		subgroup = 0 
 		class_name = '!' 
 	end
 
 	return unit, name, subgroup, class_name, role
 end
 
--- AssigneFakeUnitIDs generates a bunch of fake unit ids for 
--- frames being show in config mode.  It's largely a rework
--- of SecureGroupHeader_Update for our purposes.  We need
--- to generate unit ids in roughly the same order that the
--- group header would for real frames but we want the fake
--- units to always be after the real units.  Sadly that makes
--- this code pretty downright ugly.
+-- utility function for ApplyConfigModeState
+-- Give a point return the opposite point and which axes the point
+-- depends on.
+local function get_relative_point_anchor(point)
+	point = point:upper()
+	if point == "TOP" then
+		return "BOTTOM", 0, -1
+	elseif point == "BOTTOM" then
+		return "TOP", 0, 1
+	elseif point == "LEFT" then
+		return "RIGHT", 1, 0
+	elseif point =="RIGHT" then
+		return "LEFT", -1, 0
+	elseif point == "TOPLEFT" then
+		return "BOTTOMRIGHT", 1, -1
+	elseif point == "TOPRIGHT" then
+		return "BOTTOMLEFT", -1, -1
+	elseif point == "BOTTOMLEFT" then
+		return "TOPRIGHT", 1, 1
+	elseif point == "BOTTOMRIGHT" then
+		return "TOPLEFT", -1, 1
+	else
+		return "CENTER", 0, 0
+	end
+end
 
+-- Tables used by ApplyConfigModeState
 local sorting_table = {}
 local token_table = {}
 local grouping_table = {}
 local temp_table = {}
-function GroupHeader:AssignFakeUnitIDs()
+
+-- utility function for ApplyConfigModeState
+local function sort_on_group_with_names(a, b)
+	local order1 = token_table[ grouping_table[a] ]
+	local order2 = token_table[ grouping_table[b] ]
+	if order1 then
+		if not order2 then
+			return true
+		else
+			if order1 == order2 then
+				return sorting_table[a] < sorting_table[b]
+			else
+				return order1 < order2
+			end
+		end
+	else
+		if order2 then
+			return false
+		else
+			return sorting_table[a] < sorting_table[b]
+		end
+	end
+end
+
+-- utility function for ApplyConfigModeState
+local function sort_on_group_with_ids(a, b)
+	local order1 = token_table[ grouping_table[a] ]
+	local order2 = token_table[ grouping_table[b] ]
+	if order1 then
+		if not order2 then
+			return true
+		else
+			if order1 == order2 then
+				return tonumber(a:match("%d+") or -1) < tonumber(b:match("%d+") or -1)
+			else
+				return tonumber(order1) < tonumber(order2)
+			end
+		end
+	else
+		if order2 then
+			return false
+		else
+			return tonumber(a:match("%d+") or -1) < tonumber(b:match("%d+") or -1)
+		end
+	end
+end
+
+-- utility function for ApplyConfigModeState
+local function sort_on_names(a, b)
+	return sorting_table[a] < sorting_table[b]
+end
+
+-- utility function for ApplyConfigModeState
+local function sort_on_name_list(a, b)
+	return token_table[ sorting_table[a] ] < token_table[ sorting_table[b] ]
+end
+
+-- ApplyConfigModeState adjusts the member frames of a GroupHeader to allow
+-- them to function in config mode. It generates a bunch of fake unit ids
+-- for frames being show in config mode.  It also positions the frames (since
+-- 4.0.3 WoW removes the anchors from hidden frames).  It's largely a rework
+-- of SecureGroupHeader_Update for our purposes.  We need to generate unit ids
+-- in roughly the same order that the group header would for real frames but we
+-- want the fake units to always be after the real units.  Sadly that makes
+-- this code pretty downright ugly.
+function GroupHeader:ApplyConfigModeState()
 	if not self.force_show then
 		return
 	end
+
+	self:SetAttribute("_ignore",true)
 
 	wipe(sorting_table)
 	
 	local super_unit_group = self.super_unit_group
 	local config_mode = PitBull4.config_mode
-	local start, finish, step = 1, self:GetMaxUnits(), 1
+	local start, finish, step = 1, self:GetMaxUnits(true), 1
 
 	if self.include_player then
 		-- start at 0 for the player
@@ -674,19 +803,6 @@ function GroupHeader:AssignFakeUnitIDs()
 		finish = finish - 1 -- GetMaxUnits already accounts for include_player
 	end
 
-	-- Limit the number of frames to the config mode for raid
-	if config_mode and config_mode:sub(1,4) == "raid" and super_unit_group == "raid" then
-		if config_mode == "raid" then
-			if finish > 5 then
-				finish = 5
-			end
-		elseif config_mode:sub(1,4) == "raid" then
-			local num = config_mode:sub(5)+0 -- raid10, raid25, raid40 => 10, 25, 40
-			if num < finish then
-				finish = num
-			end
-		end
-	end
 
 	local name_list = self:GetAttribute("nameList")
 	local group_filter = self:GetAttribute("groupFilter")
@@ -700,33 +816,28 @@ function GroupHeader:AssignFakeUnitIDs()
 
 
 	if group_filter then
-		-- Add in our bogus group to the appropriate
-		-- place on the group_filter.
-		if sort_dir == 'DESC' then
-			group_filter = "!,"..group_filter
-		else
-			group_filter = group_filter..",!"
-		end
+		-- Add in our bogus group and class to the group filter.
+		group_filter = group_filter..',0,!'
 
 		-- filter by a list of group numbers and/or classes
-		fill_table(token_table, strsplit(",", group_filter))
+		fill_table(wipe(token_table), strsplit(",", group_filter))
 		local strict_filter = self:GetAttribute("strictFiltering")
 
 		for i = start, finish, 1 do
-			local unit, name, subgroup, class_name, role = get_group_roster_info(super_unit_group, i, sort_dir, group_by)
+			local unit, name, subgroup, class_name, role = get_group_roster_info(super_unit_group, i)
 
 			if name and (not strict_filtering 
 				and (token_table[subgroup] or token_table[class_name] or (role and token_table[role]))) -- non-strict filtering
 				or (token_table[subgroup] and token_table[class_name]) -- strict filtering
 				then
-				sorting_table[#sorting_table+1] = name
-				sorting_table[name] = unit
+				sorting_table[#sorting_table+1] = unit
+				sorting_table[unit] = name 
 				if group_by == "GROUP" then
-					grouping_table[name] = subgroup
+					grouping_table[unit] = subgroup
 				elseif group_by == "CLASS" then
-					grouping_table[name] = class_name
+					grouping_table[unit] = class_name
 				elseif group_by == "ROLE" then
-					grouping_table[name] = role
+					grouping_table[unit] = role
 				end
 			end
 		end
@@ -735,91 +846,35 @@ function GroupHeader:AssignFakeUnitIDs()
 			local grouping_order = self:GetAttribute("groupingOrder")
 
 			-- Add in our bogus group token onto the grouping_order
-			-- in the right place to achieve the sorting we want
-			if sort_dir == 'DESC' then
-				grouping_order = "!,"..grouping_order
-			else	
-				grouping_order = grouping_order..',!'
+			local bogus_group = 0
+			if group_by == "CLASS" then
+				bogus_group = '!'
 			end
+			grouping_order = grouping_order..','..bogus_group
 
-			double_fill_table(token_table, strsplit(",", grouping_order))
-			wipe(temp_table)
-			for _, grouping in ipairs(token_table) do
-				grouping = tonumber(grouping) or grouping
-				for k in ipairs(grouping_table) do
-					grouping_table[k] = nil
-				end
-				for index, name in ipairs(sorting_table) do
-					if grouping_table[name] == grouping then
-						grouping_table[#grouping_table+1] = name
-						temp_table[name] = true
-					end
-				end
-				if sort_method == "NAME" then -- sort by ID by default
-					sort(grouping_table)
-				end
-				for _, name in ipairs(grouping_table) do
-					temp_table[#temp_table+1] = name
-				end
-			end
-			-- hande units whose group didn't appear in groupingOrder
-			wipe(grouping_table)
-			for index, name in ipairs(sorting_table) do
-				if not temp_table[name] then
-					grouping_table[#grouping_table+1] = name
-				end
-			end
-			if sort_method == "NAME" then -- sort by ID by default
-				sort(grouping_table)
-			end
-			for _, name in ipairs(grouping_table) do
-				temp_table[#temp_table+1] = name
-			end
-
-			-- copy the names back to sorting_table
-			for index, name in ipairs(temp_table) do
-				sorting_table[index] = name
+			double_fill_table(wipe(token_table), strsplit(",", grouping_order:gsub("%s+", "")))
+			if sort_method == "NAME" then
+				table.sort(sorting_table, sort_on_group_with_names)
+			else
+				table.sort(sorting_table, sort_on_group_with_ids)
 			end
 		elseif sort_method == "NAME" then -- sort by ID by default
-			sort(sorting_table)
-		else
-			-- Have to do some reordering on ID DESC sort order
-			-- since normally the fake ids would come first.
-			wipe(temp_table)
-			-- add in the fake units first so they end up at the end 
-			for _, name in ipairs(sorting_table) do
-				if name:sub(1,1) == "!" then
-					temp_table[#temp_table+1] = name
-				end
-			end
-			-- now the real units
-			for _, name in ipairs(sorting_table) do
-				if name:sub(1,1) ~= "!" then
-					temp_table[#temp_table+1] = name
-				end
-			end
-			-- copy back to sorting_table
-			for index, name in ipairs(temp_table) do
-				sorting_table[index] = name
-			end
+			table.sort(sorting_table, sort_on_names)
 		end
 	else
-		-- filtering via a list of names
-		double_fill_table(sorting_table, strsplit(",", name_list))
+		--filtering via a list of names
+		double_fill_table(wipe(token_table), strsplit(",", name_list))
 		for i = start, finish, 1 do
 			local unit, name = get_group_roster_info(super_unit_group, i)
-			if sorting_table[name] then
-				sorting_table[name] = unit
-			end
-		end
-		for i = #sorting_table, 1, -1 do
-			local name = sorting_table[i]
-			if sorting_table[name] == true then
-				tremove(sorting_table, i)
+			if token_table[name] then
+				sorting_table[#sorting_table+1] = unit
+				sorting_table[unit] = name
 			end
 		end
 		if sort_method == "NAME" then
-			sort(sorting_table)
+			table.sort(sorting_table, sort_on_names)
+		elseif sort_method == "NAMELIST" then
+			table.sort(sorting_table, sort_on_namelist)
 		end
 	end
 
@@ -829,36 +884,91 @@ function GroupHeader:AssignFakeUnitIDs()
 	-- startingIndex to always be 1.  If we ever
 	-- configure the startingIndex to be something else
 	-- this code will have to be adjusted.
+	local point = self:GetAttribute("point") or "TOP" --default anchor point of "TOP"
+	local relative_point, x_offset_mult, y_offset_mult = get_relative_point_anchor(point)
+	local x_multiplier, y_multiplier = abs(x_offset_mult), abs(y_offset_mult)
+	local x_offset = self:GetAttribute("xOffset") or 0
+	local y_offset = self:GetAttribute("yOffset") or 0
+	local column_spacing = self:GetAttribute("columnSpacing") or 0
+	local units_per_column = self:GetAttribute("unitsPerColumn")
+	local num_displayed = #sorting_table
+	local num_columns
+	if units_per_column and num_displayed > units_per_column then
+		num_columns = min( ceil(num_displayed / units_per_column), (self:GetAttribute("maxColumns") or 1) )
+	else
+		units_per_column = num_displayed
+		num_columns = 1
+	end
+
 	start, finish = 1, #sorting_table
+	-- Limit the number of frames to the config mode for raid
+	if config_mode and config_mode:sub(1,4) == "raid" and super_unit_group == "raid" then
+		if config_mode == "raid" then
+			if finish > MEMBERS_PER_RAID_GROUP then
+				finish = MEMBERS_PER_RAID_GROUP
+			end
+		elseif config_mode:sub(1,4) == "raid" then
+			local num = config_mode:sub(5)+0 -- raid10, raid25, raid40 => 10, 25, 40
+			if num < finish then
+				finish = num
+			end
+			local filtered_max = self:GetMaxUnits()
+			if filtered_max < finish then
+				finish = filtered_max
+			end
+		end
+	end
 	if sort_dir == "DESC" then
 		start, finish, step = finish, start, -1
 	end
 
+	local column_anchor_point, column_rel_point, colx_multi, coly_multi
+	if num_columns > 1 then
+		column_anchor_point = self:GetAttribute("columnAnchorPoint")
+		column_rel_point, colx_multi, coly_multi = get_relative_point_anchor(column_anchor_point)
+	end
+
 	local frame_num = 0
+	local column_num = 1
+	local column_unit_count = 0
+	local current_anchor = self
 	for i = start, finish, step do
 		frame_num = frame_num + 1
-		local frame = self[frame_num]
-
-		if not frame.guid then
-			local old_unit = frame:GetAttribute("unit")
-			local unit = sorting_table[sorting_table[i]]
-			frame:SetAttribute("unit", unit)
-			if old_unit ~= unit then
-				frame:Update()
-			end
-		elseif DEBUG then
-			-- Spit out errors to chat if our code didn't
-			-- come up with the same unit ids for the real frames
-			-- that the group header did.
-			local unit = frame:GetAttribute("unit")
-			local expected_unit = sorting_table[sorting_table[i]]
-			if unit ~= expected_unit then
-				print("PitBull4 expected "..tostring(expected_unit).." but found "..tostring(unit).." for "..frame:GetName())
-			end
+		column_unit_count = column_unit_count + 1
+		if column_unit_count > units_per_column then
+			column_unit_count = 1
+			column_num = column_num + 1
 		end
+
+		local frame = self[frame_num]
+		if not frame then
+			break
+		end
+		if frame_num == 1 then
+			frame:SetPoint(point, current_anchor, point, 0, 0)
+			if column_anchor_point then
+				frame:SetPoint(column_anchor_point, current_anchor, column_anchor_point, 0, 0)
+			end
+		elseif column_unit_count == 1 then
+			local column_anchor = self:GetAttribute("child"..(frame_num - units_per_column))
+			frame:SetPoint(column_anchor_point, column_anchor, column_rel_point, colx_multi * column_spacing, coly_multi * column_spacing)
+		else
+			frame:SetPoint(point, current_anchor, relative_point, x_multiplier * x_offset, y_multiplier * y_offset)
+		end
+
+		local old_unit = frame:GetAttribute("unit")
+		local unit = sorting_table[i]
+		frame:SetAttribute("unit", unit)
+		if old_unit ~= unit then
+			frame:Update()
+		end
+
+		current_anchor = frame
 	end
+
+	self:SetAttribute("_ignore",nil)
 end
-GroupHeader.AssignFakeUnitIDs = PitBull4:OutOfCombatWrapper(GroupHeader.AssignFakeUnitIDs)
+GroupHeader.ApplyConfigModeState = PitBull4:OutOfCombatWrapper(GroupHeader.ApplyConfigModeState)
 
 local ipairs_upto_num
 do
@@ -889,9 +999,9 @@ local function get_filter_type_count(...)
 	return tonumber(start) and true or false, select('#', ...)
 end
 
-function GroupHeader:GetMaxUnits()
+function GroupHeader:GetMaxUnits(ignore_filters)
 	if self.super_unit_group == "raid" then
-		if self.group_db then
+		if not ignore_filters and self.group_db then
 			local group_filter = self.group_db.group_filter
 			if group_filter then
 				if group_filter == "" then
@@ -993,7 +1103,7 @@ function GroupHeader:ForceShow()
 		end
 		self.force_show = true
 		self:ForceUnitFrameCreation()
-		self:AssignFakeUnitIDs()
+		self:RefixSizeAndPosition()
 		if not self.label then
 			local label = self:CreateFontString(self:GetName() .. "_Label", "OVERLAY", "ChatFontNormal")
 			self.label = label
@@ -1194,6 +1304,38 @@ function MemberUnitFrame:RefixSizeAndPosition()
 	self:SetWidth(layout_db.size_x * classification_db.size_x)
 	self:SetHeight(layout_db.size_y * classification_db.size_y)
 end
+
+function MemberUnitFrame:ForceShow()
+	if not self.force_show then
+		self.force_show = true
+
+		-- Continue to watch the frame but do the hiding and showing ourself
+		UnregisterUnitWatch(self)
+		RegisterUnitWatch(self, true)
+	end
+
+	-- Always make sure the frame is shown even if we think it already is
+	self:Show()
+end
+MemberUnitFrame.ForceShow = PitBull4:OutOfCombatWrapper(MemberUnitFrame.ForceShow)
+
+function MemberUnitFrame:UnforceShow()
+	if not self.force_show then
+		return
+	end
+	self.force_show = nil
+
+	-- Ask the SecureStateDriver to show/hide the frame for us
+	UnregisterUnitWatch(self)
+	RegisterUnitWatch(self)
+
+	-- If we're visible force an update so everything is properly in a
+	-- non-config mode state
+	if self:IsVisible() then
+		self:Update()
+	end
+end
+MemberUnitFrame.UnforceShow = PitBull4:OutOfCombatWrapper(MemberUnitFrame.UnforceShow)
 
 --- Add the proper functions and scripts to a SecureGroupHeaderTemplate or SecureGroupPetHeaderTemplate, as well as some initialization.
 -- @param frame a Frame which inherits from SecureGroupHeaderTemplate or SecureGroupPetHeaderTemplate

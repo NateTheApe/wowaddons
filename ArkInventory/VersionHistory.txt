@@ -14,7 +14,107 @@
  * faq - http://code.google.com/p/arkinventory/wiki/FAQ
  * local help files can be downloaded from http://code.google.com/p/arkinventory/wiki/LocalHelpFiles
 
+*3.03.15 (28-SEP-2012)*
+ * added - config > settings > [location] > items > scale
+ * fixed - optional dependency link for libpetjournal
+ * fixed - x-embed dependency link for libpetjournal
+
+ *3.03.14 (27-SEP-2012)*
+ * fixed - idiot programmers really stupid mistake
+ * note - all data has been erased.  please login to each character to update its data
  
+*3.03.13 (27-SEP-2012)*
+ * fixed - issue with guild data not erasing gold value when erased
+ * fixed - possible issue with erase data function (might not be fixed as i couldnt duplicate the issue)
+ * changed - a guild bank now only has an option to erase all data
+
+*3.03.12 (26-SEP-2012)*
+ * fixed - issue with cursor not showing sell icon
+ * changed - tooltip item counts, by default they now show only your own faction
+  
+*3.03.11 (26-SEP-2012)*
+ * fixed - issue with clicking on gold amount in bag window
+ * fixed - issue with rule caching
+ * fixed - currency tokens now using blizzard linktype
+ * fixed - currency tooltips now include item counts
+ * fixed - the chatlink and dressup functions work for items in wearing, token, mail and void storage locations
+ * fixed - pet window, summon/dismiss via left click, right click menu as per pet journal
+ * fixed - ldb pet object, left click to summon next pet, shift left click to dismiss active pet, right click for setup
+ * added - pets now break down into four categories, pet (bound), pet (tradeable), battle pet (bound) and battle pet (tradeable)
+ * added - for sorting purposes item (stat) level = pet level, and item type and subtype = pet type
+ * added - for rule purposes ilvl( ) matches pet level, and type( ) matches pet type
+ * added - summoned/active pet has a pulsing glow
+ * added - custom tooltip for battle pets, should override blizzard tooltip
+ * added - option to not display source and description text from battlepet tooltip
+ * note - pet, mount and currency tracking data for ldb has been erased, please login to each character to setup ldb
+ 
+*3.03.10 (17-SEP-2012)*
+ * fixed - outfitter support code should now work properly
+ * changed - outfit rule will now check against each supported addon and then lastly check the equipment manager
+ 
+*3.03.09 (16-SEP-2012)*
+ * fixed - issue with empty bag slot custom colour reverting to grey when displayed offline
+ * fixed - issue with soulbound status, item quality and default category assignment during scan
+ * note - all saved data has been erased, please login to each character to update its data
+
+*3.03.08 (15-SEP-2012)*
+ * fixed - window drawing when in combat will draw slower but it will complete
+
+*3.03.07 (14-SEP-2012)*
+ * fixed - debug info for battlepets
+ * fixed - parts and materials categorised by your primary skills, then under trade goods
+ * fixed - keystones categorised under skill > archeology
+
+*3.03.06 (14-SEP-2012)*
+ * changed - default category; all trade goods reverted to trade goods category
+
+*3.03.05 (14-SEP-2012)*
+ * added - forge master and transmogrify npcs are now treated as merchants in regards to your auto open/close options
+ * fixed - issue with item quality not updating in bags
+ * fixed - issue where jewelcrafting didnt appear under the skill menu
+
+*3.03.04 (13-SEP-2012)*
+ * fixed - error with profession scanning code
+ * changed - default category assignment code
+
+*3.03.03 (12-SEP-2012)*
+ * fixed - issue with profession scanning code
+ * fixed - issue where internal sort keys were always recalculated every bag opening
+ * fixed - issue when outfitter initialised after ai
+ * changed - some translations reverted to blizzard internal values
+ * changed - edit mode now ignores the tint unusable option
+ * changed - bag highlight now uses the searchoverlay layer, custom layer removed
+
+*3.03.02 (01-SEP-2012)*
+ * fixed - issue with herbalism skill translation
+ * fixed - issue with fishing skill translation
+ 
+*3.03.01 (29-AUG-2012)*
+ * changed - toc set to 50001
+ * added - battle pet category
+ * added - battle pet item and tooltip support
+ * removed - ability to summon pets (via window and ldb, will return in a later version)
+
+*3.03.00 (21-AUG-2012) BETA 08-21-11-00*
+ * changed - toc set to 50001
+ * changed - will not load on live servers
+ * fixed - caged battlepet items and offline tooltips
+ * removed (temporarily) - pets (theyre now account wide so i need to decide what to do with them)
+ * removed (temporarily) - mounts
+
+*3.02.95 (09-AUG-2012)*
+ * fixed - removed ranged slot for mop beta
+ * added - more checking of saved variables
+ 
+*3.02.94 (06-JUL-2012)*
+ * added - monk class
+ 
+*3.02.93 (04-JUL-2012)*
+ * fixed - issue when hooking other mods and clearing the item cache
+ 
+*3.02.92 (24-JUN-2012)*
+ * updated - item relocation will now clear the cached rule/category assignment for that item.  allows for custom rules to work better.
+
 *3.02.91 (02-MAY-2012)*
  * updated - pets and mounts
  * fixed - issue with rules window font application

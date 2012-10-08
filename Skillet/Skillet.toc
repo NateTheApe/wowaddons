@@ -1,10 +1,10 @@
-﻿## Interface: 40300
+﻿## Interface: 50001
 ## Title: Skillet |cff7fff7f -Ace3-|r
 ## Notes: A replacement tradeskill window
 ## Notes-esES: Una sustitucion de la ventana de Habilidades de Comercio
 ## Notes-ruRU: Заменяет окно профессий на более функциональное.
 ## Author: yossa, lilsparky
-## Version 2.21
+## Version 2.36
 ## X-Category: Tradeskill
 ## X-eMail: yossa.addons@googlemail.com
 ## X-License GPL v3 or later
@@ -17,14 +17,10 @@
 #### X-RelSite-UI.WoW:
 ## SavedVariables: SkilletDB
 ## SavedVariablesPerCharacter: SkilletDBPC
-## OptionalDeps: Ace3, LibAbacus-3.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo
-## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibWindow-1.1, LibPeriodicTable-3.1
-## X-Revision: $Rev: 266 $
-## X-Curse-Packaged-Version: 2.10
-## X-Curse-Project-Name: Skillet
-## X-Curse-Project-ID: skillet
-## X-Curse-Repository-ID: wow/skillet/mainline
-## X-Curse-Packaged-Version: 2.21
+## OptionalDeps: Ace3, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1, Fizzwidget Reagent Cost, TradeSkillInfo
+## X-Embeds: Ace3, LibStub, CallbackHandler-1.0, LibAbacus-3.0, LibDialog-1.0, LibWindow-1.1, LibPeriodicTable-3.1
+## X-Revision: $Rev: 291 $
+## X-Curse-Packaged-Version: 2.37
 ## X-Curse-Project-Name: Skillet
 ## X-Curse-Project-ID: skillet
 ## X-Curse-Repository-ID: wow/skillet/mainline
@@ -50,6 +46,7 @@ Libs\AceConfig-3.0\AceConfig-3.0.xml
 Libs\AceTimer-3.0\AceTimer-3.0.xml
 
 Libs\LibAbacus-3.0\lib.xml
+Libs\LibDialog-1.0\lib.xml
 Libs\LibWindow-1.1\LibWindow-1.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1.lua
 Libs\LibPeriodicTable-3.1\LibPeriodicTable-3.1-Tradeskill\LibPeriodicTable-3.1-Tradeskill.lua

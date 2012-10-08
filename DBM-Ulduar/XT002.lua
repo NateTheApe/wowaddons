@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("XT002", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4523 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(33293)
 mod:SetModelID(28611)
 mod:SetUsedIcons(7, 8)
@@ -92,13 +92,9 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-do 
-	local lastConsumption = 0
-	function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-		if (spellId == 64208 or spellId == 64206) and destGUID == UnitGUID("player") and time() - lastConsumption > 2 then
-			specWarnConsumption:Show()
-			lastConsumption = time()
-		end
+function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if (spellId == 64208 or spellId == 64206) and destGUID == UnitGUID("player") and self:AntiSpam() then
+		specWarnConsumption:Show()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE

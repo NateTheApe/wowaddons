@@ -2,6 +2,9 @@
 
 local FL = LibStub("LibFishing-1.0");
 
+-- 5.0.4 has a problem with a global "_" (see some for loops below)
+local _
+
 local FBOptionsTable = {};
 
 local function FindOptionInfo (setting)
@@ -34,7 +37,7 @@ local function GetSetting(setting)
 	local val = nil;
 	if ( setting ) then
 		local info = FindOptionInfo(setting);
-		if ( info ) then
+		if ( info and info.getter) then
 			val = info.getter(setting);
 			if ( val == nil ) then
 				val = GetDefault(setting);
@@ -56,7 +59,7 @@ FishingBuddy.GetSettingBool = GetSettingBool;
 local function SetSetting(setting, value)
 	if ( setting ) then
 		local info = FindOptionInfo(setting);
-		if ( info ) then
+		if ( info and info.setter ) then
 			local val = GetDefault(setting);
 			if ( val == value ) then
 				info.setter(setting, nil);
@@ -259,7 +262,10 @@ end
 -- rightextra -- extra room needed, if any
 -- setting -- what this slider changes
 local function Slider_Create(info)
-	local s = CreateFrame("Slider", info.name, nil, "OptionsSliderTemplate");
+	local s = getglobal(info.name);
+	if (not s) then
+		s = CreateFrame("Slider", info.name, nil, "OptionsSliderTemplate");
+	end
 	Slider_OnLoad(s, info);
 	s:SetScript("OnShow", Slider_OnShow);
 	s:SetScript("OnValueChanged", Slider_OnValueChanged);
@@ -365,35 +371,45 @@ local function orderbuttons(btnlist)
 	return order;
 end
 
+local function CleanupButton(button)
+	button.name = nil;
+	button.width = 0;
+	button.slider = 0;
+	button.update = nil;
+	button.enabled = nil;
+	button.text = "";
+	button.tooltipText = nil;
+	button.disabledTooltipText = nil;
+	button.primary = nil;
+	button.deps = nil;
+	button.right = nil;
+	button.layoutright = nil;
+	button.margin = nil;
+	button.visible = nil;
+	button.adjacent = nil;
+	button.parents = nil;
+	if (button.overlay) then
+		button.overlay:Hide();
+		button.overlay = nil;
+	end
+	CheckBox_Able(button, 0);
+	button:ClearAllPoints();
+	if (button.checkbox) then
+		button:SetHitRectInsets(0, -100, 0, 0);
+		button:SetScript("OnShow", nil);
+		button:SetScript("OnClick", nil);
+		button.checkbox = nil;
+	end
+	button.custom = nil;
+	button:Hide();
+end
+
 local function Setup(options, nomap)
 	FishingOptionsFrame.groupoptions = options;
 	
 -- Clear out all the stuff we put on the old buttons
 	for name,button in pairs(optionmap) do
-		button.name = nil;
-		button.width = 0;
-		button.slider = 0;
-		button.update = nil;
-		button.enabled = nil;
-		button.text = "";
-		button.tooltipText = nil;
-		button.disabledTooltipText = nil;
-		button.primary = nil;
-		button.deps = nil;
-		button.right = nil;
-		button.layoutright = nil;
-		button.margin = nil;
-		button.visible = nil;
-		button.adjacent = nil;
-		button.parents = nil;
-		button.overlay = nil;
-		CheckBox_Able(button, 0);
-		button:ClearAllPoints();
-		if (button.checkbox) then
-			button:SetHitRectInsets(0, -100, 0, 0);
-		end
-		button.custom = nil;
-		button:Hide();
+		CleanupButton(button);
 	end
 	optionmap = {};
 	
@@ -410,10 +426,6 @@ local function Setup(options, nomap)
 					button:ClearAllPoints();
 					button:SetParent(FishingOptionsFrame);
 				end
-				if ( button.checkbox and option.v ) then
-					button:SetScript("OnShow", CheckButton_OnShow);
-					button:SetScript("OnClick", CheckButton_OnClick);
-				end
 			end
 		elseif ( option.v ) then
 			button = optionbuttons[index];
@@ -421,9 +433,6 @@ local function Setup(options, nomap)
 				button = CreateFrame(
 					"CheckButton", "FishingBuddyOption"..index,
 					FishingOptionsFrame, "OptionsSmallCheckButtonTemplate");
-				-- override OnShow and OnClick
-				button:SetScript("OnShow", CheckButton_OnShow);
-				button:SetScript("OnClick", CheckButton_OnClick);
 				optionbuttons[index] = button;
 			end
 			button.checkbox = 1;
@@ -434,6 +443,13 @@ local function Setup(options, nomap)
 				optionmap[name] = button;
 				button:SetFrameLevel(FishingOptionsFrame:GetFrameLevel() + 2);
 			end
+
+			if ( button.checkbox and option.v ) then
+				-- override OnShow and OnClick
+				button:SetScript("OnShow", CheckButton_OnShow);
+				button:SetScript("OnClick", CheckButton_OnClick);
+			end
+
 			button.name = name;
 			button.layoutright = option.layoutright;
 			button.margin = option.margin;
@@ -767,14 +783,16 @@ local function HandleOptions(name, icon, options, setter, getter, last)
 	handler.name = name;
 	handler.icon = icon or INV_MISC_QUESTIONMARK;
 	handler.options = FL:copytable(options);
-	handler.setter = setter or FishingBuddy.BaseSetSetting;
-	handler.getter = getter or FishingBuddy.BaseGetSetting;
+	handler.setter = setter;
+	handler.getter = getter;
 	handler.visible = maketab;
 	if ( FBOptionsTable[name] ) then
 		for name,info in pairs(FBOptionsTable[name].options) do
 			handler.options[name] = FL:copytable(info);
 		end
 		handler.index = FBOptionsTable[name].index;
+		handler.getter = handler.getter or FBOptionsTable[name].getter;
+		handler.setter = handler.setter or FBOptionsTable[name].setter;
 	end
 	FBOptionsTable[name] = handler;
 

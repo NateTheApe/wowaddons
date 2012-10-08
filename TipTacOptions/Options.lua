@@ -45,7 +45,8 @@ local options = {
 		{ type = "Check", var = "showUnitTip", label = "Enable TipTac Unit Tip Appearance", tip = "Will change the appearance of how unit tips look. Many options in TipTac only work with this setting enabled.\nNOTE: Using this options with a non English client may cause issues!", y = 8 },
 		{ type = "Check", var = "showStatus", label = "Show DC, AFK and DND Status", tip = "Will show the <DC>, <AFK> and <DND> status after the player name" },
 		{ type = "Check", var = "showGuildRank", label = "Show Player Guild Rank Title", tip = "In addition to the guild name, with this option on, you will also see their guild rank by title" },
-		{ type = "Check", var = "showTargetedBy", label = "Show Who Targets the Unit", tip = "When in a raid or party, the tip will show who from your group is targeting the unit", y = 16 },
+		{ type = "Check", var = "showTargetedBy", label = "Show Who Targets the Unit", tip = "When in a raid or party, the tip will show who from your group is targeting the unit" },
+		{ type = "Check", var = "showPlayerGender", label = "Show Player Gender", tip = "This will show the gender of the player. E.g. \"85 Female Blood Elf Paladin\".", y = 16 },
 		{ type = "DropDown", var = "nameType", label = "Name Type", list = { ["Name only"] = "normal", ["Use player titles"] = "title", ["Copy from original tip"] = "original" } },
 		{ type = "DropDown", var = "showRealm", label = "Show Unit Realm", list = { ["Do not show realm"] = "none", ["Show realm"] = "show", ["Show (*) instead"] = "asterisk" } },
 		{ type = "DropDown", var = "showTarget", label = "Show Unit Target", list = { ["Do not show target"] = "none", ["First line"] = "first", ["Second line"] = "second", ["Last line"] = "last" }, y = 16 },
@@ -57,6 +58,7 @@ local options = {
 		{ type = "Slider", var = "gttScale", label = "GameTooltip Scale", min = 0.2, max = 4, step = 0.05 },
 		{ type = "Slider", var = "updateFreq", label = "Tip Update Frequency", min = 0, max = 5, step = 0.05, y = 24 },
 		{ type = "Check", var = "enableChatHoverTips", label = "Enable ChatFrame Hover Hyperlinks", tip = "When hovering the mouse over a link in the chatframe, show the tooltip without having to click on it" },
+		{ type = "Check", var = "hideFactionText", label = "Hide Faction Text", tip = "Strips the Alliance or Horde faction text from the tooltip", y = 16 },
  	},
 	-- Colors
 	{
@@ -118,6 +120,7 @@ local options = {
 	-- Classify
 	{
 		[0] = "Classify",
+		{ type = "Text", var = "classification_minus", label = "Minus" },
 		{ type = "Text", var = "classification_trivial", label = "Trivial" },
 		{ type = "Text", var = "classification_normal", label = "Normal" },
 		{ type = "Text", var = "classification_elite", label = "Elite" },
@@ -146,7 +149,7 @@ local options = {
 	{
 		[0] = "Bar Types",
 		{ type = "Check", var = "hideDefaultBar", label = "Hide the Default Health Bar", tip = "Check this to hide the default health bar" },
-		{ type = "Check", var = "barsCondenseValues", label = "Show Condenced Bar Values", tip = "You can enable this option to condense values shown on the bars. It does this by showing 57254 as 57.3k as an example" },
+		{ type = "Check", var = "barsCondenseValues", label = "Show Condensed Bar Values", tip = "You can enable this option to condense values shown on the bars. It does this by showing 57254 as 57.3k as an example" },
 		{ type = "Check", var = "healthBar", label = "Show Health Bar", tip = "Will show a health bar of the unit." },
 		{ type = "DropDown", var = "healthBarText", label = "Health Bar Text", list = DROPDOWN_BARTEXTFORMAT, y = -2 },
 		{ type = "Check", var = "healthBarClassColor", label = "Class Colored Health Bar", tip = "This options colors the health bar in the same color as the player class", y = 6 },
@@ -217,14 +220,14 @@ local options = {
 if (TipTacTalents) then
 	options[#options + 1] = {
 		[0] = "Talents",
-		{ type = "Check", var = "showTalents", label = "Enable TipTacTalents", tip = "This options makes the tip show the talents of other players" },
+		{ type = "Check", var = "showTalents", label = "Enable TipTacTalents", tip = "This option makes the tip show the talent specialization of other players" },
 		{ type = "Check", var = "talentOnlyInParty", label = "Only Show Talents for Players in Party or Raid", tip = "When you enable this, only talents of players in your party or raid will be requested and shown", y = 12 },
-		{ type = "DropDown", var = "talentFormat", label = "Talent Format", list = { ["Elemental (57/14/00)"] = 1, ["Elemental"] = 2, ["57/14/00"] = 3,}, y = 8 },
+--		{ type = "DropDown", var = "talentFormat", label = "Talent Format", list = { ["Elemental (57/14/00)"] = 1, ["Elemental"] = 2, ["57/14/00"] = 3,}, y = 8 },	-- not supported with MoP changes
 		{ type = "Slider", var = "talentCacheSize", label = "Talent Cache Size", min = 0, max = 50, step = 1 },
 	};
 end
 
--- TipTacItemRef Support
+-- TipTacItemRef Support -- Az: this category page is full
 if (TipTacItemRef) then
 	options[#options + 1] = {
 		[0] = "ItemRef",
@@ -234,6 +237,8 @@ if (TipTacItemRef) then
 		{ type = "Check", var = "if_showAuraCaster", label = "Show Aura Tooltip Caster", tip = "When showing buff and debuff tooltips, it will add an extra line, showing who cast the specific aura" },
 		{ type = "Check", var = "if_showItemLevelAndId", label = "Show Item Level & ID", tip = "For item tooltips, show their itemLevel and itemID" },
 		{ type = "Check", var = "if_showSpellIdAndRank", label = "Show Spell ID & Rank", tip = "For spell tooltips, show their spellID and spellRank" },
+--		{ type = "Check", var = "if_showCurrencyId", label = "Show Currency ID", tip = "Currency items will now show their ID" },
+--		{ type = "Check", var = "if_showAchievementIdAndCategory", label = "Show Achievement ID & Category", tip = "On achievement tooltips, the achievement ID as well as the category will be shown" },
 		{ type = "Check", var = "if_showQuestLevelAndId", label = "Show Quest Level & ID", tip = "For quest tooltips, show their questLevel and questID" },
 		{ type = "Check", var = "if_modifyAchievementTips", label = "Modify Achievement Tooltips", tip = "Changes the achievement tooltips to show a bit more information\nWarning: Might conflict with other achievement addons" },
 		{ type = "Check", var = "if_showIcon", label = "Show Icon Texture and Count (when available)", tip = "Shows an icon next to the tooltip" },

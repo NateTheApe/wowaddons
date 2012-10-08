@@ -1,49 +1,46 @@
---German Localization
+--German localization by Pathur
+if (GetLocale()~="deDE") then return end
 local _, me = ...
+local L = me.L
 
-me:NewL({
-	professions        = "Berufe",
-	cds                = "Abklingzeiten",
-	nocds              = "Alle Bereit",
-	resetcds           = "Reset CDs",
-	settings           = "Einstellungen",
-	quicklaunch        = "Quicklaunch",
-	tooltips           = "Tooltips",
-	ShowAllTooltips    = "Alle Tooltips anzeigen",
-	showcds            = "Abklingzeiten",
-	showbuttons        = "Tasten",
-	bothfactions       = "CDs und Berufe beider Fraktionen anzeigen",
-	leftclick          = "Linksklick",
-	rightclick         = "Rechtsklick",
-	shift              = "Umschalt",
-	alt                = "ALT",
-	ctrl               = "STRG",
-	exchangeleftright  = "Vertausche Maustasten",
-	openmenu           = "Menü öffnen",
-	infight            = "Du bist im Kampf!",
-	otherchar          = "Anderere Charaktere",
-	linktome           = "Mir selber linken",
-	linktoother        = "In Chat verlinken",
-	quicklauncher      = "Separate Quicklauncher",
-	deletechartooltip  = "|cffff0000Achtung:|r Löscht alle Einstellungen des Charakters!",
-	relog              = "Relog wird benötigt!",
-	possiblereagents   = "Warscheinlichste Reagenzien",
-	autoloot           = " (+ Autoloot)",
-	filter             = "Berufe ausblenden",
-	nomats             = "Keine Mats",
-	ShowIfYouCanCraftThisInItemTooltips = "Zeige in Item Tooltips, ob du es herstellen kannst.",
-	--shared cds
-	transmute          = "Alchemie: Transmutieren",
-	--favorites
-	favorites          = "Favoriten",
-	showfavorites      = "Favoriten anzeigen",
-	nofavorites        = "Keine Favoriten angelegt!\nÖffne das Berufsfenster und Rechtsklicke auf deine Tradeskills um sie hinzuzufügen.",
-	addtofav		 		 = "Zu den Favoriten hinzufügen.",
-	removefromfav		 = "Von den Favoriten entfernen.",
-	--trainer
-	trainer            = "Lehrer",
-	knowallrecipes     = "|cffffcf00Alle Rezepte bereits gelernt|r",
-	databaseempty      = "Datenbank leer",
-	visityourtrainer   = "Besuche deinen |cff00ff00%s|r Lehrer",
-	trainerdisabled    = "Lehrer Fenster deaktivieren",
-},"deDE")
+L["addtofav"] = "Zu den Favoriten hinzufügen."
+L["alt"] = "ALT"
+L["autoloot"] = " (+ Autoloot)"
+L["bothfactions"] = "CDs und Berufe beider Fraktionen anzeigen"
+L["cds"] = "Abklingzeiten"
+L["ctrl"] = "STRG"
+L["databaseempty"] = "Datenbank leer"
+L["deletechartooltip"] = "|cffff0000Achtung:|r Löscht alle Einstellungen des Charakters!"
+L["exchangeleftright"] = "Vertausche Maustasten"
+L["favorites"] = "Favoriten"
+L["filter"] = "Berufe ausblenden"
+L["infight"] = "Du bist im Kampf!"
+L["knowallrecipes"] = "|cffffcf00Alle Rezepte bereits gelernt|r"
+L["leftclick"] = "Linksklick"
+L["linktome"] = "Mir selber linken"
+L["linktoother"] = "In Chat verlinken"
+L["nocds"] = "Alle Bereit"
+L["nofavorites"] = [=[Keine Favoriten angelegt!
+Öffne das Berufsfenster und Rechtsklicke auf deine Tradeskills um sie hinzuzufügen.]=]
+L["nomats"] = "Keine Mats"
+L["openmenu"] = "Menü öffnen"
+L["otherchar"] = "Anderere Charaktere"
+L["professions"] = "Berufe"
+L["quicklaunch"] = "Quicklaunch"
+L["quicklauncher"] = "Separate Quicklauncher"
+L["relog"] = "Relog wird benötigt!"
+L["removefromfav"] = "Von den Favoriten entfernen."
+L["resetcds"] = "Reset CDs"
+L["rightclick"] = "Rechtsklick"
+L["settings"] = "Einstellungen"
+L["shift"] = "Umschalt"
+L["ShowAllTooltips"] = "Alle Tooltips anzeigen"
+L["showbuttons"] = "Tasten"
+L["showcds"] = "Abklingzeiten"
+L["showfavorites"] = "Favoriten anzeigen"
+L["ShowIfYouCanCraftThisInItemTooltips"] = "Zeige in Item Tooltips, ob du es herstellen kannst."
+L["tooltips"] = "Tooltips"
+L["trainer"] = "Lehrer"
+L["trainerdisabled"] = "Lehrer Fenster deaktivieren"
+L["transmute"] = "Alchemie: Transmutieren"
+L["visityourtrainer"] = "Besuche deinen |cff00ff00%s|r Lehrer"

@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -15,13 +15,13 @@
     required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2011-11-06T13:34:55Z
+    This file was last updated on 2012-09-23T20:33:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -59,6 +59,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -72,7 +73,7 @@ end
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhTW");
 
 if not L then
-    T._LoadedFiles["zhTW.lua"] = "2.7.0.5";
+    T._LoadedFiles["zhTW.lua"] = "2.7.2.2";
     return;
 end;
 
@@ -139,6 +140,7 @@ L["DISABLEWARNING"] = [=[Decursive 已停用！
 如欲啟用, 輸入 |cFFFFAA44/DCR ENABLE|r]=]
 L["DISEASE"] = "疾病"
 L["DONOT_BL_PRIO"] = "不添加優先名單的玩家到排除名單"
+L["DONT_SHOOT_THE_MESSENGER"] = "Decursive is merely reporting the issue. So, don't shoot the messenger and address the actual problem." -- Needs review
 L["FAILEDCAST"] = "|cFF22FFFF%s %s|r |cFFAA0000對|r %s釋放失敗\\n|cFF00AAAA%s|r"
 L["FOCUSUNIT"] = "監控單位"
 L["FUBARMENU"] = "Fubar 選單"
@@ -195,7 +197,7 @@ L["OPT_ADVDISP"] = "進階顯示選項"
 L["OPT_ADVDISP_DESC"] = "可設定邊框與中央色塊各自的透明度，以及 MUFs 之間的距離。"
 L["OPT_AFFLICTEDBYSKIPPED"] = "%s 受到 %s 的影響，但將被忽略。"
 L["OPT_ALLOWMACROEDIT"] = "允許巨集版本"
-L["OPT_ALLOWMACROEDIT_DESC"] = "啟用此項以防止 Decursive 更新巨集，可自行編輯所需的巨集。" -- Needs review
+L["OPT_ALLOWMACROEDIT_DESC"] = "啟用此項以防止 Decursive 更新巨集，可自行編輯所需的巨集。"
 L["OPT_ALWAYSIGNORE"] = "即使不在戰鬥中也忽略之"
 L["OPT_ALWAYSIGNORE_DESC"] = "如果選取該選項，即使脫離戰鬥也忽略該負面效果而不解除"
 L["OPT_AMOUNT_AFFLIC_DESC"] = "設定即時清單最多顯示幾人。"
@@ -214,11 +216,11 @@ L["OPT_CHECKOTHERPLAYERS_DESC"] = "顯示當前小隊或團隊玩家 Decursive �
 L["OPT_CMD_DISBLED"] = "已禁用"
 L["OPT_CMD_ENABLED"] = "啟用"
 L["OPT_CREATE_VIRTUAL_DEBUFF"] = "建立虛擬負面效果測試"
-L["OPT_CREATE_VIRTUAL_DEBUFF_DESC"] = "讓你看到當負面效果發生時的情形" -- Needs review
+L["OPT_CREATE_VIRTUAL_DEBUFF_DESC"] = "讓你看到當負面效果發生時Decursive的樣子。"
 L["OPT_CUREPETS_DESC"] = "寵物會被顯示出來也可淨化。"
 L["OPT_CURE_PRIORITY_NUM"] = "優先級 #%d"
 L["OPT_CURINGOPTIONS"] = "淨化選項"
-L["OPT_CURINGOPTIONS_DESC"] = "設定淨化選項。" -- Needs review
+L["OPT_CURINGOPTIONS_DESC"] = "淨化的選項包含更改每種負面效果與順序的選項。"
 L["OPT_CURINGOPTIONS_EXPLANATION"] = [=[	
 選擇你想要治療的傷害類型，未經檢查的類型將被 Decursive 完全忽略。
 
@@ -228,9 +230,9 @@ L["OPT_CURINGOPTIONS_EXPLANATION"] = [=[
 
 所有這一切的說明文檔（請見）：
 http://www.wowace.com/addons/decursive/]=] -- Needs review
-L["OPT_CURINGORDEROPTIONS"] = "淨化順序設定" -- Needs review
+L["OPT_CURINGORDEROPTIONS"] = "淨化順序設定"
 L["OPT_CURSECHECK_DESC"] = "選取後你可以看見並解除被詛咒的玩家。"
-L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "允許巨集編輯（僅限進階使用者）" -- Needs review
+L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "允許巨集編輯（僅限進階使用者）"
 L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = [=[如果要編輯內部巨集請勾選此項，Decursive 將使用您的自訂法術。
 
 注意：勾選此項將允許你編輯由 Decursive 所管理的法術。
@@ -238,8 +240,8 @@ L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = [=[如果要編輯內部巨集請勾�
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "傷害類型"
 L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "此法術是 Decursive 自動配置的一部份，如果此法術無法正常運作，移除或禁用此項以回復預設的 Decursive 設定。" -- Needs review
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"] = "警告：法術 %q 未出現在巨集中，範圍及冷卻資訊將無法符合。" -- Needs review
-L["OPT_CUSTOM_SPELL_MACRO_MISSING_UNITID_KEYWORD"] = "缺少 UNITED 關鍵字。" -- Needs review
-L["OPT_CUSTOM_SPELL_MACRO_TEXT"] = "巨集文字：" -- Needs review
+L["OPT_CUSTOM_SPELL_MACRO_MISSING_UNITID_KEYWORD"] = "缺少結合關鍵字。"
+L["OPT_CUSTOM_SPELL_MACRO_TEXT"] = "巨集文字："
 L["OPT_CUSTOM_SPELL_MACRO_TEXT_DESC"] = [=[編輯預設的巨集文字。
 |cFFFF0000有兩項限制：|r
 
@@ -247,14 +249,13 @@ L["OPT_CUSTOM_SPELL_MACRO_TEXT_DESC"] = [=[編輯預設的巨集文字。
 
 - 無論法術在巨集中如何使用， Decursive 將保持顯示左方的原始名稱，以利範圍及冷卻的顯示 / 追蹤。
 （如果你計畫要使用不同的法術名稱的話，請注意這一點）]=] -- Needs review
-L["OPT_CUSTOM_SPELL_MACRO_TOO_LONG"] = "你的巨集過長，需移除 %d 個字元。" -- Needs review
+L["OPT_CUSTOM_SPELL_MACRO_TOO_LONG"] = "你的巨集過長，需移除 %d 個字元。"
 L["OPT_CUSTOM_SPELL_PRIORITY"] = "法術優先級"
-L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = "當有多個法術可以治療相同類型的傷害，將選擇優先級高的。"
+L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = "當有多個法術可以治療相同類型的傷害，將選擇優先級高的。" -- Needs review
 L["OPT_CUSTOMSPELLS"] = "自訂法術"
-L["OPT_CUSTOMSPELLS_DESC"] = "這裡添加法術擴展 Decursive 的自動配置。" -- Needs review
+L["OPT_CUSTOMSPELLS_DESC"] = [=[這裡添加法術以擴展Decursive的自動配置。
+您的自訂法術總是會有高優先權，並且將蓋過與替代預設的法術(只有在你的角色可以使用這些法術的時候)。]=]
 L["OPT_CUSTOMSPELLS_EFFECTIVE_ASSIGNMENTS"] = "有效法術分配"
-L["OPT_CUSTOM_SPELL_STOPCASTING"] = "/StopCasting"
-L["OPT_CUSTOM_SPELL_STOPCASTING_DESC"] = "使用此法術將打斷其它施放法術（如果是寵物法術請反選此項）"
 L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "不可用"
 L["OPT_DEBCHECKEDBYDEF"] = [=[
 
@@ -322,15 +323,15 @@ L["OPT_MFREFRESHSPEED"] = "刷新速度"
 L["OPT_MFREFRESHSPEED_DESC"] = "設定每次刷新多少個 micro-unit-frames。"
 L["OPT_MFSCALE"] = "micro-unit-frames 大小"
 L["OPT_MFSCALE_DESC"] = "設定螢幕上 micro-unit-frames 的大小。"
-L["OPT_MFSETTINGS"] = "Micro Unit Frame 設定選項" -- Needs review
-L["OPT_MFSETTINGS_DESC"] = "設定 MUF 視窗以符合你的需求。" -- Needs review
+L["OPT_MFSETTINGS"] = "微單位框格(MUF)設定選項"
+L["OPT_MFSETTINGS_DESC"] = "設定 MUF 框格以顯示不同的負面類型與順序。"
 L["OPT_MUFFOCUSBUTTON"] = "監控按鈕："
 L["OPT_MUFHANDLE_HINT"] = "移動 MUFs：在第一個 MUF 之上 Alt+點擊的不可見表頭。"
 L["OPT_MUFMOUSEBUTTONS"] = "滑鼠綁定"
 L["OPT_MUFMOUSEBUTTONS_DESC"] = [=[設定每個 MUF 滑鼠按鈕的警報顏色。
 更改此項之前請檢查“|cFFFF5533淨化選項|”！]=] -- Needs review
 L["OPT_MUFSCOLORS"] = "顏色"
-L["OPT_MUFSCOLORS_DESC"] = "變更 MUFs 的顏色" -- Needs review
+L["OPT_MUFSCOLORS_DESC"] = "設定MUF不同負面類型的顏色與順序的選項。"
 L["OPT_MUFSVERTICALDISPLAY"] = "垂直顯示"
 L["OPT_MUFSVERTICALDISPLAY_DESC"] = "MUFs 視窗將垂直增長"
 L["OPT_MUFTARGETBUTTON"] = "目標按鈕："
@@ -434,9 +435,11 @@ L["SUCCESSCAST"] = "|cFF22FFFF%s %s|r |cFF00AA00成功淨化|r %s"
 L["TARGETUNIT"] = "選取目標"
 L["TIE_LIVELIST"] = "即時清單顯示與 DCR 視窗連結"
 L["TOOFAR"] = "太遠"
+L["TOO_MANY_ERRORS_ALERT"] = [=[There are too many Lua errors in your User Interface (%d). Your game experience is currently degraded. Disable or update the failing add-ons to turn off this message and regain a proper frame rate.
+You may want to turn on Lua error reporting ('Help' section of World of Warcraft's interface options) to identify the problematic add-ons.]=] -- Needs review
 L["UNITSTATUS"] = "玩家狀態: "
 L["UNSTABLERELEASE"] = "不穩定釋出版"
 
 
 
-T._LoadedFiles["zhTW.lua"] = "2.7.0.5";
+T._LoadedFiles["zhTW.lua"] = "2.7.2.2";

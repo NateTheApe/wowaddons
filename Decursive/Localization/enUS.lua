@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -15,13 +15,13 @@
     required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2011-11-06T13:34:55Z
+    This file was last updated on 2012-09-23T20:33:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -60,6 +60,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -117,6 +118,10 @@ L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33Please report the content of this window
 Also tell in your report if you noticed any strange behavior of Decursive.
 ]=]
 L["DECURSIVE_DEBUG_REPORT"] = "**** |cFFFF0000Decursive Debug Report|r ****"
+L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"] = [=[|cFF11FF33Decursive crashed but fear not! A NEW version of Decursive has been detected (%s). You simply need to update. Go to curse.com and search for 'Decursive' or use Curse's client, it'll update automatically all your beloved add-ons.|r
+|cFFFF1133So don't waste your time reporting this bug as it's probably been fixed already. Just update Decursive to get rid of this problem!|r
+|cFF11FF33Thanks for reading this!|r
+]=]
 L["DECURSIVE_DEBUG_REPORT_NOTIFY"] = [=[A debug report is available!
 Type |cFFFF0000/DCRREPORT|r to see it.]=]
 L["DECURSIVE_DEBUG_REPORT_SHOW"] = "Debug report available!"
@@ -242,6 +247,8 @@ Note: Checking this allows you to modify spells managed by Decursive.
 (---For advanced users only---)]=]
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "Affliction types"
 L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "This spell is part of Decursive's automatic configuration. If this spell is no longer working correctly, you can remove or disable it to regain default Decursive behaviour."
+L["OPT_CUSTOM_SPELL_ISPET"] = "Pet ability"
+L["OPT_CUSTOM_SPELL_ISPET_DESC"] = "Check this if this is an ability belonging to one of your pets so Decursive can detect and cast it properly."
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"] = "Warning: The spell %q is not present in your macro, range and cooldown information will not match..."
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_UNITID_KEYWORD"] = "The UNITID keyword is missing."
 L["OPT_CUSTOM_SPELL_MACRO_TEXT"] = "Macro text:"
@@ -254,14 +261,16 @@ L["OPT_CUSTOM_SPELL_MACRO_TEXT_DESC"] = [=[Edit the default macro text.
 (keep that in mind if you plan on using different spells with conditionals)]=]
 L["OPT_CUSTOM_SPELL_MACRO_TOO_LONG"] = "Your macro is too long, you need to remove %d characters."
 L["OPT_CUSTOM_SPELL_PRIORITY"] = "Spell priority"
-L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = "When several spells can cure the same affliction types, those with a higher priority will be preferred."
+L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = [=[When several spells can cure the same affliction types, those with a higher priority will be preferred.
+
+Note that default abilities managed by Decursive have a priority ranging from 0 to 9.
+
+Thus, if you give your custom spell a negative priority, it will only be chosen if the default ability is not available.]=]
 L["OPT_CUSTOMSPELLS"] = "Custom spells"
 L["OPT_CUSTOMSPELLS_DESC"] = [=[Here you can add spells to extend Decursive's automatic configuration.
 Your custom spells always have a higher priority and will override and replace the default spells (if and only if your character can use those spells).
 ]=]
 L["OPT_CUSTOMSPELLS_EFFECTIVE_ASSIGNMENTS"] = "Effective spells assignments:"
-L["OPT_CUSTOM_SPELL_STOPCASTING"] = "/StopCasting"
-L["OPT_CUSTOM_SPELL_STOPCASTING_DESC"] = "Using this spell will interrupt other spells in progress (uncheck that if the spell comes from a pet)"
 L["OPT_CUSTOM_SPELL_UNAVAILABLE"] = "unavailable"
 L["OPT_DEBCHECKEDBYDEF"] = [=[
 
@@ -455,4 +464,4 @@ L["UNSTABLERELEASE"] = "Unstable release"
 
 
 
-T._LoadedFiles["enUS.lua"] = "2.7.0.5";
+T._LoadedFiles["enUS.lua"] = "2.7.2.2";

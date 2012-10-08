@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Skarloc", "DBM-Party-BC", 11)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 386 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 399 $"):sub(12, -3))
 mod:SetCreatureID(17862)
 mod:SetModelID(17387)
 
@@ -39,13 +39,9 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-do 
-	local lastConsecration = 0
-	function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-		if spellId == 38385 and destGUID == UnitGUID("player") and time() - lastConsecration > 2 then
-			specWarnConsecration:Show()
-			lastConsecration = time()
-		end
+function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if spellId == 38385 and destGUID == UnitGUID("player") and self:AntiSpam() then
+		specWarnConsecration:Show()
 	end
-	mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 end
+mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE

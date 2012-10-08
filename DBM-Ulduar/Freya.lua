@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Freya", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4133 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 
 mod:SetCreatureID(32906)
 mod:SetModelID(28777)
@@ -51,7 +51,6 @@ mod:AddBoolOption("HealthFrame", true)
 local adds		= {}
 local rootedPlayers 	= {}
 local altIcon 		= true
-local killTime		= 0
 local iconId		= 6
 
 function mod:OnCombatStart(delay)
@@ -139,8 +138,7 @@ function mod:UNIT_DIED(args)
 		if self.Options.HealthFrame then
 			DBM.BossHealth:RemoveBoss(cid)
 		end
-		if (GetTime() - killTime) > 20 then
-			killTime = GetTime()
+		if self:AntiSpam(20) then
 			timerSimulKill:Start()
 			warnSimulKill:Show()
 		end

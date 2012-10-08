@@ -2,10 +2,10 @@
 ************************************************************************
 Custom.lua
 ************************************************************************
-File date: 2011-12-18T18:17:48Z
-File hash: 8bf2196
-Project hash: de16aef
-Project version: 2.3.0
+File date: 2012-09-19T02:14:11Z
+File hash: f4ad732
+Project hash: 9e1f108
+Project version: 2.4.1
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -27,47 +27,50 @@ local LibStub = _G.LibStub
 
 local addon		= LibStub("AceAddon-3.0"):GetAddon(private.addon_name)
 local L			= LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
-local BZ		= LibStub("LibBabble-Zone-3.0"):GetLookupTable()
+
+local Z			= private.ZONE_NAMES
 
 private.custom_list	= {}
 
 function addon:InitCustom()
-	local function AddCustom(identifier, location, coord_x, coord_y, faction)
-		private:AddListEntry(private.custom_list, identifier, L[identifier], location, coord_x, coord_y, nil)
+	local function AddCustom(identifier, zone_name, coord_x, coord_y, faction)
+		private:AddListEntry(private.custom_list, identifier, L[identifier], zone_name, coord_x, coord_y, nil)
 	end
-	AddCustom("DAILY_COOKING_MEAT", BZ["Shattrath City"])
-	AddCustom("DAILY_COOKING_FISH", BZ["Shattrath City"])
-	AddCustom("DAILY_FISHING_SHATT", BZ["Shattrath City"])
+	AddCustom("DAILY_COOKING_MEAT", Z.SHATTRATH_CITY)
+	AddCustom("DAILY_COOKING_FISH", Z.SHATTRATH_CITY)
+	AddCustom("DAILY_FISHING_SHATT", Z.SHATTRATH_CITY)
 	AddCustom("DEFAULT_RECIPE")
 	AddCustom("CRAFTED_ENGINEERS")
-	AddCustom("ONYXIA_HEAD_QUEST", BZ["Onyxia's Lair"])
-	AddCustom("HENRY_STERN_RFD", BZ["Razorfen Downs"])
-	AddCustom("ENG_GNOMER", BZ["Gnomeregan"])
-	AddCustom("ENG_FLOOR_ITEM_BRD", BZ["Blackrock Depths"])
-	AddCustom("AQ40_RANDOM_BOP", BZ["Temple of Ahn'Qiraj"])
-	AddCustom("SUNWELL_RANDOM", BZ["Sunwell Plateau"])
-	AddCustom("BRD_RANDOM_ROOM", BZ["Blackrock Depths"])
-	AddCustom("MC_RANDOM", BZ["Molten Core"])
-	AddCustom("HYJAL_RANDOM", BZ["Hyjal Summit"])
-	AddCustom("SCHOLO_BOOK_SPAWN", BZ["Scholomance"])
-	AddCustom("STRATH_BS_PLANS", BZ["Stratholme"])
-	AddCustom("DM_TRIBUTE", BZ["Dire Maul"], 59.04, 48.82)
-	AddCustom("BT_RANDOM", BZ["Black Temple"])
-	AddCustom("TK_RANDOM", BZ["Tempest Keep"])
+	AddCustom("ONYXIA_HEAD_QUEST", Z.ONYXIAS_LAIR)
+	AddCustom("HENRY_STERN_RFD", Z.RAZORFEN_DOWNS)
+	AddCustom("ENG_GNOMER", Z.GNOMEREGAN)
+	AddCustom("ENG_FLOOR_ITEM_BRD", Z.BLACKROCK_DEPTHS)
+	AddCustom("AQ40_RANDOM_BOP", Z.AHNQIRAJ_THE_FALLEN_KINGDOM)
+	AddCustom("SUNWELL_RANDOM", Z.SUNWELL_PLATEAU)
+	AddCustom("BRD_RANDOM_ROOM", Z.BLACKROCK_DEPTHS)
+	AddCustom("MC_RANDOM", Z.MOLTEN_CORE)
+	AddCustom("HYJAL_RANDOM", Z.HYJAL_SUMMIT)
+	AddCustom("SCHOLO_BOOK_SPAWN", Z.SCHOLOMANCE)
+	AddCustom("STRATH_BS_PLANS", Z.STRATHOLME)
+	AddCustom("DM_TRIBUTE", Z.DIRE_MAUL, 59.04, 48.82)
+	AddCustom("BT_RANDOM", Z.BLACK_TEMPLE)
+	AddCustom("TK_RANDOM", Z.TEMPEST_KEEP)
 	AddCustom("OGRI_DRAGONS")
 	AddCustom("KUNG")
-	AddCustom("SSC_RANDOM", BZ["Serpentshrine Cavern"])
-	AddCustom("DAILY_COOKING_DAL", BZ["Dalaran"])
-	AddCustom("ULDUAR_RANDOM", BZ["Ulduar"])
-	AddCustom("NAXX40_GONE")
-	AddCustom("TOC25_RANDOM", BZ["Trial of the Crusader"])
+	AddCustom("SSC_RANDOM", Z.SERPENTSHRINE_CAVERN)
+	AddCustom("DAILY_COOKING_DAL", Z.DALARAN)
+	AddCustom("ULDUAR_RANDOM", Z.ULDUAR)
+	AddCustom("TOC25_RANDOM", Z.TRIAL_OF_THE_CRUSADER)
 	AddCustom("LORE_NORTH")
 	AddCustom("NORTH_DUNG")
 	AddCustom("BUGGED")
-	AddCustom("ARCH_DROP_ULD", BZ["Uldum"])
+	AddCustom("ARCH_DROP_ULD", Z.ULDUM)
 	AddCustom("REMOVED_FROM_GAME")
-	AddCustom("FIRELANDS_RANDOM", BZ["Firelands"])
-	AddCustom("DRAGONSOUL_RANDOM", BZ["Dragon Soul"])
+	AddCustom("FIRELANDS_RANDOM", Z.FIRELANDS)
+	AddCustom("DRAGONSOUL_RANDOM", Z.DRAGON_SOUL)
+	AddCustom("PREREQ")
+	AddCustom("BLACK_MARKET_AUCTION_HOUSE")
+	AddCustom("MOP_RAIDS_RANDOM", Z.HEART_OF_FEAR)
 
 	self.InitCustom = nil
 end

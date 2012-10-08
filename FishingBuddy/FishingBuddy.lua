@@ -2,16 +2,11 @@
 --
 -- Everything you wanted support for in your fishing endeavors
 
+-- 5.0.4 has a problem with a global "_" (see some for loops below)
+local _
+
 local Crayon = LibStub("LibCrayon-3.0");
 local FL = LibStub("LibFishing-1.0");
-
-local BL = LibStub("LibBabble-Zone-3.0"):GetBaseLookupTable();
-local BZ = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
-local BZR = LibStub("LibBabble-Zone-3.0"):GetReverseLookupTable();
-local LT = LibStub("LibTourist-3.0");
-local BSL = LibStub("LibBabble-SubZone-3.0"):GetBaseLookupTable();
-local BSZ = LibStub("LibBabble-SubZone-3.0"):GetLookupTable();
-local BSZR = LibStub("LibBabble-SubZone-3.0"):GetReverseLookupTable();
 
 -- Information for the stylin' fisherman
 local POLES = {
@@ -168,7 +163,7 @@ local CastingOptions = {
 		["default"] = 0 },
 	["AutoOpen"] = {
 		["text"] = FBConstants.CONFIG_AUTOOPEN_ONOFF,
-		["tooltip"] = FBConstants.CONFIG_AUTOPEN_INFO,
+		["tooltip"] = FBConstants.CONFIG_AUTOOPEN_INFO,
 		["v"] = 1,
 		["m"] = 1,
 		["deps"] = { ["EasyCast"] = "d" },
@@ -214,23 +209,21 @@ local CastingOptions = {
 		["primary"] = "ContestSupport",
 		["deps"] = { ["ContestSupport"] = "d", ["EasyCast"] = "d" }
 	},
-	["ShowPools"] = {
-		["text"] = FBConstants.CONFIG_SHOWPOOLS_ONOFF,
-		["tooltip"] = FBConstants.CONFIG_SHOWPOOLS_INFO,
-		["v"] = 1,
-		["default"] = 1,
-		["primary"] = "ContestSupport",
-		["deps"] = { ["ContestSupport"] = "d" }
-	},
 	["EasyCastKeys"] = {
 		["default"] = FBConstants.KEYS_NONE,
 		["button"] = "FishingBuddyOption_EasyCastKeys",
+		["tooltipd"] = FBConstants.CONFIG_EASYCASTKEYS_INFO,
 		["margin"] = { 16, 0 },
 		["deps"] = { ["EasyCast"] = "h" },
 		["setup"] =
-			function()
+			function(button)
 				local gs = FishingBuddy.GetSetting;
 				FishingBuddyOption_EasyCastKeys:SetKeyValue("EasyCastKeys", gs("EasyCastKeys"));
+				button.overlay:ClearAllPoints();
+				button.overlay:SetPoint("TOPLEFT", button.label, "TOPLEFT");
+				button.overlay:SetSize(button:GetWidth(), button:GetHeight());
+				button.overlay:SetFrameLevel(button:GetFrameLevel()+2);
+				button.overlay:Show();
 			end,
 	},
 };
@@ -263,6 +256,9 @@ local InvisibleOptions = {
 	},
 	["EnhanceSound_AmbienceVolume"] = {
 		["default"] = 0.0,
+	},
+	["EnhanceSound_MasterVolume"] = {
+		["default"] = 100,
 	},
 	["EnhanceMapWaterSounds"] = {
 		["default"] = 0,
@@ -302,6 +298,8 @@ local VolumeSlider =
 	["format"] = VOLUME.." - %d%%",
 	["min"] = 0,
 	["max"] = 100,
+	["step"] = 5,
+	["scale"] = 1,
 	["rightextra"] = 32,
 	["setting"] = "EnhanceSound_MasterVolume",
 };
@@ -335,8 +333,6 @@ end
 
 FishingBuddy.ByFishie = nil;
 FishingBuddy.SortedFishies = nil;
-
-FishingBuddy.SavedToggleMinimap = nil;
 
 FishingBuddy.StartedFishing = nil;
 
@@ -452,11 +448,7 @@ local function RegisterHandlers(handlers)
 			fake = IsFakeEvent(evt);
 		else
 			func = info.func;
-			if ( IsFakeEvent(evt) ) then
-				fake = true;
-			else
-				fake = info.fake;
-			end
+			fake = IsFakeEvent(evt) or info.fake;
 		end
 		tinsert(event_handlers[evt], func);
 		if ( not fake ) then
@@ -543,7 +535,7 @@ end
 
 -- handle option keys for enabling casting
 local key_actions = {
-	[FBConstants.KEYS_NONE] = function() return true; end,
+	[FBConstants.KEYS_NONE] = function() return false; end,
 	[FBConstants.KEYS_SHIFT] = function() return IsShiftKeyDown(); end,
 	[FBConstants.KEYS_CTRL] = function() return IsControlKeyDown(); end,
 	[FBConstants.KEYS_ALT] = function() return IsAltKeyDown(); end,
@@ -761,8 +753,18 @@ QuestItems[69914] = {
 	["enUS"] = "Giant Catfish",
 	open = true,
 };
-
 FishingBuddy.QuestItems = QuestItems;
+
+local QuestLures = {};
+QuestLures[58788] = {
+	["enUS"] = "Overgrown Earthworm",	-- Diggin' for Worms
+	spell = 80534,
+};
+QuestLures[58949] = {
+	["enUS"] = "Stag Eye",				-- A Staggering Effor
+	spell = 80868,
+};
+FishingBuddy.QuestLures = QuestLures;
 
 local function SetFishingLevel(skillcheck, zone, subzone, fishid)
 	if ( not zone ) then
@@ -817,9 +819,8 @@ local function AddFishie(color, id, name, zone, subzone, texture, quantity, qual
 	if ( name and not FishingBuddy_Info["Fishies"][id][CurLoc] ) then
 		FishingBuddy_Info["Fishies"][id][CurLoc] = name;
 	end
-	-- Only quest items have matching itemType and subType values, but let's
-	-- can use the value that the AH instead
-	if ( it and it == questType) then
+	-- Only quest items have matching itemType and subType values, as well
+	if ( (it and it == questType) or QuestItems[id] ) then
 		-- subtype is Quest as well
 		FishingBuddy_Info["Fishies"][id].quest = true;
 		if ( FishingBuddy_Info["Fishies"][id].canopen == nil ) then
@@ -979,24 +980,31 @@ local function UpdateLure()
 
 	if ( GSB("EasyLures") ) then
 		-- Is this a quest fish we should open up?
-		if ( OpenThisFishId and GSB("AutoOpen") and GetItemCount(OpenThisFishId) > 0 ) then
-			FL:InvokeLuring(OpenThisFishId);
-			if ( GetItemCount(OpenThisFishId) < 2 ) then
-				OpenThisFishId = nil;
-			end
-			return true;
-		end
-		
-		-- do we have an overgrown earthworm in our possession?
-		if ( GetItemCount(58788) > 0 ) then
-			local worms, _, _, _, _, _, _, _, _ = GetSpellInfo(80534);
-			if ( not FL:HasBuff(worms) ) then
-				FL:InvokeLuring(58788);
+		if ( GSB("AutoOpen") ) then
+			if ( OpenThisFishId and GetItemCount(OpenThisFishId) > 0 ) then
+				FL:InvokeLuring(OpenThisFishId);
 				return true;
 			end
+			
+			-- look for quest lures
+			for itemid, spellid in pairs(QuestLures) do
+				if ( GetItemCount(itemid) > 0 ) then
+					local buff = GetSpellInfo(spellid);
+					if ( not FL:HasBuff(buff) ) then
+						FL:InvokeLuring(itemid);
+						return true;
+					end
+				end
+			end
 		end
-		-- we can drop through and add our normal lure, because the overgrown
-		-- earthworm buff is on the player, not the pole...
+
+		-- only apply a lure if we're actually fishing with a "real" pole
+		if (not FL:IsFishingPole()) then
+			return false;
+		end
+		 
+		-- we can drop through and add our normal lure, because the quest buff is on
+		-- the player, not the pole...
 		local skill, _, _, _ = FL:GetCurrentSkill();
 		
 		if (skill > 0) then
@@ -1065,7 +1073,13 @@ CaptureEvents["TRACKED_ACHIEVEMENT_UPDATE"] = function(id, criterion, actualtime
 end
 
 CaptureEvents["LOOT_OPENED"] = function()
-	if ( IsFishingLoot()) then
+	if (OpenThisFishId) then
+		if (GetItemCount(OpenThisFishId) == 0 ) then
+			OpenThisFishId = nil
+		end
+	end
+	
+	if ( IsFishingLoot() or OpenThisFishId ) then
 		local poolhint = nil;
 		-- How long ago did the achievement fire?
 		local elapsedtime = GetTime() - trackedtime;
@@ -1076,8 +1090,9 @@ CaptureEvents["LOOT_OPENED"] = function()
 		-- if we want to autoloot, and Blizz isn't, let's grab stuff
 		local doautoloot = ShouldAutoLoot() and (GetCVar("autoLootDefault") ~= "1" );
 		local zone, subzone = FL:GetZoneInfo();
+		local checkloot = LootSlotIsItem or LootSlotHasItem;
 		for index = 1, GetNumLootItems(), 1 do
-			if (LootSlotIsItem(index)) then
+			if (checkloot(index)) then
 -- lootIcon, lootName, lootQuantity, rarity, locked = GetLootSlotInfo(index)
 -- itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,itemEquipLoc, itemTexture = GetItemInfo(itemID or "itemString" or "itemName" or "itemLink") ;
 				local texture, fishie, quantity, quality = GetLootSlotInfo(index);
@@ -1094,11 +1109,19 @@ CaptureEvents["LOOT_OPENED"] = function()
 				LootSlot(index);
 			end
 		end
+
 		ClearTooltipText();
 		FL:ExtendDoubleClick();
 		LureState = 0;
 	end
 end
+
+local function ClearAddingLure()
+	AddingLure = false;
+end
+
+CaptureEvents["UNIT_SPELLCAST_STOP"] = ClearAddingLure;
+CaptureEvents["UNIT_SPELLCAST_INTERRUPTED"] = ClearAddingLure;
 
 StatusEvents = {};
 StatusEvents["ACTIONBAR_SLOT_CHANGED"] = function()
@@ -1121,7 +1144,7 @@ local function NormalHijackCheck()
 	if ( not AddingLure and
 		 not InCombatLockdown() and (not IsMounted() or GSB("MountedCast")) and
 		 not IsFishingAceEnabled() and
-		 GSB("EasyCast") and CastingKeys() and FL:IsFishingPole() ) then
+		 GSB("EasyCast") and (CastingKeys() or FL:IsFishingGear()) ) then
 		return true;
 	end
 end
@@ -1300,7 +1323,7 @@ local function StopFishingMode(logout)
 end
 
 local function FishingMode()
-	if ( FL:IsFishingPole() ) then
+	if ( FL:IsFishingGear() ) then
 		StartFishingMode();
 	else
 		StopFishingMode();
@@ -1815,6 +1838,18 @@ if ( FishingBuddy.Debugging ) then
 					FishingBuddy.Debug("		'"..it.."' '"..st.."'");
 				end
 			end
+			return true;
+		end
+
+	FishingBuddy.Commands["opens"] = {};
+	FishingBuddy.Commands["opens"].func =
+		function()
+			local id = 7973;
+			QuestItems[id] = { open = true, };
+			FishingBuddy_Info["Fishies"][id].canopen = nil;
+			local name, _, _, _, _, _, _, _,_, _ = GetItemInfo(id) ;
+			FishingBuddy.Debug("Make "..name.." openable ("..GetItemCount(id)..")");
+			OpenThisFishId = id;
 			return true;
 		end
 

@@ -1,16 +1,16 @@
 --[[
 Name: LibJostle-3.0
-Revision: $Rev: 50 $
+Revision: $Rev: 55 $
 Author(s): ckknight (ckknight@gmail.com)
 Website: http://ckknight.wowinterface.com/
 Documentation: http://www.wowace.com/addons/libjostle-3-0/
 SVN: svn://svn.wowace.com/wow/libjostle-3-0/mainline/trunk
-Description: A library to handle rearrangement of blizzard's frames when bars are added to the sides of the screen.
+Description: A library to handle rearrangement of blizzards frames when bars are added to the sides of the screen.
 License: LGPL v2.1
-]]
+--]]
 
 local MAJOR_VERSION = "LibJostle-3.0"
-local MINOR_VERSION = tonumber(("$Revision: 50 $"):match("(%d+)")) + 90000
+local MINOR_VERSION = tonumber(("$Revision: 55 $"):match("(%d+)")) + 90000
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -34,6 +34,7 @@ local blizzardFrames = {
 	'Gypsy_PlayerFrameCapsule',
 	'Gypsy_TargetFrameCapsule',
 	'ConsolidatedBuffs',
+	'BuffFrame',
 	'DEFAULT_CHAT_FRAME',
 	'ChatFrame2',
 	'GroupLootFrame1',
@@ -426,7 +427,7 @@ function Jostle:Refresh(...)
 						offset = offset - TicketStatusFrame:GetHeight() * TicketStatusFrame:GetScale()
 					elseif frame == DEFAULT_CHAT_FRAME then
 						y = MainMenuBar:GetHeight() * MainMenuBar:GetScale() + 32
-						if PetActionBarFrame:IsShown() or ShapeshiftBarFrame:IsShown() then
+						if ShapeshiftBarFrame and (PetActionBarFrame:IsShown() or ShapeshiftBarFrame:IsShown()) then
 							offset = offset + ShapeshiftBarFrame:GetHeight() * ShapeshiftBarFrame:GetScale()
 						end
 						if MultiBarBottomLeft:IsShown() then
@@ -439,7 +440,7 @@ function Jostle:Refresh(...)
 						end
 					elseif frame == CastingBarFrame then
 						y = MainMenuBar:GetHeight() * MainMenuBar:GetScale() + 17
-						if PetActionBarFrame:IsShown() or ShapeshiftBarFrame:IsShown() then
+						if ShapeshiftBarFrame and (PetActionBarFrame:IsShown() or ShapeshiftBarFrame:IsShown()) then
 							offset = offset + ShapeshiftBarFrame:GetHeight() * ShapeshiftBarFrame:GetScale()
 						end
 						if MultiBarBottomLeft:IsShown() or MultiBarBottomRight:IsShown() then

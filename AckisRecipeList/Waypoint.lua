@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- Waypoint.lua
 -------------------------------------------------------------------------------
--- File date: 2011-10-16T12:32:08Z
--- File hash: ed52e48
--- Project hash: de16aef
--- Project version: 2.3.0
+-- File date: 2012-09-13T18:19:29Z
+-- File hash: 5b03947
+-- Project hash: 9e1f108
+-- Project version: 2.4.1
 -------------------------------------------------------------------------------
 -- Please see http://www.wowace.com/addons/arl/ for more information.
 -------------------------------------------------------------------------------
@@ -29,10 +29,9 @@ local FOLDER_NAME, private	= ...
 local LibStub = _G.LibStub
 local addon	= LibStub("AceAddon-3.0"):GetAddon(private.addon_name)
 local L		= LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
-local BFAC	= LibStub("LibBabble-Faction-3.0"):GetLookupTable()
-local BZ	= LibStub("LibBabble-Zone-3.0"):GetLookupTable()
 
 local A = private.ACQUIRE_TYPES
+local Z = private.ZONE_NAMES
 
 -------------------------------------------------------------------------------
 -- Constants.
@@ -41,12 +40,17 @@ local KALIMDOR_NAMES = {}
 local EASTERN_KINGDOMS_NAMES = {}
 local OUTLAND_NAMES = {}
 local NORTHREND_NAMES = {}
+local THE_MAELSTROM_NAMES = {}
+local PANDARIA_NAMES = {}
 
 local KALIMDOR_IDNUMS = {}
 local EASTERN_KINGDOMS_IDNUMS = {}
 local OUTLAND_IDNUMS = {}
 local NORTHREND_IDNUMS = {}
+local THE_MAELSTROM_IDNUMS = {}
+local PANDARIA_IDNUMS = {}
 
+-- TODO: Rewrite the whole thing based on GetMapContinents() instead of raw IDs for continents.
 local function LoadZones(continent, zone, ...)
 	-- Assign names to idnums
 	for id = 1, select('#', ...), 1 do
@@ -63,238 +67,239 @@ LoadZones(KALIMDOR_NAMES, KALIMDOR_IDNUMS, _G.GetMapZones(1))
 LoadZones(EASTERN_KINGDOMS_NAMES, EASTERN_KINGDOMS_IDNUMS, _G.GetMapZones(2))
 LoadZones(OUTLAND_NAMES, OUTLAND_IDNUMS, _G.GetMapZones(3))
 LoadZones(NORTHREND_NAMES, NORTHREND_IDNUMS, _G.GetMapZones(4))
+LoadZones(THE_MAELSTROM_NAMES, THE_MAELSTROM_IDNUMS, _G.GetMapZones(5))
+LoadZones(PANDARIA_NAMES, PANDARIA_IDNUMS, _G.GetMapZones(6))
 
 local INSTANCE_LOCATIONS = {
-	[BZ["Ahn'kahet: The Old Kingdom"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["Dragonblight"]],
-		["continent"] = 4,
-		["x"] = 28.49,
-		["y"] = 51.73,
+	[Z.AHNKAHET_THE_OLD_KINGDOM] = {
+		zone = NORTHREND_IDNUMS[Z.DRAGONBLIGHT],
+		continent = 4,
+		x = 28.49,
+		y = 51.73,
 	},
-	[BZ["Auchenai Crypts"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Terokkar Forest"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.AUCHENAI_CRYPTS] = {
+		zone = OUTLAND_IDNUMS[Z.TEROKKAR_FOREST],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Azjol-Nerub"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["Dragonblight"]],
-		["continent"] = 4,
-		["x"] = 26.01,
-		["y"] = 50.83,
+	[Z.AZJOL_NERUB] = {
+		zone = NORTHREND_IDNUMS[Z.DRAGONBLIGHT],
+		continent = 4,
+		x = 26.01,
+		y = 50.83,
 	},
-	[BZ["Blackrock Depths"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Searing Gorge"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.BLACKROCK_DEPTHS] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.BURNING_STEPPES],
+		continent = 2,
+		x = 20.72,
+		y = 36.94,
 	},
-	[BZ["Blackrock Spire"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Searing Gorge"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.BLACKROCK_SPIRE] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.BURNING_STEPPES],
+		continent = 2,
+		x = 20.72,
+		y = 36.94,
 	},
-	[BZ["Blackwing Lair"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Searing Gorge"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.BLACKWING_LAIR] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.BURNING_STEPPES],
+		continent = 2,
+		x = 20.72,
+		y = 36.94,
 	},
-	[BZ["Dire Maul"]] = {
-		["zone"] = KALIMDOR_IDNUMS[BZ["Feralas"]],
-		["continent"] = 1,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.DIRE_MAUL] = {
+		zone = KALIMDOR_IDNUMS[Z.FERALAS],
+		continent = 1,
+		x = 61.36,
+		y = 31.78,
 	},
-	[BZ["Drak'Tharon Keep"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["Zul'Drak"]],
-		["continent"] = 4,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.DRAKTHARON_KEEP] = {
+		zone = NORTHREND_IDNUMS[Z.ZULDRAK],
+		continent = 4,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Gnomeregan"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Dun Morogh"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.GNOMEREGAN] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.DUN_MOROGH],
+		continent = 2,
+		x = 31.29,
+		y = 37.89,
 	},
-	[BZ["Halls of Lightning"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["The Storm Peaks"]],
-		["continent"] = 4,
-		["x"] = 45.40,
-		["y"] = 21.37,
+	[Z.HALLS_OF_LIGHTNING] = {
+		zone = NORTHREND_IDNUMS[Z.THE_STORM_PEAKS],
+		continent = 4,
+		x = 45.40,
+		y = 21.37,
 	},
-	[BZ["Halls of Stone"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["The Storm Peaks"]],
-		["continent"] = 4,
-		["x"] = 39.49,
-		["y"] = 26.92,
+	[Z.HALLS_OF_STONE] = {
+		zone = NORTHREND_IDNUMS[Z.THE_STORM_PEAKS],
+		continent = 4,
+		x = 39.49,
+		y = 26.92,
 	},
-	[BZ["Karazhan"]] = {
-		["zone"] = KALIMDOR_IDNUMS[BZ["Deadwind Pass"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.KARAZHAN] = {
+		zone = KALIMDOR_IDNUMS[Z.DEADWIND_PASS],
+		continent = 2,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Magisters' Terrace"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Isle of Quel'Danas"]],
-		["continent"] = 2,
-		["x"] = 61.20,
-		["y"] = 30.89,
+	[Z.MAGISTERS_TERRACE] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.ISLE_OF_QUELDANAS],
+		continent = 2,
+		x = 61.20,
+		y = 30.89,
 	},
-	[BZ["Mana-Tombs"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Terokkar Forest"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.MANA_TOMBS] = {
+		zone = OUTLAND_IDNUMS[Z.TEROKKAR_FOREST],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Oculus"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["Borean Tundra"]],
-		["continent"] = 4,
-		["x"] = 27.52,
-		["y"] = 26.71,
+	[Z.THE_OCULUS] = {
+		zone = NORTHREND_IDNUMS[Z.BOREAN_TUNDRA],
+		continent = 4,
+		x = 27.52,
+		y = 26.71,
 	},
-	[BZ["Old Hillsbrad Foothills"]] = {
-		["zone"] = KALIMDOR_IDNUMS[BZ["Tanaris"]],
-		["continent"] = 1,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.OLD_HILLSBRAD_FOOTHILLS] = {
+		zone = KALIMDOR_IDNUMS[Z.TANARIS],
+--		zone = Z.TANARIS,
+		continent = 1,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Onyxia's Lair"]] = {
-		["zone"] = KALIMDOR_IDNUMS[BZ["Dustwallow Marsh"]],
-		["continent"] = 1,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.ONYXIAS_LAIR] = {
+		zone = KALIMDOR_IDNUMS[Z.DUSTWALLOW_MARSH],
+		continent = 1,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Ruins of Ahn'Qiraj"]] = {
-		["zone"] = KALIMDOR_IDNUMS[BZ["Silithus"]],
-		["continent"] = 1,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.RUINS_OF_AHNQIRAJ] = {
+		zone = KALIMDOR_IDNUMS[Z.SILITHUS],
+		continent = 1,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Scholomance"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Western Plaguelands"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.SCHOLOMANCE] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.WESTERN_PLAGUELANDS],
+		continent = 2,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Sethekk Halls"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Terokkar Forest"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.SETHEKK_HALLS] = {
+		zone = OUTLAND_IDNUMS[Z.TEROKKAR_FOREST],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Shadow Labyrinth"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Terokkar Forest"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.SHADOW_LABYRINTH] = {
+		zone = OUTLAND_IDNUMS[Z.TEROKKAR_FOREST],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["Stratholme"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Eastern Plaguelands"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.STRATHOLME] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.EASTERN_PLAGUELANDS],
+		continent = 2,
+		x = 26.75,
+		y = 11.60,
 	},
-	[BZ["Temple of Ahn'Qiraj"]] = {
-		["zone"] = KALIMDOR_IDNUMS[BZ["Silithus"]],
-		["continent"] = 1,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.AHNQIRAJ_THE_FALLEN_KINGDOM] = {
+		zone = KALIMDOR_IDNUMS[Z.SILITHUS],
+		continent = 1,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Arcatraz"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Netherstorm"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_ARCATRAZ] = {
+		zone = OUTLAND_IDNUMS[Z.NETHERSTORM],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Black Morass"]] = {
-		["zone"] = KALIMDOR_IDNUMS[BZ["Tanaris"]],
-		["continent"] = 1,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_BLACK_MORASS] = {
+		zone = KALIMDOR_IDNUMS[Z.TANARIS],
+		continent = 1,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Botanica"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Netherstorm"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_BOTANICA] = {
+		zone = OUTLAND_IDNUMS[Z.NETHERSTORM],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Deadmines"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Westfall"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_DEADMINES] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.WESTFALL],
+		continent = 2,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Mechanar"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Netherstorm"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_MECHANAR] = {
+		zone = OUTLAND_IDNUMS[Z.NETHERSTORM],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Nexus"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["Borean Tundra"]],
-		["continent"] = 4,
-		["x"] = 27.50,
-		["y"] = 25.97,
+	[Z.THE_NEXUS] = {
+		zone = NORTHREND_IDNUMS[Z.BOREAN_TUNDRA],
+		continent = 4,
+		x = 27.50,
+		y = 25.97,
 	},
-	[BZ["The Shattered Halls"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Hellfire Peninsula"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_SHATTERED_HALLS] = {
+		zone = OUTLAND_IDNUMS[Z.HELLFIRE_PENINSULA],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Slave Pens"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Zangarmarsh"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_SLAVE_PENS] = {
+		zone = OUTLAND_IDNUMS[Z.ZANGARMARSH],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Steamvault"]] = {
-		["zone"] = OUTLAND_IDNUMS[BZ["Zangarmarsh"]],
-		["continent"] = 3,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_STEAMVAULT] = {
+		zone = OUTLAND_IDNUMS[Z.ZANGARMARSH],
+		continent = 3,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Temple of Atal'Hakkar"]] = {
-		["zone"] = EASTERN_KINGDOMS_IDNUMS[BZ["Swamp of Sorrows"]],
-		["continent"] = 2,
-		["x"] = 0,
-		["y"] = 0,
+	[Z.THE_TEMPLE_OF_ATALHAKKAR] = {
+		zone = EASTERN_KINGDOMS_IDNUMS[Z.SWAMP_OF_SORROWS],
+		continent = 2,
+		x = 0,
+		y = 0,
 	},
-	[BZ["The Violet Hold"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["Dalaran"]],
-		["continent"] = 4,
-		["x"] = 66.78,
-		["y"] = 68.19,
+	[Z.THE_VIOLET_HOLD] = {
+		zone = NORTHREND_IDNUMS[Z.DALARAN],
+		continent = 4,
+		x = 66.78,
+		y = 68.19,
 	},
-	[BZ["Utgarde Keep"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["Howling Fjord"]],
-		["continent"] = 4,
-		["x"] = 57.28,
-		["y"] = 46.73,
+	[Z.UTGARDE_KEEP] = {
+		zone = NORTHREND_IDNUMS[Z.HOWLING_FJORD],
+		continent = 4,
+		x = 57.28,
+		y = 46.73,
 	},
-	[BZ["Utgarde Pinnacle"]] = {
-		["zone"] = NORTHREND_IDNUMS[BZ["Howling Fjord"]],
-		["continent"] = 4,
-		["x"] = 57.26,
-		["y"] = 46.67,
+	[Z.UTGARDE_PINNACLE] = {
+		zone = NORTHREND_IDNUMS[Z.HOWLING_FJORD],
+		continent = 4,
+		x = 57.26,
+		y = 46.67,
 	},
 }
 
-local iconlist = {}
+local icon_list = {}
 
 -- Clears all the icons from the world map and the mini-map
 function addon:ClearWaypoints()
-	if _G.TomTom and _G.TomTom.RemoveWaypoint then
-		while iconlist[1] do
-			_G.TomTom:RemoveWaypoint(table.remove(iconlist))
-		end
-	elseif _G.Cartographer_Waypoints then
-		while iconlist[1] do
-			_G.Cartographer_Waypoints:CancelWaypoint(table.remove(iconlist))
-		end
+	if not _G.TomTom or not _G.TomTom.RemoveWaypoint then
+		return
+	end
+
+	while icon_list[1] do
+		_G.TomTom:RemoveWaypoint(table.remove(icon_list))
 	end
 end
 
@@ -376,7 +381,6 @@ local WAYPOINT_FUNCS = {
 	end,
 }
 
-local TEXTURE_UP_FORMAT = ([[Interface\Addons\%s\img\]]):format(FOLDER_NAME) .. "%s_up"
 local current_waypoints = {}
 
 local function AddRecipeWaypoints(recipe_id, acquire_id, location_id, npc_id)
@@ -461,12 +465,29 @@ local function AddAllWaypoints(acquire_id, location_id, npc_id)
 	end
 end
 
+-- Replace the TomTom waypoint icon with the icon for the profession.
+local ICON_TEXTURE_FORMAT = [[Interface\ICONS\%s]]
+
+local function SetWaypointIcon(uid, ...)
+	local map_children = {...}
+
+	for index = 1, #map_children do
+		local child = map_children[index]
+
+		if child.point and child.point.uid == uid then
+			child.icon:SetTexture(ICON_TEXTURE_FORMAT:format(private.PROFESSION_TEXTURES[addon.Frame.current_profession]))
+			break
+		end
+
+	end
+end
+
 -- Adds mini-map and world map icons with tomtom.
 -- Expected result: Icons are added to the world map and mini-map.
 -- Input: An optional recipe ID, acquire ID, and location ID.
 -- Output: Points are added to the maps
 function addon:AddWaypoint(recipe_id, acquire_id, location_id, npc_id)
-	if not _G.TomTom and not _G.Cartographer_Waypoints then
+	if not _G.TomTom then
 		return
 	end
 	local worldmap = addon.db.profile.worldmap
@@ -542,24 +563,10 @@ function addon:AddWaypoint(recipe_id, acquire_id, location_id, npc_id)
 
 			if _G.TomTom then
 				local uid = _G.TomTom:AddZWaypoint(continent, zone, x, y, name, false, minimap, worldmap)
-				table.insert(iconlist, uid)
+				table.insert(icon_list, uid)
 
-				if _G.TomTom.ChangeWaypointIcon then
-					local icon_tex
-
-					-- Get the proper icon to put on the mini-map
-					for index, profession in pairs(private.ORDERED_PROFESSIONS) do
-						if index == self.Frame.profession then
-							icon_tex = TEXTURE_UP_FORMAT:format(private.PROFESSION_TEXTURES[index])
-							break
-						end
-					end
-					_G.TomTom:ChangeWaypointIcon(uid, minimap, worldmap, icon_tex)
-				end
-			elseif _G.Cartographer_Waypoints then
-				local pt = _G.NotePoint:new(zone, x/100, y/100, name)
-				_G.Cartographer_Waypoints:AddWaypoint(pt)
-				table.insert(iconlist, pt.WaypointID)
+				SetWaypointIcon(uid, _G.Minimap:GetChildren())
+				SetWaypointIcon(uid, _G.TomTomMapOverlay:GetChildren())
 			end
 		else
 			--[===[@debug@

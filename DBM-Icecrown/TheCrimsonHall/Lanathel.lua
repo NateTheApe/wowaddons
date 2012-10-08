@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Lanathel", "DBM-Icecrown", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4212 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(37955)
 mod:SetModelID(31165)
 mod:SetUsedIcons(4, 5, 6, 7, 8)
@@ -22,27 +22,27 @@ local warnPactDarkfallen			= mod:NewTargetAnnounce(71340, 4)
 local warnBloodMirror				= mod:NewTargetAnnounce(71510, 3, nil, mod:IsTank() or mod:IsHealer())
 local warnSwarmingShadows			= mod:NewTargetAnnounce(71266, 4)
 local warnInciteTerror				= mod:NewSpellAnnounce(73070, 3)
-local warnVampricBite				= mod:NewTargetAnnounce(71727, 2)
+local warnVampricBite				= mod:NewTargetAnnounce(70946, 2)
 local warnMindControlled			= mod:NewTargetAnnounce(70923, 4)
-local warnBloodthirstSoon			= mod:NewSoonAnnounce(71474, 2)
-local warnBloodthirst				= mod:NewTargetAnnounce(71474, 3, nil, false)
-local warnEssenceoftheBloodQueen	= mod:NewTargetAnnounce(71473, 3, nil, false)
+local warnBloodthirstSoon			= mod:NewSoonAnnounce(70877, 2)
+local warnBloodthirst				= mod:NewTargetAnnounce(70877, 3, nil, false)
+local warnEssenceoftheBloodQueen	= mod:NewTargetAnnounce(70867, 3, nil, false)
 
 local specWarnBloodBolt				= mod:NewSpecialWarningSpell(71772)
 local specWarnPactDarkfallen		= mod:NewSpecialWarningYou(71340)
-local specWarnEssenceoftheBloodQueen= mod:NewSpecialWarningYou(71473)
-local specWarnBloodthirst			= mod:NewSpecialWarningYou(71474)
+local specWarnEssenceoftheBloodQueen= mod:NewSpecialWarningYou(70867)
+local specWarnBloodthirst			= mod:NewSpecialWarningYou(70877)
 local specWarnSwarmingShadows		= mod:NewSpecialWarningMove(71266)
 local specWarnMindConrolled			= mod:NewSpecialWarningTarget(70923, mod:IsTank())
 
 local timerNextInciteTerror			= mod:NewNextTimer(100, 73070)
-local timerFirstBite				= mod:NewCastTimer(15, 71727)
+local timerFirstBite				= mod:NewCastTimer(15, 70946)
 local timerNextPactDarkfallen		= mod:NewNextTimer(30.5, 71340)
 local timerNextSwarmingShadows		= mod:NewNextTimer(30.5, 71266)
 local timerInciteTerror				= mod:NewBuffActiveTimer(4, 73070)
 local timerBloodBolt				= mod:NewBuffActiveTimer(6, 71772)
-local timerBloodThirst				= mod:NewBuffActiveTimer(10, 71474)
-local timerEssenceoftheBloodQueen	= mod:NewBuffActiveTimer(60, 71473)
+local timerBloodThirst				= mod:NewBuffActiveTimer(10, 70877)
+local timerEssenceoftheBloodQueen	= mod:NewBuffActiveTimer(60, 70867)
 
 local berserkTimer					= mod:NewBerserkTimer(320)
 
@@ -178,16 +178,12 @@ function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, 
 	end
 end
 
-do
-	local lastswarm = 0
-	function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-		if (spellId == 71277 or spellId == 72638 or spellId == 72639 or spellId == 72640) and destGUID == UnitGUID("player") and GetTime() - 3 > lastswarm then		--Swarn of Shadows (spell damage, you're standing in it.)
-			specWarnSwarmingShadows:Show()
-			lastswarm = GetTime()
-		end
+function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
+	if (spellId == 71277 or spellId == 72638 or spellId == 72639 or spellId == 72640) and destGUID == UnitGUID("player") and self:AntiSpam() then		--Swarn of Shadows (spell damage, you're standing in it.)
+		specWarnSwarmingShadows:Show()
 	end
-	mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 end
+mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg:match(L.SwarmingShadows) then

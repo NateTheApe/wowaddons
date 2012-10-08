@@ -1,12 +1,14 @@
 local mod	= DBM:NewMod("Putricide", "DBM-Icecrown", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4693 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(36678)
 mod:SetModelID(30881)
-mod:RegisterCombat("yell", L.YellPull)
-mod:SetMinSyncRevision(3860)
 mod:SetUsedIcons(5, 6, 7, 8)
+--mod:SetMinSyncRevision(3860)
+mod:SetMinSyncRevision(7)--Could break if someone is running out of date version with higher revision
+
+mod:RegisterCombat("yell", L.YellPull)
 
 mod:RegisterEvents(
 	"SPELL_CAST_START",
@@ -31,7 +33,7 @@ local warnChokingGasBombSoon		= mod:NewPreWarnAnnounce(71255, 5, 3, nil, mod:IsM
 local warnChokingGasBomb			= mod:NewSpellAnnounce(71255, 3, nil, mod:IsMelee())		-- Phase 2 ability
 local warnPhase3Soon				= mod:NewAnnounce("WarnPhase3Soon", 2)
 local warnMutatedPlague				= mod:NewAnnounce("WarnMutatedPlague", 2, 72451, mod:IsTank() or mod:IsHealer()) -- Phase 3 ability
-local warnUnboundPlague				= mod:NewTargetAnnounce(72856, 3)			-- Heroic Ability
+local warnUnboundPlague				= mod:NewTargetAnnounce(70911, 3)			-- Heroic Ability
 
 local specWarnVolatileOozeAdhesive	= mod:NewSpecialWarningYou(70447)
 local specWarnGaseousBloat			= mod:NewSpecialWarningYou(70672)
@@ -43,7 +45,7 @@ local specWarnChokingGasBomb		= mod:NewSpecialWarningSpell(71255, mod:IsTank())
 local specWarnMalleableGooCast		= mod:NewSpecialWarningSpell(72295, false)
 local specWarnOozeVariable			= mod:NewSpecialWarningYou(70352)		-- Heroic Ability
 local specWarnGasVariable			= mod:NewSpecialWarningYou(70353)		-- Heroic Ability
-local specWarnUnboundPlague			= mod:NewSpecialWarningYou(72856)		-- Heroic Ability
+local specWarnUnboundPlague			= mod:NewSpecialWarningYou(70911)		-- Heroic Ability
 
 local timerGaseousBloat				= mod:NewTargetTimer(20, 70672)			-- Duration of debuff
 local timerSlimePuddleCD			= mod:NewCDTimer(35, 70341)				-- Approx
@@ -53,8 +55,8 @@ local timerMalleableGooCD			= mod:NewCDTimer(25, 72295)
 local timerTearGas					= mod:NewBuffActiveTimer(16, 71615)
 local timerPotions					= mod:NewBuffActiveTimer(30, 73122)
 local timerMutatedPlagueCD			= mod:NewCDTimer(10, 72451)				-- 10 to 11
-local timerUnboundPlagueCD			= mod:NewNextTimer(60, 72856)
-local timerUnboundPlague			= mod:NewBuffActiveTimer(12, 72856)		-- Heroic Ability: we can't keep the debuff 60 seconds, so we have to switch at 12-15 seconds. Otherwise the debuff does to much damage!
+local timerUnboundPlagueCD			= mod:NewNextTimer(60, 70911)
+local timerUnboundPlague			= mod:NewBuffActiveTimer(12, 70911)		-- Heroic Ability: we can't keep the debuff 60 seconds, so we have to switch at 12-15 seconds. Otherwise the debuff does to much damage!
 
 -- buffs from "Drink Me"
 local timerMutatedSlash				= mod:NewTargetTimer(20, 70542)
@@ -62,7 +64,7 @@ local timerRegurgitatedOoze			= mod:NewTargetTimer(20, 70539)
 
 local berserkTimer					= mod:NewBerserkTimer(600)
 
-local soundGaseousBloat 			= mod:NewSound(72455)
+local soundGaseousBloat 			= mod:NewSound(70672)
 
 mod:AddBoolOption("OozeAdhesiveIcon")
 mod:AddBoolOption("GaseousBloatIcon")
@@ -74,8 +76,6 @@ mod:AddBoolOption("YellOnUnbound", true, "announce")
 
 local warned_preP2 = false
 local warned_preP3 = false
-local spamPuddle = 0
-local spamGas = 0
 local phase = 0
 local lastGoo = 0
 
@@ -187,14 +187,13 @@ function mod:NextPhase()
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(70341) and GetTime() - spamPuddle > 5 then
+	if args:IsSpellID(70341) and self:AntiSpam(5, 1) then
 		warnSlimePuddle:Show()
 		if phase == 3 then
 			timerSlimePuddleCD:Start(20)--In phase 3 it's faster
 		else
 			timerSlimePuddleCD:Start()
 		end
-		spamPuddle = GetTime()
 	elseif args:IsSpellID(71255) then
 		warnChokingGasBomb:Show()
 		specWarnChokingGasBomb:Show()
@@ -299,9 +298,8 @@ function mod:SPELL_AURA_REMOVED(args)
 		if self.Options.UnboundPlagueIcon then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(71615) and GetTime() - spamGas > 5 then 	-- Tear Gas Removal
+	elseif args:IsSpellID(71615) and self:AntiSpam(5, 2) then 	-- Tear Gas Removal
 		self:NextPhase()
-		spamGas = GetTime()
 	elseif args:IsSpellID(70539, 72457, 72875, 72876) then
 		timerRegurgitatedOoze:Cancel(args.destName)
 	elseif args:IsSpellID(70542) then

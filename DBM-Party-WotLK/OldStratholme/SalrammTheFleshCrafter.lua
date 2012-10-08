@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("SalrammTheFleshcrafter", "DBM-Party-WotLK", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 2250 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(26530)
 mod:SetModelID(26581)
 mod:SetZone()
@@ -32,7 +32,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		warningCurse:Show(args.destName)
 		timerCurse:Start(args.destName)
 	elseif args:IsSpellID(52709) then
-		wagningSteal:Show(args.destName)
+		warningSteal:Show(args.destName)
 	end
 end
 

@@ -1,0 +1,5 @@
+<Ui>
+	<Script file="Core.lua" />
+	<Script file="DefaultHandlers.lua" />
+	<Script file="DefaultCategories.lua" />
+</Ui>

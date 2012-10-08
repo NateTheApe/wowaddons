@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Rage", "DBM-Hyjal")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 350 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 399 $"):sub(12, -3))
 mod:SetCreatureID(17767)
 mod:SetModelID(17444)
 mod:SetZone()
@@ -28,10 +28,7 @@ local berserkTimer		= mod:NewBerserkTimer(600)
 
 mod:AddBoolOption("IceBoltIcon", true)
 
-local decaySpam = 0
-
 function mod:OnCombatStart(delay)
-	decaySpam = 0
 	berserkTimer:Start(-delay)
 end
 
@@ -44,9 +41,8 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.IceBoltIcon then
 			self:SetIcon(args.destName, 8)
 		end
-	elseif args:IsSpellID(31258) and args:IsPlayer() and GetTime() - decaySpam >= 3 then
+	elseif args:IsSpellID(31258) and args:IsPlayer() and self:AntiSpam() then
 		specWarnDnD:Show()
-		decaySpam = GetTime()
 	end
 end
 

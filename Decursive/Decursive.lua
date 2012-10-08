@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John Wellesz).
@@ -11,13 +11,13 @@
     To distribute Decursive through other means a special authorization is required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2011-04-26T21:52:40Z
+    This file was last updated on 2012-10-07T15:12:16Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -35,6 +35,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -250,9 +251,27 @@ function D:PlaySound (UnitID, Caller) --{{{
             -- good sounds: Sound\\Doodad\\BellTollTribal.wav
             --          Sound\\interface\\AuctionWindowOpen.wav
             --          Sound\\interface\\AlarmClockWarning3.wav
-            PlaySoundFile(self.profile.SoundFile, "Master");
-            self:Debug("Sound Played! by %s", Caller);
+            local testTime;
+
+            if self.debug then
+                testTime = debugprofilestop();
+            end
+
+            --PlaySoundFile(self.profile.SoundFile, "Master");
+
+            -- Play the sound on a special update execution context to avoid
+            -- crashing and leaving the program in an unknown state if WoW fails
+            -- to play the sound fast enough... ('script ran too long' add-on
+            -- breaker thingy of which I had a few report failing on the
+            -- PlaySoundFile call)
+
+            self:ScheduleDelayedCall('PlaySoundFile', PlaySoundFile, 0.1, self.profile.SoundFile, "Master");
             self.Status.SoundPlayed = true;
+
+            if self.debug then
+                self:Debug("x Sound Played! by", Caller, 'it took:', (debugprofilestop() - testTime), ' ms' );
+            end
+
         else
             self.UnitDebuffed[UnitID] = false;
         end
@@ -392,11 +411,10 @@ do
 
     local D                 = D;
 
-    local UnitAura          = _G.UnitAura;
+    local UnitDebuff        = _G.UnitDebuff;
     local UnitIsCharmed     = _G.UnitIsCharmed;
     local UnitCanAttack     = _G.UnitCanAttack;
     local GetTime           = _G.GetTime;
-    local IsSpellInRange    = _G.IsSpellInRange;
 
     -- This local function only sets interesting values of UnitDebuff()
     local Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime;
@@ -410,7 +428,7 @@ do
 
         --    Name, Rank, Texture, Applications, TypeName, duration, ExpirationTime, unitCaster, isStealable = UnitAura("unit", index or ["name", "rank"][, "filter"])
 
-        Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime = UnitAura(Unit, i, "HARMFUL");
+        Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime = UnitDebuff (Unit, i);
 
         if Name then
             return true;
@@ -705,6 +723,9 @@ do
     local Debuffs               = {}; local IsCharmed = false; local Unit; local MUF; local IsDebuffed = false; local IsMUFDebuffed = false; local CheckStealth = false;
     local NoScanStatuses        = false;
     local band                  = _G.bit.band;
+    --[===[@debug@
+    --local debugprofilestop = _G.debugprofilestop;
+    --@end-debug@]===]
     function D:ScanEveryBody()
 
         if not NoScanStatuses then
@@ -715,7 +736,7 @@ do
         local CheckStealth = self.profile.Show_Stealthed_Status;
 
         --[===[@debug@
-        local start = GetTime();
+        --local start = debugprofilestop();
         --@end-debug@]===]
 
         while UnitArray[i] do
@@ -753,7 +774,7 @@ do
             i = i + 1;
         end
         --[===[@debug@
-        --D:Debug("|cFF777777Scanning everybody...", i - 1, "units scanned in ", GetTime() - start, "seconds|r");
+        --D:Debug("|cFF777777Scanning everybody...", i - 1, "units scanned in ", debugprofilestop() - start, "miliseconds|r");
         --@end-debug@]===]
     end
 
@@ -782,71 +803,49 @@ do
 
 end
 
-local UnitBuffsCache    = {};
+--local UnitBuffsCache    = {};
 
--- this function returns true if one of the debuff(s) passed to it is found on the specified unit
-function D:CheckUnitForBuffs(Unit, BuffNamesToCheck) --{{{
+do
+    local UnitBuff = _G.UnitBuff;
 
-    -- --[=[
-    if (not UnitBuffsCache[Unit]) then
-        UnitBuffsCache[Unit] = {};
-    end
+    -- this function returns true if one of the debuff(s) passed to it is found on the specified unit
+    function D:CheckUnitForBuffs(unit, BuffNamesToCheck) --{{{
 
-    local UnitBuffs     = UnitBuffsCache[Unit];
-    local i             = 1;
-    local buff_name     = "";
 
-    -- Get all the unit's buffs
-    while true do
+        if type(BuffNamesToCheck) == "string" then
 
-        buff_name = UnitBuff(Unit, i)
-
-        if not buff_name then
-            break;
-        end
-
-        UnitBuffs[i] = buff_name;
-        i = i + 1;
-    end
-
-    while UnitBuffs[i] do -- clean the rest of the cache
-        UnitBuffs[i] = false;
-        i = i + 1;
-    end
-    --]=]
-
-    if type(BuffNamesToCheck) ~= "table" then
-
-        if self:tcheckforval(UnitBuffs, BuffNamesToCheck) then
-            return true;
+            return (UnitBuff(unit, BuffNamesToCheck)) and true or false;
+         
         else
-            return false;
-        end
-    else
-        local Buff;
-        for _, Buff in pairs(BuffNamesToCheck) do
+            for buff in pairs(BuffNamesToCheck) do
 
-            if self:tcheckforval(UnitBuffs, Buff) then
-                return true;
+                if UnitBuff(unit, buff) then
+                    return true;
+                end
+
             end
-
         end
-    end
 
-    return false;
+        return false;
 
-end --}}}
+    end --}}}
+end
 
 
 D.Stealthed_Units = {};
 
 do
-    local Stealthed = {DS["Prowl"], DS["Stealth"], DS["Shadowmeld"],  DS["Invisibility"], DS["Lesser Invisibility"]}; --, DS["Ice Armor"],};
+    local Stealthed = {DS["Prowl"], DS["Stealth"], DS["Shadowmeld"],  DS["Invisibility"], DS["Lesser Invisibility"], DS["Camouflage"]}; --, DS["Ice Armor"],};
+
+    if DC.MOP then
+        table.insert(Stealthed, DS["SHROUD_OF_CONCEALMENT"])
+        table.insert(Stealthed, DS['Greater Invisibility'])
+    end
 
     DC.IsStealthBuff = D:tReverse(Stealthed);
 
-    function D:CheckUnitStealth(Unit)
-        if self:CheckUnitForBuffs(Unit, Stealthed) then
+    function D:CheckUnitStealth(unit)
+        if self:CheckUnitForBuffs(unit, DC.IsStealthBuff) then
             --      self:Debug("Sealth found !");
             return true;
         end
@@ -857,6 +856,6 @@ end
 
 
 
-T._LoadedFiles["Decursive.lua"] = "2.7.0.5";
+T._LoadedFiles["Decursive.lua"] = "2.7.2.2";
 
 -- Sin

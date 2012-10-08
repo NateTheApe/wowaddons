@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John Wellesz).
@@ -11,13 +11,13 @@
     To distribute Decursive through other means a special authorization is required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-01-15T18:56:52Z
+    This file was last updated on 2012-09-27T23:56:03Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -35,6 +35,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -61,8 +62,8 @@ local str_format        = _G.string.format;
 local str_gsub          = _G.string.gsub;
 local str_sub           = _G.string.sub;
 local abs               = _G.math.abs;
-local GetNumRaidMembers         = _G.GetNumRaidMembers;
-local GetNumPartyMembers        = _G.GetNumPartyMembers;
+local GetNumRaidMembers = DC.GetNumRaidMembers;
+local GetNumPartyMembers= DC.MOP and _G.GetNumSubgroupMembers or _G.GetNumPartyMembers;
 local InCombatLockdown  = _G.InCombatLockdown;
 local _;
 -- Default values for the option
@@ -323,7 +324,6 @@ function D:GetDefaultsSettings()
                 DS["CRIPLES"],
                 DS["DUSTCLOUD"],
                 DS["WIDOWSEMBRACE"],
-                DS["CURSEOFTONGUES"],
                 DS["SONICBURST"],
                 DS["DELUSIONOFJINDO"]
             },
@@ -334,7 +334,6 @@ function D:GetDefaultsSettings()
                     [DS["IGNITE"]]              = true,
                     [DS["TAINTEDMIND"]]         = true,
                     [DS["WIDOWSEMBRACE"]]       = true,
-                    [DS["CURSEOFTONGUES"]]      = true,
                     [DS["DELUSIONOFJINDO"]]     = true,
                 },
                 ["ROGUE"] = {
@@ -343,7 +342,6 @@ function D:GetDefaultsSettings()
                     [DS["IGNITE"]]              = true,
                     [DS["TAINTEDMIND"]]         = true,
                     [DS["WIDOWSEMBRACE"]]       = true,
-                    [DS["CURSEOFTONGUES"]]      = true,
                     [DS["SONICBURST"]]          = true,
                     [DS["DELUSIONOFJINDO"]]     = true,
                 },
@@ -383,6 +381,8 @@ function D:GetDefaultsSettings()
                     [DS["DELUSIONOFJINDO"]]     = true,
                 },
                 ["DEATHKNIGHT"] = {
+                },
+                ["MONK"] = {
                 }
             },
             -- }}}
@@ -1674,13 +1674,13 @@ local function GetStaticOptions ()
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"..
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"
                                 ):format(
-                                    "2.7.0.5", "John Wellesz", ("2012-02-05T17:48:12Z"):sub(1,10),
+                                    "2.7.2.2", "John Wellesz", ("2012-10-07T20:46:09Z"):sub(1,10),
                                     L["ABOUT_NOTES"],
-                                    L["ABOUT_LICENSE"],         GetAddOnMetadata("Decursive", "X-License"),
-                                    L["ABOUT_SHAREDLIBS"],      GetAddOnMetadata("Decursive", "X-Embeds"),
-                                    L["ABOUT_OFFICIALWEBSITE"], GetAddOnMetadata("Decursive", "X-Website"),
-                                    L["ABOUT_AUTHOREMAIL"],     GetAddOnMetadata("Decursive", "X-eMail"),
-                                    L["ABOUT_CREDITS"],         GetAddOnMetadata("Decursive", "X-Credits")
+                                    L["ABOUT_LICENSE"],         GetAddOnMetadata("Decursive", "X-License") or 'MoP is buggy',
+                                    L["ABOUT_SHAREDLIBS"],      GetAddOnMetadata("Decursive", "X-Embeds") or 'MoP is buggy',
+                                    L["ABOUT_OFFICIALWEBSITE"], GetAddOnMetadata("Decursive", "X-Website") or 'MoP is buggy',
+                                    L["ABOUT_AUTHOREMAIL"],     GetAddOnMetadata("Decursive", "X-eMail") or 'MoP is buggy',
+                                    L["ABOUT_CREDITS"],         GetAddOnMetadata("Decursive", "X-Credits") or 'MoP is buggy'
                                 ),
                         order = 0,
                     },
@@ -1755,7 +1755,8 @@ function D:ExportOptions ()
     LibStub("AceConfig-3.0"):RegisterOptionsTable(D.name,  GetOptions, 'dcr');
 
     
-    
+    -- Don't feed the interface option panel until Blizz fixes the taint issue...
+    --[=[ 
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(D.name, D.name, nil, "general");
 
     local SubGroups_ToBlizzOptions = {
@@ -1772,6 +1773,7 @@ function D:ExportOptions ()
     for key,values in ipairs(SubGroups_ToBlizzOptions) do
         LibStub("AceConfigDialog-3.0"):AddToBlizOptions(D.name, values[1], D.name, values[2]);
     end
+    --]=]
 end
 
 
@@ -1972,8 +1974,10 @@ function D:ShowHideDebuffsFrame ()
 
     if (not D.profile.ShowDebuffsFrame) then
         D:CancelDelayedCall("Dcr_MUFupdate");
+        D:CancelDelayedCall("Dcr_ScanEverybody");
     else
         D:ScheduleRepeatedCall("Dcr_MUFupdate", D.DebuffsFrame_Update, D.profile.DebuffsFrameRefreshRate, D);
+        self:ScheduleRepeatedCall("Dcr_ScanEverybody", D.ScanEveryBody, 1, D);
     end
 
     -- set Icon
@@ -2694,26 +2698,27 @@ do
                         D:ScheduleDelayedCall("Dcr_Delayed_Configure", D.Configure, 2, D);
                     end
                 end,
-                min = 10,
+                min = -10,
                 max = 30,
                 step = 1,
                 order = 110,
             },
-            stopcasting = {
+            
+            isPet = {
                 type = "toggle",
-                name = L["OPT_CUSTOM_SPELL_STOPCASTING"],
-                desc = L["OPT_CUSTOM_SPELL_STOPCASTING_DESC"];
+                name = L["OPT_CUSTOM_SPELL_ISPET"],
+                desc = L["OPT_CUSTOM_SPELL_ISPET_DESC"];
                 set = function(info,v)
-                    D.classprofile.UserSpells[info[#info-1]].Pet = not v;
+                    D.classprofile.UserSpells[info[#info-1]].Pet = v;
                     if GetSpellInfo(info[#info-1]) then
                         D:ScheduleDelayedCall("Dcr_Delayed_Configure", D.Configure, 2, D);
                     end
                 end,
                 get = function(info,v)
-                    return not D.classprofile.UserSpells[info[#info-1]].Pet;
+                    return D.classprofile.UserSpells[info[#info-1]].Pet;
                 end,
-                hidden = function(info,v) return D.classprofile.UserSpells[info[#info-1]].MacroText end,
-                order = 115
+                -- hidden = function(info,v) return D.classprofile.UserSpells[info[#info-1]].MacroText end,
+                order = 112
             },
             MacroEdition = {
                 type = 'input',
@@ -2941,34 +2946,85 @@ function D:QuickAccess (CallingObject, button) -- {{{
 
 end -- }}}
 
+do
+    local DebugHeader = false;
+    local HeaderFailOver = "|cFF11FF33Please report the content of this window to Archarodim@teaser.fr|r\n|cFF009999(Use CTRL+A to select all and then CTRL+C to put the text in your clip-board)|r\n\n";
+    local LoadedAddonNum = 0;
 
-local DebugHeader = false;
-function D:ShowDebugReport()
+    local function GetAddonListAsString ()
+        local addonCount = GetNumAddOns();
+        local loadedAddonList = {};
 
-    if DC.DevVersionExpired then
-        self:VersionWarnings();
-        return;
+        for addonID=1, addonCount do
+            local name, title, notes, enabled, loadable, reason, security = GetAddOnInfo(addonID)
+            if security == 'INSECURE' and IsAddOnLoaded(addonID) then
+                local version = GetAddOnMetadata(addonID, "Version");
+
+                table.insert(loadedAddonList, ("%s (%s)"):format(name, version or 'N/A'));
+
+            end
+        end
+
+        LoadedAddonNum = #loadedAddonList;
+        return table.concat(loadedAddonList, "\n");
     end
 
-    D:Debug(GetLocale());
+    local function setReportHeader()
 
-    if not DebugHeader then
-        DebugHeader = ("%s\n2.7.0.5  %s(%s)  CT: %0.4f D: %s %s %s BDTHFAd: %s nDrE: %d Embeded: %s (%s, %s, %s, %s)"):format((self.L) and self.L["DEBUG_REPORT_HEADER"] or "X|cFF11FF33Please report the content of this window to Archarodim@teaser.fr|r\n|cFF009999(Use CTRL+A to select all and then CTRL+C to put the text in your clip-board)|r\n", -- "%s\n
+        local instructionsHeader;
+
+        if not D.db.global.NewerVersionName then
+            instructionsHeader = D.L and D.L["DEBUG_REPORT_HEADER"] or HeaderFailOver;
+        else
+            instructionsHeader = D.L and ((D.L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"]):format(D.db.global.NewerVersionName)) or HeaderFailOver;
+            -- disable bug me not since the user _clearly_ took the wrong decision
+            D.db.global.NewVersionsBugMeNot = false;
+        end
+
+        DebugHeader = ("%s\n2.7.2.2  %s(%s)  CT: %0.4f D: %s %s %s BDTHFAd: %s nDrE: %d Embeded: %s W: %d LA: %d TA: %d (%s, %s, %s, %s)"):format(instructionsHeader, -- "%s\n
         DC.MyClass, tostring(UnitLevel("player") or "??"), D:NiceTime(), date(), GetLocale(), -- %s(%s)  CT: %0.4f D: %s %s
         BugGrabber and "BG" .. (T.BugGrabber and "e" or "") or "NBG", -- %s
         tostring(T._BDT_HotFix1_applyed), -- BDTHFAd: %s
         T._NonDecursiveErrors, -- nDrE: %d
         tostring(T._EmbeddedMode), -- Embeded: %s
+        IsWindowsClient() and 1 or 0, -- W: %d
+        LoadedAddonNum, -- LA: %d
+        T._TaintingAccusations, -- TA: %d
         GetBuildInfo()); --  (%s, %s, %s, %s)
     end
 
-    T._DebugText = DebugHeader .. table.concat(T._DebugTextTable, "");
-    _G.DecursiveDebuggingFrameText:SetText(T._DebugText);
+    function D:ShowDebugReport()
 
-    _G.DecursiveDEBUGtext:SetText(L["DECURSIVE_DEBUG_REPORT"]);
-    _G.DecursiveDebuggingFrame:Show();
+        if DC.DevVersionExpired then
+            self:VersionWarnings();
+            return;
+        end
+
+        local yourWastingMyTime = "";
+        if self.db.global.NewerVersionName then
+            yourWastingMyTime = L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"];
+        end
+
+        -- get running add-ons list
+        local success, errorm, loadedAddonList;
+        success, errorm, loadedAddonList = pcall (GetAddonListAsString);
+
+        local headerSucess, hederGenErrorm;
+        if not DebugHeader then
+            headerSucess, hederGenErrorm = pcall(setReportHeader);
+        else
+            headerSucess = true;
+        end
+
+
+        T._DebugText = (headerSucess and DebugHeader or (HeaderFailOver .. 'Report header gen failed: ' .. (hederGenErrorm and hederGenErrorm or ""))) .. table.concat(T._DebugTextTable, "") .. "\n\nLoaded Addons:\n\n" .. (success and loadedAddonList or errorm) .. "\n-- --";
+        _G.DecursiveDebuggingFrameText:SetText(T._DebugText);
+
+        _G.DecursiveDEBUGtext:SetText(L["DECURSIVE_DEBUG_REPORT"]);
+        _G.DecursiveDebuggingFrame:Show();
+    end
 end
 
-T._LoadedFiles["Dcr_opt.lua"] = "2.7.0.5";
+T._LoadedFiles["Dcr_opt.lua"] = "2.7.2.2";
 
 -- Closer

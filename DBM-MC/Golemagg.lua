@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Golemagg", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 337 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
 mod:SetCreatureID(11988)--, 11672
 mod:SetModelID(11986)
 mod:RegisterCombat("combat")
@@ -27,8 +27,8 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:UNIT_HEALTH(uId)
-	if UnitHealth(uId) / UnitHealthMax(uId) <= 0.25 and self:GetUnitCreatureId(uId) == 11099 and not prewarn_P2 then
+	if UnitHealth(uId) / UnitHealthMax(uId) <= 0.25 and self:GetUnitCreatureId(uId) == 11099 and not prewarn_p2 then
 		warnP2Soon:Show()
-		prewarn_P2 = true
+		prewarn_p2 = true
 	end
 end

@@ -1,5 +1,5 @@
 --
--- $Id: BugGrabber.lua 179 2011-05-07 23:47:39Z rabbit $
+-- $Id: BugGrabber.lua 188 2012-08-28 19:07:09Z nevcairiel $
 --
 -- The BugSack and !BugGrabber team is:
 -- Current Developer: Rabbit
@@ -77,20 +77,36 @@ local L = {
 -- Locals
 --
 
+-- isGetAddOnMetadataFunctional is a Mists of Pandaria Beta workaround (GetAddOnMetadata doesn't work for "X-" tags)
+local isGetAddOnMetadataFunctional
+if select(4, GetBuildInfo()) >= 50000 then
+	isGetAddOnMetadataFunctional = GetAddOnMetadata("!BugGrabber", "X-Credits")
+else
+	isGetAddOnMetadataFunctional = true
+end
 local frame = CreateFrame("Frame")
 
 -- Should implement :FormatError(errorTable).
 local displayObjectName = nil
-for i = 1, GetNumAddOns() do
-	local meta = GetAddOnMetadata(i, "X-BugGrabber-Display")
-	if meta then
-		local enabled = select(4, GetAddOnInfo(i))
-		if enabled then
-			displayObjectName = meta
-			break
+if isGetAddOnMetadataFunctional then
+	for i = 1, GetNumAddOns() do
+		local meta = GetAddOnMetadata(i, "X-BugGrabber-Display")
+		if meta then
+			local enabled = select(4, GetAddOnInfo(i))
+			if enabled then
+				displayObjectName = meta
+				break
+			end
 		end
 	end
+else
+	-- If we can't search through metadata, then just look for BugSack and use it if its enabled
+	local bugSackEnabled = select(4, GetAddOnInfo("BugSack"))
+	if bugSackEnabled then
+		displayObjectName = "BugSack"
+	end
 end
+
 
 -- Shorthand to BugGrabberDB.errors
 local db = nil
@@ -162,15 +178,15 @@ local function printErrorObject(err)
 	end
 end
 
--- XXX Disabled until someone complains and demands that they return.
+-- XXX Re-enabled until someone complains and demands that they go away again.
 local function registerAddonActionEvents()
-	--frame:RegisterEvent("ADDON_ACTION_BLOCKED")
-	--frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
+	frame:RegisterEvent("ADDON_ACTION_BLOCKED")
+	frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
 end
 
 local function unregisterAddonActionEvents()
-	--frame:UnregisterEvent("ADDON_ACTION_BLOCKED")
-	--frame:UnregisterEvent("ADDON_ACTION_FORBIDDEN")
+	frame:UnregisterEvent("ADDON_ACTION_BLOCKED")
+	frame:UnregisterEvent("ADDON_ACTION_FORBIDDEN")
 end
 
 -----------------------------------------------------------------------
@@ -329,6 +345,11 @@ do
 		else
 			found = fetchFromDatabase(loadErrors, sanitizedMessage)
 		end
+		-- XXX Note that fetchFromDatabase will set the error objects
+		-- XXX session ID to the current one, if found - and it will also
+		-- XXX increment the counter on it. This is probably wrong, it should
+		-- XXX be done here instead, as "fetchFromDatabase" implies a simple
+		-- XXX :Get procedure.
 
 		frame.count = frame.count + 1
 
@@ -381,9 +402,32 @@ function addon:StoreError(errorObject)
 	end
 end
 
-function addon:GetChatLink(errorObject)
-	local tableId = tostring(errorObject):sub(8)
-	return chatLinkFormat:format(playerName, tableId, tableId)
+do
+	local hookCreated = nil
+	local function createChatHook()
+		-- Set up the ItemRef hook that allow us to link bugs.
+		local origHandler = _G.ChatFrame_OnHyperlinkShow
+		_G.ChatFrame_OnHyperlinkShow = function(chatFrame, link, ...)
+			local player, tableId = link:match("^buggrabber:(%a+):(%x+)")
+			if not player or not tableId then return origHandler(chatFrame, link, ...) end
+			if IsModifiedClick("CHATLINK") then
+				ChatEdit_InsertLink(link)
+			else
+				addon:HandleBugLink(player, tableId, link, chatFrame, ...)
+			end
+		end
+		hookCreated = true
+	end
+
+	-- XXX We need to hook the chat frame when anyone requests a chat link from
+	-- XXX us, in case some other addon has hooked :HandleBugLink to process it.
+	-- XXX If not, we could've just created the hook in grabError when we do the
+	-- XXX print.
+	function addon:GetChatLink(errorObject)
+		if not hookCreated then createChatHook() end
+		local tableId = tostring(errorObject):sub(8)
+		return chatLinkFormat:format(playerName, tableId, tableId)
+	end
 end
 
 function addon:GetErrorByPlayerAndID(player, id)
@@ -506,7 +550,9 @@ do
 
 		if not swatterDisabled and _G.Swatter and not _G.Swatter.isFake then
 			swatterDisabled = true
-			print(L.ADDON_DISABLED:format("Swatter", "Swatter", "Swatter"))
+			if bugGrabberParentAddon == STANDALONE_NAME then
+				print(L.ADDON_DISABLED:format("Swatter", "Swatter", "Swatter"))
+			end
 			DisableAddOn("!Swatter")
 			SlashCmdList.SWATTER = nil
 			SLASH_SWATTER1, SLASH_SWATTER2 = nil, nil
@@ -555,7 +601,9 @@ do
 		if totalElapsed > 1 then
 			-- Seems like we're getting more errors/sec than we want.
 			if self.count > BUGGRABBER_ERRORS_PER_SEC_BEFORE_THROTTLE then
-				print(L.BUGGRABBER_STOPPED)
+				if bugGrabberParentAddon == STANDALONE_NAME then
+					print(L.BUGGRABBER_STOPPED)
+				end
 				unregisterAddonActionEvents()
 				real_seterrorhandler(function() --[[ noop ]] end)
 				paused = true
@@ -567,20 +615,6 @@ do
 			totalElapsed = 0
 		end
 	end)
-end
-
-do
-	-- Set up the ItemRef hook that allow us to link bugs.
-	local origHandler = _G.ChatFrame_OnHyperlinkShow
-	_G.ChatFrame_OnHyperlinkShow = function(chatFrame, link, ...)
-		local player, tableId = link:match("^buggrabber:(%a+):(%x+)")
-		if not player or not tableId then return origHandler(chatFrame, link, ...) end
-		if IsModifiedClick("CHATLINK") then
-			ChatEdit_InsertLink(link)
-		else
-			addon:HandleBugLink(player, tableId, link, chatFrame, ...)
-		end
-	end
 end
 
 -- Set up slash command

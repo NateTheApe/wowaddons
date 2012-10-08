@@ -29,13 +29,19 @@ end
 
 function PitBull4_AltPowerBar:GetValue(frame)	
 	local unit = frame.unit
-	local bar_type, min_power = UnitAlternatePowerInfo(unit)
-	if not bar_type then
-		return nil
+	local bar_type, min_power, _, _, _, hide_from_others, show_on_raid = UnitAlternatePowerInfo(unit)
+	local visible = false
+	if bar_type then
+		if (unit == "player" or unit == "vehicle" or unit == "pet") or not hide_from_others then
+			visible = true
+		elseif show_on_raid and (UnitInRaid(unit) or UnitInParty(unit)) then
+			visible = true
+		end
 	end
+	if not visible then return nil end
 
-	local max = UnitPowerMax(unit, ALTERNATIVE_POWER_INDEX)
-	if max == 0 then
+	local max_power = UnitPowerMax(unit, ALTERNATE_POWER_INDEX)
+	if max_power == 0 then
 		return 0
 	end
 	
@@ -43,8 +49,11 @@ function PitBull4_AltPowerBar:GetValue(frame)
 	if min_power > current_power then
 		current_power = min_power
 	end
+	if max_power < current_power then
+		current_power = max_power
+	end
 
-	return current_power / max
+	return (current_power - min_power) / (max_power - min_power)
 end
 
 function PitBull4_AltPowerBar:GetExampleValue(frame)

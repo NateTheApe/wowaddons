@@ -1,9 +1,10 @@
 local mod	= DBM:NewMod(324, "DBM-DragonSoul", nil, 187)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7231 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
 mod:SetCreatureID(55308)
 mod:SetModelID(39138)
+mod:SetModelSound("sound\\CREATURE\\WarlordZonozz\\VO_DS_ZONOZZ_INTRO_01.OGG", "sound\\CREATURE\\WarlordZonozz\\VO_DS_ZONOZZ_SPELL_05.OGG")
 mod:SetZone()
 mod:SetUsedIcons()
 
@@ -61,7 +62,7 @@ end
 --"Never", "Normal", "DynamicPhase2", "DynamicAlways"
 function mod:updateRangeFrame()
 	if self:IsDifficulty("normal10", "normal25", "lfr25") or self.Options.CustomRangeFrame == "Never" then return end
-	if self.Options.CustomRangeFrame == "Normal" or UnitDebuff("player", GetSpellInfo(103434)) or self.Options.CustomRangeFrame == "DynamicPhase2" and not phase2started then--You have debuff or only want normal range frame or it's phase 1 and you only want dymanic in phase 2
+	if self.Options.CustomRangeFrame == "Normal" or UnitDebuff("player", GetSpellInfo(103434)) or self.Options.CustomRangeFrame == "DynamicPhase2" and not phase2Started then--You have debuff or only want normal range frame or it's phase 1 and you only want dymanic in phase 2
 		DBM.RangeCheck:Show(10, nil)--Show everyone.
 	else
 		DBM.RangeCheck:Show(10, shadowsDebuffFilter)--Show only people who have debuff.
@@ -81,7 +82,7 @@ function mod:OnCombatStart(delay)
 	table.wipe(shadowsTargets)
 	timerVoidofUnmakingCD:Start(5.5-delay)
 	timerFocusedAngerCD:Start(10.5-delay)
-	timerPsychicDrainCD:Start(16.5-delay)
+	timerPsychicDrainCD:Start(13-delay)
 	timerShadowsCD:Start(-delay)
 	self:updateRangeFrame()
 	if not self:IsDifficulty("lfr25") then
@@ -96,7 +97,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(104322, 104606, 104607, 104608) then
+	if args:IsSpellID(104322) then
 		warnPsychicDrain:Show()
 		specWarnPsychicDrain:Show()
 		timerPsychicDrainCD:Start()
@@ -104,7 +105,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 end	
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(104377, 104378, 110322, 110306) and not phase2Started then
+	if args:IsSpellID(104377, 104378) and not phase2Started then--Might not need both, but leave just in case, removed the 2 non existant ones though.
 		phase2Started = true
 		timerFocusedAngerCD:Cancel()
 		timerPsychicDrainCD:Cancel()
@@ -121,13 +122,13 @@ function mod:SPELL_AURA_APPLIED(args)
 				timerVoidofUnmakingCD:Update(54.3, 90.3)
 			end
 		end
-	elseif args:IsSpellID(104543, 109409, 109410, 109411) then
+	elseif args:IsSpellID(104543) then
 		warnFocusedAnger:Show(args.destName, args.amount or 1)
 		timerFocusedAngerCD:Start()
 	elseif args:IsSpellID(106836) then--Do NOT add 103527 to this, that's a seperate spellid for when BOSS is affected by diffusion, this warning is counting the ball stacks.
 		warnVoidDiffusion:Show(args.destName, args.amount or 1)
 		timerVoidDiffusionCD:Start()
-	elseif args:IsSpellID(103434, 104599, 104600, 104601) then
+	elseif args:IsSpellID(103434) then
 		shadowsTargets[#shadowsTargets + 1] = args.destName
 		if args:IsPlayer() and self:IsDifficulty("heroic10", "heroic25") then
 			specWarnShadows:Show()
@@ -145,16 +146,16 @@ end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(104600, 104601) and args:IsPlayer() then--Only heroic spellids here, no reason to call functions that aren't needed on normal or LFR
+	if args:IsSpellID(103434) and args:IsPlayer() and self:IsDifficulty("heroic10", "heroic25") then
 		self:updateRangeFrame()
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellID)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 	if uId ~= "boss1" then return end--Anti spam to ignore all other args (like target/focus/mouseover)
 	--Void of the unmaking cast, do not use spellname because we want to ignore events using spellid 103627 which fires when the sphere dispurses on the boss.
 	--It looks this event doesn't fire in raid finder. It seems to still fire in normal and heroic modes.
-	if spellID == 103571 and not voidWarned then
+	if spellId == 103571 and not voidWarned then
 		if timerPsychicDrainCD:GetTime() == 0 then--Just a hack to prevent this from overriding first timer on pull, which is only drain that doesn't follow this rule
 			timerPsychicDrainCD:Start(8.5)
 		end

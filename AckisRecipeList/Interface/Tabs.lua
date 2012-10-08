@@ -95,7 +95,7 @@ function private.InitializeTabs()
 
 	-- Expands or collapses a list entry in the current active tab.
 	local function Tab_ModifyEntry(self, entry, expanded)
-		local member = ORDERED_PROFESSIONS[MainPanel.profession] .. " expanded"
+		local member = ORDERED_PROFESSIONS[MainPanel.current_profession] .. " expanded"
 
 		if entry.acquire_id then
 			self[member][private.ACQUIRE_NAMES[entry.acquire_id]] = expanded or nil
@@ -212,7 +212,7 @@ function private.InitializeTabs()
 			end
 			table.sort(sorted_acquires, Sort_Acquisition)
 		end
-		local prof_name = ORDERED_PROFESSIONS[MainPanel.profession]
+		local prof_name = ORDERED_PROFESSIONS[MainPanel.current_profession]
 		local profession_recipes = private.profession_recipe_list[prof_name]
 
 		self[prof_name.." expanded"] = self[prof_name.." expanded"] or {}
@@ -279,7 +279,7 @@ function private.InitializeTabs()
 			end
 			table.sort(sorted_locations, Sort_Location)
 		end
-		local prof_name = ORDERED_PROFESSIONS[MainPanel.profession]
+		local prof_name = ORDERED_PROFESSIONS[MainPanel.current_profession]
 		local profession_recipes = private.profession_recipe_list[prof_name]
 
 		self[prof_name.." expanded"] = self[prof_name.." expanded"] or {}
@@ -347,7 +347,14 @@ function private.InitializeTabs()
 			if count > 0 then
 				local is_expanded = self[prof_name.." expanded"][loc_name]
 				local entry = AcquireTable()
-				entry.text = ("%s (%d)"):format(SetTextColor(private.CATEGORY_COLORS["location"], loc_name),count)
+
+				if loc_name == _G.GetRealZoneText() then
+					entry.text = ("%s (%d)"):format(SetTextColor(private.DIFFICULTY_COLORS["optimal"], loc_name), count)
+					entry.emphasized = true
+				else
+					entry.text = ("%s (%d)"):format(SetTextColor(private.CATEGORY_COLORS["location"], loc_name), count)
+					entry.emphasized = nil
+				end
 				entry.location_id = loc_name
 
 				insert_index = ListFrame:InsertEntry(entry, nil, insert_index, "header", is_expanded or expand_mode, is_expanded or expand_mode)
@@ -359,7 +366,7 @@ function private.InitializeTabs()
 	end
 
 	function RecipesTab:Initialize(expand_mode)
-		local prof_name = ORDERED_PROFESSIONS[MainPanel.profession]
+		local prof_name = ORDERED_PROFESSIONS[MainPanel.current_profession]
 		local profession_recipes = private.profession_recipe_list[prof_name]
 
 		self[prof_name.." expanded"] = self[prof_name.." expanded"] or {}

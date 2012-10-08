@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Rotface", "DBM-Icecrown", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4558 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(36627)
 mod:SetModelID(31005)
 mod:SetUsedIcons(7, 8)
@@ -23,14 +23,14 @@ mod:RegisterEvents(
 local InfectionIcon	-- alternating between 2 icons (2 debuffs can be up at the same time in 25man at least)
 
 local warnSlimeSpray			= mod:NewSpellAnnounce(69508, 2)
-local warnMutatedInfection		= mod:NewTargetAnnounce(71224, 4)
+local warnMutatedInfection		= mod:NewTargetAnnounce(69674, 4)
 local warnRadiatingOoze			= mod:NewSpellAnnounce(69760, 3)
 local warnOozeSpawn				= mod:NewAnnounce("WarnOozeSpawn", 1)
 local warnStickyOoze			= mod:NewSpellAnnounce(69774, 1)
 local warnUnstableOoze			= mod:NewAnnounce("WarnUnstableOoze", 2, 69558)
 local warnVileGas				= mod:NewTargetAnnounce(72272, 3)
 
-local specWarnMutatedInfection	= mod:NewSpecialWarningYou(71224)
+local specWarnMutatedInfection	= mod:NewSpecialWarningYou(69674)
 local specWarnStickyOoze		= mod:NewSpecialWarningMove(69774)
 local specWarnOozeExplosion		= mod:NewSpecialWarningRun(69839)
 local specWarnSlimeSpray		= mod:NewSpecialWarningSpell(69508, false)--For people that need a bigger warning to move
@@ -41,11 +41,11 @@ local specWarnVileGas			= mod:NewSpecialWarningYou(72272)
 local timerStickyOoze			= mod:NewNextTimer(16, 69774, nil, mod:IsTank())
 local timerWallSlime			= mod:NewTimer(20, "NextPoisonSlimePipes", 69789)
 local timerSlimeSpray			= mod:NewNextTimer(21, 69508)
-local timerMutatedInfection		= mod:NewTargetTimer(12, 71224)
+local timerMutatedInfection		= mod:NewTargetTimer(12, 69674)
 local timerOozeExplosion		= mod:NewCastTimer(4, 69839)
 local timerVileGasCD			= mod:NewNextTimer(30, 72272)
 
-local soundMutatedInfection		= mod:NewSound(71224)
+local soundMutatedInfection		= mod:NewSound(69674)
 mod:AddBoolOption("RangeFrame", mod:IsRanged())
 mod:AddBoolOption("InfectionIcon", true)
 mod:AddBoolOption("TankArrow")
@@ -53,7 +53,6 @@ mod:AddBoolOption("TankArrow")
 local RFVileGasTargets	= {}
 local spamOoze = 0
 local InfectionIcon = 8
-local antiSpam = 0
 
 local function warnRFVileGasTargets()
 	warnVileGas:Show(table.concat(RFVileGasTargets, "<, >"))
@@ -66,7 +65,6 @@ function mod:OnCombatStart(delay)
 	self:ScheduleMethod(25-delay, "WallSlime")
 	InfectionIcon = 8
 	spamOoze = 0
-	antiSpam = 0
 	if self:IsDifficulty("heroic10", "heroic25") then
 		timerVileGasCD:Start(22-delay)
 		if self.Options.RangeFrame then
@@ -163,9 +161,8 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 69761 or spellId == 71212 or spellId == 73026 or spellId == 73027) and destGUID == UnitGUID("player") and GetTime() - antiSpam > 3 then
+	if (spellId == 69761 or spellId == 71212 or spellId == 73026 or spellId == 73027) and destGUID == UnitGUID("player") and self:AntiSpam(3, 1) then
 		specWarnRadiatingOoze:Show()
-		antiSpam = GetTime()
 	elseif spellId ~= 50288 and self:GetCIDFromGUID(destGUID) == 36899 and bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 and self:IsInCombat() then--Any spell damage except for starfall
 		if sourceGUID ~= UnitGUID("player") then
 			if self.Options.TankArrow then
@@ -177,9 +174,8 @@ end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
 function mod:SWING_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags)
-	if self:GetCIDFromGUID(sourceGUID) == 36897 and destGUID == UnitGUID("player") and GetTime() - antiSpam > 3 then --Little ooze hitting you
+	if self:GetCIDFromGUID(sourceGUID) == 36897 and destGUID == UnitGUID("player") and self:AntiSpam(3, 2) then --Little ooze hitting you
 		specWarnLittleOoze:Show()
-		antiSpam = GetTime()
 	elseif self:GetCIDFromGUID(destGUID) == 36899 and bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 and self:IsInCombat() then
 		if sourceGUID ~= UnitGUID("player") then
 			if self.Options.TankArrow then

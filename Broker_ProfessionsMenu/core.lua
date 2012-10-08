@@ -3,7 +3,7 @@
 -- Author: Sanori/Pathur                                                      --
 --------------------------------------------------------------------------------
 local _, me = ...                                 --Includes all functions and variables
-me.version = "Version: 2.1.4a (13/03/2012)"
+me.version = "Version: 2.2 (27. Sep. 2012)"
 
 
 
@@ -47,16 +47,6 @@ me.L={}															--localization
 --------------------------------------------------------------------------------
 -- Functions                                                                  --
 --------------------------------------------------------------------------------
---Localization
---add new locale
-function me:NewL(table, locale)
-	if (locale and locale~=GetLocale()) then return end
-	for k,v in pairs(table) do
-		if (locale or (not locale and not me.L[k])) then
-			me.L[k] = v
-		end
-	end
-end
 --Filter Tradewindows and Tradeskills
 function me:GetProfs(sorted)
 	local result={}
@@ -699,29 +689,31 @@ function me:Trainer_Refresh()
 				money = tonumber(money)
 				if not profs[GetSpellInfo(skillid)] then --Test, if skill know
 					local name,_,icon,_ = GetSpellInfo(skillid)
-					local _,maxrank = me:TransProfID(skillid)
-					if (not maxrank or maxrank>=maxskill+75) then
-						local skillcolor
-						if reqskill>curskill then
-							skillcolor = {r=1.0,g=0,b=0}
-						else
-							skillcolor = {r=0,g=1.0,b=0}
-						end
-						local gold = floor( money / COPPER_PER_GOLD )
-						local silver = floor( ( money - ( gold * COPPER_PER_GOLD ) ) / COPPER_PER_SILVER )
-						local copper = mod( money, COPPER_PER_SILVER )
-						tinsert(table,{
-							["cols"] = {
-								{["value"] = "|T"..icon..":16:16:0:0|t",},--Spalte 1
-								{
-									["value"] = name,
-									["id"] = skillid,
-									["cost"] = format("%s %s %s",format( GOLD_AMOUNT_TEXTURE, gold, 0, 0 ),format( SILVER_AMOUNT_TEXTURE, silver, 0, 0 ),format( COPPER_AMOUNT_TEXTURE, copper, 0, 0 )),
-									["color"] = {r=1.0,g=0.81,b=0},
+					if icon and name then
+						local _,maxrank = me:TransProfID(skillid)
+						if (not maxrank or maxrank>=maxskill+75) then
+							local skillcolor
+							if reqskill>curskill then
+								skillcolor = {r=1.0,g=0,b=0}
+							else
+								skillcolor = {r=0,g=1.0,b=0}
+							end
+							local gold = floor( money / COPPER_PER_GOLD )
+							local silver = floor( ( money - ( gold * COPPER_PER_GOLD ) ) / COPPER_PER_SILVER )
+							local copper = mod( money, COPPER_PER_SILVER )
+							tinsert(table,{
+								["cols"] = {
+									{["value"] = "|T"..icon..":16:16:0:0|t",},--Spalte 1
+									{
+										["value"] = name,
+										["id"] = skillid,
+										["cost"] = format("%s %s %s",format( GOLD_AMOUNT_TEXTURE, gold, 0, 0 ),format( SILVER_AMOUNT_TEXTURE, silver, 0, 0 ),format( COPPER_AMOUNT_TEXTURE, copper, 0, 0 )),
+										["color"] = {r=1.0,g=0.81,b=0},
+									},
+									{["value"] = reqskill,["color"]=skillcolor,},
 								},
-								{["value"] = reqskill,["color"]=skillcolor,},
-							},
-						})
+							})
+						end
 					end
 				end
 			end
@@ -790,7 +782,7 @@ function me:ScanTradeSkillFrame()
 					else
 						item="0"
 					end
-						me.save[my].craftableitems[profid] = me.save[my].craftableitems[profid].."|"..enchant..","..item.."|"
+					if (enchant) then me.save[my].craftableitems[profid] = me.save[my].craftableitems[profid].."|"..enchant..","..item.."|" end
 				end
 			end
 			i=i+1
@@ -807,10 +799,10 @@ end
 
 --because me:GetSpellID() returns different Prof.-IDs for different ranks, I need a translation function to return always the same id (rank 1) (for saving, ...)
 me.profidtable={	--format {id of rank 1,id2,id3,id4,...,other ids[elixir master, etc.]}   ->   return "id of rank 1", "max skill"
-	{2259,3101,3464,11611,28596,51304,80731,28677,28675,28672},
+	{2259,3101,3464,11611,28596,51304,80731,105206,28677,28675,28672}, 	--Alchemy
 	{2575,2576,3564,10248,29354,50310,74517,2656},
 	{4036,4037,4038,12656,30350,51306,82774,20219,20222},
-	{45357,45358,45359,45360,45361,45363,86008},
+	{45357,45358,45359,45360,45361,45363,86008,110417},						--Inscription
 	{25229,25230,28894,28895,28897,51311,73318},
 	{2366,2368,3570,11993,28695,50300,74519},
 	{8613,8617,7618,10768,32678,50305,74522},
@@ -829,7 +821,7 @@ function me:TransProfID(profid)
 		for kk,vv in pairs(v) do
 			if (vv==profid) then
 				local maxrank
-				if kk<8 then maxrank=kk*75 end
+				if kk<9 then maxrank=kk*75 end	--Bei MotP gibt es 9 Ränke
 				return v[1], maxrank, profid
 			end
 		end

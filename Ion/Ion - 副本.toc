@@ -1,0 +1,36 @@
+﻿## Interface: 50001
+## Title: Ion
+## Notes: Ion: Action Bar & Object Mananger
+## Author: Connor Chenoweth (aka Maul)
+## Version: Hydrogen-2
+## DefaultState: enabled
+## SavedVariables: IonGDB, IonItemCache
+## SavedVariablesPerCharacter: IonCDB, IonSpec
+## OptionalDeps: Align, Masque, BarKeep, Bartender4, Dominos, MagnetButtons, nMainbar, Orbs, rActionBarStyler, StellarBars, Tukui, XBar
+## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved.
+## X-Permissions: AI-Art Visual Elements used with Author Permission (Quokka@WoWInterface)
+## X-Email: trinityui@live.com
+## X-Versioning: Atoms
+
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\AceLocale-3.0\AceLocale-3.0.xml
+Libs\LibDataBroker-1.1\LibDataBroker.lua
+
+Ion_Localizations.xml
+
+Ion__Core.lua
+
+Ion_States.lua
+Ion_Buttons.lua
+Ion_Bars.lua
+Ion_EditFrames.lua
+Ion_KeyBinder.lua
+Ion_Flyouts.lua
+Ion_SnapTo.lua
+
+Ion_ExtraBar.lua
+
+Ion-Broker.lua
+
+Ion__Core.xml

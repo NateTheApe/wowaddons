@@ -94,9 +94,33 @@ L["TP_RUNE"] = "Rune der Teleportation"
 
 end
 
+if GetLocale() == "itIT" then
+
+-- L["ANNOUNCE"] = ""
+-- L["ANNOUNCEMENT"] = ""
+-- L["ATT_MINIMAP"] = ""
+-- L["HEARTHSTONE"] = ""
+-- L["INN"] = ""
+-- L["MIN"] = ""
+-- L["N/A"] = ""
+-- L["OPTIONS"] = ""
+-- L["P"] = ""
+-- L["P_RUNE"] = ""
+-- L["RCLICK"] = ""
+-- L["READY"] = ""
+-- L["SEC"] = ""
+-- L["SEE_SPELLS"] = ""
+-- L["SHOW_ITEM_COOLDOWNS"] = ""
+-- L["SHOW_ITEMS"] = ""
+-- L["TP"] = ""
+-- L["TP_RUNE"] = ""
+
+
+end
+
 if GetLocale() == "koKR" then
 
-L["ANNOUNCE"] = "차원문의 시전 알림"
+L["ANNOUNCE"] = "차원문 시전 알림" -- Needs review
 L["ANNOUNCEMENT"] = "시전"
 L["ATT_MINIMAP"] = "미니맵 표시"
 L["HEARTHSTONE"] = "귀환석"
@@ -106,12 +130,12 @@ L["N/A"] = "사용 불가"
 L["OPTIONS"] = "설정"
 L["P"] = "차원문"
 L["P_RUNE"] = "차원이동의 룬"
-L["RCLICK"] = "오른쪽-클릭"
+L["RCLICK"] = "우클릭" -- Needs review
 L["READY"] = "사용 가능"
 L["SEC"] = "초"
 L["SEE_SPELLS"] = "주문 목록 보기"
-L["SHOW_ITEM_COOLDOWNS"] = "아이템 재사용시간 표시"
-L["SHOW_ITEMS"] = "아이템 보이기"
+L["SHOW_ITEM_COOLDOWNS"] = "아이템 재사용 시간 표시" -- Needs review
+L["SHOW_ITEMS"] = "아이템 표시" -- Needs review
 L["TP"] = "순간이동"
 L["TP_RUNE"] = "순간이동의 룬"
 

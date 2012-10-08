@@ -3,10 +3,10 @@
 Config.lua
 Ace3 Configuration options for ARL
 ************************************************************************
-File date: 2011-12-20T04:35:25Z
-File hash: 4f28db5
-Project hash: de16aef
-Project version: 2.3.0
+File date: 2012-08-18T04:52:05Z
+File hash: 4d6b8e4
+Project hash: 9e1f108
+Project version: 2.4.1
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -233,7 +233,7 @@ end
 local arlmap
 
 local function GetMapOptions()
-	local has_waypoints = _G.TomTom or _G.Cartographer_Waypoints or false
+	local has_waypoints = _G.TomTom
 
 	if not arlmap then
 		arlmap = {
@@ -435,7 +435,7 @@ local function GetDatamineOptions()
 					name = L["Scan A Spell ID"],
 					desc = L["SCAN_SPELL_ID_DESC"],
 					get = false,
-					set = function(info, v) addon:TooltipScanRecipe(tonumber(v),false,false) end,
+					set = function(info, v) addon:ScanTooltipRecipe(tonumber(v), false, false) end,
 				},
 				null2 = {
 					order	= 80,
@@ -838,7 +838,7 @@ function addon:SetupOptions()
 	-- Register the module options
 	self:RegisterModuleOptions("Display", GetDisplayOptions(), _G.DISPLAY_OPTIONS)
 
-	if _G.TomTom or _G.Cartographer_Waypoints then
+	if _G.TomTom then
 		self:RegisterModuleOptions("Waypoint", GetMapOptions(), L["Waypoints"])
 	end
 

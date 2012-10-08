@@ -16,15 +16,17 @@ local TT_DefaultConfig = {
 	showUnitTip = true,
 	showStatus = true,
 	showGuildRank = false,
+	showTargetedBy = true,
+	showPlayerGender = false,
 	nameType = "title",
 	showRealm = "show",
 	showTarget = "last",
 	targetYouText = "<<YOU>>",
-	showTargetedBy = true,
 
 	gttScale = 1,
 	updateFreq = 0.5,
 	enableChatHoverTips = false,
+	hideFactionText = false,
 
 	colorGuildByReaction = true,
 	colGuild = "|cff0080cc",
@@ -68,6 +70,7 @@ local TT_DefaultConfig = {
 	fontFlags = "",
 	fontSizeDelta = 2,
 
+	classification_minus = "-%s ",		-- New classification in MoP; Unsure what it's used for, but apparently the units have no mana. Example of use: The "Sha Haunts" early in the Horde's quests in Thunder Hold.
 	classification_trivial = "~%s ",
 	classification_normal = "%s ",
 	classification_elite = "+%s ",
@@ -141,6 +144,7 @@ local TT_DefaultConfig = {
 	if_showItemLevelAndId = true,
 	if_showQuestLevelAndId = true,
 	if_showSpellIdAndRank = false,
+	if_showCurrencyId = true,					-- Az: no option for this added to TipTac/options yet!
 	if_showAchievementIdAndCategory = false,	-- Az: no option for this added to TipTac/options yet!
 	if_modifyAchievementTips = true,
 	if_showIcon = true,
@@ -152,10 +156,13 @@ local TT_DefaultConfig = {
 -- Tips modified by TipTac in appearance and scale, you can add to this list if you want to modify more tips
 local TT_TipsToModify = {
 	"GameTooltip",
-	"ItemRefTooltip",
 	"ShoppingTooltip1",
 	"ShoppingTooltip2",
 	"ShoppingTooltip3",
+	"ItemRefTooltip",
+	"ItemRefShoppingTooltip1",
+	"ItemRefShoppingTooltip2",
+	"ItemRefShoppingTooltip3",
 	"WorldMapTooltip",
 	"WorldMapCompareTooltip1",
 	"WorldMapCompareTooltip2",
@@ -235,7 +242,7 @@ local bars = {};
 local tipIcon;
 
 --------------------------------------------------------------------------------------------------------
---                                       TipTac Anchor Creation                                       --
+--                                   TipTac Anchor Creation & Events                                  --
 --------------------------------------------------------------------------------------------------------
 
 tt:SetWidth(114);
@@ -438,20 +445,20 @@ local function ModifyUnitTooltip()
 	local hasGuildTitle;
 	-- Level + Classification
 	local level = UnitLevel(unit);
-	local tttData = (TipTacTalents and TipTacTalents.current);
-	if (tttData) and (level == -1) and (u.isPlayer) and (tttData.name == name) and (tttData[3]) then -- Using TipTacTalents, estimate level of ?? players by using talent points spent
-		local points = (tttData[1] + tttData[2] + tttData[3]);
-		if (points >= 36) then
-			level = (80 + points - 36);
-		else
-			level = ((points - 1) * 2 + 10);
-		end
-	end
 	local classification = UnitClassification(unit);
 	lineInfo[#lineInfo + 1] = (UnitCanAttack(unit,"player") or UnitCanAttack("player",unit)) and GetDifficultyLevelColor(level ~= -1 and level or 500) or cfg.colLevel;
-	lineInfo[#lineInfo + 1] = (cfg["classification_"..classification] or "%d? "):format(level == -1 and "??" or level);
+	lineInfo[#lineInfo + 1] = (cfg["classification_"..classification] or "%d? "):format(level == -1 and "??" or level); -- Why "%d? " on the alt format? Bug?
 	-- Players
 	if (u.isPlayer) then
+		-- gender
+		if (cfg.showPlayerGender) then
+			local sex = UnitSex(unit);
+			if (sex == 2) or (sex == 3) then
+				lineInfo[#lineInfo + 1] = " ";
+				lineInfo[#lineInfo + 1] = cfg.colRace;
+				lineInfo[#lineInfo + 1] = (sex == 3 and "Female" or "Male");
+			end
+		end
 		-- race
 		lineInfo[#lineInfo + 1] = " ";
 		lineInfo[#lineInfo + 1] = cfg.colRace;
@@ -544,24 +551,26 @@ end
 
 -- Add "Targeted By" line
 local function AddTargetedBy()
-	local numParty, numRaid = GetNumPartyMembers(), GetNumRaidMembers();
-	if (numParty > 0 or numRaid > 0) then
-		for i = 1, (numRaid > 0 and numRaid or numParty) do
-			local unit = (numRaid > 0 and "raid"..i or "party"..i);
-			if (UnitIsUnit(unit.."target",u.token)) and (not UnitIsUnit(unit,"player")) then
-				local _, class = UnitClass(unit);
-				targetedList[#targetedList + 1] = TT_ClassColors[class];
-				targetedList[#targetedList + 1] = UnitName(unit);
-				targetedList[#targetedList + 1] = "|r, ";
-			end
+	local numGroup = GetNumGroupMembers();
+	if (not numGroup) or (numGroup <= 1) then
+		return;
+	end
+	local inRaid = IsInRaid();
+	for i = 1, numGroup do
+		local unit = (inRaid and "raid"..i or "party"..i);
+		if (UnitIsUnit(unit.."target",u.token)) and (not UnitIsUnit(unit,"player")) then
+			local _, class = UnitClass(unit);
+			targetedList[#targetedList + 1] = TT_ClassColors[class];
+			targetedList[#targetedList + 1] = UnitName(unit);
+			targetedList[#targetedList + 1] = "|r, ";
 		end
-		if (#targetedList > 0) then
-			targetedList[#targetedList] = nil;
-			gtt:AddLine(" ",nil,nil,nil,1);
-			local line = _G["GameTooltipTextLeft"..gtt:NumLines()];
-			line:SetFormattedText("Targeted By (|cffffffff%d|r): %s",(#targetedList + 1) / 3,table.concat(targetedList));
-			wipe(targetedList);
-		end
+	end
+	if (#targetedList > 0) then
+		targetedList[#targetedList] = nil;
+		gtt:AddLine(" ",nil,nil,nil,1);
+		local line = _G["GameTooltipTextLeft"..gtt:NumLines()];
+		line:SetFormattedText("Targeted By (|cffffffff%d|r): %s",(#targetedList + 1) / 3,table.concat(targetedList));
+		wipe(targetedList);
 	end
 end
 
@@ -1178,7 +1187,10 @@ function tt:AddModifiedTip(tip,noHooks)
 		if (not noHooks) then
 			tip:HookScript("OnHide",TipHook_OnHide);
 		end
-		self:ApplySettings();
+		-- Only apply settings if "cfg" has been initialised, meaning after VARIABLES_LOADED. If AddModifiedTip() is called before, settings will be applied for all tips once VARIABLES_LOADED is fired anyway.
+		if (cfg) then
+			self:ApplySettings();
+		end
 	end
 end
 
@@ -1213,12 +1225,12 @@ local function ApplyTipTacAppearance(first)
 		SetupHealthAndPowerBar();
 	end
 	UpdateHealthAndPowerBar();
-	-- Remove PVP Line, which makes the tip look a bit bad
+	-- Remove PVP Line, which makes the tip look a bit bad -- MoP: Now removes alliance and horde faction text as well
 	for i = 2, gtt:NumLines() do
 		local line = _G["GameTooltipTextLeft"..i];
-		if (line:GetText() == PVP_ENABLED) then
+		local text = line:GetText();
+		if (text == PVP_ENABLED) or (cfg.hideFactionText and (text == FACTION_ALLIANCE or text == FACTION_HORDE)) then
 			line:SetText(nil);
-			break;
 		end
 	end
 	-- Show & Adjust Height

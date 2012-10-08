@@ -1,8 +1,8 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.0.5) add-on for World of Warcraft UI
-    Copyright (C) 2006-2007-2008-2009-2010-2011 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
+    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
     is no longer free software, all rights are reserved to its author (John Wellesz).
@@ -11,13 +11,13 @@
     To distribute Decursive through other means a special authorization is required.
     
 
-    Decursive is inspired from the original "Decursive v1.9.4" by Quu.
+    Decursive is inspired from the original "Decursive v1.9.4" by Patrick Bohnet (Quu).
     The original "Decursive 1.9.4" is in public domain ( www.quutar.com )
 
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2011-06-06T21:10:50Z
+    This file was last updated on 2012-10-07T15:50:17Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -35,6 +35,7 @@ StaticPopupDialogs["DECURSIVE_ERROR_FRAME"] = {
     whileDead = 1,
     hideOnEscape = 1,
     showAlert = 1,
+    preferredIndex = 3,
     }; -- }}}
 T._FatalError = function (TheError) StaticPopup_Show ("DECURSIVE_ERROR_FRAME", TheError); end
 end
@@ -72,7 +73,32 @@ local tonumber          = _G.tonumber;
 local UnitGUID          = _G.UnitGUID;
 local band              = _G.bit.band;
 local GetTime           = _G.GetTime;
+local IsSpellInRange    = _G.IsSpellInRange;
+local UnitInRange       = _G.UnitInRange;
+local debugprofilestop  = _G.debugprofilestop;
 
+if DC.MOP then
+    -- replacement for the default function as it is bugged in WoW5 (it returns nil for some spells)
+    D.IsSpellInRange = function (spellName, unit)
+        local range = IsSpellInRange(spellName, unit);
+
+        if range ~= nil then
+            return range;
+        else
+            --[===[@debug@
+            D:Debug('IsSpellInRange() returned nil for', spellName, unit);
+            --@end-debug@]===]
+            if unit == 'player' or unit == 'pet' then
+                return 1;
+            else
+                return (UnitInRange(unit)) and 1 or 0;
+            end
+        end
+
+    end
+else
+    D.IsSpellInRange = IsSpellInRange;
+end
 
 function D:ColorText (text, color) --{{{
     return "|c".. color .. text .. "|r";
@@ -145,9 +171,7 @@ function D:NumToHexStr(number)
 end
 
 
-local function debugStyle(...)
-    return "|cFF00AAAADebug:("..D:NiceTime()..")|r", ...;
-end
+
 
 function D:Println( ... ) --{{{
 
@@ -189,10 +213,17 @@ function D:errln( ... ) --{{{
     end
 end --}}}
 
+do
+    local timerStart = debugprofilestop();
 
-function D:Debug(...)
-    if self.debug then
-        self:Print(debugStyle(UseFormatIfPresent(...)));
+    local function debugStyle(...)
+        return ("|cFF00AAAADebug:(%0.3f)|r"):format((debugprofilestop() - timerStart) / 1000), ...;
+    end
+
+    function D:Debug(...)
+        if self.debug then
+            self:Print(debugStyle(UseFormatIfPresent(...)));
+        end
     end
 end
 
@@ -210,8 +241,7 @@ function D:tremovebyval(tab, val) -- {{{
 end -- }}}
 
 function D:tcheckforval(tab, val) -- {{{
-    local k;
-    local v;
+    local k, v;
     if tab then
         for k,v in pairs(tab) do
             if v==val then
@@ -599,12 +629,14 @@ function D:GetTimersNumber()
             dcrcount = dcrcount + 1;
         end
     end
-    local acetimercount = 0;
-    local Acetimer = LibStub("AceTimer-3.0");
-    for table in pairs(Acetimer.selfs[D]) do
-        acetimercount = acetimercount + 1;
+    local timercount = 0;
+    local ShefkiTimer = LibStub("LibShefkiTimer-1.0");
+    --local Acetimer = LibStub("AceTimer-3.0");
+    for table in pairs(ShefkiTimer.selfs[D]) do
+        timercount = timercount + 1;
     end
-    return "Dcr says: " .. dcrcount .. ", AceTimers says: " .. acetimercount;
+    return "Dcr says: " .. dcrcount .. ", LibShefkiTimer says: " .. timercount;
+    --return "Dcr says: " .. dcrcount .. ", AceTimers says: " .. timercount;
 end
 
 -- /echo LibStub("AceTimer-3.0").selfs[Dcr]
@@ -616,4 +648,4 @@ function D:GetOPtionPath(info)
 end -- }}}
 
 
-T._LoadedFiles["Dcr_utils.lua"] = "2.7.0.5";
+T._LoadedFiles["Dcr_utils.lua"] = "2.7.2.2";

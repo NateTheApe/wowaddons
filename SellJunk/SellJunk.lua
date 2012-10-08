@@ -5,12 +5,19 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
 local addonName, addonTable = ...
 local L = addonTable.L
+local _
 
 addon.optionsFrame = {}
 local options = nil
 
 addon.sellButton = CreateFrame("Button", nil, MerchantFrame, "OptionsButtonTemplate")
-addon.sellButton:SetPoint("TOPRIGHT", -41, -40)
+
+if IsAddOnLoaded("GnomishVendorShrinker") then
+  addon.sellButton:SetPoint("TOPRIGHT", -23, 0)
+else
+  addon.sellButton:SetPoint("TOPLEFT", 60, -32)
+end
+
 addon.sellButton:SetText(L["Sell Junk"])
 addon.sellButton:SetScript("OnClick", function() SellJunk:Sell() end)
 

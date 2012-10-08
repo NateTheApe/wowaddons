@@ -1,7 +1,7 @@
-local mod	= DBM:NewMod("GrandVizierErtan", "DBM-Party-Cataclysm", 8)
+local mod	= DBM:NewMod(114, "DBM-Party-Cataclysm", 8, 68)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7049 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
 mod:SetCreatureID(43878)
 mod:SetModelID(35181)
 mod:SetZone()
@@ -16,7 +16,7 @@ mod:RegisterEventsInCombat(
 local warnSummonTempest		= mod:NewSpellAnnounce(86340, 2)
 
 local timerSummonTempest	= mod:NewCDTimer(17, 86340)
-local timerShield			= mod:NewNextTimer(31.5, 93991)
+local timerShield			= mod:NewNextTimer(31.5, 86292)
 
 function mod:OnCombatStart(delay)
 	timerShield:Start(24-delay)

@@ -4,7 +4,7 @@
 	<Frame name="FishingBuddyDropDownMenuTemplate" inherits="UIDropDownMenuTemplate" virtual="true">
 		<Layers>
 			<Layer level="BACKGROUND">
-				<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+				<FontString name="$parentLabel" parentKey="label" inherits="GameFontNormalSmall">
 					<Anchors>
 						<Anchor point="RIGHT" relativePoint="LEFT">
 							<Offset>

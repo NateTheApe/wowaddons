@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Champions", "DBM-Coliseum")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 3726 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetCreatureID(34458, 34451, 34459, 34448, 34449, 34445, 34456, 34447, 34441, 34454, 34444, 34455, 34450, 34453, 34461, 34460, 34469, 34467, 34468, 34471, 34465, 34466, 34473, 34472, 34470, 34463, 34474, 34475)
 
 mod:RegisterCombat("combat")
@@ -61,12 +61,12 @@ local isDispeller = select(2, UnitClass("player")) == "WARRIOR"
 				or select(2, UnitClass("player")) == "PRIEST"
 				or select(2, UnitClass("player")) == "SHAMAN"
 
-local warnHellfire			= mod:NewSpellAnnounce(68147, 4)
+local warnHellfire			= mod:NewSpellAnnounce(65816, 4)
 local preWarnBladestorm 	= mod:NewSoonAnnounce(65947, 3)
 local warnBladestorm		= mod:NewSpellAnnounce(65947, 4)
 local warnHeroism			= mod:NewSpellAnnounce(65983, 3)
 local warnBloodlust			= mod:NewSpellAnnounce(65980, 3)
-local warnHandofFreedom		= mod:NewTargetAnnounce(68758, 2)
+local warnHandofFreedom		= mod:NewTargetAnnounce(66115, 2)
 local warnHandofProt		= mod:NewTargetAnnounce(66009, 3)
 local warnDivineShield		= mod:NewSpellAnnounce(66010, 3)
 local warnIceBlock			= mod:NewSpellAnnounce(65802, 3)
@@ -80,18 +80,12 @@ local timerShadowstepCD		= mod:NewCDTimer(30, 66178)
 local timerDeathgripCD		= mod:NewCDTimer(35, 66017)
 local timerBladestormCD		= mod:NewCDTimer(90, 65947)
 
-local specWarnHellfire		= mod:NewSpecialWarningMove(68147)
+local specWarnHellfire		= mod:NewSpecialWarningMove(65816)
 local specWarnHandofProt	= mod:NewSpecialWarningDispel(66009, isDispeller)
 local specWarnDivineShield	= mod:NewSpecialWarningDispel(66010, isDispeller) 
 local specWarnIceBlock		= mod:NewSpecialWarningDispel(65802, isDispeller)
 
 local soundBladestorm		= mod:NewSound(65947, nil, mod:IsMelee())
-
-local antiSpam = 0
-
-function mod:OnCombatStart(delay)
-	antiSpam = 0
-end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args:IsSpellID(65816, 68145, 68146, 68147) then		-- Warlock Hellfire
@@ -143,9 +137,8 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 65817 or spellId == 68142 or spellId == 68143 or spellId == 68144) and destGUID == UnitGUID("player") and GetTime() - antiSpam >= 3 then
+	if (spellId == 65817 or spellId == 68142 or spellId == 68143 or spellId == 68144) and destGUID == UnitGUID("player") and self:AntiSpam() then
 		specWarnHellfire:Show()
-		antiSpam = GetTime()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE

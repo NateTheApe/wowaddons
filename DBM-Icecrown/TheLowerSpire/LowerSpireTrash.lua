@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("LowerSpireTrash", "DBM-Icecrown", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4408 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
 mod:SetModelID(30459)
 mod:SetUsedIcons(8)
 
@@ -27,11 +27,6 @@ mod:AddBoolOption("SetIconOnDarkReckoning", true)
 mod:RemoveOption("HealthFrame")
 mod:RemoveOption("SpeedKillTimer")
 
-local function warnPlagueTargetsTargets()
-	warnDeathPlague:Show(table.concat(DeathPlagueTargets, "<, >"))
-	table.wipe(DeathPlagueTargets)
-	DeathPlagueIcons = 8
-end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(69483) then

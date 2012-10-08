@@ -7,7 +7,25 @@ end
 
 local L = PitBull4.L
 
-local cata_400 = select(4,GetBuildInfo()) >= 40000
+local mop_500 = select(4,GetBuildInfo()) >= 50000
+
+local GROUP_UPDATE_EVENT = 'GROUP_ROSTER_UPDATE'
+local IsInRaid = IsInRaid
+local GetNumGroupMembers = GetNumGroupMembers
+if not mop_500 then
+	GROUP_UPDATE_EVENT = 'PARTY_MEMBERS_CHANGED'
+	IsInRaid = function()
+		return GetNumRaidMembers() > 0
+	end
+	GetNumGroupMembers = function()
+		local raid_members = GetNumRaidMembers()
+		if raid_members > 0 then
+			return raid_members
+		else
+			return GetNumPartyMembers()
+		end
+	end
+end
 
 local PitBull4_LuaTexts = PitBull4:NewModule("LuaTexts","AceEvent-3.0","AceHook-3.0")
 
@@ -567,6 +585,50 @@ return math.abs(Power(unit,SPELL_POWER_ECLIPSE))
 ]],
 		},
 	},
+	[L["Demonic fury"]] = {
+		[L["Absolute"]] = {
+			events = {['UNIT_POWER_FREQUENT']=true,['UNIT_MAXPOWER']=true},
+			code = [[
+return "%s/%s",Power(unit,SPELL_POWER_DEMONIC_FURY),MaxPower(unit,SPELL_POWER_DEMONIC_FURY)
+]],
+		},
+		[L["Absolute short"]] = {
+			events = {['UNIT_POWER_FREQUENT']=true,['UNIT_MAXPOWER']=true},
+			code = [[
+return "%s/%s",Short(Power(unit,SPELL_POWER_DEMONIC_FURY),true),Short(MaxPower(unit,SPELL_POWER_DEMONIC_FURY),true)
+]],
+		},
+		[L["Difference"]] = {
+			events = {['UNIT_POWER_FREQUENT']=true,['UNIT_MAXPOWER']=true},
+			code = [[
+return -(MaxPower(unit,SPELL_POWER_DEMONIC_FURY) - Power(unit,SPELL_POWER_DEMONIC_FURY))
+]],
+		},
+		[L["Percent"]] = {
+			events = {['UNIT_POWER_FREQUENT']=true,['UNIT_MAXPOWER']=true},
+			code = [[
+local max = MaxPower(unit,0)
+if max > 0 then
+  return "%s%%",Percent(Power(unit,SPELL_POWER_DEMONIC_FURY),max)
+end
+]],
+		},
+		[L["Mini"]] = {
+			events = {['UNIT_POWER_FRQUENT']=true,['UNIT_MAXPOWER']=true},
+			code = [[
+return VeryShort(Power(unit,SPELL_POWER_DEMONIC_FURY))
+]],
+		},
+		[L["Smart"]] = {
+			events = {['UNIT_POWER_FREQUENT']=true,['UNIT_MAXPOWER']=true},
+			code = [[
+local miss = MaxPower(unit,SPELL_POWER_DEMONIC_FURY) - Power(unit,SPELL_POWER_DEMONIC_FURY)
+if miss ~= 0 then
+  return "|cff7f7fff%s|r",Short(miss,true)
+end
+]],
+		},
+	},
 }
 
 PitBull4_LuaTexts:SetModuleType("text_provider")
@@ -641,42 +703,27 @@ end
 -- require very little actual processing time.
 local protected_events = {
 	['UNIT_SPELLCAST_SENT'] = true,
-	['PARTY_MEMBERS_CHANGED'] = true,
+	[GROUP_UPDATE_EVENT] = true,
 }
 
 -- Provide a way to map changed events so existing LuaTexts configs
 -- continue to work transparently to end users.
 local compat_event_map = {}
-if cata_400 then
-	compat_event_map.UNIT_MANA = 'UNIT_POWER'
-	compat_event_map.UNIT_MAXMANA = 'UNIT_POWER'
-	compat_event_map.UNIT_RAGE = 'UNIT_POWER'
-	compat_event_map.UNIT_MAXRAGE = 'UNIT_POWER'
-	compat_event_map.UNIT_ENERGY = 'UNIT_POWER'
-	compat_event_map.UNIT_MAXENERGY = 'UNIT_POWER'
-	compat_event_map.UNIT_FOCUS = 'UNIT_POWER'
-	compat_event_map.UNIT_MAXFOCUS = 'UNIT_POWER'
-	compat_event_map.UNIT_HAPPINESS = 'UNIT_POWER'
-	compat_event_map.UNIT_MAXHAPPINESS = 'UNIT_POWER'
-	compat_event_map.UNIT_RUNIC_POWER = 'UNIT_POWER'
-	compat_event_map.UNIT_MAXRUNIC_POWER = 'UNIT_POWER'
-else
-	compat_event_map.UNIT_POWER = {
-		'UNIT_MANA',
-		'UNIT_RAGE',
-		'UNIT_ENERGY',
-		'UNIT_FOCUS',
-		'UNIT_HAPPINESS',
-		'UNIT_RUNIC_POWER',
-	}
-	compat_event_map.UNIT_MAXPOWER = {
-		'UNIT_MAXMANA',
-		'UNIT_MAXRAGE',
-		'UNIT_MAXENERGY',
-		'UNIT_MAXFOCUS',
-		'UNIT_MAXHAPPINESS',
-		'UNIT_MAXRUNIC_POWER',
-	}
+compat_event_map.UNIT_MANA = 'UNIT_POWER'
+compat_event_map.UNIT_MAXMANA = 'UNIT_POWER'
+compat_event_map.UNIT_RAGE = 'UNIT_POWER'
+compat_event_map.UNIT_MAXRAGE = 'UNIT_POWER'
+compat_event_map.UNIT_ENERGY = 'UNIT_POWER'
+compat_event_map.UNIT_MAXENERGY = 'UNIT_POWER'
+compat_event_map.UNIT_FOCUS = 'UNIT_POWER'
+compat_event_map.UNIT_MAXFOCUS = 'UNIT_POWER'
+compat_event_map.UNIT_HAPPINESS = 'UNIT_POWER'
+compat_event_map.UNIT_MAXHAPPINESS = 'UNIT_POWER'
+compat_event_map.UNIT_RUNIC_POWER = 'UNIT_POWER'
+compat_event_map.UNIT_MAXRUNIC_POWER = 'UNIT_POWER'
+if mop_500 then
+	compat_event_map.PARTY_MEMBERS_CHANGED = 'GROUP_ROSTER_UPDATE'
+	compat_event_map.RAID_ROSTER_UPDATE = 'GROUP_ROSTER_UPDATE'
 end
 
 local timerframe = CreateFrame("Frame")
@@ -730,7 +777,7 @@ function PitBull4_LuaTexts:OnEnable()
 	-- UNIT_SPELLCAST_SENT has to always be registered so we can capture 
 	-- additional data not always available.
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
-	self:RegisterEvent("PARTY_MEMBERS_CHANGED")
+	self:RegisterEvent(GROUP_UPDATE_EVENT, "GROUP_ROSTER_UPDATE")
 
 	-- Hooks to trap OnEnter/OnLeave for the frames.
 	self:AddFrameScriptHook("OnEnter")
@@ -870,10 +917,10 @@ local function update_cast_data(event, unit, event_spell, event_rank, event_cast
 		cast_data[guid] = data
 	end
 
-	local spell, rank, name, icon, start_time, end_time, is_trade_skill, cast_id, interrupt = UnitCastingInfo(unit)
+	local spell, rank, name, icon, start_time, end_time, is_trade_skill, cast_id, uninterruptible = UnitCastingInfo(unit)
 	local channeling = false
 	if not spell then
-		spell, rank, name, icon, start_time, end_time, uninterruptble = UnitChannelInfo(unit)
+		spell, rank, name, icon, start_time, end_time, uninterruptible = UnitChannelInfo(unit)
 		channeling = true
 	end
 	if spell then
@@ -985,7 +1032,7 @@ local first = true
 local function update_timers()
 	if first then
 		first = false
-		PitBull4_LuaTexts:PARTY_MEMBERS_CHANGED()
+		PitBull4_LuaTexts:GROUP_ROSTER_UPDATE()
 	end
 	for unit, guid in pairs(group_members) do 
 		if not UnitIsConnected(unit) then
@@ -1055,10 +1102,10 @@ local function update_timers()
 	end
 end
 
-function PitBull4_LuaTexts:PARTY_MEMBERS_CHANGED(event)
-  local prefix, min, max = "raid", 1, GetNumRaidMembers()
-	if max == 0 then
-		prefix, min, max = "party", 0, GetNumPartyMembers()
+function PitBull4_LuaTexts:GROUP_ROSTER_UPDATE(event)
+  local prefix, min, max = "raid", 1, GetNumGroupMembers()
+	if not IsInRaid() then
+		prefix, min = "party", 0
 	end
 	if max == 0 then
 		-- not in a raid or a party
@@ -1298,6 +1345,12 @@ function PitBull4_LuaTexts:OnNewLayout(layout)
 			events = copy(PROVIDED_CODES[L['Alternate power']][L['Percent']].events),
 			attach_to = "AltPowerBar",
 			location = "right"
+		},
+		["Lua:"..L["Demonic fury"]] = {
+			code = PROVIDED_CODES[L["Demonic fury"]][L["Absolute"]].code,
+			events = copy(PROVIDED_CODES[L["Demonic fury"]][L["Absolute"]].events),
+			attach_to = "DemonicFury",
+			location = "center"
 		},
 	} do
 		local text_db = texts[name]

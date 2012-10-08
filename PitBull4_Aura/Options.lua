@@ -14,6 +14,7 @@ local self_debuffs = PitBull4_Aura.self_debuffs
 local pet_buffs = PitBull4_Aura.pet_buffs
 local enemy_debuffs = PitBull4_Aura.enemy_debuffs
 local extra_buffs = PitBull4_Aura.extra_buffs
+local can_purge = PitBull4_Aura.can_purge
 
 local color_defaults = {
 	caster = {
@@ -106,12 +107,13 @@ PitBull4_Aura:SetDefaults({
 	},
 	highlight = true,
 	highlight_filters = {
-		'!H','!I','!J'
+		'!H','!L','!I','!J'
 	},
 	highlight_filters_color_by_type = {
-		true, false, false
+		true, true, false, false
 	},
 	highlight_filters_custom_color = {
+		{ 1, 1, 1, 1},
 		{ 1, 1, 1, 1},
 		{ 1, 0, 0, 1},
 		{ 1, 0, 0, 1},
@@ -267,10 +269,12 @@ PitBull4_Aura:SetDefaults({
 		-- # Intermediate Filters
 		-- % Race map filters
 		-- & Class map filters
+		-- * Extra filters
 		-- + DeathKnight
 		-- , Druid
 		-- - Hunter
 		-- . Mage
+		-- // Monk (this has two characters for the class since there is no room to add a class otherwise)
 		-- / Paladin
 		-- 0 Priest
 		-- 1 Rogue
@@ -287,6 +291,9 @@ PitBull4_Aura:SetDefaults({
 		-- < Taruen
 		-- = Troll
 		-- > Blood Elf
+		-- ?? Goblin (this has two characters for the race since there is no room to add a race otherwise)
+		-- ? Worgen 
+		-- @ Pandaren (shared with the one below, race filters are always followed by a number)
 		-- @ Simple filters
 		--
 		-- The 2nd character places it within the proper order
@@ -299,6 +306,7 @@ PitBull4_Aura:SetDefaults({
 		-- 4 self buffs
 		-- 5 friend debuffs
 		-- 6 enemy debuffs
+		-- 7 can purge
 		--
 		-- This is necessary to get the sort order proper for the
 		-- drop down boxes while using a value that is not localized
@@ -393,6 +401,23 @@ PitBull4_Aura:SetDefaults({
 			disabled = true,
 			built_in = true,
 		},
+		['@P'] = {
+			display_name = L['Purgeable'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = {
+				Magic = true,
+				Enrage = true,
+			},
+			built_in = true,
+		},
+		['//3'] = {
+			display_name = L['Monk can dispel'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_dispel['MONK'],
+			built_in = true,
+		},
 		[',3'] = {
 			display_name = L['Druid can dispel'],
 			filter_type = 'Aura Type',
@@ -454,6 +479,13 @@ PitBull4_Aura:SetDefaults({
 			filter_type = 'Aura Type',
 			whitelist = true,
 			aura_type_list = can_dispel['WARRIOR'],
+			built_in = true,
+		},
+		['//0'] = {
+			display_name = L['Monk self buffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = self_buffs.MONK,
 			built_in = true,
 		},
 		['+0'] = {
@@ -547,6 +579,13 @@ PitBull4_Aura:SetDefaults({
 			name_list = pet_buffs.WARLOCK,
 			built_in = true,
 		},
+		['//2'] = {
+			display_name = L['Monk friend buffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = friend_buffs.MONK,
+			built_in = true,
+		},
 		['+2'] = {
 			display_name = L['Death Knight friend buffs'],
 			filter_type = 'Name',
@@ -617,6 +656,13 @@ PitBull4_Aura:SetDefaults({
 			name_list = friend_buffs.WARRIOR,
 			built_in = true,
 		},
+		['//6'] = {
+			display_name = L['Monk enemy debuffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = enemy_debuffs.MONK,
+			built_in = true,
+		},
 		['+6'] = {
 			display_name = L['Death Knight enemy debuffs'],
 			filter_type = 'Name',
@@ -639,7 +685,7 @@ PitBull4_Aura:SetDefaults({
 			built_in = true,
 		},
 		['.6'] = {
-			display_name = L['Mage enemey debuffs'],
+			display_name = L['Mage enemy debuffs'],
 			filter_type = 'Name',
 			whitelist = true,
 			name_list = enemy_debuffs.MAGE,
@@ -685,6 +731,20 @@ PitBull4_Aura:SetDefaults({
 			filter_type = 'Name',
 			whitelist = true,
 			name_list = enemy_debuffs.WARRIOR,
+			built_in = true,
+		},
+		['-5'] = {
+			display_name = L['Hunter friend debuffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = friend_debuffs.HUNTER,
+			built_in = true,
+		},
+		['.5'] = {
+			display_name = L['Mage friend debuffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = friend_debuffs.MAGE,
 			built_in = true,
 		},
 		['/5'] = {
@@ -748,6 +808,13 @@ PitBull4_Aura:SetDefaults({
 			filter_type = 'Name',
 			whitelist = true,
 			name_list = self_buffs.BloodElf,
+			built_in = true,
+		},
+		['?0'] = {
+			display_name = L['Worgen self buffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = self_buffs.Worgen,
 			built_in = true,
 		},
 		['52'] = {
@@ -820,6 +887,27 @@ PitBull4_Aura:SetDefaults({
 			name_list = friend_buffs.BloodElf,
 			built_in = true,
 		},
+		['??2'] = {
+			display_name = L['Goblin friend buffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = friend_buffs.Goblin,
+			built_in = true,
+		},
+		['?2'] = {
+			display_name = L['Worgen friend buffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = friend_buffs.Worgen,
+			built_in = true,
+		},
+		['@2'] = {
+			display_name = L['Pandaren friend buffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = friend_buffs.Pandaren,
+			built_in = true,
+		},
 		['<6'] = {
 			display_name = L['Taruen enemy debuffs'],
 			filter_type = 'Name',
@@ -832,6 +920,13 @@ PitBull4_Aura:SetDefaults({
 			filter_type = 'Name',
 			whitelist = true,
 			name_list = enemy_debuffs.BloodElf,
+			built_in = true,
+		},
+		['@6'] = {
+			display_name = L['Pandaren enemy debuffs'],
+			filter_type = 'Name',
+			whitelist = true,
+			name_list = enemy_debuffs.Pandaren,
 			built_in = true,
 		},
 		[':4'] = {
@@ -862,11 +957,68 @@ PitBull4_Aura:SetDefaults({
 			name_list = self_debuffs.WARRIOR,
 			built_in = true,
 		},
+		[',7'] = {
+			display_name = L['Druid can purge'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_purge.DRUID,
+			built_in = true,
+		},
+		['-7'] = {
+			display_name = L['Hunter can purge'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_purge.HUNTER,
+			built_in = true,
+		},
+		['.7'] = {
+			display_name = L['Mage can purge'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_purge.MAGE,
+			built_in = true,
+		},
+		['07'] = {
+			display_name = L['Priest can purge'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_purge.PRIEST,
+			built_in = true,
+		},
+		['17'] = {
+			display_name = L['Rogue can purge'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_purge.ROGUE,
+			built_in = true,
+		},
+		['27'] = {
+			display_name = L['Shaman can purge'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_purge.SHAMAN,
+			built_in = true,
+		},
+		['37'] = {
+			display_name = L['Warlock can purge'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_purge.WARLOCK,
+			built_in = true,
+		},
+		['47'] = {
+			display_name = L['Warrior can purge'],
+			filter_type = 'Aura Type',
+			whitelist = true,
+			aura_type_list = can_purge.WARRIOR,
+			built_in = true,
+		},
 		['&D'] = {
 			display_name = L['My class can dispel'],
 			filter_type = 'Map',
 			map_type = 'class',
 			map = {
+				['MONK'] = '//3',
 				['DEATHKNIGHT'] = '@J',
 				['DRUID'] = ',3',
 				['HUNTER'] = '-3',
@@ -895,6 +1047,7 @@ PitBull4_Aura:SetDefaults({
 				['SHAMAN'] = '20',
 				['WARLOCK'] = '30',
 				['WARRIOR'] = '40',
+				['MONK'] = '//0',
 			},
 			built_in = true,
 		},
@@ -913,6 +1066,7 @@ PitBull4_Aura:SetDefaults({
 				['SHAMAN'] = '@J',
 				['WARLOCK'] = '31',
 				['WARRIOR'] = '@J',
+				['MONK'] = '@J',
 			},
 			built_in = true,
 		},
@@ -931,6 +1085,7 @@ PitBull4_Aura:SetDefaults({
 				['SHAMAN'] = '22',
 				['WARLOCK'] = '32',
 				['WARRIOR'] = '42',
+				['MONK'] = '//2',
 			},
 			built_in = true,
 		},
@@ -949,6 +1104,7 @@ PitBull4_Aura:SetDefaults({
 				['SHAMAN'] = '26',
 				['WARLOCK'] = '36',
 				['WARRIOR'] = '46',
+				['MONK'] = '//6',
 			},
 			built_in = true,
 		},
@@ -959,14 +1115,15 @@ PitBull4_Aura:SetDefaults({
 			map = {
 				['DEATHKNIGHT'] = '@J',
 				['DRUID'] = '@J',
-				['HUNTER'] = '@J',
-				['MAGE'] = '@J',
+				['HUNTER'] = '-5',
+				['MAGE'] = '.5',
 				['PALADIN'] = '/5',
 				['PRIEST'] = '05',
 				['ROGUE'] = '@J',
 				['SHAMAN'] = '25',
 				['WARLOCK'] = '@J',
 				['WARRIOR'] = '@J',
+				['MONK'] = '@J',
 			},
 			built_in = true,
 		},
@@ -985,7 +1142,26 @@ PitBull4_Aura:SetDefaults({
 				['SHAMAN'] = '@J',
 				['WARLOCK'] = '@J',
 				['WARRIOR'] = '44',
-
+				['MONK'] = '@J',
+			},
+			built_in = true,
+		},
+		['&P'] = {
+			display_name = L['My class can purge'],
+			filter_type = 'Map',
+			map_type = 'class',
+			map = {
+				['MONK'] = '@J',
+				['DEATHKNIGHT'] = '@J',
+				['DRUID'] = ',7',
+				['HUNTER'] = '-7',
+				['MAGE'] = '.7',
+				['PALADIN'] = '@J',
+				['PRIEST'] = '07',
+				['ROGUE'] = '17',
+				['SHAMAN'] = '27',
+				['WARLOCK'] = '37',
+				['WARRIOR'] = '47',
 			},
 			built_in = true,
 		},
@@ -1004,6 +1180,9 @@ PitBull4_Aura:SetDefaults({
 				['Tauren'] = '@J',
 				['Troll'] = '=0',
 				['BloodElf'] = '>0',
+				['Worgen'] = '?0',
+				['Goblin'] = '@J',
+				['Pandaren'] = '@J',
 			},
 			built_in = true,
 		},
@@ -1022,6 +1201,9 @@ PitBull4_Aura:SetDefaults({
 				['Tauren'] = '<2',
 				['Troll'] = '=2',
 				['BloodElf'] = '>2',
+				['Worgen'] = '?2',
+				['Goblin'] = '??2',
+				['Pandaren'] = '@2',
 			},
 			built_in = true,
 		},
@@ -1040,6 +1222,9 @@ PitBull4_Aura:SetDefaults({
 				['Tauren'] = '<6',
 				['Troll'] = '@J',
 				['BloodElf'] = '>6',
+				['Worgen'] = '@J',
+				['Goblin'] = '@J',
+				['Pandaren'] = '@6',
 			},
 			built_in = true,
 		},
@@ -1058,6 +1243,9 @@ PitBull4_Aura:SetDefaults({
 				['Tauren'] = '@J',
 				['Troll'] = '@J',
 				['BloodElf'] = '@J',
+				['Worgen'] = '@J',
+				['Goblin'] = '@J',
+				['Pandaren'] = '@J',
 			},
 			built_in = true,
 		},
@@ -1145,6 +1333,13 @@ PitBull4_Aura:SetDefaults({
 			operators = {'|'},
 			built_in = true,
 		},
+		['#H'] = {
+			display_name = L['Purgeable by me or extra enemy'],
+			filter_type = 'Meta',
+			filters = {'&P','*E'},
+			operators = {'|'},
+			built_in = true,
+		},
 		['!B'] = {
 			display_name = L['Default buffs'],
 			filter_type = 'Meta',
@@ -1214,6 +1409,22 @@ PitBull4_Aura:SetDefaults({
 			filter_type = 'Meta',
 			filters = {'!F','*D'},
 			operators = {'&'},
+			built_in = true,
+			display_when = "highlight",
+		},
+		['!K'] = {
+			display_name = L['Highlight: purgeable buffs'],
+			filter_type = 'Meta',
+			filters = {'@E','@A','@P'},
+			operators = {'&','&','&'},
+			built_in = true,
+			display_when = "highlight",
+		},
+		['!L'] = {
+			display_name = L['Highlight: purgeable by me buffs'],
+			filter_type = 'Meta',
+			filters = {'@E','@A','&P'},
+			operators = {'&','&','&'},
 			built_in = true,
 			display_when = "highlight",
 		},
