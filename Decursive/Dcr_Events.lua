@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-13T16:54:48Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@ if not T._LoadedFiles or not T._LoadedFiles["Dcr_opt.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["Dcr_Events.lua"] = false;
+
 local D = T.Dcr;
---D:SetDateAndRevision("$Date: 2008-09-16 00:25:13 +0200 (mar., 16 sept. 2008) $", "$Revision: 81755 $");
 
 
 local L = D.L;
 local LC = D.LC;
 local DC = T._C;
-local DS = DC.DS;
 
 D.DebuffUpdateRequest = 0;
 
@@ -74,10 +74,9 @@ local UnitCreatureFamily= _G.UnitCreatureFamily;
 local UnitFactionGroup  = _G.UnitFactionGroup;
 local IsInInstance      = _G.IsInInstance;
 local GetNumRaidMembers = DC.GetNumRaidMembers;
-local GetNumPartyMembers= DC.MOP and _G.GetNumSubgroupMembers or _G.GetNumPartyMembers;
+local GetNumPartyMembers= _G.GetNumSubgroupMembers;
 local GetGuildInfo      = _G.GetGuildInfo;
 local InCombatLockdown  = _G.InCombatLockdown;
-local PlaySoundFile     = _G.PlaySoundFile;
 local UnitExists        = _G.UnitExists;
 local UnitCanAttack     = _G.UnitCanAttack;
 local UnitName          = _G.UnitName;
@@ -430,7 +429,6 @@ function D:DECURSIVE_TALENTS_AVAILABLE()
 
     self.Groups_datas_are_invalid = true;
     D:GetUnitArray(); -- get the unit array
-    D:CheckPlayer();
 end
 ---[=[
 local SeenUnitEventsUNITAURA = {};
@@ -592,15 +590,9 @@ do -- Combat log event handling {{{1
     local TOC = T._tocversion;
 
     function D:DummyDebuff (UnitID)
-        
         local PLAYER = bit.bor (COMBATLOG_OBJECT_CONTROL_PLAYER   , COMBATLOG_OBJECT_TYPE_PLAYER  , COMBATLOG_OBJECT_REACTION_FRIENDLY  ); -- still used
-        if TOC < 40100 then
-            D:COMBAT_LOG_EVENT_UNFILTERED("COMBAT_LOG_EVENT_UNFILTERED", 0, "SPELL_AURA_APPLIED", false, nil, COMBATLOG_OBJECT_NONE, UnitGUID(UnitID), (UnitName(UnitID)), PLAYER, 0, "Test item", 0x32, "DEBUFF");
-        elseif TOC == 40100 then
-            D:COMBAT_LOG_EVENT_UNFILTERED("COMBAT_LOG_EVENT_UNFILTERED", 0, "SPELL_AURA_APPLIED", false, nil, nil, COMBATLOG_OBJECT_NONE, UnitGUID(UnitID), (UnitName(UnitID)), PLAYER, 0, "Test item", 0x32, "DEBUFF");
-        elseif TOC > 40100 then
-            D:COMBAT_LOG_EVENT_UNFILTERED("COMBAT_LOG_EVENT_UNFILTERED", 0, "SPELL_AURA_APPLIED", false, nil, nil, COMBATLOG_OBJECT_NONE, 0, UnitGUID(UnitID), (UnitName(UnitID)), PLAYER, 0, 0, "Test item", 0x32, "DEBUFF");
-        end
+        
+        D:COMBAT_LOG_EVENT_UNFILTERED("COMBAT_LOG_EVENT_UNFILTERED", 0, "SPELL_AURA_APPLIED", false, nil, nil, COMBATLOG_OBJECT_NONE, 0, UnitGUID(UnitID), (UnitName(UnitID)), PLAYER, 0, 0, "Test item", 0x32, "DEBUFF");
     end
 
     local SpecialDebuffs = {
@@ -631,7 +623,7 @@ do -- Combat log event handling {{{1
 
                 if auraTYPE_failTYPE == "BUFF" and self.profile.Show_Stealthed_Status then
 
-                    if DC.IsStealthBuff[spellNAME] then
+                    if DC.IS_STEALTH_BUFF[spellNAME] then
                         if AuraEvents[event] == 1 then
                             self.Stealthed_Units[UnitID] = true;
                         else
@@ -668,7 +660,7 @@ do -- Combat log event handling {{{1
                 self.LiveList:DelayedGetDebuff("target");
 
                 if auraTYPE_failTYPE == "BUFF" and self.profile.Show_Stealthed_Status then
-                    if DC.IsStealthBuff[spellNAME] then
+                    if DC.IS_STEALTH_BUFF[spellNAME] then
                         if AuraEvents[event] == 1 then
                             self.Stealthed_Units["target"] = true;
                         else
@@ -721,7 +713,7 @@ do -- Combat log event handling {{{1
                         self:ScheduleDelayedCall("Dcr_Update"..self.Status.ClickedMF.CurrUnit, self.Status.ClickedMF.UpdateSkippingSetBuf, self.profile.DebuffsFrameRefreshRate, self.Status.ClickedMF);
                     end
 
-                    PlaySoundFile(DC.FailedSound, "Master");
+                    self:SafePlaySoundFile(DC.FailedSound);
                     --[=[
                     elseif auraTYPE_failTYPE == SPELL_FAILED_BAD_IMPLICIT_TARGETS then
                     self:AddDebugText("ERR_GENERIC_NO_TARGET", "Unit:", self.Status.ClickedMF.CurrUnit, "UE:", UnitExists(self.Status.ClickedMF.CurrUnit), "UiF:",  UnitIsFriend("player",self.Status.ClickedMF.CurrUnit), "CBEs:", timestamp, event, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellID, spellNAME, _spellSCHOOL, auraTYPE_failTYPE); --]=]
@@ -732,7 +724,7 @@ do -- Combat log event handling {{{1
                 destName = self:PetUnitName( self.Status.ClickedMF.CurrUnit, true);
 
                 self:Println(L["FAILEDCAST"], spellNAME, (select(2, GetSpellInfo(spellID))), self:MakePlayerName(destName), auraTYPE_failTYPE);
-                PlaySoundFile(DC.FailedSound, "Master");
+                self:SafePlaySoundFile(DC.FailedSound);
                 self.Status.ClickedMF = false;
                 --[===[@alpha@
                 -- self:AddDebugText("sanitycheck ", event, spellNAME); -- It works!
@@ -1041,11 +1033,10 @@ do
 
     local UnitLevel          = _G.UnitLevel;
     local GetNumTalentPoints = _G.GetNumTalentPoints;
-    --local GetNumTalentPoints = DC.MOP and function () return math.floor(UnitLevel("player") / 15) end or _G.GetNumTalentPoints;
 
     local GetTalentInfo      = _G.GetTalentInfo;
 
-    local function CheckTalentsAvaibility_MOP() -- {{{
+    local function CheckTalentsAvaibility() -- {{{
 
 
         if not (UnitGUID("player")) then
@@ -1079,27 +1070,6 @@ do
         return false;
 
     end -- }}}
-
-    local function CheckTalentsAvaibility_preMOP() -- {{{
-
-        local playerLevel = UnitLevel("player");
-        local totalTalentPoints = GetNumTalentPoints();
-
-        if playerLevel > 0 and playerLevel < 10 then
-            return true;
-        end
-
-        if totalTalentPoints ~= 0 then
-            -- Talents are available
-            return true;
-        else
-            -- Talents are not available
-            return false;
-        end
-    end -- }}}
-
-
-    local CheckTalentsAvaibility = DC.MOP and CheckTalentsAvaibility_MOP or CheckTalentsAvaibility_preMOP;
 
     --[===[@alpha@
     local player_is_almost_alive = false; -- I'm trying to figure out why sometimes talents are not detected while PLAYER_ALIVE event fired
@@ -1140,6 +1110,6 @@ do
     end
 end
 
-T._LoadedFiles["Dcr_Events.lua"] = "2.7.2.2";
+T._LoadedFiles["Dcr_Events.lua"] = "2.7.2.3_beta_3";
 
 -- The Great Below

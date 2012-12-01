@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-19T01:15:55Z
 
 --]]
 -------------------------------------------------------------------------------
@@ -46,14 +46,13 @@ if not T._LoadedFiles or not T._LoadedFiles["Dcr_DebuffsFrame.xml"] or not T._Lo
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["Dcr_LiveList.lua"] = false;
 
 local D   = T.Dcr;
---D:SetDateAndRevision("$Date: 2008-09-16 00:25:13 +0200 (mar., 16 sept. 2008) $", "$Revision: 81755 $");
 
 local L     = D.L;
 local LC    = D.LC;
 local DC    = T._C;
-local DS    = DC.DS;
 
 --D.LiveList = OOP.Class();
 
@@ -110,10 +109,9 @@ function LiveList:Create() -- {{{
         return false;
     end
 
+    self.ExistingPerID[self.Number + 1] = self:new(DcrLiveList, self.Number + 1);
+
     self.Number = self.Number + 1;
-
-    self.ExistingPerID[self.Number] = self:new(DcrLiveList, self.Number);
-
 
     return self.ExistingPerID[self.Number];
 
@@ -165,9 +163,6 @@ function LiveList.prototype:GiveAnchor() -- {{{
 
     local ItemHeight = self.Frame:GetHeight();
 
-    if D.profile.ReverseLiveDisplay then
-    end
-
     if self.ID == 1 then
         if D.profile.ReverseLiveDisplay then
             return "BOTTOMLEFT", DecursiveMainBar, "BOTTOMLEFT", 5, -1 * (ItemHeight + 1) * D.profile.Amount_Of_Afflicted;
@@ -178,7 +173,7 @@ function LiveList.prototype:GiveAnchor() -- {{{
         if D.profile.ReverseLiveDisplay then
             return "BOTTOMLEFT", LiveList.ExistingPerID[self.ID - 1].Frame, "TOPLEFT", 0, 1;
         else
-            return "TOPLEFT", LiveList.ExistingPerID[self.ID - 1].Frame, "BOTTOMLEFT", 0, -1;
+            return "TOPLEFT", LiveList.ExistingPerID[self.ID - 1].Frame, "BOTTOMLEFT", 0, -1; -- TODO index is nil error received in a report by mail on 2012-11-02
         end
     end
 
@@ -389,7 +384,7 @@ function LiveList:DelayedGetDebuff(UnitID) -- {{{
     if not D:DelayedCallExixts("Dcr_GetDebuff"..UnitID) then
         D.DebuffUpdateRequest = D.DebuffUpdateRequest + 1;
         D:Debug("LiveList: GetDebuff scheduled for, ", UnitID);
-        D:ScheduleDelayedCall("Dcr_GetDebuff"..UnitID, self.GetDebuff, (D.profile.ScanTime / 2) * (1 + floor(D.DebuffUpdateRequest / 7.5)), self, UnitID);
+        D:ScheduleDelayedCall("Dcr_GetDebuff"..UnitID, self.GetDebuff, (D.profile.ScanTime / 3) * (1 + D.DebuffUpdateRequest / 30), self, UnitID);
     end
 end -- }}}
 
@@ -564,7 +559,7 @@ function LiveList:HideTestItem() -- {{{
 
      for UnitID, Debuffed in pairs(D.UnitDebuffed) do
          if Debuffed then
-             D:ScheduleDelayedCall("Dcr_rmt"..i, D.DummyDebuff, i * (D.profile.ScanTime / 2), D, UnitID);
+             D:ScheduleDelayedCall("Dcr_rmt"..i, D.DummyDebuff, i * (D.profile.ScanTime / 3), D, UnitID);
              i = i + 1;
          end
      end
@@ -588,4 +583,4 @@ function LiveList:Onclick() -- {{{
     D:Println(L["HLP_LL_ONCLICK_TEXT"]);
 end -- }}}
 
-T._LoadedFiles["Dcr_LiveList.lua"] = "2.7.2.2";
+T._LoadedFiles["Dcr_LiveList.lua"] = "2.7.2.3_beta_3";

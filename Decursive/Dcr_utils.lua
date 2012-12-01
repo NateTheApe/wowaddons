@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2012-10-07T15:50:17Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -45,14 +45,13 @@ if not T._LoadedFiles or not T._LoadedFiles["Dcr_LDB.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["Dcr_utils.lua"] = false;
 
 local D = T.Dcr;
---D:SetDateAndRevision("$Date: 2008-09-16 00:48:59 +0200 (mar., 16 sept. 2008) $", "$Revision: 81756 $");
 
 local L = D.L;
 local LC = D.LC;
 local DC = T._C;
-local DS = DC.DS;
 
 local pairs             = _G.pairs;
 local ipairs            = _G.ipairs;
@@ -77,28 +76,25 @@ local IsSpellInRange    = _G.IsSpellInRange;
 local UnitInRange       = _G.UnitInRange;
 local debugprofilestop  = _G.debugprofilestop;
 
-if DC.MOP then
-    -- replacement for the default function as it is bugged in WoW5 (it returns nil for some spells)
-    D.IsSpellInRange = function (spellName, unit)
-        local range = IsSpellInRange(spellName, unit);
+-- replacement for the default function as it is bugged in WoW5 (it returns nil for some spells)
+D.IsSpellInRange = function (spellName, unit)
+    local range = IsSpellInRange(spellName, unit);
 
-        if range ~= nil then
-            return range;
+    if range ~= nil then
+        return range;
+    else
+        --[===[@debug@
+        D:Debug('IsSpellInRange() returned nil for', spellName, unit);
+        --@end-debug@]===]
+        if unit == 'player' or unit == 'pet' then
+            return 1;
         else
-            --[===[@debug@
-            D:Debug('IsSpellInRange() returned nil for', spellName, unit);
-            --@end-debug@]===]
-            if unit == 'player' or unit == 'pet' then
-                return 1;
-            else
-                return (UnitInRange(unit)) and 1 or 0;
-            end
+            return (UnitInRange(unit)) and 1 or 0;
         end
-
     end
-else
-    D.IsSpellInRange = IsSpellInRange;
+
 end
+
 
 function D:ColorText (text, color) --{{{
     return "|c".. color .. text .. "|r";
@@ -565,16 +561,20 @@ function D:ScheduleDelayedCall(RefName, FunctionRef, Delay, arg1, ...)
 
         DcrTimers[RefName][1] = self:ScheduleTimer (
         function(arg)
+            T._DebugTimerRefName = RefName;
             DcrTimers[RefName][1] = false;
             FunctionRef(unpack(arg));
+            T._DebugTimerRefName = "";
         end
         , Delay, DcrTimers[RefName][2]
         );
     else
         DcrTimers[RefName][1] = self:ScheduleTimer (
         function(arg)
+            T._DebugTimerRefName = RefName;
             DcrTimers[RefName][1] = false;
             FunctionRef(arg);
+            T._DebugTimerRefName = "";
         end
         , Delay, arg1
         );
@@ -631,15 +631,12 @@ function D:GetTimersNumber()
     end
     local timercount = 0;
     local ShefkiTimer = LibStub("LibShefkiTimer-1.0");
-    --local Acetimer = LibStub("AceTimer-3.0");
     for table in pairs(ShefkiTimer.selfs[D]) do
         timercount = timercount + 1;
     end
     return "Dcr says: " .. dcrcount .. ", LibShefkiTimer says: " .. timercount;
-    --return "Dcr says: " .. dcrcount .. ", AceTimers says: " .. timercount;
 end
 
--- /echo LibStub("AceTimer-3.0").selfs[Dcr]
 
 
 -- function D:GetOPtionPath(info) {{{
@@ -647,5 +644,50 @@ function D:GetOPtionPath(info)
     return table.concat(info, "->");
 end -- }}}
 
+do
+    local PlaySoundFile = _G.PlaySoundFile;
+    T._PlayingASound = false;
 
-T._LoadedFiles["Dcr_utils.lua"] = "2.7.2.2";
+    --[===[@debug@
+    local function CrashTest(path, chanel)
+        local start = debugprofilestop();
+
+        repeat
+        until debugprofilestop() - start == 1000;
+
+        return 'blah1', 'blah2';
+
+    end
+    --@end-debug@]===]
+
+    -- Play sounda on a special update execution context to avoid
+    -- crashing and leaving the program in an unknown state if WoW fails
+    -- to play the sound fast enough... ('script ran too long' add-on
+    -- breaker thingy of which I had a few report failing on the
+    -- PlaySoundFile() call)
+
+    local testTime;
+
+    local function SafePlaySoundFile(path)
+
+        if D.debug then
+            testTime = debugprofilestop();
+        end
+
+        T._PlayingASound = GetTime();
+        -- local r1, r2 = CrashTest(path, "Master");
+        local r1, r2 = PlaySoundFile(path, "Master");
+        T._PlayingASound = false;
+
+        if D.debug then
+            D:Debug('Sound played:', path, r1, r2, 'it took:', ('%0.3fms'):format(debugprofilestop() - testTime));
+        end
+    end
+
+    function D:SafePlaySoundFile(path)
+        self:ScheduleDelayedCall('PlaySoundFile', SafePlaySoundFile, 0.1, path);
+    end
+end
+
+
+T._LoadedFiles["Dcr_utils.lua"] = "2.7.2.3_beta_3";

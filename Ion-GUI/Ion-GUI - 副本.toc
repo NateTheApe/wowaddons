@@ -1,0 +1,21 @@
+﻿## Interface: 50001
+## Title: Ion: GUI
+## Author: Maul
+## Version: Hydrogen
+## Notes: GUI for Ion
+## DefaultState: enabled
+## Dependencies: Ion
+## LoadOnDemand: 1
+## SavedVariables: IonGUIGDB
+## SavedVariablesPerCharacter: IonGUICDB
+## X-Child-Of: Ion
+## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved..
+## X-Email: trinityui@live.com
+
+Libs\LibStub\LibStub.lua
+Libs\AceLocale-3.0\AceLocale-3.0.xml
+
+Ion-GUI_Localizations.xml
+
+Ion-GUI.lua
+Ion-GUI.xml

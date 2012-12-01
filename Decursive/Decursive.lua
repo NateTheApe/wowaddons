@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-10-07T15:12:16Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -45,14 +45,13 @@ if not T._LoadedFiles or not T._LoadedFiles["Dcr_Raid.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["Decursive.lua"] = false;
 
 local D = T.Dcr;
---D:SetDateAndRevision("$Date: 2008-09-16 00:25:13 +0200 (mar., 16 sept. 2008) $", "$Revision: 81755 $");
 
 local L = D.L;
 local LC = D.LC;
 local DC = T._C;
-local DS = DC.DS;
 -------------------------------------------------------------------------------
 
 local pairs             = _G.pairs;
@@ -60,7 +59,6 @@ local ipairs            = _G.ipairs;
 local type              = _G.type;
 local table             = _G.table;
 local t_sort            = _G.table.sort;
-local PlaySoundFile     = _G.PlaySoundFile;
 local UnitName          = _G.UnitName;
 local UnitDebuff        = _G.UnitDebuff;
 local UnitBuff          = _G.UnitBuff;
@@ -251,25 +249,14 @@ function D:PlaySound (UnitID, Caller) --{{{
             -- good sounds: Sound\\Doodad\\BellTollTribal.wav
             --          Sound\\interface\\AuctionWindowOpen.wav
             --          Sound\\interface\\AlarmClockWarning3.wav
-            local testTime;
+            
 
-            if self.debug then
-                testTime = debugprofilestop();
-            end
+            self:SafePlaySoundFile(self.profile.SoundFile);
 
-            --PlaySoundFile(self.profile.SoundFile, "Master");
-
-            -- Play the sound on a special update execution context to avoid
-            -- crashing and leaving the program in an unknown state if WoW fails
-            -- to play the sound fast enough... ('script ran too long' add-on
-            -- breaker thingy of which I had a few report failing on the
-            -- PlaySoundFile call)
-
-            self:ScheduleDelayedCall('PlaySoundFile', PlaySoundFile, 0.1, self.profile.SoundFile, "Master");
             self.Status.SoundPlayed = true;
 
             if self.debug then
-                self:Debug("x Sound Played! by", Caller, 'it took:', (debugprofilestop() - testTime), ' ms' );
+                self:Debug("Sound scheduled by", Caller);
             end
 
         else
@@ -832,30 +819,18 @@ do
 end
 
 
-D.Stealthed_Units = {};
 
-do
-    local Stealthed = {DS["Prowl"], DS["Stealth"], DS["Shadowmeld"],  DS["Invisibility"], DS["Lesser Invisibility"], DS["Camouflage"]}; --, DS["Ice Armor"],};
-
-    if DC.MOP then
-        table.insert(Stealthed, DS["SHROUD_OF_CONCEALMENT"])
-        table.insert(Stealthed, DS['Greater Invisibility'])
+function D:CheckUnitStealth(unit)
+    if self:CheckUnitForBuffs(unit, DC.IS_STEALTH_BUFF) then
+        --      self:Debug("Sealth found !");
+        return true;
     end
-
-    DC.IsStealthBuff = D:tReverse(Stealthed);
-
-    function D:CheckUnitStealth(unit)
-        if self:CheckUnitForBuffs(unit, DC.IsStealthBuff) then
-            --      self:Debug("Sealth found !");
-            return true;
-        end
-        return false;
-    end
+    return false;
 end
 -- }}}
 
 
 
-T._LoadedFiles["Decursive.lua"] = "2.7.2.2";
+T._LoadedFiles["Decursive.lua"] = "2.7.2.3_beta_3";
 
 -- Sin

@@ -127,6 +127,11 @@ FishingTranslations["enUS"] = {
 	CONFIG_USEACTION_INFO	 = "If enabled, #NAME# will look for an action bar button to use for casting.",
 	CONFIG_MOUNTEDCAST_ONOFF = "Mounted",
 	CONFIG_MOUNTEDCAST_INFO  = "If enabled, allow casting while mounted.",
+	CONFIG_PARTIALGEAR_ONOFF = "Partial Outfit",
+	CONFIG_PARTIALGEAR_INFO  = "If enabled, cast when wearing any fishing gear at all, even if a pole is not equipped.",
+	
+	CONFIG_MAINTAINRAFT_ONOFF = "Maintain only",
+	CONFIG_MAINTAINRAFT_INFO  = "If enabled, do not use the raft item, only maintain it if it is already being used.",
 	
 	CONFIG_EASYLURES_ONOFF	 = "Easy Lures",
 	CONFIG_EASYLURES_INFO	 = "If enabled, a lure will applied to your fishing pole before you start fishing, whenever you need one.",
@@ -144,7 +149,7 @@ FishingTranslations["enUS"] = {
 	CONFIG_ONLYMINE_ONOFF	  = "Outfit Pole Only",
 	CONFIG_ONLYMINE_INFO      = "If enabled, easy cast will only check for your outfit's fishing pole (i.e. it won't search all possible poles for a match).",
 	CONFIG_TURNOFFPVP_ONOFF	  = "Turn off PVP",
-	CONFIG_TURNOFFPVP_INFO	  = "If enabled, PVP will be turned off while a fishing pole is equipped.",
+	CONFIG_TURNOFFPVP_INFO	  = "If enabled, PVP will be turned off when a fishing pole is equipped.",
 
 	CONFIG_ENHANCESOUNDS_ONOFF	= "Enhance fishing sounds",
 	CONFIG_ENHANCESOUNDS_INFO	= "When enabled, maximize sound volume and minimize ambient volume to make the bobber noise more noticeable while fishing.",
@@ -157,14 +162,16 @@ FishingTranslations["enUS"] = {
 	CONFIG_MAXSOUND_INFO      = "If enabled, set the sound volume to the maximum while fishing.",
 	CONFIG_TURNONSOUND_ONOFF  = "Force sound",
 	CONFIG_TURNONSOUND_INFO   = "If enabled, always turn on sounds while fishing.",
-
+	CONFIG_DINGQUESTFISH_ONOFF = "Fish Ringer",
+	CONFIG_DINGQUESTFISH_INFO = "If enabled, the quest added sound will play when a Nat Pagle reputation fish is caught.",
+	
 	CONFIG_AUTOOPEN_ONOFF	  = "Open quest items",
 	CONFIG_AUTOOPEN_INFO	  = "If enabled, use a double-click to open up fishing quest items.",
 
 	CONFIG_FISHINGFLUFF_ONOFF = "Fishing Fun",
 	CONFIG_FISHINGFLUFF_INFO  = "Enable all sorts of fun while you fish.",
 	CONFIG_FINDFISH_ONOFF	  = "Find Fish",
-	CONFIG_FINDFISH_INFO		  = "Turn on the 'Find Fish' ability when dressed to fish.",
+	CONFIG_FINDFISH_INFO	  = "Turn on the 'Find Fish' ability when dressed to fish.",
 	CONFIG_DRINKHEAVILY_ONOFF = "Drink Lager",
 	CONFIG_DRINKHEAVILY_INFO  = "If enabled, drink #LAGER# whenever you're fishing and 'dry'.",
 	CONFIG_FISHINGBUDDY_ONOFF = "Fishing Buddy",
@@ -267,7 +274,7 @@ FishingTranslations["enUS"] = {
 	ROLE_TRANSLATE_FRFR = "French translation",
 	ROLE_TRANSLATE_ESES = "Spanish translation",
 	ROLE_TRANSLATE_KOKR = "Korean translation",
-	ROLE_TRANSLATE_RURU = "Russion translation",
+	ROLE_TRANSLATE_RURU = "Russian translation",
 	ROLE_TRANSLATE_PTBR = "Brazilian Portuguese translation",
 	ROLE_HELP_BUGS = "Bug fixes and coding help",
 	ROLE_HELP_SUGGESTIONS = "Feature suggestions",

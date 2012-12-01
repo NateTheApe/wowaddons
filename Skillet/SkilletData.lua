@@ -48,6 +48,7 @@ Skillet.TradeSkillAdditionalAbilities = {
     [2550]  = {818,"Basic_Campfire"},          -- cooking = basic campfire
     [45357] = {51005,"Milling"},        -- inscription = milling
     [25229] = {31252,"Prospecting"},        -- jewelcrafting = prospecting
+    [2018]  = {87216,"Thermal Anvil"},        -- blacksmithing = thermal anvil
 }
 
 Skillet.AutoButtonsList = {}
@@ -202,6 +203,7 @@ local TradeSkillIgnoredMats  = {
 		[42615] = 1 , -- small prismatic shard
 		[42613] = 1 , -- nexus transformation
 		[28022] = 1 , -- large prismatic shard
+		[118239] = 1 , -- sha shatter
 		[118238] = 1 , -- ethereal shard shatter
 		[118237] = 1 , -- mysterious diffusion
 }

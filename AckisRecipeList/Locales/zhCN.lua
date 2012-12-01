@@ -6,7 +6,7 @@ zhCN localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.1
+Project version: 2.4.2
 ************************************************************************
 Original translated by: iCat, Kurax, 冰焱妩魅 @ CWDG, ananhaid
 Currently maintained by:
@@ -136,6 +136,7 @@ L["Awan Iceborn"] = "埃万·冰原"
 L["Awilo Lon'gomba"] = "埃维罗·隆古巴"
 L["Ayla Shadowstorm"] = "艾拉·影暴"
 L["Banalash"] = "巴纳拉什"
+L["BANANA_INFUSED_RUM"] = "从卡桑琅丛林的“一桶泡蕉朗姆酒”中找到。"
 L["Barien"] = "巴利尔"
 L["Barim Spilthoof"] = "巴里姆·裂蹄"
 L["Bario Matalli"] = "巴里奥·玛塔里"
@@ -474,6 +475,7 @@ L["Flask"] = "合剂"
 L["Fono"] = "弗诺"
 L["FONT_SIZE_DESC"] = "改变 ARL 字体的大小。"
 L["Foreman Marcrid"] = "工头玛希瑞德"
+L["FOUR_SENSES_BREW"] = "从昆莱山的不息山山顶的“云壬的石板”中找到。"
 L["Fradd Swiftgear"] = "弗拉德"
 L["Franklin Lloyd"] = "弗兰克林·洛伊德"
 L["Fremal Doohickey"] = "弗雷玛尔"
@@ -860,6 +862,7 @@ L["Nahogg"] = "纳霍加"
 L["Naka"] = "纳卡"
 L["Nakodu"] = "纳克杜"
 L["Namha Moonwater"] = "娜穆·月水"
+L["Nam Ironpaw"] = "纳姆·铁掌"
 L["Nardstrum Copperpinch"] = "纳斯塔姆·卡布彬"
 L["Narj Deepslice"] = "纳尔基·长刀"
 L["Narkk"] = "纳尔克"
@@ -1011,7 +1014,7 @@ L["Rikqiz"] = "雷克奇兹"
 L["Ring"] = "戒指"
 L["Risen Inquisitor"] = "复生的审查者"
 L["Risen Sorcerer"] = "复生的法术师"
-L["Rockseeker Guo"] = "67024-Rockseeker Guo" -- Needs review
+L["Rockseeker Guo"] = "觅石者郭岩"
 L["Rod"] = "附魔棒"
 L["Rogg"] = "罗格"
 L["Rogvar"] = "罗格瓦尔"
@@ -1113,7 +1116,7 @@ L["Smudge Thunderwood"] = "斯穆德·雷木"
 L["Sock Brightbolt"] = "索克·亮钉"
 L["Son of Arkkoroc"] = "亚考罗克之子"
 L["Soolie Berryfizz"] = "苏雷·浆泡"
-L["Soraka"] = "65983-Soraka" -- Needs review
+L["Soraka"] = "索拉卡"
 L["Sort"] = "种类"
 L["Sorting"] = "种类"
 L["SORTING_DESC"] = "更改配方的种类显示方式。"
@@ -1133,6 +1136,7 @@ L["Staff"] = "法杖"
 L["Steeg Haskell"] = "斯蒂格·赫斯克尔"
 L["Stephen Ryback"] = "斯蒂芬·雷百克"
 L["Stoic Mammoth"] = "坚韧猛犸象"
+L["Stonebreaker Ruian"] = "碎石者瑞安"
 L["Stone Guard Mukar"] = "石头守卫穆卡尔"
 L["Stormforged Ambusher"] = "雷铸伏击者"
 L["Stormforged Artificer"] = "雷铸技师"

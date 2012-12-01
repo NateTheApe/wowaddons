@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -21,7 +21,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-19T01:19:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -70,6 +70,7 @@ if not T._LoadedFiles or not T._LoadedFiles["Dcr_DIAG.xml"] or not T._LoadedFile
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["enUS.lua"] = false;
 
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "enUS", true, false);
@@ -161,7 +162,7 @@ L["GLOR5"] = "He will always be remembered..."
 L["HANDLEHELP"] = "Drag all the Micro-UnitFrames (MUFs)"
 L["HIDE_LIVELIST"] = "Hide the live-list"
 L["HIDE_MAIN"] = "Hide Decursive Window"
-L["HIDESHOW_BUTTONS"] = "Hide/Show buttons"
+L["HIDESHOW_BUTTONS"] = "Hide/Show buttons and Lock/Unlock the \"Decursive\" bar"
 L["HLP_LEFTCLICK"] = "Left-Click"
 L["HLP_LL_ONCLICK_TEXT"] = [=[The Live-List is not meant to be clicked. Please, read the documentation to learn how to use this add-on. Just search for 'Decursive' on WoWAce.com
 (To move this list move the Decursive bar, /dcrshow and left-alt-click to move)]=]
@@ -171,7 +172,7 @@ L["HLP_RIGHTCLICK"] = "Right-Click"
 L["HLP_USEXBUTTONTOCURE"] = "Use \"%s\" to cure this affliction!"
 L["HLP_WRONGMBUTTON"] = "Wrong mouse button!"
 L["IGNORE_STEALTH"] = "Ignore cloaked Units"
-L["IS_HERE_MSG"] = "Decursive is now initialized, remember to check the options"
+L["IS_HERE_MSG"] = "Decursive is now initialized, remember to check the options (/decursive)"
 L["LIST_ENTRY_ACTIONS"] = [=[|cFF33AA33[CTRL]|r-Click: Remove this player
 |cFF33AA33LEFT|r-Click: Rise this player
 |cFF33AA33RIGHT|r-Click: Come down this player
@@ -311,7 +312,11 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "Invalid spell ID!"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "Spell not found in your spell book!"
 L["OPTION_MENU"] = "Decursive Options Menu"
 L["OPT_LIVELIST"] = "Live list"
-L["OPT_LIVELIST_DESC"] = "Options for the live list"
+L["OPT_LIVELIST_DESC"] = [=[These are the settings concerning the list of afflicted units displayed beneath the "Decursive" bar.
+
+To move this list you need to move the little "Decursive" frame. Some of the settings below are available only when this frame is displayed. You can display it by typing |cff20CC20/DCRSHOW|r in your chat window.
+
+Once you have set the position, scale and transparency of the live-list you can safely hide Decursive's frame by typing |cff20CC20/DCRHIDE|r.]=]
 L["OPT_LLALPHA"] = "Live-list transparency"
 L["OPT_LLALPHA_DESC"] = "Changes Decursive main bar and live-list transparency (Main bar must be displayed)"
 L["OPT_LLSCALE"] = "Scale of the Live-list"
@@ -361,7 +366,7 @@ L["OPT_NEWVERSIONBUGMENOT_DESC"] = "If a newer version of Decursive is detected,
 L["OPT_NOKEYWARN"] = "Warn if no key"
 L["OPT_NOKEYWARN_DESC"] = "Display a warning if no key is mapped."
 L["OPT_NOSTARTMESSAGES"] = "Disable welcome messages"
-L["OPT_NOSTARTMESSAGES_DESC"] = "Remove the three messages Decursive prints to the chat frame at every login."
+L["OPT_NOSTARTMESSAGES_DESC"] = "Remove the two messages Decursive prints to the chat frame at every login."
 L["OPT_OPTIONS_DISABLED_WHILE_IN_COMBAT"] = "These options are disabled while you are in combat."
 L["OPT_PERFOPTIONWARNING"] = "WARNING: Do not change those values unless you know exactly what you are doing. These settings can have a great impact on the game performances. Most users should use the default values of 0.1 and 10."
 L["OPT_PLAYSOUND_DESC"] = "Play a sound if someone get cursed"
@@ -454,6 +459,12 @@ L["STR_QUICK_POP"] = "Quickly Populate"
 L["SUCCESSCAST"] = "|cFF22FFFF%s %s|r |cFF00AA00succeeded on|r %s"
 L["TARGETUNIT"] = "Target Unit"
 L["TIE_LIVELIST"] = "Tie live-list visibility to DCR window"
+L["TOC_VERSION_EXPIRED"] = [=[Your Decursive's version is outdated. This version of Decursive was released before the version of World of Warcraft you are using.
+You need to update Decursive to fix potential incompatibilities and runtime errors.
+
+Go to curse.com and search for 'Decursive' or use Curse's client to update all your add-ons at once.
+
+This notice will be displayed again in 2 days.]=]
 L["TOOFAR"] = "Too far"
 L["TOO_MANY_ERRORS_ALERT"] = [=[There are too many Lua errors in your User Interface (%d). Your game experience is currently degraded. Disable or update the failing add-ons to turn off this message and regain a proper frame rate.
 You may want to turn on Lua error reporting ('Help' section of World of Warcraft's interface options) to identify the problematic add-ons.]=]
@@ -464,4 +475,4 @@ L["UNSTABLERELEASE"] = "Unstable release"
 
 
 
-T._LoadedFiles["enUS.lua"] = "2.7.2.2";
+T._LoadedFiles["enUS.lua"] = "2.7.2.3_beta_3";

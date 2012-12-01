@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-09-27T23:56:03Z
+    This file was last updated on 2012-11-19T01:19:56Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -45,14 +45,16 @@ if not T._LoadedFiles or not T._LoadedFiles["Dcr_utils.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["Dcr_opt.lua"] = false;
 
 local D = T.Dcr;
 
 local L  = D.L;
 local LC = D.LC;
 local DC = T._C;
-local DS = DC.DS;
+T._CatchAllErrors = "LibDBIcon";
 local icon = LibStub("LibDBIcon-1.0", true)
+T._CatchAllErrors = false;
 
 local pairs             = _G.pairs;
 local ipairs            = _G.ipairs;
@@ -63,14 +65,15 @@ local str_gsub          = _G.string.gsub;
 local str_sub           = _G.string.sub;
 local abs               = _G.math.abs;
 local GetNumRaidMembers = DC.GetNumRaidMembers;
-local GetNumPartyMembers= DC.MOP and _G.GetNumSubgroupMembers or _G.GetNumPartyMembers;
+local GetNumPartyMembers= _G.GetNumSubgroupMembers;
 local InCombatLockdown  = _G.InCombatLockdown;
 local _;
 -- Default values for the option
 
-D:GetSpellsTranslations(false); -- Register spell translations
 
 function D:GetDefaultsSettings()
+    local DS = DC.DS;
+
     return {
         -- default settings {{{
         class = {
@@ -98,7 +101,8 @@ function D:GetDefaultsSettings()
 
         global = {
             debug = false,
-            NonRealease = false,
+            NonRelease = false,
+            TocExpiredDetection = false,
             LastExpirationAlert = 0,
             NewerVersionDetected = D.VersionTimeStamp,
             NewerVersionName = false,
@@ -106,7 +110,7 @@ function D:GetDefaultsSettings()
             NewVersionsBugMeNot = false,
             LastVersionAnnounce = 0,
             --[===[@debug@
-            LastChekOutAlert = 0,
+            LastUnpackagedAlert = 0,
             --@end-debug@]===]
 
             -- the key to bind the macro to
@@ -712,7 +716,7 @@ local function GetStaticOptions ()
                         func = function ()
                             LibStub("AceConfigDialog-3.0"):Close(D.name);
                             GameTooltip:Hide();
-                            D:ShowDebugReport();
+                            T._ShowDebugReport();
                         end,
                         hidden = function() return  #T._DebugTextTable < 1 end,
                         order = 1000
@@ -887,7 +891,7 @@ local function GetStaticOptions ()
                 -- {{{
                 type = "group",
                 name = D:ColorText(L["OPT_LIVELIST"], "FF22EE33"),
-                desc = L["OPT_LIVELIST_DESC"],
+                desc = L["OPT_LIVELIST_DESC"] .. "\n",
                 hidden = function () return not D:IsEnabled() or D.profile.HideLiveList; end,
                 disabled = function () return not D:IsEnabled() or D.profile.HideLiveList; end,
                 order = 10,
@@ -897,6 +901,21 @@ local function GetStaticOptions ()
                         type = "description",
                         name = L["OPT_LIVELIST_DESC"],
                         order = 0,
+                    },
+                    TestItemDisplayed = {
+                        type = "toggle",
+                        name = L["OPT_CREATE_VIRTUAL_DEBUFF"],
+                        desc = L["OPT_CREATE_VIRTUAL_DEBUFF_DESC"],
+                        get = function() return  D.LiveList.TestItemDisplayed end,
+                        set = function()
+                            if not D.LiveList.TestItemDisplayed then
+                                D.LiveList:DisplayTestItem();
+                            else
+                                D.LiveList:HideTestItem();
+                            end
+                        end,
+                        disabled = function() return D.profile.HideLiveList and not D.profile.ShowDebuffsFrame or not D.Status.HasSpell or not D.Status.Enabled end,
+                        order = -1
                     },
                     LV_OnlyInRange = {
                         type = "toggle",
@@ -1674,7 +1693,7 @@ local function GetStaticOptions ()
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"..
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"
                                 ):format(
-                                    "2.7.2.2", "John Wellesz", ("2012-10-07T20:46:09Z"):sub(1,10),
+                                    "2.7.2.3_beta_3", "John Wellesz", ("2012-11-19T01:19:56Z"):sub(1,10),
                                     L["ABOUT_NOTES"],
                                     L["ABOUT_LICENSE"],         GetAddOnMetadata("Decursive", "X-License") or 'MoP is buggy',
                                     L["ABOUT_SHAREDLIBS"],      GetAddOnMetadata("Decursive", "X-Embeds") or 'MoP is buggy',
@@ -1752,7 +1771,9 @@ end
 function D:ExportOptions ()
     -- Export the option table to Blizz option UI and to Ace3 option UI
 
+    T._CatchAllErrors = "ExportOptions"; 
     LibStub("AceConfig-3.0"):RegisterOptionsTable(D.name,  GetOptions, 'dcr');
+    T._CatchAllErrors = false; 
 
     
     -- Don't feed the interface option panel until Blizz fixes the taint issue...
@@ -2946,85 +2967,7 @@ function D:QuickAccess (CallingObject, button) -- {{{
 
 end -- }}}
 
-do
-    local DebugHeader = false;
-    local HeaderFailOver = "|cFF11FF33Please report the content of this window to Archarodim@teaser.fr|r\n|cFF009999(Use CTRL+A to select all and then CTRL+C to put the text in your clip-board)|r\n\n";
-    local LoadedAddonNum = 0;
 
-    local function GetAddonListAsString ()
-        local addonCount = GetNumAddOns();
-        local loadedAddonList = {};
-
-        for addonID=1, addonCount do
-            local name, title, notes, enabled, loadable, reason, security = GetAddOnInfo(addonID)
-            if security == 'INSECURE' and IsAddOnLoaded(addonID) then
-                local version = GetAddOnMetadata(addonID, "Version");
-
-                table.insert(loadedAddonList, ("%s (%s)"):format(name, version or 'N/A'));
-
-            end
-        end
-
-        LoadedAddonNum = #loadedAddonList;
-        return table.concat(loadedAddonList, "\n");
-    end
-
-    local function setReportHeader()
-
-        local instructionsHeader;
-
-        if not D.db.global.NewerVersionName then
-            instructionsHeader = D.L and D.L["DEBUG_REPORT_HEADER"] or HeaderFailOver;
-        else
-            instructionsHeader = D.L and ((D.L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"]):format(D.db.global.NewerVersionName)) or HeaderFailOver;
-            -- disable bug me not since the user _clearly_ took the wrong decision
-            D.db.global.NewVersionsBugMeNot = false;
-        end
-
-        DebugHeader = ("%s\n2.7.2.2  %s(%s)  CT: %0.4f D: %s %s %s BDTHFAd: %s nDrE: %d Embeded: %s W: %d LA: %d TA: %d (%s, %s, %s, %s)"):format(instructionsHeader, -- "%s\n
-        DC.MyClass, tostring(UnitLevel("player") or "??"), D:NiceTime(), date(), GetLocale(), -- %s(%s)  CT: %0.4f D: %s %s
-        BugGrabber and "BG" .. (T.BugGrabber and "e" or "") or "NBG", -- %s
-        tostring(T._BDT_HotFix1_applyed), -- BDTHFAd: %s
-        T._NonDecursiveErrors, -- nDrE: %d
-        tostring(T._EmbeddedMode), -- Embeded: %s
-        IsWindowsClient() and 1 or 0, -- W: %d
-        LoadedAddonNum, -- LA: %d
-        T._TaintingAccusations, -- TA: %d
-        GetBuildInfo()); --  (%s, %s, %s, %s)
-    end
-
-    function D:ShowDebugReport()
-
-        if DC.DevVersionExpired then
-            self:VersionWarnings();
-            return;
-        end
-
-        local yourWastingMyTime = "";
-        if self.db.global.NewerVersionName then
-            yourWastingMyTime = L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"];
-        end
-
-        -- get running add-ons list
-        local success, errorm, loadedAddonList;
-        success, errorm, loadedAddonList = pcall (GetAddonListAsString);
-
-        local headerSucess, hederGenErrorm;
-        if not DebugHeader then
-            headerSucess, hederGenErrorm = pcall(setReportHeader);
-        else
-            headerSucess = true;
-        end
-
-
-        T._DebugText = (headerSucess and DebugHeader or (HeaderFailOver .. 'Report header gen failed: ' .. (hederGenErrorm and hederGenErrorm or ""))) .. table.concat(T._DebugTextTable, "") .. "\n\nLoaded Addons:\n\n" .. (success and loadedAddonList or errorm) .. "\n-- --";
-        _G.DecursiveDebuggingFrameText:SetText(T._DebugText);
-
-        _G.DecursiveDEBUGtext:SetText(L["DECURSIVE_DEBUG_REPORT"]);
-        _G.DecursiveDebuggingFrame:Show();
-    end
-end
-
-T._LoadedFiles["Dcr_opt.lua"] = "2.7.2.2";
+T._LoadedFiles["Dcr_opt.lua"] = "2.7.2.3_beta_3";
 
 -- Closer

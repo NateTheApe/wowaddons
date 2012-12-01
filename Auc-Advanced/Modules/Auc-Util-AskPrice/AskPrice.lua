@@ -251,7 +251,7 @@ function private.sendResponse(link, count, player, answerCount, totalSeenCount, 
 	if (totalSeenCount > 0) then
 		local averageSeenCount = math.floor(totalSeenCount/answerCount + 0.5)
 		private.sendWhisper(
-			(_TRANS('ASKP_Interface_SeenAverageByAuctioneer') ):format( --%s: Seen an average of %d times at auction by %d people using Auctioneer
+			(_TRANS('ASKP_Interface_SeenAverageByAuctioneer') ):format( --%s: Seen an average of %d times at auction by %d people by Auctioneer
 				link,
 				averageSeenCount,
 				answerCount),

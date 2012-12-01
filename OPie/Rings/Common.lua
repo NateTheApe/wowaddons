@@ -60,10 +60,31 @@ do -- OPieTracker
 	EC_Register("PLAYER_ENTERING_WORLD", "OPie.AutoTrackerInit", function() return "remove", preClick(col, nil, col) end)
 end
 do -- OPieAutoQuest
-	local whitelist, collection, inring, colId, ctok = {[37888]=true, [37860]=true, [37859]=true, [37815]=true, [46847]=true, [47030]=true, [39213]=true, [42986]=true, [49278]=true}, {}, {}
+	local whitelist, questItems, collection, inring, colId, ctok, current, changed = {[37888]=true, [37860]=true, [37859]=true, [37815]=true, [46847]=true, [47030]=true, [39213]=true, [42986]=true, [49278]=true}, {[30148]="72986 72985"}, {}, {}
+	local function scanQuests(i)
+		for i=i or 1,GetNumQuestLogEntries() do
+			local _, _, _, _, isHeader, isCollapsed, isComplete, _, qid = GetQuestLogTitle(i)
+			if isHeader and isCollapsed then
+				ExpandQuestHeader(i)
+				return scanQuests(i+1), CollapseQuestHeader(i)
+			elseif questItems[qid] and not isComplete then
+				for id in questItems[qid]:gmatch("%d+") do
+					local act = AB:get("item", tonumber(id))
+					if act then
+						local tok = "OpieBundleQuest" .. id
+						if not inring[tok] then
+							collection[#collection+1], collection[tok], changed = tok, act, true
+						end
+						inring[tok] = current
+						break
+					end
+				end
+			end
+		end
+	end
 	local function syncRing(_, _, upId)
 		if upId ~= colId then return end
-		local changed, current = false, ((ctok or 0) + 1) % 2;
+		changed, current = false, ((ctok or 0) + 1) % 2;
 
 		-- Search quest log
 		for i=1,GetNumQuestLogEntries() do
@@ -83,7 +104,7 @@ do -- OPieAutoQuest
 			for slot=1,GetContainerNumSlots(bag) do
 				local iid = GetContainerItemID(bag, slot);
 				local isQuest, startQuestId, isQuestActive = GetContainerItemQuestInfo(bag, slot);
-				isQuest = iid and ((isQuest and GetItemSpell(iid)) or whitelist[iid] or (startQuestId and not isQuestActive));
+				isQuest = iid and ((isQuest and GetItemSpell(iid)) or whitelist[iid] or (startQuestId and not isQuestActive and not IsQuestFlaggedCompleted(startQuestId)));
 				if isQuest then
 					local tok = "OPieBundleQuest" .. iid
 					if not inring[tok] then
@@ -100,6 +121,9 @@ do -- OPieAutoQuest
 			local tok = "OPieBundleQuest" .. (GetInventoryItemID("player", i) or 0)
 			if inring[tok] then inring[tok] = current end
 		end
+		
+		-- Additional quest-based whitelist
+		scanQuests()
 
 		-- Drop any items in the ring we haven't found.
 		local freePos, oldCount = 1, #collection
@@ -121,64 +145,4 @@ do -- OPieAutoQuest
 	OneRingLib:SetRing("OPieAutoQuest", {name="Quest Items", hotkey="ALT-Q", action=colId})
 	AB:observe("internal.collection.preopen", syncRing)
 	EC_Register("PLAYER_REGEN_DISABLED", "OPie.AutoQuest", function() syncRing(nil, nil, colId) end);
-end
-
-do -- DataBroker bridge (not a ring)
-	-- Part 1: Provide opie.databroker.launcher(broker name) action type
-	local nameMap, LDB = {}
-	local function checkLDB()
-		LDB = LibStub and LibStub:GetLibrary("LibDataBroker-1.1", 1)
-	end
-	local function call(obj, btn)
-		obj:OnClick(btn)
-	end
-	local function describe(name)
-		local obj = (LDB or checkLDB() or LDB) and LDB:GetDataObjectByName(name);
-		return "Launcher", obj and obj.label or name, obj and obj.icon or "Interface/Icons/INV_Misc_QuestionMark", obj
-	end
-	local function hint(id)
-		local obj = nameMap[id]
-		if not obj then return end
-		return true, 0, obj.icon, obj.label or obj.text or name, 0,0,0, obj.OnTooltipShow, nil, obj
-	end
-	local function create(name, rightClick)
-		if type(name) ~= "string" or not (LDB or checkLDB() or LDB) then return end
-		local pname = name .. "#" .. (rightClick and "R" or "L") 
-		if not nameMap[pname] then
-			local obj = LDB:GetDataObjectByName(name)
-			if not obj then return end
-			nameMap[pname] = AB:create("func", hint, call, obj, rightClick and "RightButton" or "LeftButton")
-			nameMap[nameMap[pname]] = obj
-		end
-		return nameMap[pname]
-	end
-	AB:register("opie.databroker.launcher", create, describe, {"clickUsingRightButton"})
-
-	-- Part 2: Hack: AB currently has no property description API; describe option to OPie's configuration front-end instead
-	OneRingLib.ext.CustomRingsConfig:addProperty("clickUsingRightButton", "Simulate a right-click")
-
-	-- Part 3: Provide an AB category listing available launchers (when there is at least one)
-	local registry, waiting = {}, true
-	local function count()
-		if not (LDB or checkLDB() or LDB) then return 0 end
-		local c = 1
-		for name, obj in LDB:DataObjectIterator() do
-			if obj.type == "launcher" then
-				registry[c], c = name, c + 1
-			end
-		end
-		return c-1
-	end
-	local function get(id) return "opie.databroker.launcher", registry[id] end
-	local function register() 
-		if waiting and count() > 0 then AB:category("DataBroker", count, get) waiting = nil end
-		if not waiting then AB:notify("opie.databroker.launcher") end
-	end
-	EC_Register("ADDON_LOADED", "opie.databroker.launcher", function()
-		if LDB or checkLDB() or LDB then
-			register()
-			if waiting then LDB.RegisterCallback("opie.databroker.launcher", "LibDataBroker_DataObjectCreated", register) end
-			return "remove"
-		end
-	end)
 end

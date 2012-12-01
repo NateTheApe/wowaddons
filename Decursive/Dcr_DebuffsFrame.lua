@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -18,7 +18,7 @@
     but WITHOUT ANY WARRANTY.
 
     
-    This file was last updated on 2012-09-27T23:56:03Z
+    This file was last updated on 2012-11-19T01:15:55Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -48,6 +48,7 @@ if not T._LoadedFiles or not T._LoadedFiles["Dcr_lists.xml"] or not T._LoadedFil
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["Dcr_DebuffsFrame.lua"] = false;
 
 local D   = T.Dcr;
 
@@ -55,7 +56,6 @@ local D   = T.Dcr;
 local L     = D.L;
 local LC    = D.LC;
 local DC    = T._C;
-local DS    = DC.DS;
 
 
 -- NS def
@@ -80,7 +80,6 @@ local BOOKTYPE_SPELL    = BOOKTYPE_SPELL;
 -- Init object factory defaults
 --MicroUnitF.ExistingPerID          = {};
 MicroUnitF.ExistingPerUNIT          = {};
--- MicroUnitF.ExistingPerNum           = {};
 MicroUnitF.UnitToMUF                = {};
 MicroUnitF.Number                   = 0;
 MicroUnitF.UnitShown                = 0;
@@ -109,7 +108,6 @@ local select            = _G.select;
 local pairs             = _G.pairs;
 local ipairs            = _G.ipairs;
 local GetTime           = _G.GetTime;
-local PlaySoundFile     = _G.PlaySoundFile;
 local IsControlKeyDown  = _G.IsControlKeyDown;
 local floor             = _G.math.floor;
 local table             = _G.table;
@@ -210,12 +208,12 @@ function MicroUnitF:Create(Unit, ID) -- {{{
         return self.ExistingPerUNIT[Unit];
     end
 
-    self.Number = self.Number + 1;
 
     -- create a new MUF object
-    self.ExistingPerUNIT[Unit] = self:new(D.MFContainer, Unit, self.Number, ID);
+    self.ExistingPerUNIT[Unit] = self:new(D.MFContainer, Unit, self.Number + 1, ID);
 
---    self.ExistingPerNum[self.Number] = self.ExistingPerUNIT[Unit];
+    self.Number = self.Number + 1;
+
 
     return self.ExistingPerUNIT[Unit];
 end -- }}}
@@ -355,7 +353,7 @@ function MicroUnitF:MFsDisplay_Update () -- {{{
                 MF.ToPlace = true;
                 Updated = Updated + 1;
 
-                D:ScheduleDelayedCall("Dcr_Update"..MF.CurrUnit, MF.UpdateWithCS, D.profile.DebuffsFrameRefreshRate * Updated, MF);
+                D:ScheduleDelayedCall("Dcr_Update"..MF.CurrUnit, MF.UpdateWithCS, D.profile.DebuffsFrameRefreshRate * (0.9 + Updated / D.profile.DebuffsFramePerUPdate), MF);
                 --D:Debug("|cFF88AA00Show schedule for MUF", Unit, "UnitShown:", self.UnitShown);
             end
         else
@@ -390,7 +388,7 @@ function MicroUnitF:MFsDisplay_Update () -- {{{
                 self.UnitShown = self.UnitShown - 1;
                 --D:Debug("|cFF88AA00Hiding %d (%s), scheduling update in %f|r", i, MF.CurrUnit, D.profile.DebuffsFrameRefreshRate * i);
                 Updated = Updated + 1;
-                D:ScheduleDelayedCall("Dcr_Update"..MF.CurrUnit, MF.Update, D.profile.DebuffsFrameRefreshRate * Updated, MF);
+                D:ScheduleDelayedCall("Dcr_Update"..MF.CurrUnit, MF.Update, D.profile.DebuffsFrameRefreshRate * (0.9 + Updated / D.profile.DebuffsFramePerUPdate), MF);
                 MF.Frame:Hide();
             end
 
@@ -437,7 +435,7 @@ function MicroUnitF:Force_FullUpdate () -- {{{
 
         MF.ChronoFontString:SetTextColor(unpack(MF_colors["COLORCHRONOS"]));
 
-        D:ScheduleDelayedCall("Dcr_Update"..MF.CurrUnit, MF.UpdateWithCS, D.profile.DebuffsFrameRefreshRate * i, MF);
+        D:ScheduleDelayedCall("Dcr_Update"..MF.CurrUnit, MF.UpdateWithCS, D.profile.DebuffsFrameRefreshRate * (0.9 + i / D.profile.DebuffsFramePerUPdate), MF);
         i = i + 1;
     end
 end -- }}}
@@ -701,7 +699,7 @@ function MicroUnitF:UpdateMUFUnit(Unitid, CheckStealth)
         -- but we don't miss any event XXX note this can be the cause of slowdown if 25 or 40 players got debuffed at the same instant, DebuffUpdateRequest is here to prevent that since 2008-02-17
         if (not D:DelayedCallExixts("Dcr_Update"..unit)) then
             D.DebuffUpdateRequest = D.DebuffUpdateRequest + 1;
-            D:ScheduleDelayedCall("Dcr_Update"..unit, CheckStealth and MF.UpdateWithCS or MF.Update, D.profile.DebuffsFrameRefreshRate * (1 + floor(D.DebuffUpdateRequest / (D.profile.DebuffsFramePerUPdate / 2))), MF);
+            D:ScheduleDelayedCall("Dcr_Update"..unit, CheckStealth and MF.UpdateWithCS or MF.Update, D.profile.DebuffsFrameRefreshRate * (0.9 + D.DebuffUpdateRequest / D.profile.DebuffsFramePerUPdate), MF);
             D:Debug("Update scheduled for, ", unit, MF.ID);
 
             return true; -- return value used to aknowledge that the function actually did something
@@ -755,9 +753,9 @@ function MicroUnitF:OnEnter(frame) -- {{{
         for i, Debuff in ipairs(MF.Debuffs) do
             if Debuff.Type then
                 -- Create a warning if an Unstable Affliction like spell is detected XXX not very pretty will be integrated along with the filtering system comming 'soon'(tm)
-                if Debuff.Name == DS["Unstable Affliction"] or Debuff.Name == DS["Vampiric Touch"] then
+                if Debuff.Name == DC.DS["Unstable Affliction"] or Debuff.Name == DC.DS["Vampiric Touch"] then
                     D:Println("|cFFFF0000 ==> %s !!|r (%s)", Debuff.Name, D:MakePlayerName((D:PetUnitName(      Unit, true    ))));
-                    PlaySoundFile("Sound\\Doodad\\G_NecropolisWound.wav", "Master");
+                    D:SafePlaySoundFile("Sound\\Doodad\\G_NecropolisWound.wav");
                 end
             end
         end
@@ -834,9 +832,9 @@ function MicroUnitF:OnEnter(frame) -- {{{
             DcrDisplay_Tooltip:SetPoint("BOTTOMLEFT", self.ExistingPerUNIT[Unit_Array[RefMUF]].Frame, "TOPLEFT", 0, 3);
 
             -- if the tooltip is at the top of the screen it means it's overlaping the MUF, let's move the tooltip somewhere else.
-            if floor(DcrDisplay_Tooltip:GetTop()) == floor(UIParent:GetTop()) then
+            if floor(DcrDisplay_Tooltip:GetTop()) == floor(UIParent:GetTop()) and Unit_Array[D.profile.DebuffsFrameGrowToTop and 1 or FarthestVerticalMUF] then
                 DcrDisplay_Tooltip:ClearAllPoints();
-                -- 1 is not ok when not grow to top and more than one line
+                -- 1 is not ok when not grow to top and more than one line -- XXX TODO nil error issue reported once on the line below
                 DcrDisplay_Tooltip:SetPoint("TOPLEFT", self.ExistingPerUNIT[Unit_Array[D.profile.DebuffsFrameGrowToTop and 1 or FarthestVerticalMUF]].Frame, "BOTTOMLEFT", 0, -3);
             end
         end
@@ -1791,6 +1789,6 @@ local MF_Textures = { -- unused
 
 -- }}}
 
-T._LoadedFiles["Dcr_DebuffsFrame.lua"] = "2.7.2.2";
+T._LoadedFiles["Dcr_DebuffsFrame.lua"] = "2.7.2.3_beta_3";
 
 -- Heresy

@@ -65,14 +65,6 @@ local function GetSettingBool(setting)
 	-- return nil;
 end
 
--- let an external entity forcibly mark a school
-FishingBuddy.Extravaganza.MarkSchool = function()
-	local zone, subzone = FL:GetZoneInfo();
-	if ( zone == FBConstants.STVZONENAME ) then
-		FishingBuddy.Schools.AddFishingSchool(FL.SCHOOL_TASTY, 19807, zone);
-	end
-end
-
 local function ExtravaganzaHijackCheck()
 	if ( FishingBuddy.NormalHijackCheck() ) then
 		-- also check to make sure we're over a pool
@@ -216,7 +208,7 @@ FishingBuddy.Extravaganza.OnLoad = function(self)
 	self:RegisterForDrag("LeftButton");
 	self:Hide();
 
-	FishingBuddy.API.RegisterHandlers(ExtravaganzaEvents);
+	FishingBuddy.RegisterHandlers(ExtravaganzaEvents);
 end
 
 FishingBuddy.Extravaganza.OnShow = function(self)

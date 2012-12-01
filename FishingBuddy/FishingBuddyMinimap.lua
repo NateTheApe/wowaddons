@@ -22,7 +22,7 @@ local MinimapOptions = {
 		["text"] = FBConstants.CONFIG_MINIMAPBUTTON_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_MINIMAPBUTTON_INFO,
 		["v"] = 1,
-		["default"] = false,
+		["default"] = 0,
 	},
 	["MinimapClickToSwitch"] = {
 		["text"] = FBConstants.CLICKTOSWITCH_ONOFF,
@@ -80,4 +80,4 @@ MinimapEvents["VARIABLES_LOADED"] = function()
 end
 
 FishingBuddy.OptionsFrame.HandleOptions(GENERAL, nil, MinimapOptions, setter, getter);
-FishingBuddy.API.RegisterHandlers(MinimapEvents);
+FishingBuddy.RegisterHandlers(MinimapEvents);

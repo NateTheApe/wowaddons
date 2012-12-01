@@ -1,5 +1,57 @@
-﻿Version 1.1b
-- Fix option stickiness bug (CurseForge #184)
+﻿Version 1.2c
+- Updated German translation (thanks DirtyHarryGermany!)
+- Updated Traditional Chinese translation (thanks titanium0107!)
+- Update the raft buff before it expires, if we can (reworking this for the next version)
+- Handle Nat's Hat correctly
+- Lots of small code improvements
+
+Version 1.2b
+- Add option to play the quest completed sound when you catch Nat Pagle rep fish (#203)
+- More work on the pet menu to try and address the "script too long" bug some people
+  are seeing
+
+Version 1.2a
+- New French translation (thanks Matisk!)
+- Updated Traditional Chinese translation (thanks titanium0107!)
+- New German translation (thanks DirtyHarryGermany!)
+- Add Nat's Hat (duh)
+- Updated the About box to thank all the translators! (I always do, calling it out :-)
+
+Version 1.2
+- Add "Partial Gear" option for casting. If enabled, wearing any item that has a fishing bonus will let you double click cast.
+- Add support for the Angler's Raft (still figuring out what to do about the spear)
+- Fishing volume slider works now
+- Updated Traditional Chinese (zhTW) translation (thanks titanium0107!)
+- Don't include pool catches in counts (works for first time fishing in a subzone)
+- Try harder to notice that we're fishing from a pool
+- Fix for pet menu timeout (CurseForge #190, #198)
+- Miscellaneous bug fixes (CurseForge #201, forum)
+
+Version 1.1f
+- Fix a startup bug for brand-new toons (or never fished from a pool)
+- Updated Russian translation (thanks DVK!)
+
+Version 1.1e
+- Fix startup bug (CurseForge #195)
+- Add a delay after we cast a lure so that it has time to show up (prevent double lures)
+- Add Tiny Goldfish to the Fishing pet list
+- Include CallHandler library
+- Updated traditional Chinese translations (thanks titanium0107!)
+- Update German translation (thanks DirtyHarryGermany!)
+
+Version 1.1d
+- Add support for Ancient Pandaren Fishing Charm (Woot! Only took two days of camping!)
+- More work on the pets, all should be good now
+
+Version 1.1c
+- Fishing Watcher works with "auto pole" casting
+- Updated Russian translation (thanks D_Angel!)
+- Fix fish caught bug (CurseForge #192, #193)
+- Fix assorted issues with causing math errors in LibTourist (CurseForge #189)
+- Clean up internal event handling, should help memory usage
+
+Version 1.1b
+- Fix option stickiness bugs (CurseForge #184, $187, #188)
 - Include LibDataBroker explicitly (CurseForge #186)
 - FIx minimap button display issues (CurseForge #185, #183, #180, #178)
 - Fix meta pet menu issues

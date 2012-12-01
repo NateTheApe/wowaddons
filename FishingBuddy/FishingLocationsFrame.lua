@@ -365,7 +365,7 @@ FishingBuddy.Locations.Update = function(self, forced)
 		LinesChanged();
 	end
 
-	local IsQuestFish = FishingBuddy.API.IsQuestFish;
+	local IsQuestFish = FishingBuddy.IsQuestFish;
 	local offset = FauxScrollFrame_GetOffset(self);
 	local lastlevel = 0;
 	FishingLocationHighlightFrame:Hide();
@@ -742,7 +742,7 @@ FishingBuddy.Locations.OnLoad = function(self)
 	FishingLocationsSwitchButton:SetText(FBConstants.SHOWFISHIES);
 	-- Set up checkbox
 	FishingBuddy.OptionsFrame.HandleOptions(nil, nil, LocOptions);
-	FishingBuddy.API.RegisterHandlers(LocationEvents);
+	FishingBuddy.RegisterHandlers(LocationEvents);
 end
 
 FishingBuddy.Locations.OnShow = function()

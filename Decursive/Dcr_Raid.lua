@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -45,15 +45,14 @@ if not T._LoadedFiles or not T._LoadedFiles["Dcr_Events.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["Dcr_Raid.lua"] = false;
 
 local D = T.Dcr;
---D:SetDateAndRevision("$Date: 2008-09-16 00:25:13 +0200 (mar., 16 sept. 2008) $", "$Revision: 81755 $");
 
 
 local L     = D.L;
 local LC    = D.LC;
 local DC    = T._C;
-local DS    = DC.DS;
 
 local RaidRosterCache           = { };
 local SortingTable              = { };
@@ -71,7 +70,7 @@ local select                = _G.select;
 local UnitIsFriend          = _G.UnitIsFriend;
 local UnitCanAttack         = _G.UnitCanAttack;
 local GetNumRaidMembers     = DC.GetNumRaidMembers;
-local GetNumPartyMembers    = DC.MOP and _G.GetNumSubgroupMembers or _G.GetNumPartyMembers;
+local GetNumPartyMembers    = _G.GetNumSubgroupMembers;
 
 local GetRaidRosterInfo     = _G.GetRaidRosterInfo;
 local random                = _G.random;
@@ -126,10 +125,6 @@ DC.ClassNumToLName = {
     [21]        = LC[DC.CLASS_MONK],
 }
 
-if not DC.MOP then
-    DC.ClassNumToLName[21] = nil;
-end
-
 DC.ClassLNameToNum = D:tReverse(DC.ClassNumToLName);
 
 DC.ClassNumToUName = {
@@ -146,9 +141,6 @@ DC.ClassNumToUName = {
     [21]        = DC.CLASS_MONK,
 }
 
-if not DC.MOP then
-    DC.ClassNumToUName[21] = nil;
-end
 DC.ClassUNameToNum = D:tReverse(DC.ClassNumToUName);
 
 
@@ -705,7 +697,7 @@ end
 --}}}
 
 -------------------------------------------------------------------------------
-T._LoadedFiles["Dcr_Raid.lua"] = "2.7.2.2";
+T._LoadedFiles["Dcr_Raid.lua"] = "2.7.2.3_beta_3";
 
 -- "Your God is dead and no one cares"
 -- "If there is a Hell I'll see you there"

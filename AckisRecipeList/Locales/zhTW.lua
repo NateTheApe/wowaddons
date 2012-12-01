@@ -6,7 +6,7 @@ zhTW localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.1
+Project version: 2.4.2
 ************************************************************************
 Original translated by: iCat, apa1102, zhucc
 Currently maintained by:
@@ -136,6 +136,7 @@ L["Awan Iceborn"] = "艾汪·冰誕"
 L["Awilo Lon'gomba"] = "阿維羅·隆貢巴"
 L["Ayla Shadowstorm"] = "埃拉·暗影風暴"
 L["Banalash"] = "巴納拉許"
+L["BANANA_INFUSED_RUM"] = "從喀撒朗蠻荒的“香蕉蘭姆酒桶”中找到。"
 L["Barien"] = "巴瑞恩"
 L["Barim Spilthoof"] = "巴爾林·裂蹄"
 L["Bario Matalli"] = "巴里歐·馬塔利"
@@ -477,6 +478,7 @@ L["Flask"] = "精鍊藥劑" -- Needs review
 L["Fono"] = "弗諾"
 L["FONT_SIZE_DESC"] = "變更 ARL 的字型大小。"
 L["Foreman Marcrid"] = "工頭瑪希瑞德"
+L["FOUR_SENSES_BREW"] = "從崑萊峰的奈佛勒斯山山頂上“雲仁的石板”中找到。"
 L["Fradd Swiftgear"] = "弗拉德"
 L["Franklin Lloyd"] = "弗蘭克林·洛伊德"
 L["Fremal Doohickey"] = "弗雷瑪爾"
@@ -863,6 +865,7 @@ L["Nahogg"] = "奈歐格"
 L["Naka"] = "那卡"
 L["Nakodu"] = "納克杜"
 L["Namha Moonwater"] = "納姆哈·月水"
+L["Nam Ironpaw"] = "年·鐵爪"
 L["Nardstrum Copperpinch"] = "納斯塔姆·卡布彬"
 L["Narj Deepslice"] = "納爾基·長刀"
 L["Narkk"] = "納爾克"
@@ -1136,6 +1139,7 @@ L["Staff"] = "法杖"
 L["Steeg Haskell"] = "斯地格·哈斯克爾"
 L["Stephen Ryback"] = "斯蒂芬·雷百克"
 L["Stoic Mammoth"] = "冷漠的長毛象"
+L["Stonebreaker Ruian"] = "碎石者瑞安"
 L["Stone Guard Mukar"] = "石衛士慕卡"
 L["Stormforged Ambusher"] = "風暴冶煉伏擊者"
 L["Stormforged Artificer"] = "風暴冶煉設計者"

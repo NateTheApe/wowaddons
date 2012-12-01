@@ -19,7 +19,6 @@ local FOLDER_NAME, private = ...
 local LibStub = _G.LibStub
 
 local addon = LibStub("AceAddon-3.0"):GetAddon(private.addon_name)
-local BFAC = LibStub("LibBabble-Faction-3.0"):GetLookupTable()
 
 -----------------------------------------------------------------------
 -- Methods.
@@ -77,7 +76,7 @@ end
 
 -- This wrapper exists primarily because Blizzard keeps changing how NPC ID numbers are extracted from GUIDs, and fixing it in one place is less error-prone.
 function private.MobGUIDToIDNum(guid)
-	return tonumber(guid:sub(-12,-9), 16)
+	return tonumber(guid:sub(6, 10), 16)
 end
 
 --[===[@debug@
@@ -145,7 +144,6 @@ do
 	end
 
 	function private.TextDump:Clear()
-		print("Wiping TextDump output.")
 		table.wipe(self.output)
 	end
 
@@ -245,7 +243,20 @@ do
 		output:Display()
 	end
 
-	--[=[
+	function addon:DumpReps()
+		output:Clear()
+
+		for index = 1, 1500 do
+			local rep_name = _G.GetFactionInfoByID(index)
+
+			if rep_name and private.FACTION_STRINGS[index] then
+				output:AddLine(("[\"%s\"] = _G.GetFactionInfoByID(%d),"):format(TableKeyFormat(rep_name), index))
+			end
+		end
+		output:Display()
+	end
+
+--[=[
 		private.ZONE_NAME_LIST = {}
 
 		local old_GetMapNameByID = _G.GetMapNameByID

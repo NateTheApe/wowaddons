@@ -179,7 +179,7 @@ local function hideOrDisable(button, what)
 	elseif ( what == "h" ) then
 		 button:Hide();
 		 if ( value == 1 ) then
-			if ( not button.visible or button.visible() == 1 ) then
+			if ( not button.visible or button.visible(button) == 1 ) then
 				button:Show();
 			end
 		end
@@ -401,7 +401,9 @@ local function CleanupButton(button)
 		button.checkbox = nil;
 	end
 	button.custom = nil;
+	button.option = nil;
 	button:Hide();
+	button:SetParent(nil);
 end
 
 local function Setup(options, nomap)
@@ -418,7 +420,11 @@ local function Setup(options, nomap)
 	for name,option in pairs(options) do
 		local button = nil;
 		if ( option.button ) then
-			button = getglobal(option.button);
+			if ( type(option.button) == "string" ) then
+				button = getglobal(option.button);
+			else
+				button = option.button;
+			end
 			if ( button ) then
 				button.custom = 1;
 				button.checkbox = (button:GetObjectType() == "CheckButton");
@@ -434,6 +440,8 @@ local function Setup(options, nomap)
 					"CheckButton", "FishingBuddyOption"..index,
 					FishingOptionsFrame, "OptionsSmallCheckButtonTemplate");
 				optionbuttons[index] = button;
+			else
+				button:SetParent(FishingOptionsFrame);
 			end
 			button.checkbox = 1;
 			index = index + 1;
@@ -450,6 +458,11 @@ local function Setup(options, nomap)
 				button:SetScript("OnClick", CheckButton_OnClick);
 			end
 
+			if (option.init) then
+				option.init(option, button);
+			end
+			
+			button.option = option;
 			button.name = name;
 			button.layoutright = option.layoutright;
 			button.margin = option.margin;
@@ -528,21 +541,22 @@ local function Setup(options, nomap)
 	-- then put everything else underneath. need to make the dep button layout code
 	-- useful for the toplevel non-dep buttons then
 	local primaries = {};
+	local pb = {};
+	local maxwidth = 0;
 	for _,name in pairs(toplevel) do
 		local button = optionmap[name];
 		if ( button and not button.deps and not button.custom ) then
 			tinsert(primaries, name);
+			tinsert(pb, button);
+			if ( not button.custom and button.width > maxwidth ) then
+				maxwidth = button.width;
+			end
 		end
-	end
-	local pb = {};
-	for _,name in ipairs(primaries) do
-		local b = optionmap[name];
-		tinsert(pb, b);
 	end
 
 	local lastbutton = nil;
-	local maxwidth = 0;
 	local order = orderbuttons(pb);
+	local right = false;
 	for iorder,which in ipairs(order) do
 		local name = primaries[which];
 		local button = optionmap[name];
@@ -554,19 +568,18 @@ local function Setup(options, nomap)
 			if ( button.margin ) then
 				yoff = yoff - button.margin[1] or 0;
 			end
-			if ( (iorder % 2) == 0 ) then
+			if ( right) then
 				if (lastbutton.margin) then
 					yoff = yoff + lastbutton.margin[1] or 0;
 				end
 				button.adjacent = lastbutton;
 				button:SetPoint("TOP", lastbutton, "TOP", 0, 0);
-				if ( not button.custom and button.width > maxwidth ) then
-					maxwidth = button.width;
-				end
 				button.right = 1;
+				right = false;
 			else
 				button:SetPoint("TOPLEFT", lastbutton, "BOTTOMLEFT", lastoff, yoff);
 				lastbutton = button;
+				right = true;
 			end
 		end
 	end
@@ -766,6 +779,7 @@ local function UpdateTabs()
 end
 
 local INV_MISC_QUESTIONMARK = "Interface\\Icons\\INV_Misc_QuestionMark";
+local GENERAL_ICON = "Interface\\Icons\\INV_Misc_QuestionMark";
 local function HandleOptions(name, icon, options, setter, getter, last)
 	local index = #tabbuttons + 1;
 	local handler = {};
@@ -778,10 +792,12 @@ local function HandleOptions(name, icon, options, setter, getter, last)
 	end
 	if ( name == GENERAL ) then
 		handler.first = true;
+		handler.icon = "Interface\\Icons\\inv_gauntlets_18";
+	else
+		handler.icon = icon or INV_MISC_QUESTIONMARK;
 	end
 	handler.last = last;
 	handler.name = name;
-	handler.icon = icon or INV_MISC_QUESTIONMARK;
 	handler.options = FL:copytable(options);
 	handler.setter = setter;
 	handler.getter = getter;
@@ -790,6 +806,7 @@ local function HandleOptions(name, icon, options, setter, getter, last)
 		for name,info in pairs(FBOptionsTable[name].options) do
 			handler.options[name] = FL:copytable(info);
 		end
+		handler.icon = FBOptionsTable[name].icon;
 		handler.index = FBOptionsTable[name].index;
 		handler.getter = handler.getter or FBOptionsTable[name].getter;
 		handler.setter = handler.setter or FBOptionsTable[name].setter;
@@ -806,11 +823,11 @@ local function HandleOptions(name, icon, options, setter, getter, last)
 			optiontab:SetScript("OnClick", OptionTab_OnClick);
 			optiontab.name = name;
 			optiontab.tooltip = name;
-			optiontab:SetNormalTexture(handler.icon);
 			tinsert(tabbuttons, optiontab);
 			tabmap[name] = optiontab;
 			handler.index = index;
 		end
+		optiontab:SetNormalTexture(handler.icon);
 	end
 end
 FishingBuddy.OptionsFrame.HandleOptions = HandleOptions;
@@ -936,6 +953,23 @@ FishingBuddy.MakeDropDown = function(switchText, switchSetting)
 			end
 		end
 	end
+end
+
+-- menuname has to be set regardless, or UI drop down doesn't work
+FishingBuddy.CreateFBDropDownMenu = function(holdername, menuname)
+	local holder = CreateFrame("Frame", holdername);
+	holder.menu = CreateFrame("Frame", menuname, holder, "FishingBuddyDropDownMenuTemplate");
+	holder.menu:ClearAllPoints();
+	holder.menu:SetPoint("TOPLEFT", holder, "TOPLEFT", 48, 0);
+	holder.html = CreateFrame("SimpleHTML", nil, holder);
+	holder.html:ClearAllPoints();
+	holder.html:SetPoint("TOPLEFT", holder, "TOPLEFT", 0, -4);
+	holder.html:SetSize(210, 16);
+	holder.fontstring = holder.html:CreateFontString(nil, nil, "GameFontNormalSmall");
+	holder.fontstring:SetAllPoints(holder.html);
+	holder.fontstring:SetSize(183, 0);
+	
+	return holder;
 end
 
 FishingBuddy.GetOptionList = function()

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Halion", "DBM-ChamberOfAspects", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 11 $"):sub(12, -3))
 mod:SetCreatureID(39863)--40142 (twilight form)
 mod:SetModelID(31952)
 mod:SetUsedIcons(7, 8)
@@ -238,14 +238,14 @@ function mod:OnSync(msg, target)
 	elseif msg == "ShadowTarget" then
 		if self.Options.AnnounceAlternatePhase then
 			warningShadowConsumption:Show(target)
-			if IsRaidLeader() and self.Options.WhisperOnConsumption then
+			if DBM:GetRaidRank() > 0 and self.Options.WhisperOnConsumption then
 				self:SendWhisper(L.WhisperConsumption, target)
 			end
 		end
 	elseif msg == "FieryTarget" then
 		if self.Options.AnnounceAlternatePhase then
 			warningFieryConsumption:Show(target)
-			if IsRaidLeader() and self.Options.WhisperOnConsumption then
+			if DBM:GetRaidRank() > 0 and self.Options.WhisperOnConsumption then
 				self:SendWhisper(L.WhisperCombustion, target)
 			end
 		end

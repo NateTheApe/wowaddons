@@ -1,0 +1,29 @@
+## Interface: 50001
+
+## Author : Angayelle of Nordrassil
+
+## Title: MageBombTracker 1.0.7
+
+## Notes: An addon for tracking Mage bombs
+
+## Dependencies:
+
+## SavedVariables: combumbtrackersettingstable
+
+## version: 1.0.7
+
+Libs\LibStub\LibStub.lua
+
+Libs\LibSharedMedia-3.0\CallbackHandler-1.0\CallbackHandler-1.0.lua
+
+Libs\LibSharedMedia-3.0\lib.xml
+
+MBTLocalization.en.lua
+
+MBTLocalization.fr.lua
+
+MageBombTracker.lua
+
+MageBombTracker.xml
+
+MageBombTrackeroptions.xml

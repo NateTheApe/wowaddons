@@ -6,7 +6,7 @@ koKR localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.1
+Project version: 2.4.2
 ************************************************************************
 Original translated by: damjau, next96
 Currently maintained by:
@@ -886,6 +886,7 @@ L["Saenorion"] = "새노리온"
 L["Sairuk"] = "사이루크"
 L["Sally Tompkins"] = "샐리 톰킨스"
 L["Samuel Van Brunt"] = "사무엘 반 브런트" -- Needs review
+L["San Redscale"] = "싼 레드스케일" -- Needs review
 L["Sarah Tanner"] = "사라 터너"
 L["Saru Steelfury"] = "사루 스틸퓨리"
 L["Sassa Weldwell"] = "사사 윌드웰"

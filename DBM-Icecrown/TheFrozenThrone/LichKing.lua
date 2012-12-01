@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("LichKing", "DBM-Icecrown", 5)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 13 $"):sub(12, -3))
 mod:SetCreatureID(36597)
 mod:SetModelID(30721)
 mod:SetZone()
@@ -401,7 +401,7 @@ do
 							end
 						end
 					end
-					if mod.Options.AnnounceValkGrabs and DBM:GetRaidRank() > 0 then
+					if mod.Options.AnnounceValkGrabs and DBM:GetRaidRank() > 1 then
 						if mod.Options.ValkyrIcon then
 							SendChatMessage(L.ValkGrabbedIcon:format(grabIcon, GetRaidRosterInfo(i)), "RAID")
 							grabIcon = grabIcon + 1

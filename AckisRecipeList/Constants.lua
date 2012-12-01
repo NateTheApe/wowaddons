@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- Constants.lua
 -------------------------------------------------------------------------------
--- File date: 2012-09-22T19:53:05Z
--- File hash: 4092b2e
--- Project hash: 9e1f108
--- Project version: 2.4.1
+-- File date: 2012-09-30T00:45:08Z
+-- File hash: 113a54a
+-- Project hash: 5a95034
+-- Project version: 2.4.2
 -------------------------------------------------------------------------------
 -- Please see http://www.wowace.com/addons/arl/ for more information.
 -------------------------------------------------------------------------------
@@ -73,6 +73,7 @@ private.PROFESSION_NAME_MAP = {
 	[_G.GetSpellInfo(125587)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Steamer
 	[_G.GetSpellInfo(125588)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Oven
 	[_G.GetSpellInfo(125589)] = private.LOCALIZED_PROFESSION_NAMES.COOKING, -- Way of the Brew
+	[_G.GetSpellInfo(2575)] = private.LOCALIZED_PROFESSION_NAMES.SMELTING, -- Mining
 }
 
 for name, localized_name in pairs(private.LOCALIZED_PROFESSION_NAMES) do
@@ -270,19 +271,18 @@ private.REP_FLAGS_WORD2 = {
 	THERAZANE		= 0x00000040,	-- 7
 	FORESTHOZEN		= 0X00000080,	-- 8
 	GOLDENLOTUS		= 0X00000100,	-- 9
-	HUOJINPANDAREN		= 0X00000200,	-- 10
-	CLOUDSERPENT		= 0X00000400,	-- 11
-	PEARLFINJINYU		= 0X00000800,	-- 12
-	SHADOPAN		= 0X00001000,	-- 13
-	ANGLERS			= 0X00002000,	-- 14
-	AUGUSTCELESTIALS	= 0X00004000,	-- 15
-	BREWMASTERS		= 0X00008000,	-- 16
-	KLAXXI			= 0X00010000,	-- 17
-	LOREWALKERS		= 0X00020000,	-- 18
-	TILLERS			= 0X00040000,	-- 19
-	TUSHUIPANDAREN		= 0X00080000,	-- 20
-	BLACKPRINCE		= 0X00100000,	-- 21
-	SHANGXIACADEMY		= 0x00200000,	-- 22
+	CLOUDSERPENT		= 0X00000200,	-- 10
+	PEARLFINJINYU		= 0X00000400,	-- 11
+	SHADOPAN		= 0X00000800,	-- 12
+	ANGLERS			= 0X00001000,	-- 13
+	AUGUSTCELESTIALS	= 0X00002000,	-- 14
+	BREWMASTERS		= 0X00004000,	-- 15
+	KLAXXI			= 0X00008000,	-- 16
+	LOREWALKERS		= 0X00010000,	-- 17
+	TILLERS			= 0X00020000,	-- 18
+	BLACKPRINCE		= 0X00040000,	-- 19
+	SHANGXIACADEMY		= 0X00080000,	-- 20
+	PANDACOMMON1		= 0X00100000,	-- 21
 }
 
 -------------------------------------------------------------------------------
@@ -545,16 +545,24 @@ private.FACTION_STRINGS = {
 	[1011]	= "LOWERCITY",
 	[1012]	= "ASHTONGUE",
 	[1037]	= "ALLIANCE_VANGUARD",
+	[1050]  = "VALLIANCE",
 	[1052]	= "HORDE_EXPEDITION",
+	[1064]  = "TAUNKA",
+	[1067]  = "HAND_VENGANCE",
+	[1068]	= "EXPLORERS_LEAGUE",
 	[1073]	= "KALUAK",
 	[1077]	= "SHATTEREDSUN",
+	[1085]  = "WARSONG",
 	[1090]	= "KIRINTOR",
 	[1091]	= "WYRMREST",
+	[1094]  = "SILVER_COVENANT",
 	[1098]	= "EBONBLADE",
 	[1104]	= "FRENZYHEART",
 	[1105]	= "ORACLES",
 	[1106]	= "ARGENTCRUSADE",
 	[1119]	= "HODIR",
+	[1124]  = "SUNREAVERS",
+	[1136]  = "FROSTBORN",
 	[1156]	= "ASHEN_VERDICT",
 	[1135]	= "EARTHEN_RING",
 	[1158]	= "GUARDIANS",
@@ -592,6 +600,176 @@ private.FACTION_STRINGS = {
 	[1359]	=  "BLACKPRINCE",
 }
 
+private.LOCALIZED_FACTION_STRINGS = {
+	["Neutral"]	= _G.FACTION_STANDING_LABEL4,
+	["Friendly"]	= _G.FACTION_STANDING_LABEL5,
+	["Honored"]	= _G.FACTION_STANDING_LABEL6,
+	["Revered"]	= _G.FACTION_STANDING_LABEL7,
+	["Exalted"]	= _G.FACTION_STANDING_LABEL8,
+	["Horde"] = _G.GetFactionInfoByID(67),
+	["Alliance"] = _G.GetFactionInfoByID(469),
+	["Thorium Brotherhood"] = _G.GetFactionInfoByID(59),
+	["Zandalar Tribe"] = _G.GetFactionInfoByID(270),
+	["Argent Dawn"] = _G.GetFactionInfoByID(529),
+	["Timbermaw Hold"] = _G.GetFactionInfoByID(576),
+	["Wintersaber Trainers"] = _G.GetFactionInfoByID(589),
+	["Cenarion Circle"] = _G.GetFactionInfoByID(609),
+	["The Aldor"] = _G.GetFactionInfoByID(932),
+	["The Consortium"] = _G.GetFactionInfoByID(933),
+	["The Scryers"] = _G.GetFactionInfoByID(934),
+	["The Sha'tar"] = _G.GetFactionInfoByID(935),
+	["The Mag'har"] = _G.GetFactionInfoByID(941),
+	["Cenarion Expedition"] = _G.GetFactionInfoByID(942),
+	["Honor Hold"] = _G.GetFactionInfoByID(946),
+	["Thrallmar"] = _G.GetFactionInfoByID(947),
+	["The Violet Eye"] = _G.GetFactionInfoByID(967),
+	["Sporeggar"] = _G.GetFactionInfoByID(970),
+	["Kurenai"] = _G.GetFactionInfoByID(978),
+	["Keepers of Time"] = _G.GetFactionInfoByID(989),
+	["The Scale of the Sands"] = _G.GetFactionInfoByID(990),
+	["Lower City"] = _G.GetFactionInfoByID(1011),
+	["Ashtongue Deathsworn"] = _G.GetFactionInfoByID(1012),
+	["Alliance Vanguard"] = _G.GetFactionInfoByID(1037),
+	["Valiance Expedition"] = _G.GetFactionInfoByID(1050),
+	["Horde Expedition"] = _G.GetFactionInfoByID(1052),
+	["The Taunka"] = _G.GetFactionInfoByID(1064),
+	["The Hand of Vengeance"] = _G.GetFactionInfoByID(1067),
+	["Explorers' League"] = _G.GetFactionInfoByID(1068),
+	["The Kalu'ak"] = _G.GetFactionInfoByID(1073),
+	["Shattered Sun Offensive"] = _G.GetFactionInfoByID(1077),
+	["Warsong Offensive"] = _G.GetFactionInfoByID(1085),
+	["Kirin Tor"] = _G.GetFactionInfoByID(1090),
+	["The Wyrmrest Accord"] = _G.GetFactionInfoByID(1091),
+	["The Silver Covenant"] = _G.GetFactionInfoByID(1094),
+	["Knights of the Ebon Blade"] = _G.GetFactionInfoByID(1098),
+	["Frenzyheart Tribe"] = _G.GetFactionInfoByID(1104),
+	["The Oracles"] = _G.GetFactionInfoByID(1105),
+	["Argent Crusade"] = _G.GetFactionInfoByID(1106),
+	["The Sons of Hodir"] = _G.GetFactionInfoByID(1119),
+	["The Sunreavers"] = _G.GetFactionInfoByID(1124),
+	["The Earthen Ring"] = _G.GetFactionInfoByID(1135),
+	["Tranquillien Conversion"] = _G.GetFactionInfoByID(1136),
+	["The Ashen Verdict"] = _G.GetFactionInfoByID(1156),
+	["Guardians of Hyjal"] = _G.GetFactionInfoByID(1158),
+	["Therazane"] = _G.GetFactionInfoByID(1171),
+	["Dragonmaw Clan"] = _G.GetFactionInfoByID(1172),
+	["Ramkahen"] = _G.GetFactionInfoByID(1173),
+	["Wildhammer Clan"] = _G.GetFactionInfoByID(1174),
+	["Baradin's Wardens"] = _G.GetFactionInfoByID(1177),
+	["Hellscream's Reach"] = _G.GetFactionInfoByID(1178),
+	["Shang Xi's Academy"] = _G.GetFactionInfoByID(1216),
+	["Forest Hozen"] = _G.GetFactionInfoByID(1228),
+	["Pearlfin Jinyu"] = _G.GetFactionInfoByID(1242),
+	["Golden Lotus"] = _G.GetFactionInfoByID(1269),
+	["Shado-Pan"] = _G.GetFactionInfoByID(1270),
+	["Order of the Cloud Serpent"] = _G.GetFactionInfoByID(1271),
+	["The Tillers"] = _G.GetFactionInfoByID(1272),
+	["Jogu the Drunk"] = _G.GetFactionInfoByID(1273),
+	["Ella"] = _G.GetFactionInfoByID(1275),
+	["Old Hillpaw"] = _G.GetFactionInfoByID(1276),
+	["Chee Chee"] = _G.GetFactionInfoByID(1277),
+	["Sho"] = _G.GetFactionInfoByID(1278),
+	["Haohan Mudclaw"] = _G.GetFactionInfoByID(1279),
+	["Tina Mudclaw"] = _G.GetFactionInfoByID(1280),
+	["Gina Mudclaw"] = _G.GetFactionInfoByID(1281),
+	["Fish Fellreed"] = _G.GetFactionInfoByID(1282),
+	["Farmer Fung"] = _G.GetFactionInfoByID(1283),
+	["The Anglers"] = _G.GetFactionInfoByID(1302),
+	["The Klaxxi"] = _G.GetFactionInfoByID(1337),
+	["The August Celestials"] = _G.GetFactionInfoByID(1341),
+	["The Lorewalkers"] = _G.GetFactionInfoByID(1345),
+	["The Brewmasters"] = _G.GetFactionInfoByID(1351),
+	["Huojin Pandaren"] = _G.GetFactionInfoByID(1352),
+	["Tushui Pandaren"] = _G.GetFactionInfoByID(1353),
+	["Nat Pagle"] = _G.GetFactionInfoByID(1358),
+	["The Black Prince"] = _G.GetFactionInfoByID(1359),
+}
+--[[
+private.LOCALIZED_FACTION_STRINGS = {
+	["Neutral"] = _G.FACTION_STANDING_LABEL4,
+	["Friendly"] = _G.FACTION_STANDING_LABEL5,
+	["Honored"] = _G.FACTION_STANDING_LABEL6,
+	["Revered"] = _G.FACTION_STANDING_LABEL7,
+	["Exalted"] = _G.FACTION_STANDING_LABEL8,
+	["Horde"] = _G.GetFactionInfoByID(67),
+	["Alliance"] = _G.GetFactionInfoByID(469),
+	["THORIUM_BROTHERHOOD"] = _G.GetFactionInfoByID(59),
+	["ZANDALAR_TRIBE"] = _G.GetFactionInfoByID(270),
+	["ARGENT_DAWN"] = _G.GetFactionInfoByID(529),
+	["TIMBERMAW_HOLD"] = _G.GetFactionInfoByID(576),
+	["WINTERSABER_TRAINERS"] = _G.GetFactionInfoByID(589),
+	["CENARION_CIRCLE"] = _G.GetFactionInfoByID(609),
+	["THE_ALDOR"] = _G.GetFactionInfoByID(932),
+	["THE_CONSORTIUM"] = _G.GetFactionInfoByID(933),
+	["THE_SCRYERS"] = _G.GetFactionInfoByID(934),
+	["THE_SHATAR"] = _G.GetFactionInfoByID(935),
+	["THE_MAGHAR"] = _G.GetFactionInfoByID(941),
+	["CENARION_EXPEDITION"] = _G.GetFactionInfoByID(942),
+	["HONOR_HOLD"] = _G.GetFactionInfoByID(946),
+	["THRALLMAR"] = _G.GetFactionInfoByID(947),
+	["THE_VIOLET_EYE"] = _G.GetFactionInfoByID(967),
+	["SPOREGGAR"] = _G.GetFactionInfoByID(970),
+	["KURENAI"] = _G.GetFactionInfoByID(978),
+	["KEEPERS_OF_TIME"] = _G.GetFactionInfoByID(989),
+	["THE_SCALE_OF_THE_SANDS"] = _G.GetFactionInfoByID(990),
+	["LOWER_CITY"] = _G.GetFactionInfoByID(1011),
+	["ASHTONGUE_DEATHSWORN"] = _G.GetFactionInfoByID(1012),
+	["ALLIANCE_VANGUARD"] = _G.GetFactionInfoByID(1037),
+	["VALIANCE_EXPEDITION"] = _G.GetFactionInfoByID(1050),
+	["HORDE_EXPEDITION"] = _G.GetFactionInfoByID(1052),
+	["THE_TAUNKA"] = _G.GetFactionInfoByID(1064),
+	["THE_HAND_OF_VENGEANCE"] = _G.GetFactionInfoByID(1067),
+	["EXPLORERS_LEAGUE"] = _G.GetFactionInfoByID(1068),
+	["THE_KALUAK"] = _G.GetFactionInfoByID(1073),
+	["SHATTERED_SUN_OFFENSIVE"] = _G.GetFactionInfoByID(1077),
+	["WARSONG_OFFENSIVE"] = _G.GetFactionInfoByID(1085),
+	["KIRIN_TOR"] = _G.GetFactionInfoByID(1090),
+	["THE_WYRMREST_ACCORD"] = _G.GetFactionInfoByID(1091),
+	["THE_SILVER_COVENANT"] = _G.GetFactionInfoByID(1094),
+	["KNIGHTS_OF_THE_EBON_BLADE"] = _G.GetFactionInfoByID(1098),
+	["FRENZYHEART_TRIBE"] = _G.GetFactionInfoByID(1104),
+	["THE_ORACLES"] = _G.GetFactionInfoByID(1105),
+	["ARGENT_CRUSADE"] = _G.GetFactionInfoByID(1106),
+	["THE_SONS_OF_HODIR"] = _G.GetFactionInfoByID(1119),
+	["THE_SUNREAVERS"] = _G.GetFactionInfoByID(1124),
+	["THE_EARTHEN_RING"] = _G.GetFactionInfoByID(1135),
+	["TRANQUILLIEN_CONVERSION"] = _G.GetFactionInfoByID(1136),
+	["THE_ASHEN_VERDICT"] = _G.GetFactionInfoByID(1156),
+	["GUARDIANS_OF_HYJAL"] = _G.GetFactionInfoByID(1158),
+	["THERAZANE"] = _G.GetFactionInfoByID(1171),
+	["DRAGONMAW_CLAN"] = _G.GetFactionInfoByID(1172),
+	["RAMKAHEN"] = _G.GetFactionInfoByID(1173),
+	["WILDHAMMER_CLAN"] = _G.GetFactionInfoByID(1174),
+	["BARADINS_WARDENS"] = _G.GetFactionInfoByID(1177),
+	["HELLSCREAMS_REACH"] = _G.GetFactionInfoByID(1178),
+	["SHANG_XIS_ACADEMY"] = _G.GetFactionInfoByID(1216),
+	["FOREST_HOZEN"] = _G.GetFactionInfoByID(1228),
+	["PEARLFIN_JINYU"] = _G.GetFactionInfoByID(1242),
+	["GOLDEN_LOTUS"] = _G.GetFactionInfoByID(1269),
+	["SHADO_PAN"] = _G.GetFactionInfoByID(1270),
+	["ORDER_OF_THE_CLOUD_SERPENT"] = _G.GetFactionInfoByID(1271),
+	["THE_TILLERS"] = _G.GetFactionInfoByID(1272),
+	["JOGU_THE_DRUNK"] = _G.GetFactionInfoByID(1273),
+	["ELLA"] = _G.GetFactionInfoByID(1275),
+	["OLD_HILLPAW"] = _G.GetFactionInfoByID(1276),
+	["CHEE_CHEE"] = _G.GetFactionInfoByID(1277),
+	["SHO"] = _G.GetFactionInfoByID(1278),
+	["HAOHAN_MUDCLAW"] = _G.GetFactionInfoByID(1279),
+	["TINA_MUDCLAW"] = _G.GetFactionInfoByID(1280),
+	["GINA_MUDCLAW"] = _G.GetFactionInfoByID(1281),
+	["FISH_FELLREED"] = _G.GetFactionInfoByID(1282),
+	["FARMER_FUNG"] = _G.GetFactionInfoByID(1283),
+	["THE_ANGLERS"] = _G.GetFactionInfoByID(1302),
+	["THE_KLAXXI"] = _G.GetFactionInfoByID(1337),
+	["THE_AUGUST_CELESTIALS"] = _G.GetFactionInfoByID(1341),
+	["THE_LOREWALKERS"] = _G.GetFactionInfoByID(1345),
+	["THE_BREWMASTERS"] = _G.GetFactionInfoByID(1351),
+	["HUOJIN_PANDAREN"] = _G.GetFactionInfoByID(1352),
+	["TUSHUI_PANDAREN"] = _G.GetFactionInfoByID(1353),
+	["NAT_PAGLE"] = _G.GetFactionInfoByID(1358),
+	["THE_BLACK_PRINCE"] = _G.GetFactionInfoByID(1359),
+}
+]]--
 private.FACTION_IDS = {}
 
 for id, name in pairs(private.FACTION_STRINGS) do

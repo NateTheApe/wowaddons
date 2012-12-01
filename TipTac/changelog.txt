@@ -1,3 +1,9 @@
+TipTac Changes | 2012 Oct 30
+----------------------------
+- Added proper support for battle pet tooltips, such as pet type, as well as their actual combat level instead of critter level.
+- Layout profiles are now consistent with the formatting of their classification.
+- Fixed a very rare error that could occur if both classification and level would be undefined.
+
 TipTac Changes | 2012 Sep 29
 ----------------------------
 - Fixed a Lua error that could occur, if another addon used TipTac's AddModifiedTip() function before the saved variables had been loaded.

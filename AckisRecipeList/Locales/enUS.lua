@@ -6,7 +6,7 @@ enUS localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.1
+Project version: 2.4.2
 ************************************************************************
 Translation credits: http://www.wowace.com/addons/arl/localization/translators/
 
@@ -142,6 +142,7 @@ L["Awan Iceborn"] = true
 L["Awilo Lon'gomba"] = true
 L["Ayla Shadowstorm"] = true
 L["Banalash"] = true
+L["BANANA_INFUSED_RUM"] = "Found in the \"Barrel of Banana Infused Rum\" in Krasarang Wilds."
 L["Barien"] = true
 L["Barim Spilthoof"] = true
 L["Bario Matalli"] = true
@@ -481,6 +482,7 @@ L["Flask"] = true
 L["Fono"] = true
 L["FONT_SIZE_DESC"] = "Changes the size of the fonts for ARL."
 L["Foreman Marcrid"] = true
+L["FOUR_SENSES_BREW"] = "Contained in \"Tablet of Ren Yun\" found atop Mount Neverest in Kun-Lai-Summit."
 L["Fradd Swiftgear"] = true
 L["Franklin Lloyd"] = true
 L["Fremal Doohickey"] = true
@@ -871,6 +873,7 @@ L["Nahogg"] = true
 L["Naka"] = true
 L["Nakodu"] = true
 L["Namha Moonwater"] = true
+L["Nam Ironpaw"] = true
 L["Nardstrum Copperpinch"] = true
 L["Narj Deepslice"] = true
 L["Narkk"] = true
@@ -1144,6 +1147,7 @@ L["Staff"] = true
 L["Steeg Haskell"] = true
 L["Stephen Ryback"] = true
 L["Stoic Mammoth"] = true
+L["Stonebreaker Ruian"] = true
 L["Stone Guard Mukar"] = true
 L["Stormforged Ambusher"] = true
 L["Stormforged Artificer"] = true

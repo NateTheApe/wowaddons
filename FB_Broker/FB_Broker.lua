@@ -3,6 +3,17 @@ local FL = LibStub:GetLibrary("LibFishing-1.0")
 local LT = LibStub("LibTourist-3.0")
 local Crayon = LibStub("LibCrayon-3.0")
 
+local FBAPI = LibStub("FishingBuddyApi-1.0", true);
+
+-- Temporary, until we're pretty sure everyone has upgraded
+local function RegisterHandlers(...)
+	if (FBAPI) then
+		return FBAPI:RegisterHandlers(...);
+	elseif ( FishingBuddy and FishingBuddy.API ) then
+		return FishingBuddy.API.RegisterHandlers(...);
+	end
+end
+
 local switchSetting = "ClickToSwitch";
 local function MenuInit()
    FishingBuddy.MakeDropDown(FBConstants.CLICKTOSWITCH_ONOFF, switchSetting)
@@ -20,8 +31,8 @@ local function Do_OnClick(self, button)
 			local menu = FB_Broker_Menu
 			if (not menu) then
 				menu = CreateFrame("FRAME", "FB_Broker_Menu", self, "UIDropDownMenuTemplate")
+				UIDropDownMenu_Initialize(menu, MenuInit, "MENU")
 			end
-			UIDropDownMenu_Initialize(menu, MenuInit, "MENU")
 			menu.point = "TOPRIGHT"
 			menu.relativePoint = "CENTER"
 			ToggleDropDownMenu(1, nil, menu, self, 0, 0)
@@ -36,8 +47,6 @@ local dataobj = ldb:NewDataObject("Fishing Broker", {
     tocname = "FB_Broker",
     label = "Skill",
 })
-
-dataobj.lastSkillCheck = nil
 
 local f = CreateFrame("frame")
 f.dataobj = dataobj
@@ -60,30 +69,43 @@ function dataobj:OnTooltipShow()
 end
 
 function dataobj:UpdateSkill()
-    local line = FL:GetFishingSkillLine(1)
-    local needed
-    self.lastSkillCheck, FB_BrokerData.caughtSoFar, needed = FL:GetSkillUpInfo(self.lastSkillCheck)
+	local isfishing = (FishingBuddy and FishingBuddy.AreWeFishing and FishingBuddy.AreWeFishing());
+    local line = FL:GetFishingSkillLine(1, false, isfishing)
+    local caughtSoFar, needed = FL:GetSkillUpInfo()
 	if ( needed ) then
-		line = line.." ("..FB_BrokerData.caughtSoFar.."/~"..needed..")"
+		line = line.." ("..caughtSoFar.."/~"..needed..")"
 	end
 	self.text = line
 	self.label = line
+end
+
+local FishingEvents = {};
+if ( FBConstants ) then
+	FishingEvents[FBConstants.FISHING_ENABLED_EVT] = function()
+		f.dataobj:UpdateSkill()
+	end
+	
+	FishingEvents[FBConstants.FISHING_DISABLED_EVT] = function(started)
+		f.dataobj:UpdateSkill()
+	end
 end
 
 f:SetScript("OnEvent", function(self, event, ...)
 	if ( event == "VARIABLES_LOADED" ) then
 		if ( not FB_BrokerData ) then
 			FB_BrokerData = {};
-			FB_BrokerData.caughtSoFar = 0;
 		end
-		f:RegisterEvent("SKILL_LINES_CHANGED")
-		f:RegisterEvent("ZONE_CHANGED")
-		f:RegisterEvent("ZONE_CHANGED_INDOORS")
-		f:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-		f:RegisterEvent("LOOT_CLOSED")
+		self:RegisterEvent("SKILL_LINES_CHANGED")
+		self:RegisterEvent("CHAT_MSG_SKILL")
+		self:RegisterEvent("ZONE_CHANGED")
+		self:RegisterEvent("ZONE_CHANGED_INDOORS")
+		self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+		self:RegisterEvent("LOOT_CLOSED")
 
-		FL:SetCaughtSoFar(FB_BrokerData.caughtSoFar)
+		if ( FBConstants ) then
+			RegisterHandlers(FishingEvents);
+		end
 	else
-		f.dataobj:UpdateSkill()
+		self.dataobj:UpdateSkill()
 	end
 end)

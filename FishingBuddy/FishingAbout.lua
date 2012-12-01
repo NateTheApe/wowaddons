@@ -5,70 +5,73 @@ local credits = {};
 
 -- Translation help
 credits[FBConstants.ROLE_TRANSLATE_ZHTW] = {
-	["machihchung"] = { "Version 0.9.9e4 (CurseForge)" },
-	["Indra (Eastern.Stories)"] = { "Version 0.9.3", "Version 0.9.3i", "Version 0.9.4", "Version 0.9.4b", "Version 0.9.7d", },
+	["machihchung"] = { "V0.9.9e4" },
+	["Indra (Eastern.Stories)"] = { "v0.9.3", "v0.9.3i", "v0.9.4", "v0.9.4b", "v0.9.7d", },
 	["Whocare"] = { "bahamut, an influential gamer forum in Taiwan 11/24/2007", },
-	["smartdavislin"] = { "Version 1.0.2 (CurseForge)", },
-	["Andyca"] = { "Version 1.0.7a (CurseForge)" },
-	["zhTW"] = { "Version 1.0.9e (CurseForge)", },
+	["smartdavislin"] = { "V1.0.2", },
+	["Andyca"] = { "V1.0.7a" },
+	["zhTW"] = { "V1.0.9e", },
+	["titanium0107"] = { "V1.1e", "V1.2", "V1.2a", "V1.2c", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_ITIT] = {
-	["bER92"] = { "Version 1.0.9f (CurseForge)" },
-	["Impaler"] = { "Version 1.0.9f (CurseForge)" },
+	["bER92"] = { "V1.0.9f" },
+	["Impaler"] = { "V1.0.9f" },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_ZHCN] = {
-	["biAji"] = { "Version 0.9.3d" },
-	["wowuicon"] = { "Version 0.9.9e4 (CurseForge)", "Version 1.0.2 (CurseForge)", },
-	["yahooor"] = { "Version 0.9.9e4 (CurseForge)" },
-	["foxdodo"] = { "Version 1.0.2 (CurseForge)" },
-	["dh0000"] = { "Version 1.0.7a (CurseForge)", "Version 1.0.7e (CurseForge)", "Version 1.0.7h (CurseForge)", },
+	["biAji"] = { "v0.9.3d" },
+	["wowuicon"] = { "V0.9.9e4", "V1.0.2", },
+	["yahooor"] = { "V0.9.9e4" },
+	["foxdodo"] = { "V1.0.2" },
+	["dh0000"] = { "V1.0.7a", "V1.0.7e", "V1.0.7h", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_DEDE] = {
-	["Leidbringer"] = { "Version 0.9.7d", },
-	["Chinkuwaila"] = { "Version 0.8.9", },
-	["blackrat"] = { "Version 0.8.1d", },
-	["RustyXXL"] = { "Version 1.0.4 (CurseForge)", },
-	["Ithilrandir"] = { "Version 1.0.5 (CurseForge)", },
-	["DirtyHarryGermany"] = { "Version 1.0.7h (CurseForge)", "Version 1.0.9e (CurseForge)", },
-	["Freydis88"] = { "Version 1.0.9e (CurseForge)", },
-	["Frontiii"] = { "Version 1.0.9e (CurseForge)", },
+	["Leidbringer"] = { "v0.9.7d", },
+	["Chinkuwaila"] = { "v0.8.9", },
+	["blackrat"] = { "v0.8.1d", },
+	["RustyXXL"] = { "V1.0.4", },
+	["Ithilrandir"] = { "V1.0.5", },
+	["DirtyHarryGermany"] = { "V1.0.7h", "V1.0.9e", "V1.1e", "V1.2a", "V1.2c", },
+	["Freydis88"] = { "V1.0.9e", },
+	["Frontiii"] = { "V1.0.9e", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_FRFR] = {
-	["krogh"] = { "Version  0.8.7", },
-	["Corwin Whitehorn"] = { "Version  0.8.5", },
-	["PierrotIV"] = { "Version 1.0.9e (CurseForge)", },
-	["boidan01"] = { "Version 1.0.9e (CurseForge)", },
+	["krogh"] = { "v0.8.7", },
+	["Corwin Whitehorn"] = { "v0.8.5", },
+	["PierrotIV"] = { "V1.0.9e", },
+	["boidan01"] = { "V1.0.9e", },
+	["Matisk"] = { "V1.2a", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_ESES] = {
-	["Fili"] = { "Version 0.8.6b", "Version  0.9.7d", },
-	["Valdesca"] = { "Version 0.9.9e6", },
-	["Winderfind Drakkari"] = { "Version 1.0.7a" },
-	["jmaister"] = { "Version 1.0.9e (CurseForge)", },
+	["Fili"] = { "v0.8.6b", "v0.9.7d", },
+	["Valdesca"] = { "v0.9.9e6", },
+	["Winderfind Drakkari"] = { "v1.0.7a" },
+	["jmaister"] = { "V1.0.9e", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_KOKR] = {
-	["maknae"] = { "Version 0.9.9e4 (CurseForge)" },
-	["post"] = { "Version 0.9.9e4 (CurseForge)" },
-	["seashop"] = { "Version 1.0.2 (Curseforge)" },
+	["maknae"] = { "V0.9.9e4" },
+	["post"] = { "V0.9.9e4" },
+	["seashop"] = { "V1.0.2" },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_RURU] = {
-	["StingerSoft"] = { "Version 0.9.8l", "Version 0.9.9e4 (CurseForge)" },
-	["hellquister"] = { "Version 0.9.9e4 (CurseForge)" },
-	["D_Angel"] = { "Version 0.9.9e4 (CurseForge)", "Version 1.0.2 (CurseForge)" },
-	["AlenaM"] = { "Version 1.0 (CurseForge)" },
-	["KVVV"] = { "Version 1.0 (CurseForge)" },
-	["frodo10"] = { "Version 1.0 (CurseForge)" },
-	["Ant1dotE"] = { "Version 1.0.1 (CurseForge)", "Version 1.0.2 (CurseForge)", "Version 1.0.4 (CurseForge)" },
+	["StingerSoft"] = { "v0.9.8l", "V0.9.9e4" },
+	["hellquister"] = { "V0.9.9e4" },
+	["D_Angel"] = { "V0.9.9e4", "V1.0.2", "V1.1c" },
+	["AlenaM"] = { "V1.0" },
+	["KVVV"] = { "V1.0" },
+	["frodo10"] = { "V1.0" },
+	["DVK"] = { "V1.1f" },
+	["Ant1dotE"] = { "V1.0.1", "V1.0.2", "V1.0.4" },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_PTBR] = {
-	["nomadbr"] = { "Version 1.0.7a (CurseForge)" },
+	["nomadbr"] = { "V1.0.7a" },
 };
 
 -- Testers/bug fixers
@@ -147,17 +150,7 @@ credits[FBConstants.ROLE_ADDON_AUTHORS] = {
 	["KarlKFI"] = { "MobileMinimapButtons" },
 };
 
-FishingBuddy.About = {};
-
-local AboutOptions = {
-	["AboutFrame"] = {
-		["button"] = "FishingAboutFrame",
-		["setup"] =
-			function()
-				FishingAboutFrame:SetAllPoints();
-			end,
-	},
-};
+local CREDITSKIP = 7;
 
 local function UpdateCreditPanel(self, elapsed)
 	if ( not self.started ) then
@@ -165,7 +158,7 @@ local function UpdateCreditPanel(self, elapsed)
 		self.fadestate = 5;
 		self.fadevalue = 0;
 		self.whatidx = 1;
-		self.currenttime = 0.1 + elapsed + math.random()*2.0;
+		self.currenttime = math.random()*2.5 + elapsed + 0.5;
 	end
 	self.currenttime = self.currenttime - elapsed;
 	if (self.currenttime > 0) then
@@ -177,7 +170,15 @@ local function UpdateCreditPanel(self, elapsed)
 		self.data = self.credits[self.idx]
 		self.lines[1]:SetText(self.categories[self.data.title])
 		self.lines[2]:SetText(self.data.who)
-		self.lines[3]:SetText(self.data.what[self.whatidx])
+		
+		local what = self.data.what[self.whatidx];
+		if (string.sub(what,1,1) == "v") then
+			what = "Version "..string.sub(what,2);
+		elseif (string.sub(what,1,1) == "V") then
+			what = "Version "..string.sub(what,2).." (CurseForge)";
+		end
+
+		self.lines[3]:SetText(what)
 		self:SetHeight(self.lines[1]:GetHeight()*4)
 		self:SetPoint("TOP", self.parent.Thanks, "BOTTOM", 0, -(self.offset-1)*self:GetHeight()-self.lines[1]:GetHeight());
 		-- Fade in everything
@@ -189,7 +190,7 @@ local function UpdateCreditPanel(self, elapsed)
 			self.currenttime = 0.1
 		else
 			self.fadestate = 1
-			self.currenttime = 5.0
+			self.currenttime = 5.0 + math.random()*1.0;
 			self.fadevalue = 1.0
 		end
 	elseif (self.fadestate == 1) then
@@ -199,9 +200,9 @@ local function UpdateCreditPanel(self, elapsed)
 		if ( self.data.what[self.whatidx] ) then
 			self.fadestate = 2
 		else
-			self.idx = self.idx + 5
+			self.idx = self.idx + CREDITSKIP
 			if ( self.idx > #self.credits ) then
-				self.idx = self.idx % 5
+				self.idx = self.idx % CREDITSKIP
 			end
 			if ( self.idx == 0 ) then
 				self.idx = 1
@@ -217,7 +218,6 @@ local function UpdateCreditPanel(self, elapsed)
 			self.currenttime = 0.1
 		else
 			self.fadestate = 3
-			self.currenttime = 2.5
 			self.fadevalue = 0.0
 		end
 	elseif (self.fadestate == 3) then
@@ -229,7 +229,7 @@ local function UpdateCreditPanel(self, elapsed)
 			self.currenttime = 0.1
 		else
 			self.fadestate = 1
-			self.currenttime = 5.0
+			self.currenttime = 5.0 + math.random()*1.0;
 			self.fadevalue = 1.0
 		end
 	elseif (self.fadestate == 4) then
@@ -242,14 +242,15 @@ local function UpdateCreditPanel(self, elapsed)
 			self.currenttime = 0.1
 		else
 			self.fadestate = 5
-			self.currenttime = 2.5
 			self.fadevalue = 0.0
 		end
 	elseif (self.fadestate == 5) then
 		-- Pause after fading out
 		self.fadestate = 0
-		self.currenttime = 2.5 - math.random()*0.5;
+		self.currenttime = math.random()*0.15;
 	end
+	-- all the reset times are offset
+	self.currenttime = self.currenttime + elapsed;
 end
 
 local function MakeCreditPanel(parent, alignment, offset)
@@ -276,55 +277,67 @@ local function MakeCreditPanel(parent, alignment, offset)
 	return panel
 end
 
-local function OnEvent(self, event)
-	self.Author = self:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	self.Author:SetPoint("TOP", self, "TOP", -4, 0)
-	self.Author:SetPoint("LEFT", self, "LEFT", 0, 0)
-	self.Author:SetPoint("RIGHT", self, "RIGHT", -48, 0)
-	self.Author:SetText(FBConstants.AUTHOR)
-	self.Author:Show()
+local function AboutSetup(self)
+	if (not self.Author) then
+		self.Author = self:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		self.Author:SetPoint("TOP", self, "TOP", -4, 0)
+		self.Author:SetPoint("LEFT", self, "LEFT", 0, 0)
+		self.Author:SetPoint("RIGHT", self, "RIGHT", -48, 0)
+		self.Author:SetText(FBConstants.AUTHOR)
+		self.Author:Show()
+		
+		self.Copyright = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+		self.Copyright:SetPoint("TOP", self.Author, "BOTTOM", 0, -10)
+		self.Copyright:SetPoint("LEFT", self, "LEFT", 0, 0)
+		self.Copyright:SetPoint("RIGHT", self, "RIGHT", -48, 0)
+		self.Copyright:SetJustifyH("CENTER")
+		self.Copyright:SetText(FBConstants.COPYRIGHT)
+		self.Copyright:Show()
 	
-	self.Copyright = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	self.Copyright:SetPoint("TOP", self.Author, "BOTTOM", 0, -10)
-	self.Copyright:SetPoint("LEFT", self, "LEFT", 0, 0)
-	self.Copyright:SetPoint("RIGHT", self, "RIGHT", -48, 0)
-	self.Copyright:SetJustifyH("CENTER")
-	self.Copyright:SetText(FBConstants.COPYRIGHT)
-	self.Copyright:Show()
-
-	self.Thanks = self:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-	self.Thanks:SetPoint("TOP", self.Copyright, "BOTTOM", 0, -10)
-	self.Thanks:SetPoint("LEFT", self, "LEFT", 0, 0)
-	self.Thanks:SetPoint("RIGHT", self, "RIGHT", -48, 0)
-	self.Thanks:SetJustifyH("CENTER")
-	self.Thanks:SetText(FBConstants.THANKS)
-	self.Thanks:Show()
-	self.Thanks.idx = -1;
-
-	self.categories = {}
-	for what,_ in pairs(credits) do
-		tinsert(self.categories, what)
-	end
-	self.credits = {}
-	for idx,shownext in ipairs(self.categories) do
-		for who,what in pairs(credits[shownext]) do
-			tinsert(self.credits, { title=idx, who=who, what=what, sort=math.random() })
+		self.Thanks = self:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+		self.Thanks:SetPoint("TOP", self.Copyright, "BOTTOM", 0, -10)
+		self.Thanks:SetPoint("LEFT", self, "LEFT", 0, 0)
+		self.Thanks:SetPoint("RIGHT", self, "RIGHT", -48, 0)
+		self.Thanks:SetJustifyH("CENTER")
+		self.Thanks:SetText(FBConstants.THANKS)
+		self.Thanks:Show()
+		self.Thanks.idx = -1;
+	
+		self.categories = {}
+		for what,_ in pairs(credits) do
+			tinsert(self.categories, what)
 		end
-	end
-
-	self.Panels = {};
-	for idx=1,5 do
-		local panel = MakeCreditPanel(self, self.Thanks, idx)
-		panel.idx = idx
-		panel.credits = self.credits
-		panel.categories = self.categories
-		tinsert(self.Panels, panel)
-	end
+		self.credits = {}
+		for idx,shownext in ipairs(self.categories) do
+			for who,what in pairs(credits[shownext]) do
+				tinsert(self.credits, { title=idx, who=who, what=what, sort=math.random() })
+			end
+		end
 	
-	-- Dump the storage, now that we have a better table
-	credits = nil;
-	table.sort(self.credits, function (a, b) return a.sort < b.sort; end)
+		self.Panels = {};
+		for idx=1,5 do
+			local panel = MakeCreditPanel(self, self.Thanks, idx)
+			panel.idx = idx
+			panel.credits = self.credits
+			panel.categories = self.categories
+			tinsert(self.Panels, panel)
+		end
+		
+		-- Dump the storage, now that we have a better table
+		credits = nil;
+		table.sort(self.credits, function (a, b) return a.sort < b.sort; end)
+	end
+	FishingAboutFrame:SetAllPoints();
+end
 
+local AboutOptions = {
+	["AboutFrame"] = {
+		["button"] = "FishingAboutFrame",
+		["setup"] = AboutSetup,
+	},
+};
+
+local function OnEvent(self, event)
 	FishingBuddy.OptionsFrame.HandleOptions(FBConstants.ABOUT_TAB, "Interface\\Icons\\Inv_Misc_Questionmark", AboutOptions, nil, nil, true);
 	self:UnregisterEvent("VARIABLES_LOADED");
 end

@@ -20,12 +20,12 @@ RingKeeper:SetRing("DruidUtility", {
 });
 RingKeeper:SetRing("DruidFeral", {
 	{c="fe1200", id=50334, ux="k"}, -- berserk
-	{c="fe9094", id="/cast [noform:3] {{spell:5229}}; [noform:1] {{spell:5217}}", ux="e"}, -- enrage / tiger's fury
+	{c="FF6A4D", id="/cast [noform:1] {{spell:5217}}; {{spell:5229/22842}}", ux="e"}, -- enrage/frenzied / tiger's fury
 	{c="fe650b", id="/cast [form:1] {{spell:77761}}; {{spell:77764}}", ux="r"}, -- stampeding roar
 	{c="fec200", id=106839, ux="s"}, -- skull bash
 	{c="fe7b00", id=22812, ux="b"}, -- barkskin
 	{c="7300fe", id=61336, ux="i"}, -- survival instincts
-	{c="d0170a", id=22842, us="f"}, -- frenzied regen
+	{c="d0170a", id=22842, us="f", skipSpecs=" 103 102 105 DRUID "}, -- frenzied regen
 	{c="fe8644", id=102401, ux="c"}, -- feral charge
 	{c="66CCFF", id="/cast [nomod,@player][mod,@none] {{spell:5185}}", skipSpecs=" 102 104 105 DRUID ", ux="h"}, -- HT
 	name="Feral", hotkey="[form:1/3] SECONDARY; ALT-SECONDARY", limit="DRUID", ux="OPCDF"
@@ -86,6 +86,7 @@ RingKeeper:SetRing("MageArmor", {
 do -- MageTravel
 	local m = "/cast [mod] {{spell:%s}}; {{spell:%s}}";
 	RingKeeper:SetRing("MageTravel", {
+		{c="77e0c4", id=m:format("132620/132626", "132621/132627"), ux="v"}, -- Vale of Eternal Blossoms
 		{c="64bbce", id=m:format(53142, 53140), ux="r"}, -- Dalaran
 		{c="77e0c4", id=m:format("35717/33691", 33690), ux="s"}, -- Shattrath
 		{c="8cb73d", id=m:format(10059, 3561), ux="w"}, -- Stormwind
@@ -98,6 +99,7 @@ do -- MageTravel
 		{c="72721e", id=m:format(49361, 49358), ux="n"}, -- Stonard
 		{c="7cc6f9", id=m:format(32267, 32272), ux="l"}, -- Silvermoon
 		{c="e89bd1", id=m:format(32266, 32271), ux="x"}, -- Exodar
+		{c="64bbce", id=m:format(120146, 120145), ux="a"}, -- Ancient Dalaran
 		{c="c33716", id=m:format("88346/88345", "88344/88342"), ux="b"}, -- Tol Barad
 	  name="Portals and Teleports", hotkey="ALT-G", limit="MAGE", ux="OPCMP"
 	});
@@ -184,6 +186,19 @@ RingKeeper:SetRing("DKCombat", {
 	{c="aef1ff", id=51271, ux="p"}, -- pillar of frost
 	{c="d0d0d0", id=49039, ux="l"}, -- lich
 	name="Combat", hotkey="SECONDARY", limit="DEATHKNIGHT", ux="OPCDC"
+});
+
+RingKeeper:SetRing("ChalPaths", {
+	{id=131204, c="0cff8d", ux="j"},
+	{id=131205, c="d99d44", ux="br"},
+	{id=131206, c="ffde00", ux="sp"},
+	{id=131222, c="CC6729", ux="mk"},
+	{id=131225, c="8d6bff", ux="ss"},
+	{id=131231, c="ff4c20", ux="cb"},
+	{id=131229, c="b7d9ff", ux="sm"},
+	{id=131232, c="0090ff", ux="n"},
+	{id=131228, c="D4E2FF", ux="b"},
+	name="Challenger's Paths", ux="OPCCGP"
 });
 
 RingKeeper:SetRing("CommonTrades", {

@@ -301,3 +301,33 @@ do -- worldmarker
 	map[rmap[6]] = 6
 	AB:register("worldmark", function(id) return rmap[id] end, function(id) return "Raid World Marker", id == 6 and REMOVE_WORLD_MARKERS or _G["WORLD_MARKER" .. id], icons[id] end)
 end
+do -- opie.databroker.launcher
+	local nameMap, LDB = {}
+	local function checkLDB()
+		LDB = LibStub and LibStub:GetLibrary("LibDataBroker-1.1", 1)
+	end
+	local function call(obj, btn)
+		obj:OnClick(btn)
+	end
+	local function describe(name)
+		local obj = (LDB or checkLDB() or LDB) and LDB:GetDataObjectByName(name);
+		return "Launcher", obj and obj.label or name, obj and obj.icon or "Interface/Icons/INV_Misc_QuestionMark", obj
+	end
+	local function hint(id)
+		local obj = nameMap[id]
+		if not obj then return end
+		return true, 0, obj.icon, obj.label or obj.text or name, 0,0,0, obj.OnTooltipShow, nil, obj
+	end
+	local function create(name, rightClick)
+		if type(name) ~= "string" or not (LDB or checkLDB() or LDB) then return end
+		local pname = name .. "#" .. (rightClick and "R" or "L") 
+		if not nameMap[pname] then
+			local obj = LDB:GetDataObjectByName(name)
+			if not obj then return end
+			nameMap[pname] = AB:create("func", hint, call, obj, rightClick and "RightButton" or "LeftButton")
+			nameMap[nameMap[pname]] = obj
+		end
+		return nameMap[pname]
+	end
+	AB:register("opie.databroker.launcher", create, describe, {"clickUsingRightButton"})
+end

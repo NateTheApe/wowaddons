@@ -131,6 +131,7 @@ local OPC_OptionSets = {
 		{"bool", "ClickActivation", caption="Activate on left click"},
 		{"bool", "ClickPriority", caption="Make rings top-most", depOn="ClickActivation", depValue=true, otherwise=false},
 		{"bool", "NoClose", caption="Leave open after use", depOn="ClickActivation", depValue=true, otherwise=false},
+		{"bool", "UseDefaultBindings", caption="Use default ring bindings"},
 		{"range", "MouseBucket", caption="Scroll wheel sensitivity", 5, 1, 1, stdLabels=true},
 		{"range", "RingScale", caption="Ring Scale", suffix=" |cffffd500(%0.1f)|r", 0.1, 2},
 	}, { "Appearance",
@@ -226,7 +227,7 @@ function OPC_AlterOption(widget, option, newval, ...)
 	end
 	for i,set in ipairs(OPC_OptionSets) do for j=2,#set do local v = set[j]
 		if v.depOn == option or v.depOn2 == option then
-			local match = OneRingLib:GetOption(v.depOn) == v.depValue and (v.depOn2 == nil or OneRingLib:GetOption(v.depOn2) == v.depValue2);
+			local match = OneRingLib:GetOption(v.depOn, OR_CurrentOptionsDomain) == v.depValue and (v.depOn2 == nil or OneRingLib:GetOption(v.depOn2, OR_CurrentOptionsDomain) == v.depValue2);
 			v.widget[match and "Enable" or "Disable"](v.widget);
 			if match then
 				v.widget:SetChecked(OneRingLib:GetOption(v[2], OR_CurrentOptionsDomain) or nil);
@@ -316,16 +317,14 @@ function frame.refresh()
 			v.widget.text:SetText(L(v.caption))
 		end
 		if v.depOn then
-			local match = OneRingLib:GetOption(v.depOn) == v.depValue and (v.depOn2 == nil or OneRingLib:GetOption(v.depOn2) == v.depValue2);
-			v.widget[match and "Enable" or "Disable"](v.widget);
+			local match = OneRingLib:GetOption(v.depOn, OR_CurrentOptionsDomain) == v.depValue and (v.depOn2 == nil or OneRingLib:GetOption(v.depOn2, OR_CurrentOptionsDomain) == v.depValue2);
+			v.widget[match and "Enable" or "Disable"](v.widget)
 			if not match then v.widget:SetChecked(v.otherwise or nil); end
 		end
-		if v.global then
-			v.widget[OR_CurrentOptionsDomain == nil and "Show" or "Hide"](v.widget);
-		end
+		v.widget:SetShown(not v.global or OR_CurrentOptionsDomain == nil)
 		if v.req then
 			local ok, res = pcall(v.req)
-			v.widget[ok and res and "Show" or "Hide"](v.widget);
+			v.widget:SetShown(ok and res)
 		end
 	end end
 	OPC_BlockInput = false;
@@ -333,6 +332,7 @@ end
 function frame.cancel()
 	table.wipe(OR_DeletedProfiles);
 	config.unwindUndo();
+	OR_CurrentOptionsDomain = nil
 end
 function frame.default()
 	OneRingLib:ResetOptions(true);
@@ -344,6 +344,7 @@ function frame.okay()
 		OR_DeletedProfiles[k] = nil;
 		OneRingLib:DeleteProfile(k);
 	end
+	OR_CurrentOptionsDomain = nil
 end
 
 local slashExtensions = {}

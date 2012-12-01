@@ -2,10 +2,10 @@
 ************************************************************************
 Enchanting.lua
 ************************************************************************
-File date: 2012-09-23T13:12:47Z
-File hash: 2cd65f8
-Project hash: 9e1f108
-Project version: 2.4.1
+File date: 2012-09-29T06:51:21Z
+File hash: dfbd91e
+Project hash: 5a95034
+Project version: 2.4.2
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -2527,6 +2527,7 @@ function addon:InitEnchanting()
 	recipe = AddRecipe(103461, V.MOP, Q.COMMON)
 	recipe:SetSkillLevels(550, 550, 560, 565, 570)
 	recipe:SetItemFilterType("ENCHANTING_RING")
+	recipe:SetPreviousRankID(74216)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOP, F.RBOP)
 	recipe:AddTrainer(1317, 3011, 3345, 3606, 4213, 4616, 5157, 16633, 16725, 18773, 19251, 19252, 19540, 26906, 26990, 28693, 33583, 33610, 33633, 65127)
 
@@ -2534,6 +2535,7 @@ function addon:InitEnchanting()
 	recipe = AddRecipe(103462, V.MOP, Q.COMMON)
 	recipe:SetSkillLevels(550, 550, 560, 565, 570)
 	recipe:SetItemFilterType("ENCHANTING_RING")
+	recipe:SetPreviousRankID(74217)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOP, F.RBOP)
 	recipe:AddTrainer(1317, 3011, 3345, 3606, 4213, 4616, 5157, 16633, 16725, 18773, 19251, 19252, 19540, 26906, 26990, 28693, 33583, 33610, 33633, 65127)
 
@@ -2541,6 +2543,7 @@ function addon:InitEnchanting()
 	recipe = AddRecipe(103463, V.MOP, Q.COMMON)
 	recipe:SetSkillLevels(550, 550, 560, 565, 570)
 	recipe:SetItemFilterType("ENCHANTING_RING")
+	recipe:SetPreviousRankID(74218)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOP, F.RBOP)
 	recipe:AddTrainer(1317, 3011, 3345, 3606, 4213, 4616, 5157, 16633, 16725, 18773, 19251, 19252, 19540, 26906, 26990, 28693, 33583, 33610, 33633, 65127)
 
@@ -2548,6 +2551,7 @@ function addon:InitEnchanting()
 	recipe = AddRecipe(103465, V.MOP, Q.COMMON)
 	recipe:SetSkillLevels(550, 550, 560, 565, 570)
 	recipe:SetItemFilterType("ENCHANTING_RING")
+	recipe:SetPreviousRankID(74215)
 	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.TRAINER, F.IBOP, F.RBOP)
 	recipe:AddTrainer(1317, 3011, 3345, 3606, 4213, 4616, 5157, 16633, 16725, 18773, 19251, 19252, 19540, 26906, 26990, 28693, 33583, 33610, 33633, 65127)
 

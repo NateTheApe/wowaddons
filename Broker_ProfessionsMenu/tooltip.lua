@@ -20,10 +20,8 @@ function me:GetTipAnchor2(frame)
 end
 --Main Tooltip
 function me:tooltip(tooltip)
-	tooltip:AddLine("Broker ProfessionsMenu")
+	tooltip:AddLine(me.L["professions"])
 	if (me:tcount({GetProfessions()})>0 and me.save[my].config.tooltip.showskills) then
-		tooltip:AddLine(" ")
-		tooltip:AddLine(me.L["professions"])
 		for _,index in pairs({GetProfessions()}) do
 			if index then
 				local name, texture, rank, maxRank, numSpells, spelloffset, skillLine = GetProfessionInfo(index)
@@ -42,84 +40,49 @@ function me:tooltip(tooltip)
 	if (me.save[my].config.tooltip.showcds == true) then
 		local jj = nil
 		local duration = 0
-		if me.save[my].config.bothfactions or UnitFactionGroup("player")=="Alliance" then
-			jj = nil
-			tooltip:AddLine(" ")
-			tooltip:AddLine(me.L["cds"].." ("..FACTION_ALLIANCE..")")
-			if UnitFactionGroup("player")=="Alliance" then
-				for k,v in me:pairsByKeys(me.save[my].cds) do
-					duration = difftime(v,time())
-					if duration>0 then
-						jj=true
-						tooltip:AddDoubleLine("|cff00ff00"..k.."|r",SecondsToTime(duration),1,1,1,1,0,0)
-					end
-				end
-			end
-			for k,v in me:pairsByKeys(me.save) do
-				if k~=my and v.faction=="Alliance" and v.cds~=nil then
-					for kk,vv in me:pairsByKeys(v.cds) do
-						duration = difftime(vv,time())
-						if duration>0 then
-							jj=true
-							tooltip:AddDoubleLine("["..k.."] "..kk,SecondsToTime(duration),1,1,1,1,0,0)
-						end
-					end
-				end
-			end
-			if not jj then
-				tooltip:AddLine(me.L["nocds"],0,1,0)
+		jj = nil
+		tooltip:AddLine(" ")
+		tooltip:AddLine(me.L["cds"])
+		for k,v in me:pairsByKeys(me.save[my].cds) do
+			duration = difftime(v,time())
+			if duration>0 then
+				jj=true
+				tooltip:AddDoubleLine("|cff00ff00"..k.."|r",SecondsToTime(duration),1,1,1,1,0,0)
 			end
 		end
-		--
-		if me.save[my].config.bothfactions or UnitFactionGroup("player")=="Horde" then
-			jj = nil
-			tooltip:AddLine(" ")
-			tooltip:AddLine(me.L["cds"].." ("..FACTION_HORDE..")")
-			if UnitFactionGroup("player")=="Horde" then
-				for k,v in me:pairsByKeys(me.save[my].cds) do
-					duration = difftime(v,time())
+		for k,v in me:pairsByKeys(me.save) do
+			if k~=my and v.cds~=nil and (me.save[my].config.bothfactions or v.faction==UnitFactionGroup("player")) then
+				for kk,vv in me:pairsByKeys(v.cds) do
+					duration = difftime(vv,time())
 					if duration>0 then
 						jj=true
-						tooltip:AddDoubleLine("|cff00ff00"..k.."|r",SecondsToTime(duration),1,1,1,1,0,0)
+						tooltip:AddDoubleLine("["..k.."] "..kk,SecondsToTime(duration),1,1,1,1,0,0)
 					end
 				end
-			end
-			for k,v in me:pairsByKeys(me.save) do
-				if k~=UnitName("player") and v.faction=="Horde" and v.cds~=nil then
-					for kk,vv in me:pairsByKeys(v.cds) do
-						duration = difftime(vv,time())
-						if duration>0 then
-							jj=true
-							tooltip:AddDoubleLine("["..k.."] "..kk,SecondsToTime(duration),1,1,1,1,0,0)
-						end
-					end
-				end
-			end
-			if not jj then
-				tooltip:AddLine(me.L["nocds"],0,1,0)
 			end
 		end
-		--
+		if not jj then tooltip:AddLine(me.L["nocds"],0,1,0) end
 	end
 	--Infos
 	if (me.save[my].config.tooltip.showbuttons == true) then
 		tooltip:AddLine(" ")
-		local button
-		if me.save[my].config.exchangeleftright then button="rightclick" else button="leftclick" end
-		if me.save[my].quicklaunch.left~=0 then
-			tooltip:AddDoubleLine(me.L[button],"|cffffffff"..GetSpellInfo(me.save[my].quicklaunch.left).."|r")
+		for _,key in pairs(me.keys) do
+			local text
+			local id = me.save[my].quicklaunch[key.Key]
+			if (id==-1 and me.save[my].lastprofession>0) then
+				text = "*"..GetSpellInfo(me.save[my].lastprofession).."*"
+			elseif (id=='menu') then
+				text = me.L["openmenu"]
+			elseif (id=='fav') then
+				text = me.L["favorites"]
+			elseif (id>0) then
+				text = GetSpellInfo(id)
+			end
+			if (text and key.Mod) then
+				tooltip:AddDoubleLine(key.Mod..' + '..key.Button, "|cffffffff"..text.."|r")
+			elseif (text) then
+				tooltip:AddDoubleLine(key.Button, "|cffffffff"..text.."|r")
+			end
 		end
-		if me.save[my].quicklaunch.shiftleft~=0 then
-			tooltip:AddDoubleLine(me.L["shift"].." + "..me.L[button],"|cffffffff"..GetSpellInfo(me.save[my].quicklaunch.shiftleft).."|r")
-		end
-		if me.save[my].quicklaunch.ctrlleft~=0 then
-			tooltip:AddDoubleLine(me.L["ctrl"].." + "..me.L[button],"|cffffffff"..GetSpellInfo(me.save[my].quicklaunch.ctrlleft).."|r")
-		end
-		if me.save[my].quicklaunch.altleft~=0 then
-			tooltip:AddDoubleLine(me.L["alt"].." + "..me.L[button],"|cffffffff"..GetSpellInfo(me.save[my].quicklaunch.altleft).."|r")
-		end
-		if me.save[my].config.exchangeleftright then button="leftclick" else button="rightclick" end
-		tooltip:AddDoubleLine(me.L[button],"|cffffffff"..me.L["openmenu"].."|r")
-		tooltip:AddDoubleLine(me.L["shift"].." + "..me.L[button],"|cffffffff"..me.L["showfavorites"].."|r")
 	end
 end

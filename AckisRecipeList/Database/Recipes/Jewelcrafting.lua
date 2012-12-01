@@ -2,10 +2,10 @@
 ************************************************************************
 Jewelcrafting.lua
 ************************************************************************
-File date: 2012-09-23T13:12:47Z
-File hash: 2cd65f8
-Project hash: 9e1f108
-Project version: 2.4.1
+File date: 2012-09-26T07:47:40Z
+File hash: 31323df
+Project hash: 5a95034
+Project version: 2.4.2
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -2776,7 +2776,7 @@ function addon:InitJewelcrafting()
 	recipe:SetCraftedItemID(40095)
 	recipe:SetSkillLevels(390, 390, 410, 425, 440)
 	recipe:SetItemFilterType("JEWELCRAFTING_GEM_GREEN")
-	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.WORLD_DROP, F.IBOE, F.RBOE, F.DPS, F.HEALER, F.CASTER, F.REPUTATION)
+	recipe:AddFilters(F.ALLIANCE, F.HORDE, F.WORLD_DROP, F.IBOE, F.RBOE, F.DPS, F.HEALER, F.CASTER, F.REPUTATION, F.ORACLES)
 	recipe:AddWorldDrop(Z.NORTHREND)
 	recipe:AddRepVendor(FAC.ORACLES, REP.REVERED, 31910)
 

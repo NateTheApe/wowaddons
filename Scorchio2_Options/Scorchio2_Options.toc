@@ -1,0 +1,34 @@
+﻿## Interface: 50001
+## X-Curse-Packaged-Version: v1.3.6
+## X-Curse-Project-Name: Scorchio! 2
+## X-Curse-Project-ID: scorchio2
+## X-Curse-Repository-ID: wow/scorchio2/mainline
+
+## Title: Scorchio2 [|cff69cceeOptions|r]
+## Title-frFR: Scorchio2 [|cff69cceeOptions|r]
+## Title-deDE: Scorchio2 [|cff69cceeOptionen|r]
+## Title-koKR: Scorchio2 [|cff69ccee옵션|r]
+## Title-ruRU: Scorchio2 [|cff69cceeНастройки|r]
+## Title-esES: Scorchio2 [|cff69cceeOpciones|r]
+## Title-zhTW: Scorchio2 [|cff69cceeOptions|r]
+## Notes: Load-on-Demand Options for Scorchio2
+## Notes-frFR: Options pour Scorchio2 (chargement à la demande)
+## Notes-ruRU: Загружаемый по требованию аддон для Scorchio2
+## Notes-esES: Cargado-bajo-Demanda Opciones para Scorchio2
+## Notes-zhTW: Scorchio2 選項模組
+## Version: v1.3.6
+## Author: ennui@bloodhoof-eu
+
+## Dependencies: Scorchio2
+## LoadOnDemand: 1
+## X-Child-Of: Scorchio2
+
+#@no-lib-strip@
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConfig-3.0\AceConfig-3.0.xml
+libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+#@end-no-lib-strip@
+
+Localization.lua
+Options.lua
+Database.lua

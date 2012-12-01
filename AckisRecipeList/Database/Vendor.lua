@@ -2,10 +2,10 @@
 ************************************************************************
 Vendor.lua
 ************************************************************************
-File date: 2012-09-22T23:32:57Z
-File hash: 59bbe95
-Project hash: 9e1f108
-Project version: 2.4.1
+File date: 2012-09-26T22:42:33Z
+File hash: 0206677
+Project hash: 5a95034
+Project version: 2.4.2
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -436,6 +436,7 @@ function addon:InitVendor()
 	AddVendor(64084,	L["Jojo"],				Z.SHRINE_OF_SEVEN_STARS,	62.4,	26.6,	"Alliance")
 	AddVendor(64085,	L["Cullen Hammerbrow"],			Z.SHRINE_OF_SEVEN_STARS,	74.4,	51.0,	"Alliance")
 	AddVendor(64094,	L["Tanner Pang"],			Z.SHRINE_OF_SEVEN_STARS,	76.8, 	49.0,	"Alliance")
+	AddVendor(64395,	L["Nam Ironpaw"],			Z.VALLEY_OF_THE_FOUR_WINDS,	53.5,	51.3,	"Neutral")
 	AddVendor(64465,	L["Noodles"],				Z.VALLEY_OF_THE_FOUR_WINDS,	52.4,	51.6,	"Neutral") -- COMPLETELY UPDATED
 	AddVendor(64595,	L["Rushi the Fox"],			Z.TOWNLONG_STEPPES,		48.8,	70.6,	"Neutral")
 	AddVendor(64599,	L["Ambersmith Zikk"],			Z.DREAD_WASTES,			55.0,	35.6,	"Neutral")

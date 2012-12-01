@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -21,7 +21,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -69,11 +69,12 @@ if not T._LoadedFiles or not T._LoadedFiles["enUS.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["zhTW.lua"] = false;
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhTW");
 
 if not L then
-    T._LoadedFiles["zhTW.lua"] = "2.7.2.2";
+    T._LoadedFiles["zhTW.lua"] = "2.7.2.3_beta_3";
     return;
 end;
 
@@ -117,6 +118,9 @@ L["DEBUG_REPORT_HEADER"] = [=[|cFF11FF33請報告此視窗的內容給 Archarodi
 |cFF009999（使用 CTRL+A 選擇所有 CTRL+C 復制文本到剪切板）|r
 如果發現 Decursive 任何奇怪的行為也一并報告。]=]
 L["DECURSIVE_DEBUG_REPORT"] = "**** |cFFFF0000Decursive 除錯報告|r ****"
+L["DECURSIVE_DEBUG_REPORT_BUT_NEW_VERSION"] = [=[|cFF11FF33 Decursive 啟動失敗但請勿擔心! 一個新版本的Decursive已經被偵測到 (%s)。你只需要執行更新。前往curse.com並搜索"Decursive" 或使用Curse Client，此服務會自動更新所有您最愛的UI。|r
+|cFFFF1133 所以請不要浪費你的時間回報此錯誤，因為它也許已被修正。安裝新更新並排除問題! |r
+|cFFFF1133 感謝你閱讀此訊息! |r]=] -- Needs review
 L["DECURSIVE_DEBUG_REPORT_NOTIFY"] = [=[一個出錯報告可用！
 輸入 |cFFFF0000/DCRREPORT|r 查看]=]
 L["DECURSIVE_DEBUG_REPORT_SHOW"] = "除錯報告可用！"
@@ -140,7 +144,7 @@ L["DISABLEWARNING"] = [=[Decursive 已停用！
 如欲啟用, 輸入 |cFFFFAA44/DCR ENABLE|r]=]
 L["DISEASE"] = "疾病"
 L["DONOT_BL_PRIO"] = "不添加優先名單的玩家到排除名單"
-L["DONT_SHOOT_THE_MESSENGER"] = "Decursive is merely reporting the issue. So, don't shoot the messenger and address the actual problem." -- Needs review
+L["DONT_SHOOT_THE_MESSENGER"] = "Decursive僅提供事件報告。問題並非Decursive產生，請尋找真正錯誤來源。" -- Needs review
 L["FAILEDCAST"] = "|cFF22FFFF%s %s|r |cFFAA0000對|r %s釋放失敗\\n|cFF00AAAA%s|r"
 L["FOCUSUNIT"] = "監控單位"
 L["FUBARMENU"] = "Fubar 選單"
@@ -153,7 +157,7 @@ L["GLOR5"] = "他將永遠被我們所銘記。"
 L["HANDLEHELP"] = "拖曳移動所有的 Micro-UnitFrames (MUFs)"
 L["HIDE_LIVELIST"] = "隱藏即時清單"
 L["HIDE_MAIN"] = "隱藏 Decursive 視窗"
-L["HIDESHOW_BUTTONS"] = "顯示/隱藏按鈕"
+L["HIDESHOW_BUTTONS"] = "顯示/隱藏按鈕" -- Needs review
 L["HLP_LEFTCLICK"] = "左-鍵"
 L["HLP_LL_ONCLICK_TEXT"] = [=[實時列表不代表能被點擊。請先閱讀此文檔來學習如何使用此插件。在 WoWAce.com 網站搜索“Decursive”
 （從 Decursive 計時條移除此列表，/dcrshow 命令並左Alt+點擊移除）]=]
@@ -236,22 +240,28 @@ L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "允許巨集編輯（僅限進階使用�
 L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = [=[如果要編輯內部巨集請勾選此項，Decursive 將使用您的自訂法術。
 
 注意：勾選此項將允許你編輯由 Decursive 所管理的法術。
-（--- 僅限進階使用者 ---）]=] -- Needs review
+（--- 僅限進階使用者 ---）]=]
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "傷害類型"
-L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "此法術是 Decursive 自動配置的一部份，如果此法術無法正常運作，移除或禁用此項以回復預設的 Decursive 設定。" -- Needs review
-L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"] = "警告：法術 %q 未出現在巨集中，範圍及冷卻資訊將無法符合。" -- Needs review
+L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "此法術是 Decursive 自動配置的一部份，如果此法術無法正常運作，移除或禁用此項以回復預設的 Decursive 設定。"
+L["OPT_CUSTOM_SPELL_ISPET"] = "寵物能力" -- Needs review
+L["OPT_CUSTOM_SPELL_ISPET_DESC"] = "檢查此技能是否屬於你的寵物，使Decursive能正確偵測並且使用該技能。" -- Needs review
+L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"] = "警告：法術 %q 未出現在巨集中，範圍及冷卻資訊將無法符合。"
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_UNITID_KEYWORD"] = "缺少結合關鍵字。"
 L["OPT_CUSTOM_SPELL_MACRO_TEXT"] = "巨集文字："
 L["OPT_CUSTOM_SPELL_MACRO_TEXT_DESC"] = [=[編輯預設的巨集文字。
 |cFFFF0000有兩項限制：|r
 
-- 必須指定目標使用 UNITED 關鍵字，將自動被每個 MUF 的單位 ID 取代。
+- 必須指定目標使用 UNITID 關鍵字，將自動被每個 MUF 的單位 ID 取代。
 
 - 無論法術在巨集中如何使用， Decursive 將保持顯示左方的原始名稱，以利範圍及冷卻的顯示 / 追蹤。
 （如果你計畫要使用不同的法術名稱的話，請注意這一點）]=] -- Needs review
 L["OPT_CUSTOM_SPELL_MACRO_TOO_LONG"] = "你的巨集過長，需移除 %d 個字元。"
 L["OPT_CUSTOM_SPELL_PRIORITY"] = "法術優先級"
-L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = "當有多個法術可以治療相同類型的傷害，將選擇優先級高的。" -- Needs review
+L["OPT_CUSTOM_SPELL_PRIORITY_DESC"] = [=[當有多個法術可以治療相同類型的傷害，將選擇優先級高的。
+
+注意Decursive預設管理的能力，優先程度設定範圍為0到9。
+
+因此如果你將自行設定之施法能力的優先程度設為負值，此能力只有在預設施法能力無法使用時才會被選用。]=] -- Needs review
 L["OPT_CUSTOMSPELLS"] = "自訂法術"
 L["OPT_CUSTOMSPELLS_DESC"] = [=[這裡添加法術以擴展Decursive的自動配置。
 您的自訂法術總是會有高優先權，並且將蓋過與替代預設的法術(只有在你的角色可以使用這些法術的時候)。]=]
@@ -295,7 +305,7 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "法術 ID 不可用！"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "不能在技能書中找到法術！"
 L["OPTION_MENU"] = "Decursive 選項"
 L["OPT_LIVELIST"] = "即時清單"
-L["OPT_LIVELIST_DESC"] = "即時清單設定選項。"
+L["OPT_LIVELIST_DESC"] = "即時清單設定選項。" -- Needs review
 L["OPT_LLALPHA"] = "實況清單的透明度"
 L["OPT_LLALPHA_DESC"] = "變更 Decursive 工作條及實況清單的透明度(工作條必須設定為顯示)"
 L["OPT_LLSCALE"] = "縮放即時列表"
@@ -340,7 +350,7 @@ L["OPT_NEWVERSIONBUGMENOT_DESC"] = "如果有較新版本的 Decursive 被檢測
 L["OPT_NOKEYWARN"] = "當沒有設定按鍵時警告"
 L["OPT_NOKEYWARN_DESC"] = "當巨集按鍵沒有設定時顯示警告"
 L["OPT_NOSTARTMESSAGES"] = "禁用歡迎訊息"
-L["OPT_NOSTARTMESSAGES_DESC"] = "移除每次登陸時在聊天框體顯示的三個 Decursive 訊息。"
+L["OPT_NOSTARTMESSAGES_DESC"] = "移除每次登入時在聊天框架顯示的兩個 Decursive 訊息。" -- Needs review
 L["OPT_OPTIONS_DISABLED_WHILE_IN_COMBAT"] = "此選項戰鬥中被禁用。"
 L["OPT_PERFOPTIONWARNING"] = "警告：不要更改這些值，除非你確切知道你在做什麼。這些設置可以對遊戲性能影響很大。大多數用戶應當使用0.1和10的默認值。"
 L["OPT_PLAYSOUND_DESC"] = "有玩家中了負面效果時發出音效。"
@@ -434,12 +444,18 @@ L["STR_QUICK_POP"] = "快速添加介面"
 L["SUCCESSCAST"] = "|cFF22FFFF%s %s|r |cFF00AA00成功淨化|r %s"
 L["TARGETUNIT"] = "選取目標"
 L["TIE_LIVELIST"] = "即時清單顯示與 DCR 視窗連結"
+L["TOC_VERSION_EXPIRED"] = [=[你的Decursive版本已經過期。當前魔獸世界版本比你的Decursive版本新。
+你需要更新Decursive以修正潛在的錯誤。
+
+前往curse.com搜索Decursive，或使用Curse's client軟體更新您所有的使用者外掛。
+
+此訊息將每兩天提示一次。]=] -- Needs review
 L["TOOFAR"] = "太遠"
-L["TOO_MANY_ERRORS_ALERT"] = [=[There are too many Lua errors in your User Interface (%d). Your game experience is currently degraded. Disable or update the failing add-ons to turn off this message and regain a proper frame rate.
-You may want to turn on Lua error reporting ('Help' section of World of Warcraft's interface options) to identify the problematic add-ons.]=] -- Needs review
+L["TOO_MANY_ERRORS_ALERT"] = [=[你的UI有太多LUA錯誤 (%d)。你的遊戲體驗正受到影響。關閉或更新產生錯誤的UI以關閉此訊息並重新取得正常的禎數。
+你可開啟LUA錯誤報告來辨別產生錯誤的UI (遊戲選項>介面>協助)。]=] -- Needs review
 L["UNITSTATUS"] = "玩家狀態: "
 L["UNSTABLERELEASE"] = "不穩定釋出版"
 
 
 
-T._LoadedFiles["zhTW.lua"] = "2.7.2.2";
+T._LoadedFiles["zhTW.lua"] = "2.7.2.3_beta_3";

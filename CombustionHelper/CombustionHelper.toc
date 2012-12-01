@@ -1,0 +1,51 @@
+## Interface: 50001
+
+## Author : Angayelle of Nordrassil
+
+## Title: CombustionHelper 3.3
+
+## Notes: An addon for optimized use of the Combustion Talent for mages
+
+## Dependencies:
+
+## SavedVariables: combusettingstable, CombuCautlevelvar, CombuCautscalevar, CombuCautalphavar, CombuCautlockvar, CombuCauthidevar, CombuCautTimevar, CombuCautChatRaidvar, CombuCautChatSayvar, CombuCautChatYellvar, CombuCautAnnouncevar, CombuCautChatAltvar, CombuCautAnnounceAltvar, CombuCautChatAlonevar,CombuCautenablevar, combumbtrackersettingstable
+
+## version: 3.3
+
+Libs\LibStub\LibStub.lua
+
+Libs\LibTransition-1.0\LibTransition-1.0.lua
+
+Libs\LibSharedMedia-3.0\CallbackHandler-1.0\CallbackHandler-1.0.lua
+
+Libs\LibSharedMedia-3.0\lib.xml
+
+Localization.en.lua
+
+Localization.de.lua
+
+Localization.fr.lua
+
+Localization.tw.lua
+
+CombustionHelper.lua
+
+CombustionHelper.xml
+
+Combuoptions.xml
+
+CauterizeCooldown\CauterizeCooldown.lua
+
+CauterizeCooldown\CauterizeCooldown.xml
+
+CauterizeCooldown\CauterizeCooldownOptions.xml
+
+MageBombTracker\MBTLocalization.en.lua
+
+MageBombTracker\MBTLocalization.fr.lua
+
+MageBombTracker\MageBombTracker.lua
+
+MageBombTracker\MageBombTracker.xml
+
+MageBombTracker\MageBombTrackeroptions.xml

@@ -5,11 +5,11 @@ local _, me = ...                                 --Includes all functions and v
 local my = UnitName("player")--player name
 
 --Include Libs
-me.dropdown = LibStub('ArkDewdrop-3.0')			--Dropdownmenu
+me.dropdown = LibStub('LibDewdrop-3.0')			--Dropdownmenu
 
 
 
-function me.dropdown:ShowMenu(level, value)
+function me.dropdown:ShowMenu(level, value, owner)
 	local info = {}
 	if not level then return end
 	--<<LEVEL 1>>--
@@ -18,27 +18,25 @@ function me.dropdown:ShowMenu(level, value)
 			for name,v in me:pairsByKeys(me:GetProfs(true)) do
 				local title=true
 				for subname,icon in pairs(v) do
-					if me.save[my].filter[subname]~=true then
-						if title then
-							me.dropdown:AddTitle(name)
-							title=nil
-						end
-						me.dropdown:AddSpell(subname, subname, icon, true)
+					if title then
+						local id = me:GetSpellID(name)
+						local _icon = nil
+						if (id) then _icon=select(3,GetSpellInfo(id)) end
+						me.dropdown:AddSpell("|cffffd100"..name.."|r", name, _icon, true)
+						title=nil
+					end
+					if (name~=subname) then me.dropdown:AddSpell("  |T"..icon..":16:16:0:0|t "..subname, subname, nil, true) end
+					-- Quicktradeskills
+					local id = me:GetSpellID(subname)
+					if (me:tcount(me.quicktradeskills)>0 and me.quicktradeskills[id]) then
+						me.dropdown:AddArrow("  |T"..icon..":16:16:0:0|t |cffff0000"..subname.."|r",id)
 					end
 				end
 			end
 		end
-		if me:tcount(me.quicktradeskills)>0 then
-			local first=true
-			for k,v in me:pairsByKeys(me.quicktradeskills) do
-				if me:GetProfs()[v.name] then
-					if first then me.dropdown:AddLine() end
-					first=nil
-					me.dropdown:AddArrow("|cffff0000"..v.name.."|r",k,v.icon)
-				end
-			end
-		end
 		me.dropdown:AddLine()                           --list other chars
+		info.func = function() me.dropdown:Open(owner, 'children', function() me.dropdown:ShowFavorites(owner) end) end
+		me.dropdown:AddFunc("|cffffd100"..me.L["favorites"].."|r",info.func,"Interface\\AddOns\\Broker_ProfessionsMenu\\icons\\fav.tga")
 		me.dropdown:AddArrow("|cff00ff00"..me.L["otherchar"].."|r","tradelinks")
 		me.dropdown:AddLine()
 		me.dropdown:AddArrow(me.L["settings"],"config")
@@ -46,9 +44,11 @@ function me.dropdown:ShowMenu(level, value)
 	elseif level == 2 then
 		--Settingsmenu
 		if value == "config" then
+			me.dropdown:AddTitle("Broker_ProfessionsMenu")
+			me.dropdown:AddTitle("|cff707070"..me.version.."|r")
+			me.dropdown:AddLine()
 			me.dropdown:AddArrow(me.L["quicklaunch"],"quicklaunch")
 			me.dropdown:AddArrow(me.L["quicklauncher"],"quicklauncher")
-			me.dropdown:AddArrow(me.L["filter"],"filter")
 			me.dropdown:AddArrow(me.L["tooltips"],"tooltip")
 			--Disable trainer frame
 			info.func = function(var)
@@ -57,7 +57,6 @@ function me.dropdown:ShowMenu(level, value)
 			end
 			me.dropdown:AddToggle(me.L["trainerdisabled"], me.save[my].config.trainerdisabled, info.func)
 			me.dropdown:AddToggle(me.L["bothfactions"], me.save[my].config.bothfactions, function(var) me.save[my].config.bothfactions=var end)
-			me.dropdown:AddToggle(me.L["exchangeleftright"], me.save[my].config.exchangeleftright, function(var) me.save[my].config.exchangeleftright=var end)
 			me.dropdown:AddLine()
 			--Reset CDs
 			info.func = function()
@@ -72,40 +71,28 @@ function me.dropdown:ShowMenu(level, value)
 				me.dropdown:Close(1)
 			end
 			me.dropdown:AddFunc(me.L["resetcds"], info.func, "Interface\\Icons\\Ability_Rogue_FeignDeath", true)
-			me.dropdown:AddLine()
-			me.dropdown:AddTitle(me.version)
 		--list other chars
 		elseif value == "tradelinks" then
-			if me.save[my].config.bothfactions or UnitFactionGroup("player")=="Alliance" then
-				local first=true
-				for k,v in me:pairsByKeys(me.save) do
-					if k~=my and v.faction=="Alliance" and v.tradelinks~=nil and me:tcount(v.tradelinks)>0  then
-						if first and v.bothfactions then
-							first=nil
-							me.dropdown:AddTitle(FACTION_ALLIANCE)
-						end
+			local first=true
+			for k,v in me:pairsByKeys(me.save) do
+				if (k and k~=UnitName("player") and v.tradelinks and me:tcount(v.tradelinks)>0 and (me.save[my].config.bothfactions or UnitFactionGroup("player")==v.faction)) then
+					if (v.class) then
+					 	local coords = CLASS_ICON_TCOORDS[v.class]
+					 	me.dropdown:AddArrow(k,k,"Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",nil,nil,
+							'iconCoordLeft', coords[1],
+							'iconCoordRight', coords[2],
+							'iconCoordTop', coords[3],
+							'iconCoordBottom', coords[4])
+					else
 						me.dropdown:AddArrow(k,k)
 					end
 				end
 			end
-			if me.save[my].config.bothfactions or UnitFactionGroup("player")=="Horde" then
-				local first=true
-				for k,v in me:pairsByKeys(me.save) do
-					if k~=my and v.faction=="Horde" and v.tradelinks~=nil and me:tcount(v.tradelinks)>0  then
-						if first and v.bothfactions then
-							first=nil
-							me.dropdown:AddLine()
-							me.dropdown:AddTitle(FACTION_HORDE)
-						end
-						me.dropdown:AddArrow(k,k)
-					end
-				end
-			end
-		--Special
+		-- Quicktradeskills
 		else
 			if me.quicktradeskills[value] then
 				local nomats=true
-				for _,v in me:pairsByKeys(me.quicktradeskills[value]['func']()) do
+				for _,v in me:pairsByKeys(me.quicktradeskills[value]()) do
 					nomats=nil
 					me.dropdown:AddLine('text',v.name,'icon',v.icon,'func',v.func,'secure',v.action,'tooltipFunc',function(self) v.tooltip(self) end)
 				end
@@ -116,16 +103,31 @@ function me.dropdown:ShowMenu(level, value)
 	elseif level == 3 then
 		--default professions
 		if value == "quicklaunch" then
-			local button="leftclick"
-			if me.save[my].config.exchangeleftright then button="rightclick" end
-			me.dropdown:AddArrow(me.L[button],"left")
-			me.dropdown:AddArrow(me.L["shift"].." + "..me.L[button],"shiftleft")
-			me.dropdown:AddArrow(me.L["alt"].." + "..me.L[button],"altleft")
-			me.dropdown:AddArrow(me.L["ctrl"].." + "..me.L[button],"ctrlleft")
+			me.dropdown:AddArrow("|cffffd100"..me.L["leftclick"].."|r","left")
+			me.dropdown:AddArrow("  + "..me.L["shift"],"shiftleft")
+			me.dropdown:AddArrow("  + "..me.L["alt"],"altleft")
+			me.dropdown:AddArrow("  + "..me.L["ctrl"],"ctrlleft")
+			me.dropdown:AddArrow("|cffffd100"..me.L["rightclick"].."|r","right")
+			me.dropdown:AddArrow("  + "..me.L["shift"],"shiftright")
+			me.dropdown:AddArrow("  + "..me.L["alt"],"altright")
+			me.dropdown:AddArrow("  + "..me.L["ctrl"],"ctrlright")
 		--quicklauncher
 		elseif value == "quicklauncher" then
-			me.dropdown:AddArrow(NEW,"newlauncher")
-			me.dropdown:AddArrow(DELETE,"deletelauncher")
+			for name,icon in me:pairsByKeys(me:GetProfs()) do
+				local id = me:GetSpellID(name)
+				if (id) then
+					local func = function(checked)
+						if (checked) then
+							me.save[my].quicklauncher[id] = true
+							if (not me.quicklauncher[id]) then me.quicklauncher[id]=me:newlauncher(name,icon) end
+						else
+							me.save[my].quicklauncher[id]=nil;
+							me:Error(me.L["relog"])
+						end
+					end
+					me.dropdown:AddToggle("|T"..icon..":16:16:0:0|t "..name, me.save[my].quicklauncher[id], func)
+				end
+			end
 		--Tooltips
 		elseif value == "tooltip" then
 			--Craftable By in item tooltips
@@ -140,10 +142,6 @@ function me.dropdown:ShowMenu(level, value)
 			--showbuttons
 			me.dropdown:AddToggle(me.L["showbuttons"],me.save[my].config.tooltip.showbuttons,function(var) me.save[my].config.tooltip.showbuttons=var end)
 			--hide professions
-		elseif value == "filter" then
-			for k,_ in me:pairsByKeys(me:GetProfs()) do
-				me.dropdown:AddToggle(k,me.save[my].filter[k],function(var) me.save[my].filter[k]=var end)
-			end
 		--list trades from an other char
 		else
 			for k,v in me:pairsByKeys(me.save[value].tradelinks) do
@@ -185,52 +183,46 @@ function me.dropdown:ShowMenu(level, value)
 		end
 	--<<LEVEL 4>>--
 	elseif level == 4 then
-		--New Launcher
-		if value == "newlauncher" then
-			for k,v in me:pairsByKeys(me:GetProfs()) do
-				if not me.quicklauncher[me:GetSpellID(k)] then
-					info.func = function()
-						me.save[my].quicklauncher[me:GetSpellID(k)] = true
-						me.quicklauncher[me:GetSpellID(k)]=me:newlauncher(k,v)
-					end
-					me.dropdown:AddFunc(k,info.func,v)
-				end
+		-- Check, if Menu is min. one time selected
+		local disabled = true;
+		for k,v in pairs(me.save[my].quicklaunch) do	-- Menu must be asigned min. one times
+			if (v=="menu" and k~=value) then
+				disabled=false
+				break
 			end
-		--Delete Launcher
-		elseif value == "deletelauncher" then
-			for k,_ in me:pairsByKeys(me.save[my].quicklauncher) do
-				me.dropdown:AddFunc(select(1,GetSpellInfo(k)),function() me.save[my].quicklauncher[k]=nil; me:Error(me.L["relog"]) end,select(3,GetSpellInfo(k)))
-			end
-		--Default Profession Menu
-		else
-			if (me.save[my].quicklaunch[value] == 0) then info.checked = true else info.checked = nil end
-			info.func = function(var)
-				me.save[my].quicklaunch[value] = 0
-				if value=="left" then
-					me:Professions_UpdateInfo(me:GetSpellInfo(0))
-				end
-			end
-			me.dropdown:AddToggle("---", info.checked, info.func)
-			me.dropdown:AddLine()
-			for k,_ in me:pairsByKeys(me:GetProfs()) do
-				info.func = function()
-					me.save[my].quicklaunch[value] = me:GetSpellID(k)
-					if value=="left" then
-						me:Professions_UpdateInfo(me:GetSpellInfo(me.save[my].quicklaunch[value]))
-					end
-				end
-				local spell,_ = GetSpellInfo(me.save[my].quicklaunch[value])
-				if spell == GetSpellInfo(k) then info.checked = true else info.checked = nil end
-				me.dropdown:AddToggle(k, info.checked, info.func)
-			end
-		end --else
+		end
+		-- No Profession
+		if (me.save[my].quicklaunch[value] == 0) then info.checked = true else info.checked = nil end
+		info.func = function(var) me.save[my].quicklaunch[value] = 0 end
+		me.dropdown:AddToggle("---", info.checked, info.func, nil, "disabled", disabled)
+		me.dropdown:AddLine()
+		-- Open Last Profession Window
+		if (me.save[my].quicklaunch[value] == -1) then info.checked = true else info.checked = nil end
+		info.func = function(var) me.save[my].quicklaunch[value] = -1 end
+		me.dropdown:AddToggle(me.L['openLastProfessionWindow'], info.checked, info.func, nil, "disabled", disabled)
+		-- Menu
+		if (me.save[my].quicklaunch[value] == "menu") then info.checked = true else info.checked = nil end
+		info.func = function(var) me.save[my].quicklaunch[value] = "menu" end
+		me.dropdown:AddToggle(me.L["openmenu"], info.checked, info.func, nil, "disabled", disabled)
+		-- Favorites
+		if (me.save[my].quicklaunch[value] == "fav") then info.checked = true else info.checked = nil end
+		info.func = function(var) me.save[my].quicklaunch[value] = "fav" end
+		me.dropdown:AddToggle(me.L["showfavorites"], info.checked, info.func, nil, "disabled", disabled)
+		-- Select Profession
+		me.dropdown:AddLine()
+		for k,icon in me:pairsByKeys(me:GetProfs()) do
+			info.func = function() me.save[my].quicklaunch[value] = me:GetSpellID(k) end
+			local spell = GetSpellInfo(me.save[my].quicklaunch[value])
+			if spell == GetSpellInfo(k) then info.checked = true else info.checked = nil end
+			me.dropdown:AddToggle("|T"..icon..":18:18:0:0|t "..k, info.checked, info.func, nil, "disabled", disabled)
+		end
 	end
 --<<END LEVEL>>--
 end --function()
 
 
 
-function me.dropdown:ShowFavorites()
+function me.dropdown:ShowFavorites(owner)
 	local first=true
 	for profid,v in pairs(me.save[my].favorites) do
 		local prof,_ = GetSpellInfo(profid)
@@ -299,13 +291,13 @@ function me.dropdown:ShowFavorites()
 							TradeSkillInputBox:SetNumber(num)
 							DoTradeSkill(i, num)
 							TradeSkillInputBox:ClearFocus()
-							me.dropdown:Open(me.dropdown.parent, 'children', function() me.dropdown:ShowFavorites() end)--Reopen Dropdownmenu
+							me.dropdown:Open(owner, 'children', function() me.dropdown:ShowFavorites(owner) end)--Reopen Dropdownmenu
 							break
 						end
 					end
 				end
 			end
-			me.dropdown:AddFunc(kk,func,vv.icon,_,vv.tooltip)
+			me.dropdown:AddFunc(kk,func,vv.icon,nil,vv.tooltip)
 		end
 	end
 	if first then me.dropdown:AddTitle(me.L.nofavorites) end
@@ -315,7 +307,7 @@ end
 
 --dropdown wrapper functions
 --create a toggle (use func(var) to save you var)
-function me.dropdown:AddToggle(name, var, func, tooltipfunc)
+function me.dropdown:AddToggle(name, var, func, tooltipfunc, ...)
 	local lfunc = function()
 		var = not var
 		if func then func(var) end
@@ -323,25 +315,25 @@ function me.dropdown:AddToggle(name, var, func, tooltipfunc)
 	local checked = false
  	if var then checked=true end
  	if not tooltipfunc then tooltipfunc=function() return end end
-	me.dropdown:AddLine('text',name,'func',lfunc,'checked',checked,'tooltipFunc',tooltipfunc)
+	me.dropdown:AddLine('text',name,'func',lfunc,'checked',checked,'tooltipFunc',tooltipfunc,...)
 end
 --create a button
-function me.dropdown:AddFunc(name, func, icon, closewhenclicked, tooltipfunc)
+function me.dropdown:AddFunc(name, func, icon, closewhenclicked, tooltipfunc, ...)
 	if closewhenclicked==nil then closewhenclicked=false end
 	if not tooltipfunc then tooltipfunc=function() return end end
-	me.dropdown:AddLine('text',name,'icon',icon,'func',func,'tooltipFunc',tooltipfunc,'closeWhenClicked',closewhenclicked)
+	me.dropdown:AddLine('text',name,'icon',icon,'func',func,'tooltipFunc',tooltipfunc,'closeWhenClicked',closewhenclicked,...)
 end
-function me.dropdown:AddSpell(name, spell, icon, closewhenclicked, tooltipfunc)
+function me.dropdown:AddSpell(name, spell, icon, closewhenclicked, tooltipfunc, ...)
 	if closewhenclicked==nil then closewhenclicked=false end
 	if not tooltipfunc then tooltipfunc=function() return end end
-	me.dropdown:AddLine('text',name,'icon',icon,'secure',{type1='spell',spell=spell},'tooltipFunc',tooltipfunc,'closeWhenClicked',closewhenclicked)
+	me.dropdown:AddLine('text',name,'icon',icon,'secure',{type1='spell',spell=spell},'tooltipFunc',tooltipfunc,'closeWhenClicked',closewhenclicked,...)
 end
 --create a submenu
-function me.dropdown:AddArrow(name,value,icon,tooltipfunc)
+function me.dropdown:AddArrow(name, value, icon, tooltipfunc, func, ...)
 	if not tooltipfunc then tooltipfunc=function() return end end
-	me.dropdown:AddLine('hasArrow',true,'text',name,'icon',icon,'value',value,'tooltipFunc',tooltipfunc)
+	me.dropdown:AddLine('hasArrow',true,'text',name,'icon',icon,'value',value,'tooltipFunc',tooltipfunc,...)
 end
 --add title line
-function me.dropdown:AddTitle(name, icon)
-	me.dropdown:AddLine('isTitle',true,'text',name,'icon',icon)
+function me.dropdown:AddTitle(name, icon, ...)
+	me.dropdown:AddLine('isTitle',true,'text',name,'icon',icon,...)
 end

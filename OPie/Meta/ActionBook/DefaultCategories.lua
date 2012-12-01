@@ -2,12 +2,23 @@ local AB = assert(OneRingLib.ext.ActionBook:compatible(1,2), "Requires a compati
 
 do -- spellbook
 	local spells, mark = {}, {}
+	local function addEntry(ni, ok, st, sid)
+		if st == "SPELL" and not IsPassiveSpell(sid) and ((mark[sid] or ni) >= ni or spells[mark[sid]] ~= sid) then
+			spells[ni], mark[sid], ni = sid, ni, ni + 1
+		elseif st == "FLYOUT" then
+			for j=1,select(3,GetFlyoutInfo(sid)) do
+				local sid, osid, ik, sname = GetFlyoutSlotInfo(sid, j)
+				ni = ik and addEntry(ni, true, "SPELL", sid) or ni
+			end
+		end
+		return ni
+	end
 	local function search()
-		local ni, i, st, sid, ok = 1, 1
-		for i=1,select(3,GetSpellTabInfo(3)) do
-			i, ok, st, sid = i + 1, pcall(GetSpellBookItemInfo, i, "spell")
-			if st == "SPELL" and not IsPassiveSpell(sid) and ((mark[sid] or ni) >= ni or spells[mark[sid]] ~= sid) then
-				spells[ni], mark[sid], ni = sid, ni, ni + 1
+		local ni = 1
+		for i=1,GetNumSpellTabs()+12 do
+			local n, tex, ofs, c, isG, sid = GetSpellTabInfo(i)
+			for j=ofs+1,sid == 0 and (ofs+c) or 0 do
+				ni = addEntry(ni, pcall(GetSpellBookItemInfo, j, "spell"))
 			end
 		end
 		for i=#spells,ni,-1 do
@@ -111,3 +122,31 @@ AB:category("Equipment sets", function() return GetNumEquipmentSets() end, funct
 	return "equipmentset", (GetEquipmentSetInfo(id))
 end)
 AB:category("Raid markers", function() return 14 end, function(id) return id <= 8 and "raidmark" or "worldmark", id <= 8 and id or (id - 8) end)
+do -- data broker launchers
+	local LDB, registry, waiting = nil, {}, true
+	local function checkLDB()
+		LDB = LibStub and LibStub:GetLibrary("LibDataBroker-1.1", 1)
+	end
+	local function count()
+		if not (LDB or checkLDB() or LDB) then return 0 end
+		local c = 1
+		for name, obj in LDB:DataObjectIterator() do
+			if obj.type == "launcher" then
+				registry[c], c = name, c + 1
+			end
+		end
+		return c-1
+	end
+	local function get(id) return "opie.databroker.launcher", registry[id] end
+	local function register() 
+		if waiting and count() > 0 then AB:category("DataBroker", count, get) waiting = nil end
+		if not waiting then AB:notify("opie.databroker.launcher") end
+	end
+	EC_Register("ADDON_LOADED", "opie.databroker.launcher", function()
+		if LDB or checkLDB() or LDB then
+			register()
+			if waiting then LDB.RegisterCallback("opie.databroker.launcher", "LibDataBroker_DataObjectCreated", register) end
+			return "remove"
+		end
+	end)
+end

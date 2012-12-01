@@ -5,8 +5,8 @@
 ## Notes: Pet action bar for Ion
 ## DefaultState: enabled
 ## Dependencies: Ion
-## SavedVariables: IonPetGDB
-## SavedVariablesPerCharacter: IonPetCDB
+## SavedVariables: 
+## SavedVariablesPerCharacter: IonPetCDB, IonPetGDB
 ## X-Child-Of: Ion
 ## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved..
 ## X-Email: trinityui@live.com

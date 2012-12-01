@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -21,7 +21,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -69,10 +69,12 @@ if not T._LoadedFiles or not T._LoadedFiles["enUS.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["esES.lua"] = false;
+
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "esES");
 
 if not L then
-    T._LoadedFiles["esES.lua"] = "2.7.2.2";
+    T._LoadedFiles["esES.lua"] = "2.7.2.3_beta_3";
     return;
 end;
 
@@ -104,4 +106,4 @@ L["TOOFAR"] = "Muy lejos"
 
 
 
-T._LoadedFiles["esES.lua"] = "2.7.2.2";
+T._LoadedFiles["esES.lua"] = "2.7.2.3_beta_3";

@@ -13,27 +13,8 @@ FBConstants.DEFAULT_MINIMAP_RADIUS = 80;
 -- don't override debugging code, if it loaded
 if ( not FishingBuddy ) then
 	FishingBuddy = {};
-	FishingBuddy.API = {};
 	FishingBuddy.Commands = {};
 
-	FishingBuddy.printable = function(foo)
-		if ( foo ) then
-	 if ( type(foo) == "table" ) then
-		 return "table";
-	 elseif ( type(foo) == "boolean" ) then
-		 if ( foo ) then
-			 return "true";
-		 else
-			 return "false";
-		 end
-	 else
-		 return foo;
-	 end
-		else
-	 return "nil";
-		end
-	end
-	
 	FishingBuddy.Debug = function(msg, fixlinks)
 	end
 
@@ -47,9 +28,9 @@ end
 FishingBuddy.Output = function(msg, r, g, b)
 	if ( DEFAULT_CHAT_FRAME ) then
 		if ( not r ) then
-	 DEFAULT_CHAT_FRAME:AddMessage(msg);
+			DEFAULT_CHAT_FRAME:AddMessage(msg);
 		else
-	 DEFAULT_CHAT_FRAME:AddMessage(msg, r, g, b);
+			DEFAULT_CHAT_FRAME:AddMessage(msg, r, g, b);
 		end
 	end
 end
@@ -88,6 +69,11 @@ FishingBuddy.Commands["missing"].func =
 		FishingBuddy_Info["Missing"] = FishingBuddy.Missing;
 		return true;
 	end
+
+-- Set the bobber name if we have a custom translation for it
+if ( FBConstants.BOBBER_NAME ~= FishingTranslations["enUS"].BOBBER_NAME) then
+	FL:SetBobberName(FBConstants.BOBBER_NAME);
+end
 
 -- dump the memory we've allocated for all the translations
 FishingTranslations = nil;

@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -21,7 +21,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -69,6 +69,7 @@ if not T._LoadedFiles or not T._LoadedFiles["enUS.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["koKR.lua"] = false;
 
 -------------------------------------------------------------------------------
 -- Korean localization
@@ -77,7 +78,7 @@ end
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "koKR");
 
 if not L then
-    T._LoadedFiles["koKR.lua"] = "2.7.2.2";
+    T._LoadedFiles["koKR.lua"] = "2.7.2.3_beta_3";
     return;
 end;
 
@@ -166,7 +167,7 @@ L["GLOR5"] = "그는 언제나 기억될 것입니다..."
 L["HANDLEHELP"] = "작은 유닛 프레임(MUFs) 모두 이동"
 L["HIDE_LIVELIST"] = "실시간 목록 숨김"
 L["HIDE_MAIN"] = "Decursive 창 숨김"
-L["HIDESHOW_BUTTONS"] = "버튼 표시/숨김"
+L["HIDESHOW_BUTTONS"] = "버튼 표시/숨김" -- Needs review
 L["HLP_LEFTCLICK"] = "좌-클릭"
 L["HLP_LL_ONCLICK_TEXT"] = [=[실시간 목록이 클릭되는 것은 아닙니다. 이 애드온의 추가 기능을 사용하는 방법을 알아보려면 설명서를 읽으십시오. WoWAce.com에서 'Decursive'를 검색하세요.
 (이 목록에서 Decursive 바를 이동하려면 /dcrshow 및 왼쪽-Alt-클릭으로 이동)]=]
@@ -176,7 +177,7 @@ L["HLP_RIGHTCLICK"] = "우-클릭"
 L["HLP_USEXBUTTONTOCURE"] = "해당 디버프를 치료하려면 \"%s\" 버튼을 사용하세요"
 L["HLP_WRONGMBUTTON"] = "잘못된 마우스 버튼입니다!"
 L["IGNORE_STEALTH"] = "은신 대상 무시"
-L["IS_HERE_MSG"] = "Decursive가 초기화 되었습니다. 옵션을 설정하세요."
+L["IS_HERE_MSG"] = "Decursive가 초기화 되었습니다. 옵션을 설정하세요." -- Needs review
 L["LIST_ENTRY_ACTIONS"] = [=[|cFF33AA33[CTRL]|r 클릭: 해당 플레이어 제거
 |cFF33AA33좌|r-클릭: 해당 플레이어를 위로
 |cFF33AA33우|r-클릭: 해당 플레이어를 아래로
@@ -303,7 +304,7 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "주문ID가 올바르지 않음!"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "마법책에서 주문을 찾을 수 없음!"
 L["OPTION_MENU"] = "Decursive 설정 메뉴"
 L["OPT_LIVELIST"] = "실시간 목록"
-L["OPT_LIVELIST_DESC"] = "실시간 목록에 대한 설정입니다."
+L["OPT_LIVELIST_DESC"] = "실시간 목록에 대한 설정입니다." -- Needs review
 L["OPT_LLALPHA"] = "실시간 목록 투명도"
 L["OPT_LLALPHA_DESC"] = "Decursive 메인바와 실시간 목록의 투명도를 변경합니다. (메인바가 표시되어 있어야 함)"
 L["OPT_LLSCALE"] = "실시간 목록 크기"
@@ -351,7 +352,7 @@ L["OPT_NEWVERSIONBUGMENOT_DESC"] = "새로운 버전의 Decursive가 발견되�
 L["OPT_NOKEYWARN"] = "키 없음 경고"
 L["OPT_NOKEYWARN_DESC"] = "지정된 키가 없다면 경고 문구를 표시합니다."
 L["OPT_NOSTARTMESSAGES"] = "환영 메시지 사용 안 함"
-L["OPT_NOSTARTMESSAGES_DESC"] = "매 로그인 시 대화창에 Decursive가 출력하는 메시지 3개를 제거합니다."
+L["OPT_NOSTARTMESSAGES_DESC"] = "매 로그인 시 대화창에 Decursive가 출력하는 메시지 3개를 제거합니다." -- Needs review
 L["OPT_OPTIONS_DISABLED_WHILE_IN_COMBAT"] = "이러한 옵션은 전투중에 사용할 수 없습니다."
 L["OPT_PERFOPTIONWARNING"] = "경고: 당신이 뭘 하는지 정확히 모른다면 값을 바꾸지 마세요. 이 설정은 게임 성능에 큰 영향을 줄 수 있습니다. 사용자 대부분은 기본값인 0.1과 10을 쓰셔야 합니다."
 L["OPT_PLAYSOUND_DESC"] = "해제 가능한 디버프 발견시 효과음을 재생합니다."
@@ -451,4 +452,4 @@ L["UNSTABLERELEASE"] = "비안정화판 배포"
 
 
 
-T._LoadedFiles["koKR.lua"] = "2.7.2.2";
+T._LoadedFiles["koKR.lua"] = "2.7.2.3_beta_3";

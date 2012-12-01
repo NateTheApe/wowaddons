@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -43,15 +43,14 @@ if not T._LoadedFiles or not T._LoadedFiles["Decursive.xml"] or not T._LoadedFil
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["Dcr_lists.lua"] = false;
 
 local D = T.Dcr;
---D:SetDateAndRevision("$Date: 2008-08-12 04:50:10 +0200 (mar., 12 août 2008) $", "$Revision: 80230 $");
 
 
 local L = D.L;
 local LC = D.LC;
 local DC = T._C;
-local DS = DC.DS;
 local _;
 local _G = _G;
 
@@ -592,4 +591,4 @@ function D:PopulateButtonPress(frame) --{{{
 
 end --}}}
 
-T._LoadedFiles["Dcr_lists.lua"] = "2.7.2.2";
+T._LoadedFiles["Dcr_lists.lua"] = "2.7.2.3_beta_3";

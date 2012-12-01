@@ -3,6 +3,7 @@ FishingBuddy.OutfitManager = {};
 
 local Crayon = LibStub("LibCrayon-3.0");
 local FL = LibStub("LibFishing-1.0");
+local FBAPI = LibStub("FishingBuddyApi-1.0");
 
 -- 5.0.4 has a problem with a global "_" (see some for loops below)
 local _
@@ -66,23 +67,26 @@ end
 
 local PoleCheck = nil;
 
--- update the watcher when we're done switching outfits
-FishingBuddy.OutfitManager.WaitForUpdate =
-	function(self)
-		local hasPole = FL:IsFishingGear();
-		if ( hasPole == PoleCheck ) then
-			FishingOutfitUpdateFrame:Hide();
-			FishingBuddy.API.FishingMode("OutfitManager");
-		end
+local function WaitForUpdate(self, arg1)
+	local hasPole = FBAPI:ReadyForFishing();
+	if ( hasPole == PoleCheck ) then
+		self:Hide();
+		FishingBuddy.FishingMode("OutfitManager");
 	end
+end
+
+local updateframe = CreateFrame("Frame");
+updateframe:Hide();
+updateframe:SetScript("OnUpdate", WaitForUpdate);
 
 local function CheckSwitch(topole)
 	PoleCheck = topole;
-	FishingOutfitUpdateFrame:Show();
+	updateframe:Show();
 end
 
 local OutfitManagers = {};
 local OutfitManagerCount = 0;
+local OutfitManagerFrame = FishingBuddy.CreateFBDropDownMenu("FBOutfitManager", "FBOutfitManagerMenu");
 
 local function HasManager()
 	return (OutfitManagerCount > 0);
@@ -123,21 +127,20 @@ end
 
 local function SetOutfitManagerDisplay()
 	if ( OutfitManagerCount == 0 ) then
-		FishingBuddyOption_OutfitMenu:Hide();
-		FishingBuddyOption_OutfitText:SetText(FBConstants.OUTFITS..": "..Crayon:Red(FBConstants.NONEAVAILABLE_MSG));
-		FishingBuddyOption_OutfitText:Show();
-		FishingBuddyOption_OutfitManager:SetWidth(FishingBuddyOption_OutfitText:GetWidth());
-		FishingBuddyOption_OutfitManager:SetHeight(FishingBuddyOption_OutfitText:GetHeight());
+		OutfitManagerFrame.menu:Hide();
+		OutfitManagerFrame.html:SetText(FBConstants.OUTFITS..": "..Crayon:Red(FBConstants.NONEAVAILABLE_MSG));
+		OutfitManagerFrame.html:Show();
+		OutfitManagerFrame:SetWidth(OutfitManagerFrame.html:GetWidth());
+		OutfitManagerFrame:SetHeight(OutfitManagerFrame.html:GetHeight());
 	elseif ( OutfitManagerCount == 1 ) then
-		FishingBuddyOption_OutfitMenu:Hide();
-		FishingBuddyOption_OutfitText:SetText(FBConstants.OUTFITS..": "..Crayon:Green(current_manager));
-		FishingBuddyOption_OutfitText:Show();
-		FishingBuddyOption_OutfitManager:SetWidth(FishingBuddyOption_OutfitText:GetWidth());
-		FishingBuddyOption_OutfitManager:SetHeight(FishingBuddyOption_OutfitText:GetHeight());
+		OutfitManagerFrame.menu:Hide();
+		OutfitManagerFrame.html:SetText(FBConstants.OUTFITS..": "..Crayon:Green(current_manager));
+		OutfitManagerFrame.html:Show();
+		OutfitManagerFrame:SetWidth(OutfitManagerFrame.html:GetWidth());
+		OutfitManagerFrame:SetHeight(OutfitManagerFrame.html:GetHeight());
 	else
-		FishingBuddyOption_OutfitText:Hide();
-		UIDropDownMenu_Initialize(FishingBuddyOption_OutfitMenu,
-										  OutfitManagerMenuSetup);
+		OutfitManagerFrame.html:Hide();
+		UIDropDownMenu_Initialize(OutfitManagerFrame.menu, OutfitManagerMenuSetup);
 		local show = 1;
 		for name,_ in pairs(OutfitManagers) do
 			if ( name == current_manager ) then
@@ -145,14 +148,12 @@ local function SetOutfitManagerDisplay()
 			end
 			show = show + 1;
 		end
-		local label = getglobal("FishingBuddyOption_OutfitMenuLabel");
-		label:SetText(FBConstants.OUTFITS..": ");
-		local menu = FishingBuddyOption_OutfitMenu;
-		UIDropDownMenu_SetWidth(menu, 210);
-		UIDropDownMenu_SetSelectedValue(menu, show);
-		UIDropDownMenu_SetText(menu, current_manager);
-		FishingBuddyOption_OutfitManager:SetWidth(menu:GetWidth());
-		FishingBuddyOption_OutfitManager:SetHeight(menu:GetHeight());
+		OutfitManagerFrame.menu.label:SetText(FBConstants.OUTFITS..": ");
+		UIDropDownMenu_SetWidth(OutfitManagerFrame.menu, 210);
+		UIDropDownMenu_SetSelectedValue(OutfitManagerFrame.menu, show);
+		UIDropDownMenu_SetText(OutfitManagerFrame.menu, current_manager);
+		OutfitManagerFrame:SetWidth(OutfitManagerFrame.menu:GetWidth());
+		OutfitManagerFrame:SetHeight(OutfitManagerFrame.menu:GetHeight());
 	end
 end
 
@@ -218,7 +219,7 @@ end
 local OutfitOptions = {
 	["OutfitManager"] = {
 		["margin"] = { 12, 4 },
-		["button"] = "FishingBuddyOption_OutfitManager",
+		["button"] = "FBOutfitManager",
 		["setup"] =  UpdateManagers,
 	},
 }
@@ -230,7 +231,8 @@ end
 
 OMEvents[FBConstants.FRAME_SHOW_EVT] = UpdateManagers;
 
-FishingBuddy.API.RegisterHandlers(OMEvents);
+FishingBuddy.RegisterHandlers(OMEvents);
+
 -- debugging
 FishingBuddy.OutfitManagers = OutfitManagers;
 

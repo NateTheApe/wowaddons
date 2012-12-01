@@ -1,0 +1,202 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<!--                     	 TEMPLATES                        -->
+
+<FontString name="CombuMBTracktexttemplate" font="Fonts\FRIZQT__.TTF" text="" nonspacewrap="true" maxlines="1" justifyH="LEFT" justifyV="MIDDLE" virtual="true">
+	 <FontHeight>
+	   <AbsValue val="6" />
+	 </FontHeight>
+	 <Color r="1" g="1" b="1" />
+	 <Shadow>
+	   <Color r="0" g="0" b="0" />
+	   <Offset>
+	     <AbsDimension x="1" y="-1" />
+	   </Offset>
+	 </Shadow>
+</FontString>
+
+<FontString name="CombuMBTracktexttemplate7" font="Fonts\FRIZQT__.TTF" text="" nonspacewrap="true" maxlines="1" justifyH="LEFT" justifyV="MIDDLE" virtual="true">
+	 <FontHeight>
+	   <AbsValue val="7" />
+	 </FontHeight>
+	 <Color r="1" g="1" b="1" />
+	 <Shadow>
+	   <Color r="0" g="0" b="0" />
+	   <Offset>
+	     <AbsDimension x="1" y="-1" />
+	   </Offset>
+	 </Shadow>
+</FontString>
+
+<FontString name="CombuMBTracktexttemplate5" font="Fonts\FRIZQT__.TTF" text="" nonspacewrap="true" maxlines="1" justifyH="LEFT" justifyV="MIDDLE" virtual="true">
+	 <FontHeight>
+	   <AbsValue val="6" />
+	 </FontHeight>
+	 <Color r="1" g="1" b="1" />
+	 <Shadow>
+	   <Color r="0" g="0" b="0" />
+	   <Offset>
+	     <AbsDimension x="1" y="-1" />
+	   </Offset>
+	 </Shadow>
+</FontString>
+
+<StatusBar name="CombuMBTrackBarTemplate" virtual="true">
+    <BarTexture file="Interface\AddOns\MageBombTracker\Images\combubarblack"/> 
+</StatusBar>
+
+<Frame name="CombuMBTrackTemplate" virtual="true">
+    <Size>
+        <AbsDimension x="78" y="9" />
+    </Size>
+    <Anchors>
+		<Anchor point="TOP" relativeTo="CombuMBTrackerBorderFrame" relativePoint="TOP">
+            <Offset>
+                <AbsDimension x="0" y="0" />
+            </Offset>
+        </Anchor>
+    </Anchors>
+    <Frames>
+		<Frame name="$parentInfo">
+            <Size>
+                <AbsDimension x="78" y="9" />
+            </Size>
+            <Anchors>
+				<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+				  <Offset>
+					<AbsDimension x="0" y="0" />
+				  </Offset>
+                </Anchor>
+            </Anchors>
+				
+            <Layers>
+                <Layer level="ARTWORK" textureSubLevel="2" >
+                    <Texture name="$parentTarget" file="">
+						<Size>
+                            <AbsDimension x="5" y="9" />
+						</Size>
+						<TexCoords left="0" right="0.5" top="0" bottom="1" />
+						<Anchors>
+						   <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+							  <AbsDimension x="0" y="0" />
+							</Offset>
+						  </Anchor>
+						</Anchors>
+				  </Texture>
+				  
+				  <FontString name="$parentText" inherits="CombuMBTracktexttemplate">
+						<Size>
+						  <AbsDimension x="47" y="9" />
+						</Size>
+						<Anchors>
+						   <Anchor point="LEFT" relativeTo="$parentTarget" relativePoint="RIGHT">
+							<Offset>
+							  <AbsDimension x="1" y="0" />
+							</Offset>
+						  </Anchor>
+						</Anchors>
+				  </FontString>
+				  
+				  <Texture name="$parentSymbol" file="">
+						<Size>
+						  <AbsDimension x="9" y="9" />
+						</Size>
+						<Anchors>
+						   <Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT">
+							<Offset>
+							  <AbsDimension x="-18" y="0"/>
+							</Offset>
+						  </Anchor>
+						</Anchors>
+				  </Texture>
+				  
+				  <FontString name="$parentTimer" inherits="CombuMBTracktexttemplate" justifyH="RIGHT">
+						<Size>
+						  <AbsDimension x="17" y="9" />
+						</Size>
+						<Anchors>
+						   <Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT">
+							<Offset>
+							  <AbsDimension x="0" y="0" />
+							</Offset>
+						  </Anchor>
+						</Anchors>
+					</FontString>
+			   </Layer>
+			</Layers>
+		</Frame>
+		
+		<StatusBar name="$parentBar" inherits="CombuMBTrackBarTemplate">
+		   <Size>
+			   <AbsDimension x="76" y="9" />
+		   </Size>
+		  <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+			  <Offset>
+				<AbsDimension x="2" y="0" />
+			  </Offset>
+			</Anchor>
+		  </Anchors>
+		</StatusBar>
+		
+	</Frames>
+</Frame>
+
+      
+<!--                       Background frame for Living bomb tracker                       -->
+       
+<Frame name="CombuMBTrackerFrame" parent="UIParent" enableMouse="true" movable="true">
+  	<Size>
+     	<AbsDimension x="88" y="20" />
+   	</Size>
+	<Anchors>
+	  	<Anchor point="CENTER"/>
+	</Anchors>
+    <Scripts>
+		<OnLoad>
+			CombuMBTracker_OnLoad()
+			self.TimeSinceLastUpdate = 0 
+		</OnLoad>
+		<OnEvent> 
+			CombuMBTracker_OnEvent(self, event, ...);
+		</OnEvent>			
+		<OnUpdate function="CombuMBTracker_OnUpdate" />     
+	   	<OnDragStart>
+			self:StartMoving()
+		</OnDragStart>
+		<OnDragStop>
+			self:StopMovingOrSizing()
+		</OnDragStop>
+	</Scripts>
+</Frame>
+
+<!--                       Border frame for Living bomb tracker                       -->
+       
+<Frame name="CombuMBTrackerBorderFrame" parent="CombuMBTrackerFrame" >
+  <Size>
+     <AbsDimension x="88" y="20" />
+   </Size>
+	<Anchors>
+		<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+   <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="false">
+     <BackgroundInsets>
+       <AbsInset left="5" right="5" top="5" bottom="5" />
+     </BackgroundInsets>
+     <TileSize>
+       <AbsValue val="16" />
+     </TileSize>
+     <EdgeSize>
+       <AbsValue val="16" />
+     </EdgeSize>
+         <Color r="0.25" g="0.25" b="0.25" />
+         <BorderColor r="0.67" g="0.67" b="0.67" />
+   </Backdrop>
+</Frame>
+
+</Ui>

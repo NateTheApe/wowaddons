@@ -6,8 +6,8 @@
 ## DefaultState: enabled
 ## Dependencies: Ion
 ## LoadOnDemand: 1
-## SavedVariables: IonGUIGDB
-## SavedVariablesPerCharacter: IonGUICDB
+## SavedVariables: 
+## SavedVariablesPerCharacter: IonGUICDB, IonGUIGDB
 ## X-Child-Of: Ion
 ## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved..
 ## X-Email: trinityui@live.com

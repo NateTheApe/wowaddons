@@ -1,6 +1,6 @@
-local OR_AddonName, versionMajor, versionRev, L, AB, ORI = ..., 3, 63, newproxy(true)
+local versionMajor, versionRev, L, OR_AddonName, T, AB, ORI = 3, 64, newproxy(true), ...
 local OR_Rings, OR_ModifierLockState, OneRing = {}, {}, {ext={},lang=L}
-local defaultConfig = {ClickActivation=false, IndicationOffsetX=0, IndicationOffsetY=0, RingAtMouse=false, RingScale=1, ClickPriority=true, CenterAction=false, MouseBucket=1, NoClose=false, SliceBinding=false, SliceBindingString="1 2 3 4 5 6 7 8 9 0", PrimaryButton="BUTTON4", SecondaryButton="BUTTON5", OpenNestedRingButton="BUTTON3", ScrollNestedRingUpButton="", ScrollNestedRingDownButton=""}
+local defaultConfig = {ClickActivation=false, IndicationOffsetX=0, IndicationOffsetY=0, RingAtMouse=false, RingScale=1, ClickPriority=true, CenterAction=false, MouseBucket=1, NoClose=false, SliceBinding=false, SliceBindingString="1 2 3 4 5 6 7 8 9 0", PrimaryButton="BUTTON4", SecondaryButton="BUTTON5", OpenNestedRingButton="BUTTON3", ScrollNestedRingUpButton="", ScrollNestedRingDownButton="", UseDefaultBindings=true}
 local configRoot, configInstance, activeProfile, PersistentStorageInfo, optionValidators, optionsMeta = {}, nil, nil, {}, {}, {__index=defaultConfig}
 
 -- Some basic utility methods
@@ -33,7 +33,7 @@ local isConditionalBinding = setmetatable({}, {__mode="k", __index=function(t, b
 		return t[b];
 	end
 end});
-getmetatable(L).__call = function(self, k) return k end
+getmetatable(L).__call = T.LocalizeText or function(self, k) return k end
 
 local function OR_GetRingOption(ringName, option)
 	if not configInstance then return defaultConfig[option], nil, nil, nil, defaultConfig[option] end
@@ -382,7 +382,7 @@ local function OR_SyncRing(name, newprops)
 	end
 
 	local hotkey = configInstance and configInstance.Bindings[name]
-	if hotkey == nil and type(props.hotkey) == "string" and GetBindingAction(props.hotkey) == "" then
+	if hotkey == nil and type(props.hotkey) == "string" and GetBindingAction(props.hotkey) == "" and OR_GetRingOption(ringName, "UseDefaultBindings") then
 		hotkey = props.hotkey
 		for i, k in ipairs(OR_Rings) do
 			if configInstance and configInstance.Bindings[k] == hotkey then
@@ -599,7 +599,8 @@ local function OR_InitConfigState()
 	OR_ForceResync()
 end
 local function OR_LibState(event, addon)
-	if event == "ADDON_LOADED" and addon == OR_AddonName then
+	if event == "ADDON_LOADED" then
+		if addon ~= OR_AddonName then return end
 		OR_InitAB();
 		OR_InitConfigState();
 		OR_ForceResync(true)
@@ -704,13 +705,14 @@ function OneRing:SetRingBinding(ringName, bind)
 	OR_SyncRing(ringName)
 end
 function OneRing:GetRingBinding(ringName)
-	assert(type(ringName) == "string", 'Syntax: binding, override, active, cndbinding = OneRing:GetRingBinding("ringName")', 2);
+	assert(type(ringName) == "string", 'Syntax: binding, override, active, cndbinding, enabled = OneRing:GetRingBinding("ringName")', 2);
 	assert(OR_Rings[ringName], 'Ring %q is not defined', 2, ringName)
-	local key, over = configInstance.Bindings[ringName], true;
+	local key, over, enabled = configInstance.Bindings[ringName], true, true;
 	if key == nil then key, over = OR_Rings[ringName].hotkey, false; end
 	local link, key2 = OR_SecEnv.bindRingKeys["r" .. OR_Rings[ringName].internalID], key;
 	if isConditionalBinding[key] then key2 = link and link.active and link.bind; end
-	return key, over, not not (link and link.active and not link.parent), key2;
+	if over == false and not OR_GetRingOption(ringName, "UseDefaultBindings") then enabled = false end
+	return key, over, not not (link and link.active and not link.parent), key2, enabled;
 end
 function OneRing:OverrideRingBinding(ringName, bind)
 	assert(type(ringName) == "string" and (bind == nil or type(bind) == "string"), 'Syntax: OneRing:OverrideRingBinding("ringName", "binding")', 2)

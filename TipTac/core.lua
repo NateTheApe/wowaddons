@@ -177,6 +177,7 @@ local tipBackdrop = { tile = false, insets = {} };
 
 -- Constants
 local TT_LevelMatch = "^"..TOOLTIP_UNIT_LEVEL:gsub("%%s",".+"); -- Was changed to match other localizations properly, used to match: "^"..LEVEL.." .+" -- Az: doesn't actually match the level line on the russian client!
+local TT_LevelMatchPet = "^"..TOOLTIP_WILDBATTLEPET_LEVEL_CLASS:gsub("%%s",".+");
 local TT_NotSpecified = "Not specified";
 local TT_Reaction = {
 	"Tapped",					-- No localized string of this
@@ -240,6 +241,7 @@ local targetedList = {};
 local auras = {};
 local bars = {};
 local tipIcon;
+local petLevelLineIndex;
 
 --------------------------------------------------------------------------------------------------------
 --                                   TipTac Anchor Creation & Events                                  --
@@ -442,12 +444,13 @@ local function ModifyUnitTooltip()
 	local unit = u.token;
 	local reaction = cfg["colReactText"..u.reactionIndex];
 	local name, realm = UnitName(unit);
-	local hasGuildTitle;
+	local lineInfoIndex = 2 + (isColorBlind and UnitIsVisible(unit) and 1 or 0);
+	local isPetWild, isPetCompanion = UnitIsWildBattlePet(unit), UnitIsBattlePetCompanion(unit);
 	-- Level + Classification
-	local level = UnitLevel(unit);
-	local classification = UnitClassification(unit);
+	local level = (isPetWild or isPetCompanion) and UnitBattlePetLevel(unit) or UnitLevel(unit) or -1;
+	local classification = UnitClassification(unit) or "";
 	lineInfo[#lineInfo + 1] = (UnitCanAttack(unit,"player") or UnitCanAttack("player",unit)) and GetDifficultyLevelColor(level ~= -1 and level or 500) or cfg.colLevel;
-	lineInfo[#lineInfo + 1] = (cfg["classification_"..classification] or "%d? "):format(level == -1 and "??" or level); -- Why "%d? " on the alt format? Bug?
+	lineInfo[#lineInfo + 1] = (cfg["classification_"..classification] or "%s? "):format(level == -1 and "??" or level);
 	-- Players
 	if (u.isPlayer) then
 		-- gender
@@ -494,7 +497,33 @@ local function ModifyUnitTooltip()
 			local pGuild = GetGuildInfo("player");
 			local guildColor = (guild == pGuild and cfg.colSameGuild or cfg.colorGuildByReaction and reaction or cfg.colGuild);
 			GameTooltipTextLeft2:SetFormattedText(cfg.showGuildRank and guildRank and "%s<%s> %s%s" or "%s<%s>",guildColor,guild,COL_LIGHTGRAY,guildRank);
-			hasGuildTitle = true;
+			lineInfoIndex = (lineInfoIndex + 1);
+		end
+	-- BattlePets
+	elseif (isPetWild or isPetCompanion) then
+		lineOne[#lineOne + 1] = reaction;
+		lineOne[#lineOne + 1] = name;
+		lineInfo[#lineInfo + 1] = " ";
+		lineInfo[#lineInfo + 1] = cfg.colRace;
+		local petType = UnitBattlePetType(unit) or 5;
+		lineInfo[#lineInfo + 1] = _G["BATTLE_PET_NAME_"..petType];
+		if (isPetWild) then
+			lineInfo[#lineInfo + 1] = " ";
+			lineInfo[#lineInfo + 1] = UnitCreatureFamily(unit) or UnitCreatureType(unit);
+		else
+			if not (petLevelLineIndex) then
+				for i = 2, gtt:NumLines() do
+					if (_G["GameTooltipTextLeft"..i]:GetText():find(TT_LevelMatchPet)) then
+						petLevelLineIndex = i;
+						break;
+					end
+				end
+			end
+			lineInfoIndex = petLevelLineIndex or 2;
+			local expectedLine = 3 + (isColorBlind and 1 or 0);
+			if (lineInfoIndex > expectedLine) then
+				GameTooltipTextLeft2:SetFormattedText("%s<%s>",reaction,u.title);
+			end
 		end
 	-- NPCs
 	else
@@ -504,8 +533,9 @@ local function ModifyUnitTooltip()
 		-- guild/title
 		if (u.title) then
 			-- Az: this doesn't work with "Mini Diablo" or "Mini Thor", which has the format: 1) Mini Diablo 2) Lord of Terror 3) Player's Pet 4) Level 1 Non-combat Pet
-			(isColorBlind and GameTooltipTextLeft3 or GameTooltipTextLeft2):SetFormattedText("%s<%s>",reaction,u.title);
-			hasGuildTitle = true;
+			local gttLine = isColorBlind and GameTooltipTextLeft3 or GameTooltipTextLeft2;
+			gttLine:SetFormattedText("%s<%s>",reaction,u.title);
+			lineInfoIndex = (lineInfoIndex + 1);
 		end
 		-- class
 		local class = UnitCreatureFamily(unit) or UnitCreatureType(unit);
@@ -543,8 +573,7 @@ local function ModifyUnitTooltip()
 	-- Line One
 	GameTooltipTextLeft1:SetFormattedText(("%s"):rep(#lineOne),unpack(lineOne));
 	-- Info Line
-	local lineIndex = 2 + (isColorBlind and UnitIsVisible(unit) and 1 or 0) + (hasGuildTitle and 1 or 0);
-	local gttLine = _G["GameTooltipTextLeft"..lineIndex];
+	local gttLine = _G["GameTooltipTextLeft"..lineInfoIndex];
 	gttLine:SetFormattedText(("%s"):rep(#lineInfo),unpack(lineInfo));
 	gttLine:SetTextColor(1,1,1);
 end
@@ -972,6 +1001,7 @@ local function GTTHook_OnTooltipCleared(self,...)
 	wipe(u);
 	gtt_lastUpdate = 0;
 	gtt_newHeight = nil;
+	petLevelLineIndex = nil;
 	self.fadeOut = nil;
 	bars.offset = nil;
 	for i = 1, #bars do

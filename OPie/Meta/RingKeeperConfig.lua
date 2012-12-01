@@ -148,6 +148,8 @@ ringDetail = CreateFrame("Frame", nil, ringContainer) do
 	function ringDetail:SetBinding(bind) return api.setRingProperty("hotkey", bind) end
 	ringDetail.binding.label = ringDetail.scope:CreateFontString(nil, "OVERLAY", "GameFontHighlight")	
 	ringDetail.binding.label:SetJustifyH("LEFT") ringDetail.binding.label:SetWidth(250) ringDetail.binding.label:SetPoint("RIGHT", ringDetail.binding, "LEFT", -5, 0)
+	ringDetail.binding:SetScript("OnEnter", function(self) if self.tooltipText then GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -self:GetWidth(), 0); GameTooltip:SetText(self.tooltipText, nil, nil, nil, nil, 1); end end)
+	ringDetail.binding:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 	ringDetail.rotation = CreateFrame("Slider", "RKC_RingRotation", ringDetail, "OptionsSliderTemplate")
 	ringDetail.rotation:SetPoint("TOPLEFT", 265, -102) ringDetail.rotation:SetWidth(220) ringDetail.rotation:SetMinMaxValues(0, 345) ringDetail.rotation:SetValueStep(15)
 	ringDetail.rotation:SetScript("OnValueChanged", function(self, value) ringDetail.rotationLabel:SetFormattedText(L"Ring Rotation %s(%d\194\176)|r:", "|cffffd500", value) api.setRingProperty("offset", value) end)
@@ -467,7 +469,7 @@ newSlice = CreateFrame("Frame", nil, ringContainer) do
 	end
 	
 	local catbg = newSlice:CreateTexture(nil, "BACKGROUND")
-	catbg:SetPoint("TOPLEFT", 2, -2) catbg:SetPoint("RIGHT", newSlice.slider, "RIGHT") catbg:SetPoint("BOTTOM", 0, 2)
+	catbg:SetPoint("TOPLEFT", 2, -2) catbg:SetPoint("RIGHT", newSlice, "RIGHT", -2, 0) catbg:SetPoint("BOTTOM", 0, 2)
 	catbg:SetTexture(0,0,0,0.65)
 	local function onClick(self) selectCategory(self:GetID()+newSlice.slider:GetValue()) end
 	for i=1,22 do
@@ -487,11 +489,11 @@ newSlice = CreateFrame("Frame", nil, ringContainer) do
 	end
 	cats[1]:SetPoint("TOPLEFT", 2, -22)
 
-	newSlice.desc = newSlice:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-	newSlice.desc:SetPoint("TOPLEFT", newSlice.slider, "TOPRIGHT", 2, 15)
-	newSlice.desc:SetPoint("RIGHT", -32, 0)
+	newSlice.desc = newSlice:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	newSlice.desc:SetPoint("TOPLEFT", newSlice.slider, "TOPRIGHT", 2, 10)
+	newSlice.desc:SetPoint("RIGHT", -24, 0)
 	newSlice.desc:SetHeight(26)
-	newSlice.desc:SetJustifyV("TOP") newSlice.desc:SetJustifyH("LEFT")
+	newSlice.desc:SetJustifyV("TOP") newSlice.desc:SetJustifyH("CENTER")
 	
 	newSlice.close = CreateFrame("Button", "RKC_CloseNewSliceBrowser", newSlice, "UIPanelCloseButton")
 	newSlice.close:SetPoint("TOPRIGHT", 3, 4)
@@ -546,7 +548,7 @@ newSlice = CreateFrame("Frame", nil, ringContainer) do
 	end
 	for i=1,24 do
 		local f = CreateFrame("Button", nil, newSlice)
-		f:SetSize(176, 34) f:SetPoint("TOPLEFT", newSlice.desc, "BOTTOMLEFT", 178*(1 - i % 2), -math.floor((i-1)/2)*36-2)
+		f:SetSize(176, 34) f:SetPoint("TOPLEFT", newSlice.desc, "BOTTOMLEFT", 178*(1 - i % 2), -math.floor((i-1)/2)*36+3)
 		f:RegisterForDrag("LeftButton")
 		actions[i] = f
 		f:SetID(i)
@@ -695,9 +697,11 @@ function api.selectRing(_, name)
 	ringDetail.binding:SetBindingText(desc.hotkey)
 	ringDetail.hiddenRing:SetChecked(desc.internal)
 	ringDetail.opportunistCA:SetChecked(not desc.noOpportunisticCA)
-	local qaBroken = not OneRingLib:GetOption("CenterAction", name)
+	local qaBroken, dbBroken = not OneRingLib:GetOption("CenterAction", name), not OneRingLib:GetOption("UseDefaultBindings", name)
 	ringDetail.opportunistCA.Text:SetText(L"Pre-select a quick action slice" .. (qaBroken and (RED_FONT_COLOR_CODE .. " (" .. L"Disabled" .. ")|r") or ""))
 	ringDetail.opportunistCA.tooltipText = qaBroken and (L"You must enable the %s option for this ring in OPie options to use quick actions."):format("|cffffffff" .. L"Quick action at ring center" .. "|r") or nil
+	ringDetail.binding.label:SetText(L"Default ring binding:" .. (dbBroken and (RED_FONT_COLOR_CODE .. " (" .. L"Disabled" .. ")|r") or ""))
+	ringDetail.binding.tooltipText = dbBroken and (L"When the %s option is disabled, ring bindings can only be changed in the Bindings panel."):format("|cffffffff" .. L"Use default ring bindings" .. "|r") or nil		
 	currentRing, currentRingName, sliceBaseIndex, currentSliceIndex = desc, name, 1
 	ringDetail:Show()
 	ringDetail.scope:text()
@@ -825,7 +829,7 @@ function api.setSliceProperty(prop, value, ...)
 	end
 	if changed then pendingRingData[currentRingName] = currentRing end
 end
-local knownProps = {fcSlice="Allow as quick action", byName="Also use items with the same name", forceShow="Always show this slice", onlyEquipped="Only show when equipped"}
+local knownProps = {fcSlice="Allow as quick action", byName="Also use items with the same name", forceShow="Always show this slice", onlyEquipped="Only show when equipped", clickUsingRightButton="Simulate a right-click"}
 function api.configureOptions(id, desc, a, ...)
 	if not a then return id end
 	local b = sliceDetail.optionBoxes[id]
@@ -938,7 +942,6 @@ function panel:refresh()
 	panel.desc:SetText(L"Customize OPie by modifying existing rings, or creating your own.")
 	UIDropDownMenu_SetText(ringDropDown, L"Select a ring to modify")
 	ringDetail.scopeLabel:SetText(L"Make this ring available to:")
-	ringDetail.binding.label:SetText(L"Default ring binding:")
 	ringDetail.rotationLabel:SetText(L"Ring Rotation:")
 	ringDetail.hiddenRing.Text:SetText(L"Hide this ring")
 	sliceDetail.color.label:SetText(L"Color:")
@@ -950,7 +953,7 @@ function panel:refresh()
 	ringDetail.restore:SetText(L"Restore default")
 	ringDetail.remove:SetText(L"Delete ring")
 	ringDetail.newSlice:SetText(L"Add a new slice")
-	newSlice.desc:SetText(L"Double click or drag the actions below onto the slice list to add them to the ring.")
+	newSlice.desc:SetText(L"Double click an action to add it to the ring.")
 	newSlice.search.label:SetText(L"Search")
 	sliceDetail.skipSpecs.label:SetText("Show for:")
 	

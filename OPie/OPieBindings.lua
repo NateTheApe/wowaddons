@@ -105,8 +105,8 @@ function ringBindings:refresh()
 end
 function ringBindings:get(id)
 	local name, key, macro, internal = OneRingLib:GetRingInfo(self.map[id])
-	local bind, isOverride, isActive, cBind = OneRingLib:GetRingBinding(key)
-	return bind, name or key or "?", (cBind and isActive == false and (isOverride and "|cffFA2800" or "|cffa0a0a0")) or (isOverride and "|cffffffff") or ""
+	local bind, isOverride, isActive, cBind, enabled = OneRingLib:GetRingBinding(key)
+	return bind, name or key or "?", enabled and ((cBind and isActive == false and (isOverride and "|cffFA2800" or "|cffa0a0a0")) or (isOverride and "|cffffffff") or "") or "|cffa0a0a0"
 end
 function ringBindings:set(id, key)
 	id = self.map[id]

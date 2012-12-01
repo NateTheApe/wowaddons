@@ -1,0 +1,34 @@
+﻿## Interface: 50001
+## X-Curse-Packaged-Version: v1.3.6
+## X-Curse-Project-Name: Scorchio! 2
+## X-Curse-Project-ID: scorchio2
+## X-Curse-Repository-ID: wow/scorchio2/mainline
+
+## Title: Scorchio2
+## Notes: Tracks vulnerability debuffs on multiple mobs
+## Notes-frFR: surveille les vulnérabilités sur les différents mobs
+## Notes-ruRU: Отслеживает уязвимости к дебаффам у мобов
+## Notes-esES: Seguimiento de debuffs en múltiples objetivos
+## Notes-zhTW: 監測多個怪物間的傷害減益
+## Version: v1.3.6
+## Author: ennui@bloodhoof-eu
+
+## SavedVariables: Scorchio2DB
+## OptionalDeps: Ace3, LibBars-1.0, LibSink-2.0, LibSharedMedia-3.0
+
+#@no-lib-strip@
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\AceAddon-3.0\AceAddon-3.0.xml
+libs\AceConsole-3.0\AceConsole-3.0.xml
+libs\AceEvent-3.0\AceEvent-3.0.xml
+libs\AceLocale-3.0\AceLocale-3.0.xml
+libs\AceDB-3.0\AceDB-3.0.xml
+libs\AceTimer-3.0\AceTimer-3.0.xml
+libs\LibBars-1.0\lib.xml
+libs\LibSink-2.0\lib.xml
+libs\LibSharedMedia-3.0\lib.xml
+#@end-no-lib-strip@
+
+Localization.lua
+Scorchio2.lua

@@ -3,7 +3,7 @@
 ## Author: Sanori (Pathur) @ EU-Anetheron
 ## Notes: Broker_ProfessionsMenu is a broker addon for managing your trade skills and trade cooldowns.
 ## SavedVariables: Broker_ProfessionsMenu
-## X-Curse-Packaged-Version: v2.2
+## X-Curse-Packaged-Version: 2.5
 ## X-Curse-Project-Name: Broker_ProfessionsMenu
 ## X-Curse-Project-ID: broker_professionsmenu
 ## X-Curse-Repository-ID: wow/broker_professionsmenu/mainline
@@ -13,22 +13,27 @@ libs\LibStub.lua
 libs\CallbackHandler-1.0.lua
 libs\LibDataBroker-1.1.lua
 libs\LibTipHooker-1.1.lua
-libs\ArkDewdrop-3.0.lua
+libs\LibDewdrop-3.0.lua
 libs\lib-ScrollingTable.lua
-
-# Core
-core.lua
 
 # Localization
 localization\enUS.lua
 localization\deDE.lua
 localization\zhCN.lua
 localization\zhTW.lua
+localization\esES.lua
+localization\esMX.lua
+localization\frFR.lua
+localization\itIT.lua
+localization\koKR.lua
+localization\ptBR.lua
+localization\ruRU.lua
 
-# Addon
+# Core
+core.lua
+
+# Addons
 tooltip.lua
 dropdownmenu.lua
-quicktradeskills\disenchant.lua
-quicktradeskills\milling.lua
-quicktradeskills\prospecting.lua
+quicktradeskills.lua
 sharedcds.lua

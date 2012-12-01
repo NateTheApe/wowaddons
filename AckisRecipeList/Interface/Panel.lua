@@ -2,10 +2,10 @@
 ************************************************************************
 Panel.lua
 ************************************************************************
-File date: 2012-09-13T19:02:30Z
-File hash: 36555f9
-Project hash: 9e1f108
-Project version: 2.4.1
+File date: 2012-09-28T15:31:40Z
+File hash: 3cfcb4d
+Project hash: 5a95034
+Project version: 2.4.2
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -37,7 +37,6 @@ local FOLDER_NAME, private	= ...
 local LibStub = _G.LibStub
 local addon	= LibStub("AceAddon-3.0"):GetAddon(private.addon_name)
 local L		= LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
-local BFAC	= LibStub("LibBabble-Faction-3.0"):GetLookupTable()
 
 -------------------------------------------------------------------------------
 -- Upvalues

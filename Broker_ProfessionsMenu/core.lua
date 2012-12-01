@@ -3,7 +3,7 @@
 -- Author: Sanori/Pathur                                                      --
 --------------------------------------------------------------------------------
 local _, me = ...                                 --Includes all functions and variables
-me.version = "Version: 2.2 (27. Sep. 2012)"
+me.version = "Version: 2.5 (4. Nov. 2012)"
 
 
 
@@ -40,7 +40,31 @@ me.sharedcds = {}												--shared cds
 me.quicktradeskills = {}									--Quicktradeskills
 BPMAutoloot=nil												--Global Variable for Auto Loot Script
 local my = UnitName("player")								--player name
-me.L={}															--localization
+
+--Keys
+me.keys = {														--Keys
+	{['Key']='left',       ['Button']=me.L.leftclick},
+	{['Key']='shiftleft',  ['Button']=me.L.leftclick,  ['Mod']=me.L.shift},
+	{['Key']='altleft',    ['Button']=me.L.leftclick,  ['Mod']=me.L.alt},
+	{['Key']='ctrlleft',   ['Button']=me.L.leftclick,  ['Mod']=me.L.ctrl},
+	{['Key']='right',      ['Button']=me.L.rightclick},
+	{['Key']='shiftright', ['Button']=me.L.rightclick, ['Mod']=me.L.shift},
+	{['Key']='altright',   ['Button']=me.L.rightclick, ['Mod']=me.L.alt},
+	{['Key']='ctrlright',  ['Button']=me.L.rightclick, ['Mod']=me.L.ctrl},
+}
+function me:KeyDownIndex(button)							--Index der gedrückten Tastenkombination
+	local shift = IsShiftKeyDown();
+	local ctrl  = IsControlKeyDown();
+	local alt   = IsAltKeyDown();
+	if (button=='LeftButton' and not shift and not ctrl and not alt) then return 1 end
+	if (button=='LeftButton' and shift and not ctrl and not alt) then return 2 end
+	if (button=='LeftButton' and not shift and not ctrl and alt) then return 3 end
+	if (button=='LeftButton' and not shift and ctrl and not alt) then return 4 end
+	if (button=='RightButton' and not shift and not ctrl and not alt) then return 5 end
+	if (button=='RightButton' and shift and not ctrl and not alt) then return 6 end
+	if (button=='RightButton' and not shift and not ctrl and alt) then return 7 end
+	if (button=='RightButton' and not shift and ctrl and not alt) then return 8 end
+end
 
 
 
@@ -61,26 +85,15 @@ function me:GetProfs(sorted)
 	for _,index in pairs({GetProfessions()}) do
 		if index then
 			local name, texture, rank, maxRank, numSpells, spelloffset, skillLine = GetProfessionInfo(index)
-			if numSpells == 1 or numSpells == 2 and not ignore[name] then
-				if not IsPassiveSpell(spelloffset+1, BOOKTYPE_PROFESSION) then
-					local subname,_ = GetSpellBookItemName(spelloffset+1, BOOKTYPE_PROFESSION)
+			for i=1, numSpells do
+				if (not ignore[name] and not IsPassiveSpell(spelloffset+i, BOOKTYPE_PROFESSION)) then
+					local subname,_ = GetSpellBookItemName(spelloffset+i, BOOKTYPE_PROFESSION)
 					if not ignore[subname] then
 						if sorted then
 							if not result[name] then result[name]={} end
-							result[name][subname] = GetSpellBookItemTexture(spelloffset+1, BOOKTYPE_PROFESSION)
+							result[name][subname] = GetSpellBookItemTexture(spelloffset+i, BOOKTYPE_PROFESSION)
 						else
-							result[subname] = GetSpellBookItemTexture(spelloffset+1, BOOKTYPE_PROFESSION)
-						end
-					end
-				end
-				if numSpells == 2 and not IsPassiveSpell(spelloffset+2, BOOKTYPE_PROFESSION) then
-					local subname,_ = GetSpellBookItemName(spelloffset+2, BOOKTYPE_PROFESSION)
-					if not ignore[subname] then
-						if sorted then
-							if not result[name] then result[name]={} end
-							result[name][subname] = GetSpellBookItemTexture(spelloffset+2, BOOKTYPE_PROFESSION)
-						else
-							result[subname] = GetSpellBookItemTexture(spelloffset+2, BOOKTYPE_PROFESSION)
+							result[subname] = GetSpellBookItemTexture(spelloffset+i, BOOKTYPE_PROFESSION)
 						end
 					end
 				end
@@ -100,13 +113,6 @@ function me:GetProfs(sorted)
 		end
 	end
 	return result
-end
---Modified Version of GetSpellInfo()
-function me:GetSpellInfo(spell)
-	local name,_,icon,_ = GetSpellInfo(spell)
-	if not name then name = "---" end
-	if not icon then icon = "Interface\\Icons\\Trade_BlackSmithing" end
-	return name, icon
 end
 --Table Alphabetical Sort Function
 function me:pairsByKeys (t, f)
@@ -157,7 +163,6 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 		me.TrainerDB = Broker_ProfessionsMenu["%TrainerDB%"] or {}
 		local defaultsave = {						--default save values
 			config = {
-				exchangeleftright = false,
 				bothfactions = false,
 				trainerdisabled = false,
 				tooltip = {
@@ -168,6 +173,7 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 					ShowIfYouCanCraftThisInItemTooltips = true,
 				},
 			},
+			lastprofession = 0,
 			cds = {},
 			tradelinks = {},
 			craftableitems = {},
@@ -177,10 +183,14 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 				shiftleft = 0,
 				altleft = 0,
 				ctrlleft = 0,
+				right = "menu",
+				shiftright = "fav",
+				altright = 0,
+				ctrlright = 0,
 			},
 			favorites = {},
-			filter = {},
 			faction = "",
+			class = "",
 		}
 		--creates a new save tableb
 		local function newsave(tbl, default)
@@ -199,10 +209,10 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 		me.save[my] = newsave(me.save[my], defaultsave)
 	elseif event == "PLAYER_LOGIN" then
 		--Init LibDataBroker
-		me:InitLDB(me:GetSpellInfo(me.save[my].quicklaunch.left))
+		me:InitLDB()
 		--Create Launchers 
 		for k,_ in pairs(me.save[my].quicklauncher) do
-			me.quicklauncher[k]=me:newlauncher(me:GetSpellInfo(k))
+			me.quicklauncher[k]=me:newlauncher(k)
 		end
 		--Modifying Atlasloot Recept Tooltips
 		if AtlasLootTooltip then
@@ -210,8 +220,9 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 				me:modifytooltip(self,select(3,self:GetSpell()))
 			end)
 		end
-		--save players faction
-		me.save[my].faction,_ = UnitFactionGroup("player")
+		--save players faction and class
+		me.save[my].faction = UnitFactionGroup("player")
+		me.save[my].class = select(2,UnitClass("player"))
 		--clear trainer stuff if module is disabled (save memory)
 		if me.save[my].config.trainerdisabled then
 			me.notrainer = true
@@ -290,45 +301,20 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 			end)
 			me.Trainer.showbtn:Show()
 			me.Trainer.showframe = nil
+			-- Sizing of the original frame
+			me.Trainer.OrigFrameSize = TradeSkillFrame:GetHeight()
+			hooksecurefunc(TradeSkillFrame, "SetHeight", function(self, size)
+				if not me.Trainer.size_changed then
+					me.Trainer.OrigFrameSize=size
+					me:Trainer_Refresh()
+				end
+				me.Trainer.size_changed=nil
+			end)
 		end
 		me:ScanTradeSkillFrame()
 		--Favorite Button-----------------------------------------------		
 		if not me.FavoriteButton then --Call only once
 			me.FavoriteButton=true
-			--Add RightClick Event to TradSkillSkill-Buttons
-			for i=1, TRADE_SKILLS_DISPLAYED do
-				_G["TradeSkillSkill"..i]:SetScript("OnMouseDown", function(self, button)
-					if (button=="RightButton" and me.FavoriteButtonProfID and self.BPM_RecipeID) then
-						local data = me.save[my].favorites[me.FavoriteButtonProfID]
-						if not data then
-							me.save[my].favorites[me.FavoriteButtonProfID] = {}
-							data = {}
-						end
-						if data[self.BPM_RecipeID] then
-							data[self.BPM_RecipeID] = nil
-							if me:tcount(data) == 0 then data = nil end
-								me.save[my].favorites[me.FavoriteButtonProfID] = data
-							else
-								data[self.BPM_RecipeID] = self.BPM_Type
-								me.save[my].favorites[me.FavoriteButtonProfID] = data
-							end
-						TradeSkillFrame_Update()
-						self:GetScript("OnEnter")(self)	
-					end
-				end)
-				_G["TradeSkillSkill"..i]:HookScript("OnEnter", function(self)
-					if (me.FavoriteButtonProfID and self.BPM_RecipeID) then
-						local skillName = GetTradeSkillInfo(self:GetID())
-						GameTooltip:SetOwner(self, "ANCHOR_NONE")
-						GameTooltip:SetPoint("TOPLEFT",TradeSkillFrame,"BOTTOMLEFT")
-						GameTooltip:ClearLines()
-						GameTooltip:AddLine(skillName)
-						GameTooltip:AddLine(self.BPM_Tooltip,1,1,1)
-						GameTooltip:Show()
-					end
-				end)
-				_G["TradeSkillSkill"..i]:HookScript("OnLeave", function(self) GameTooltip:Hide() end)
-			end
 			--Hook Update Function
 			hooksecurefunc("TradeSkillFrame_Update",function()
 				me.FavoriteButtonProfID = nil
@@ -341,8 +327,29 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 							return
 						end
 					end
+					me.save[my].lastprofession = me.FavoriteButtonProfID	-- Save last opened profession window
 					local skillOffset = FauxScrollFrame_GetOffset(TradeSkillListScrollFrame)
 					for i=1, TRADE_SKILLS_DISPLAYED do
+						--Button Right Click Event
+						_G["TradeSkillSkill"..i]:SetScript("OnMouseDown", function(self, button)
+							if (button=="RightButton" and me.FavoriteButtonProfID and self.BPM_RecipeID) then
+								local data = me.save[my].favorites[me.FavoriteButtonProfID]
+								if not data then
+									me.save[my].favorites[me.FavoriteButtonProfID] = {}
+									data = {}
+								end
+								if data[self.BPM_RecipeID] then
+									data[self.BPM_RecipeID] = nil
+									if me:tcount(data) == 0 then data = nil end
+									me.save[my].favorites[me.FavoriteButtonProfID] = data
+								else
+									data[self.BPM_RecipeID] = self.BPM_Type
+									me.save[my].favorites[me.FavoriteButtonProfID] = data
+								end
+								TradeSkillFrame_Update()
+							end
+						end)
+						--
 						local skillIndex = i + skillOffset;
 						if TradeSkillFilterBar:IsShown() then skillIndex=skillIndex-1 end
 						local skillName, skillType, numAvailable, isExpanded, altVerb, numSkillUps = GetTradeSkillInfo(skillIndex)
@@ -351,12 +358,11 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 							local link = GetTradeSkillRecipeLink(skillIndex)
 							if link then 
 								local recipeid = tonumber(strmatch(link,"enchant:(%d+)"))
+								_G["TradeSkillSkill"..i]:SetNormalTexture("Interface\\AddOns\\Broker_ProfessionsMenu\\icons\\fav.tga")
 								if me.save[my].favorites[me.FavoriteButtonProfID] and me.save[my].favorites[me.FavoriteButtonProfID][recipeid] then
-									_G["TradeSkillSkill"..i].BPM_Tooltip = me.L.rightclick..": "..me.L.removefromfav
-									_G["TradeSkillSkill"..i]:SetNormalTexture("Interface\\AddOns\\Broker_ProfessionsMenu\\icons\\fav.tga")
 									_G["TradeSkillSkill"..i]:GetNormalTexture():SetAlpha(1.0)
 								else
-									_G["TradeSkillSkill"..i].BPM_Tooltip = me.L.rightclick..": "..me.L.addtofav
+									_G["TradeSkillSkill"..i]:GetNormalTexture():SetAlpha(0.1)
 								end
 								_G["TradeSkillSkill"..i].BPM_RecipeID = recipeid
 								if altVerb then
@@ -493,51 +499,34 @@ end)
 --------------------------------------------------------------------------------
 -- Init LibDataBroker (Main Window)                                           --
 --------------------------------------------------------------------------------
-function me:InitLDB(txt,icon)
-	if txt=="---" then txt=me.L.professions end
+function me:InitLDB()
 	--Create Secure Frame Overlay
 	me.secureframe = CreateFrame("Button", nil, UIParent, "SecureActionButtonTemplate");
 	me.secureframe.OnMouseUp = function(self,button)
 		if InCombatLockdown() then return end
-		if me.save[my].config.exchangeleftright then
-			self:SetAttribute("*type1", nil)
-			self:SetAttribute("*type2", "spell")
-		else
-			self:SetAttribute("*type2", nil)
-			self:SetAttribute("*type1", "spell")
-		end
-		if IsControlKeyDown() then
-			self:SetAttribute("spell", GetSpellInfo(me.save[my].quicklaunch.ctrlleft))
-		elseif IsAltKeyDown() then
-			self:SetAttribute("spell", GetSpellInfo(me.save[my].quicklaunch.altleft))
-		elseif IsShiftKeyDown() then
-			self:SetAttribute("spell", GetSpellInfo(me.save[my].quicklaunch.shiftleft))
-		else
-			self:SetAttribute("spell", GetSpellInfo(me.save[my].quicklaunch.left))
-		end
-		if button == "RightButton" and not me.save[my].config.exchangeleftright then
+		self:SetAttribute("*type1", "spell")
+		self:SetAttribute("*type2", "spell")
+		self:SetAttribute("spell", "")
+		local key = me.keys[me:KeyDownIndex(button)]
+		if not key then return end
+		local id = me.save[my].quicklaunch[key.Key]
+		if (id==-1 and me.save[my].lastprofession>0) then
+			self:SetAttribute("spell", GetSpellInfo(me.save[my].lastprofession))
+		elseif (id=='menu') then
 			GameTooltip:Hide()
-			me.dropdown.parent=self
-			if IsShiftKeyDown() then
-				me.dropdown:Open(self, 'children', function() me.dropdown:ShowFavorites() end)
-			else
-				me.dropdown:Open(self, 'children', function(level, value) me.dropdown:ShowMenu(level, value) end)
-			end
-		elseif button == "LeftButton" and me.save[my].config.exchangeleftright then
+			me.dropdown:Open(self, 'children', function(level, value) me.dropdown:ShowMenu(level, value, self) end)
+		elseif (id=='fav') then
 			GameTooltip:Hide()
-			me.dropdown.parent=self
-			if IsShiftKeyDown() then
-				me.dropdown:Open(self, 'children', function() me.dropdown:ShowFavorites() end)
-			else
-				me.dropdown:Open(self, 'children', function(level, value) me.dropdown:ShowMenu(level, value) end)
-			end
+			me.dropdown:Open(self, 'children', function() me.dropdown:ShowFavorites(self) end)
+		elseif (id>0) then
+			self:SetAttribute("spell", GetSpellInfo(id))
 		end
 	end
 	--Create LDB
 	me.dataobj = me.LDB:NewDataObject("Broker_ProfessionsMenu", {
 		type = "data source",
-		text = txt,
-		icon = icon,
+		text = me.L["professions"],
+		icon = "Interface\\Icons\\Trade_BlackSmithing",
 		OnEnter = function(self)
 			me:Broker_OnEnter(self,me.secureframe,function(self) me:tooltip(self) end)
 		end,
@@ -549,7 +538,9 @@ end
 --------------------------------------------------------------------------------
 -- Creates Launchers                                                          --
 --------------------------------------------------------------------------------
-function me:newlauncher(spell,icon)
+function me:newlauncher(id)
+	local spell,_,icon = GetSpellInfo(id)
+	if (not spell) then return end
 	local launcher = {}
 	--secure frame
 	launcher.secureframe = CreateFrame("Button", nil, UIParent, "SecureActionButtonTemplate")
@@ -722,10 +713,14 @@ function me:Trainer_Refresh()
 			tinsert(table,{["cols"] = {{["value"] = "",},{["value"] = me.L.knowallrecipes,},{["value"] = "",},},})
 		end
 		me.Trainer:SetData(table)
-		TradeSkillFrame:SetHeight(560)
+		--TradeSkillFrame:SetHeight(560)
+		me.Trainer.size_changed=true
+		TradeSkillFrame:SetHeight(me.Trainer.OrigFrameSize+me.Trainer.frame:GetHeight())
 		me.Trainer.frame:Show()
 	else
-		TradeSkillFrame:SetHeight(424)
+		--TradeSkillFrame:SetHeight(424)
+		me.Trainer.size_changed=true
+		TradeSkillFrame:SetHeight(me.Trainer.OrigFrameSize)
 		me.Trainer.frame:Hide()
 	end
 end

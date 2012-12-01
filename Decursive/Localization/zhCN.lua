@@ -1,7 +1,7 @@
 ﻿--[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -21,7 +21,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -69,11 +69,12 @@ if not T._LoadedFiles or not T._LoadedFiles["enUS.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["zhCN.lua"] = false;
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhCN");
 
 if not L then
-    T._LoadedFiles["zhCN.lua"] = "2.7.2.2";
+    T._LoadedFiles["zhCN.lua"] = "2.7.2.3_beta_3";
     return;
 end;
 
@@ -161,7 +162,7 @@ L["GLOR5"] = "他将永远被我们所铭记……"
 L["HANDLEHELP"] = "拖动所有微单位框体"
 L["HIDE_LIVELIST"] = "隐藏实时列表"
 L["HIDE_MAIN"] = "隐藏 Decursive 窗口"
-L["HIDESHOW_BUTTONS"] = "显示/隐藏按钮"
+L["HIDESHOW_BUTTONS"] = "显示/隐藏按钮" -- Needs review
 L["HLP_LEFTCLICK"] = "鼠标左键"
 L["HLP_LL_ONCLICK_TEXT"] = [=[实时列表不代表能被点击。请先阅读此文档来学习如何使用此插件。在 WoWAce.com 网站搜索“Decursive”
 （从 Decursive 计时条移除此列表，/dcrshow 命令并左Alt+点击移除）]=]
@@ -171,7 +172,7 @@ L["HLP_RIGHTCLICK"] = "鼠标右键"
 L["HLP_USEXBUTTONTOCURE"] = "用“%s”来净化这个负面效果！"
 L["HLP_WRONGMBUTTON"] = "错误的鼠标按键！"
 L["IGNORE_STEALTH"] = "忽略潜行的单位"
-L["IS_HERE_MSG"] = "Decursive 已经初始化，请核对相关选项。"
+L["IS_HERE_MSG"] = "Decursive 已经初始化，请核对相关选项。（/decursive）"
 L["LIST_ENTRY_ACTIONS"] = [=[|cFF33AA33[Ctrl]+点击|r：删除此玩家
 |cFF33AA33点击|r：上移此玩家
 |cFF33AA33右击|r：下移此玩家
@@ -311,7 +312,7 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "法术 ID 不可用！"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "不能在技能书中找到法术！"
 L["OPTION_MENU"] = "Decursive 选项菜单"
 L["OPT_LIVELIST"] = "实时列表"
-L["OPT_LIVELIST_DESC"] = "实时列表选项"
+L["OPT_LIVELIST_DESC"] = "实时列表选项" -- Needs review
 L["OPT_LLALPHA"] = "实时列表透明度"
 L["OPT_LLALPHA_DESC"] = "改变 Decursive 状态条面和实时列表的透明度（状态条必须可见）"
 L["OPT_LLSCALE"] = "实时列表缩放"
@@ -361,7 +362,7 @@ L["OPT_NEWVERSIONBUGMENOT_DESC"] = "如过检测到 Decursive 新的版本，每
 L["OPT_NOKEYWARN"] = "当没有按键时发出警报"
 L["OPT_NOKEYWARN_DESC"] = "当没有映射案件时发出警报。"
 L["OPT_NOSTARTMESSAGES"] = "禁用欢迎信息"
-L["OPT_NOSTARTMESSAGES_DESC"] = "移除每次登陆时在聊天框体显示的三个 Decursive 信息。"
+L["OPT_NOSTARTMESSAGES_DESC"] = "移除每次登陆时在聊天框体显示的两个 Decursive 信息。"
 L["OPT_OPTIONS_DISABLED_WHILE_IN_COMBAT"] = "此选项战斗中被禁用。"
 L["OPT_PERFOPTIONWARNING"] = "警告：不要更改这些值，除非你确切知道你在做什么。这些设置可以对游戏性能影响很大。大多数用户应当使用0.1和10的默认值。"
 L["OPT_PLAYSOUND_DESC"] = "有玩家受到减益时播放音效"
@@ -454,6 +455,12 @@ L["STR_QUICK_POP"] = "快速添加器"
 L["SUCCESSCAST"] = "|cFF22FFFF%s %s|r |cFF00AA00成功施放于|r %s"
 L["TARGETUNIT"] = "目标单位"
 L["TIE_LIVELIST"] = "根据 Decursive 窗口是否可见实时列表"
+L["TOC_VERSION_EXPIRED"] = [=[Decursive 版本已过期。此版本的 Decursive 是在当前魔兽世界版本之前发布的。
+需要更新 Decursive 来解决潜在的不兼容和运行时错误。
+
+到 curse.com 搜寻“Decursive”或使用 Curse 客户端立刻更新你的全部插件。
+
+此消息2天内会重复显示。]=]
 L["TOOFAR"] = "太远"
 L["TOO_MANY_ERRORS_ALERT"] = [=[你的用户界面（%d）有太多的 Lua 错误。当前游戏体验被弱化。禁用或者更新失效的插件关闭信息并重新获得适当的帧数频率。
 如果想打开 Lua 错误报告（魔兽世界”下“帮助插件选项）来找出可能出问题的插件。]=]
@@ -462,4 +469,4 @@ L["UNSTABLERELEASE"] = "不稳定版本"
 
 
 
-T._LoadedFiles["zhCN.lua"] = "2.7.2.2";
+T._LoadedFiles["zhCN.lua"] = "2.7.2.3_beta_3";

@@ -4,10 +4,11 @@
 ## Author: foxlit
 ## SavedVariables: OneRing_Config
 ## OptionalDeps: Masque
-## Version: Kiwi 1
+## Version: Kiwi 2
 ## X-Update-FeedURL: http://www.go-hero.net/opie/rss/beta
 ## X-Website: http://www.go-hero.net/opie/
 EventLib.lua
+Locale.lua
 OneRingLib.lua
 OneRingIndication.lua
 OPieConfig.lua

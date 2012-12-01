@@ -1,0 +1,45 @@
+------------------------------------------------------------------------
+r220 | kagaro | 2012-11-18 07:01:31 +0000 (Sun, 18 Nov 2012) | 1 line
+Changed paths:
+   A /tags/v13.4 (from /trunk:219)
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r217 | kagaro | 2012-11-04 07:01:10 +0000 (Sun, 04 Nov 2012) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r215 | kagaro | 2012-10-29 14:36:38 +0000 (Mon, 29 Oct 2012) | 1 line
+Changed paths:
+   M /trunk/ArchaeologyData.lua
+   M /trunk/FishData.lua
+   M /trunk/GasData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r213 | kagaro | 2012-10-29 14:23:56 +0000 (Mon, 29 Oct 2012) | 1 line
+Changed paths:
+   M /trunk/GasData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r211 | kagaro | 2012-10-28 06:06:51 +0000 (Sun, 28 Oct 2012) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/MiningData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------
+r209 | kagaro | 2012-10-21 06:06:28 +0000 (Sun, 21 Oct 2012) | 1 line
+Changed paths:
+   M /trunk/HerbalismData.lua
+   M /trunk/TreasureData.lua
+
+GatherMate2_Data: Data update
+------------------------------------------------------------------------

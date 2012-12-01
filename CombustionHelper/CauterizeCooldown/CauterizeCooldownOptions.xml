@@ -1,0 +1,620 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+<!--                       Templates                                           -->
+
+<FontString name="CombuCautScaleValueTemplate" virtual="true" font="Fonts\FRIZQT__.TTF" text="" justifyH="CENTER">
+    <Anchors>
+        <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+            <Offset>
+                <AbsDimension x="0" y="-20"/>
+            </Offset>
+        </Anchor>
+    </Anchors>
+   <FontHeight>
+    <AbsValue val="8" />
+  </FontHeight>
+  <Color r="1" g="1" b="1" />
+  <Shadow>
+    <Color r="0" g="0" b="0" />
+    <Offset>
+      <AbsDimension x="1" y="-1" />
+    </Offset>
+  </Shadow>
+</FontString>
+
+
+<!--                        Interface panel Option frame                        -->
+
+	<Frame name="CombuCautOptionsFrame" parent="InterfaceOptionsFramePanelContainer">
+		<Scripts>
+			<OnLoad function="CombuCautOptions_OnLoad"/>
+		</Scripts>
+		
+		<Frames>
+            <CheckButton name="CombuCautEnableButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("Enable CauterizeCooldown")
+						if (CombuCautenablevar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautEnable()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+			<Slider name="CombuCautScaleSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuCautEnableButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuCautScaleValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."Text"]:SetText("Scale")
+						_G[self:GetName().."High"]:SetText("300%")
+						_G[self:GetName().."Low"]:SetText("25%")
+						self:SetMinMaxValues(0.25, 3)
+						self:SetValueStep(0.01)
+					</OnLoad>
+					<OnShow>
+                        self:SetValue(CombuCautscalevar)
+                        CombuCautScaleSliderValue:SetText(format("%.0f%%",self:GetValue()*100))
+					</OnShow>
+					<OnValueChanged>
+                        CombuCautscalevar = self:GetValue()
+                        CombuCautFrameResize()
+                        CombuCautScaleSliderValue:SetText(format("%.0f%%",self:GetValue()*100))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            				
+			<Slider name="CombuCautlevelSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuCautScaleSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuCautScaleValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."Text"]:SetText("Level")
+						_G[self:GetName().."High"]:SetText("30")
+						_G[self:GetName().."Low"]:SetText("1")
+						self:SetMinMaxValues(1, 30)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						if (CombuCautlevelvar == nil) then self:SetValue(10)
+													CombuCautlevelvar = 10
+						else self:SetValue(CombuCautlevelvar)
+						end
+                        CombuCautlevelSliderValue:SetText(self:GetValue())
+					</OnShow>
+					<OnValueChanged>
+                        CombuCautlevelvar = self:GetValue()
+                        CombuCautlevelSliderValue:SetText(self:GetValue())
+                        CombuCautFrame:SetFrameLevel(CombuCautlevelvar)
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+
+			<Slider name="CombuCautAlphaSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuCautlevelSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuCautScaleValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."Text"]:SetText("Alpha")
+						_G[self:GetName().."High"]:SetText("100%")
+						_G[self:GetName().."Low"]:SetText("0%")
+						self:SetMinMaxValues(0, 1)
+						self:SetValueStep(0.01)
+					</OnLoad>
+					<OnShow>
+						if (CombuCautalphavar == nil) then self:SetValue(1)
+													CombuCautalphavar = 1
+						else self:SetValue(CombuCautalphavar)
+						end
+                        CombuCautAlphaSliderValue:SetText(format("%.0f%%",self:GetValue()*100))
+					</OnShow>
+					<OnValueChanged>
+                        CombuCautalphavar = self:GetValue()
+                        CombuCautAlphaSliderValue:SetText(format("%.0f%%",self:GetValue()*100))
+                        CombuCautFrame:SetAlpha(CombuCautalphavar)
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+            <CheckButton name="CombuCautlockButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuCautAlphaSlider" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("Lock CauterizeCooldown")
+						if (CombuCautlockvar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautlock()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+            <CheckButton name="CombuCautHideButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuCautlockButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("Hide CauterizeCooldown when Cauterize is off CD")
+						if (CombuCauthidevar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautHide()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+            <CheckButton name="CombuCautTimerButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuCautHideButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("Show timer cooldown with numbers")
+						if (CombuCautTimevar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautTimer()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+            <CheckButton name="CombuCautChatAloneButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuCautTimerButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("No announce when soloing/alone")
+						if (CombuCautChatAlonevar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautChatAlone()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+            <Frame name="CombuCautAnnounceInfo">
+                <Size>
+                  <AbsDimension x="180" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuCautChatAloneButton" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-30" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Send announcement to :" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+
+            <CheckButton name="CombuCautAnnounceRaidButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuCautAnnounceInfo" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("Raid/Party channel")
+						if (CombuCautChatRaidvar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautChatRaid()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+			
+            <CheckButton name="CombuCautAnnounceSayButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuCautAnnounceRaidButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("Vicinity channel")
+						if (CombuCautChatSayvar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautChatSay()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+            <CheckButton name="CombuCautAnnounceYellButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuCautAnnounceSayButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("Yell channel")
+						if (CombuCautChatYellvar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautChatYell()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+			
+            <Frame name="CombuCautAnnounceEditInfo">
+                <Size>
+                  <AbsDimension x="150" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuCautAnnounceInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-90" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Announce :" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+
+		    <EditBox name="CombuCautAnnounceEditBox" letters="100" ignoreArrows="false" autoFocus="false">
+		 	  <Size>
+				 <AbsDimension x="400" y="32" ></AbsDimension>
+			  </Size>
+			  <Anchors>
+		          <Anchor point="TOPLEFT" relativeTo="CombuCautAnnounceEditInfo" relativePoint="TOPLEFT">
+		              <Offset>
+		                  <AbsDimension x="0" y="-25"/>
+		              </Offset>
+		          </Anchor>
+		      </Anchors>
+		      <Layers>
+				<Layer level="BACKGROUND">
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+						<Size>
+							<AbsDimension x="35" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-10" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0" right="0.2" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Mid">
+						<Size>
+							<AbsDimension x="350" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER">
+								<Offset>
+									<AbsDimension x="0" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0" right="1.0" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+						<Size>
+							<AbsDimension x="35" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0.7" right="1.0" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+				</Layer>
+			</Layers>
+				<FontString inherits="ChatFontNormal"></FontString>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="25" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+			    <Scripts>
+					<OnShow>
+						CombuCautAnnounceEditBox:SetText(CombuCautAnnouncevar)
+						CombuCautAnnounceEditBox:SetCursorPosition(0)
+					</OnShow>
+			        <OnEscapePressed>
+			            self:ClearFocus()
+			        </OnEscapePressed>
+			        <OnEnterPressed>
+			            CombuCautAnnouncevar = self:GetText()
+			            print("Cauterize announce changed to :",CombuCautAnnouncevar)
+			            self:ClearFocus()           
+			        </OnEnterPressed>
+				</Scripts>
+			</EditBox>
+			<Button name="CombuCautAnnounceEditBoxokButton" inherits="OptionsButtonTemplate" text="ok">
+				<Size>
+					<AbsDimension x="25" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuCautAnnounceEditBox" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CombuCautAnnouncevar = CombuCautAnnounceEditBox:GetText()
+			            print("Cauterize announce changed to :",CombuCautAnnouncevar)
+						CombuCautAnnounceEditBox:ClearFocus()           
+   					</OnClick>				
+				</Scripts>
+			</Button>
+
+            <CheckButton name="CombuCautAnnounceAltButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuCautAnnounceEditBox" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText("Use alternate announce when Ice Block is available.")
+						if (CombuCautChatAltvar == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuCautChatAlt()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+		    <EditBox name="CombuCautAnnounceAltEditBox" letters="100" ignoreArrows="false" autoFocus="false">
+		 	  <Size>
+				 <AbsDimension x="400" y="32" ></AbsDimension>
+			  </Size>
+			  <Anchors>
+		          <Anchor point="TOPLEFT" relativeTo="CombuCautAnnounceAltButton" relativePoint="TOPLEFT">
+		              <Offset>
+		                  <AbsDimension x="0" y="-25"/>
+		              </Offset>
+		          </Anchor>
+		      </Anchors>
+		      <Layers>
+				<Layer level="BACKGROUND">
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+						<Size>
+							<AbsDimension x="35" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-10" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0" right="0.2" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Mid">
+						<Size>
+							<AbsDimension x="350" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER">
+								<Offset>
+									<AbsDimension x="0" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0" right="1.0" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+						<Size>
+							<AbsDimension x="35" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0.7" right="1.0" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+				</Layer>
+			</Layers>
+				<FontString inherits="ChatFontNormal"></FontString>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="25" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+			    <Scripts>
+					<OnShow>
+						CombuCautAnnounceAltEditBox:SetText(CombuCautAnnounceAltvar)
+						CombuCautAnnounceAltEditBox:SetCursorPosition(0)
+					</OnShow>
+			        <OnEscapePressed>
+			            self:ClearFocus()
+			        </OnEscapePressed>
+			        <OnEnterPressed>
+			            CombuCautAnnounceAltvar = self:GetText()
+			            print("Cauterize announce changed to :",CombuCautAnnounceAltvar)
+			            self:ClearFocus()           
+			        </OnEnterPressed>
+				</Scripts>
+			</EditBox>
+			<Button name="CombuCautAnnounceAltEditBoxokButton" inherits="OptionsButtonTemplate" text="ok">
+				<Size>
+					<AbsDimension x="25" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuCautAnnounceAltEditBox" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CombuCautAnnounceAltvar = CombuCautAnnounceAltEditBox:GetText()
+			            print("Alternate Cauterize announce changed to :",CombuCautAnnounceAltvar)
+						CombuCautAnnounceAltEditBox:ClearFocus()           
+   					</OnClick>				
+				</Scripts>
+			</Button>
+			
+            <Button name="CombuCautresetButton" inherits="OptionsButtonTemplate" text="Reset SavedVariables">
+				<Size>
+					<AbsDimension x="180" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuCautAnnounceAltEditBox" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CombuCautreset()
+                        CombuCautOptionsFrame:Hide()
+                        CombuCautOptionsFrame:Show()
+					</OnClick>				
+				</Scripts>
+			</Button>
+
+	        </Frames>
+	</Frame>
+	
+</Ui>

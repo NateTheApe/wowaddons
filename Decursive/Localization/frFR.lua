@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -20,7 +20,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -68,11 +68,12 @@ if not T._LoadedFiles or not T._LoadedFiles["enUS.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["frFR.lua"] = false;
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "frFR");
 
 if not L then 
-    T._LoadedFiles["frFR.lua"] = "2.7.2.2";
+    T._LoadedFiles["frFR.lua"] = "2.7.2.3_beta_3";
     return;
 end
 
@@ -159,7 +160,7 @@ L["GLOR5"] = "On ne l'oubliera jamais..."
 L["HANDLEHELP"] = "Déplacer tous les micro-portraits"
 L["HIDE_LIVELIST"] = "Cacher la liste"
 L["HIDE_MAIN"] = "Cacher la fenêtre \"Decursive\""
-L["HIDESHOW_BUTTONS"] = "Cacher/Afficher les boutons"
+L["HIDESHOW_BUTTONS"] = "Cacher/Afficher les boutons et Verrouiller/Déverrouiller la barre \"Decursive\""
 L["HLP_LEFTCLICK"] = "Clic Gauche"
 L["HLP_LL_ONCLICK_TEXT"] = [=[Cette liste n'est pas cliquable. Merci de lire la documentation pour apprendre à utiliser cet add-on. Cherchez 'Decursive' sur WoWAce.com
 (Pour bouger cette liste, bougez la barre de Decursive, /dcrshow et alt-clic-gauche pour déplacer)]=]
@@ -169,7 +170,7 @@ L["HLP_RIGHTCLICK"] = "Clic Droit"
 L["HLP_USEXBUTTONTOCURE"] = "Utilisez \"%s\" pour guérir cette affection !"
 L["HLP_WRONGMBUTTON"] = "Mauvais clique !"
 L["IGNORE_STEALTH"] = "Ignorer les unités camouflées"
-L["IS_HERE_MSG"] = "Decursive est initialisé, n'oubliez pas de contrôler les options disponibles"
+L["IS_HERE_MSG"] = "Decursive est initialisé, n'oubliez pas de contrôler les options disponibles (/decursive)"
 L["LIST_ENTRY_ACTIONS"] = [=[|cFF33AA33[CTRL]|r Click : Efface ce joueur
 Click |cFF33AA33GAUCHE|r : Monte ce joueur
 Click |cFF33AA33DROIT|r: Descend ce joueur
@@ -308,7 +309,11 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "ID de sort invalide !"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "Ce sort ne se trouve pas dans votre grimoire !"
 L["OPTION_MENU"] = "Menu options"
 L["OPT_LIVELIST"] = "Liste des affligés"
-L["OPT_LIVELIST_DESC"] = "Options pour la liste des affligés"
+L["OPT_LIVELIST_DESC"] = [=[Ce sont les options concernant la liste des affligés affichée en dessous de la barre "Decursive".
+
+Pour déplacer cette liste il faut bouger cette barre. Certains des réglages ci-dessous ne sont accessibles que lorsque cette barre est affichée. Vous pouvez l'afficher en tapant |cff20CC20/DCRSHOW|r dans votre fenêtre de discussion.
+
+Une fois que vous avez réglé la position, l'échelle et la transparence vous pouvez cacher cette barre sans problème en tapant  |cff20CC20/DCRHIDE|r.]=]
 L["OPT_LLALPHA"] = "Transparence"
 L["OPT_LLALPHA_DESC"] = [=[Définit la transparence de la barre principale de Decursive et de la liste des affligés
 (la barre principale doit être affichée)]=]
@@ -360,7 +365,7 @@ L["OPT_NEWVERSIONBUGMENOT_DESC"] = "Si une nouvelle version de Decursive est dé
 L["OPT_NOKEYWARN"] = "Avertir si aucune touche"
 L["OPT_NOKEYWARN_DESC"] = "Affiche un avertissement si aucune touche n'est affectée à la macro."
 L["OPT_NOSTARTMESSAGES"] = "Désactiver les messages de bienvenue"
-L["OPT_NOSTARTMESSAGES_DESC"] = "Enlève les trois messages que Decursive écrit dans le chat à chaque connexion."
+L["OPT_NOSTARTMESSAGES_DESC"] = "Enlève les deux messages que Decursive écrit dans le chat à chaque connexion."
 L["OPT_OPTIONS_DISABLED_WHILE_IN_COMBAT"] = "Ces options sont désactivées lorsque vous combattez."
 L["OPT_PERFOPTIONWARNING"] = "ATTENTION : Ne changez pas ces réglages sauf si vous savez parfaitement ce que vous faites. Ces réglages peuvent affecter grandement les performances du jeux. La plus part des utilisateurs devrait utiliser les valeurs par défaut de 0,1 et 10."
 L["OPT_PLAYSOUND_DESC"] = "Joue un son si quelqu'un est affecté."
@@ -453,6 +458,12 @@ L["STR_QUICK_POP"] = "Remplir rapidement"
 L["SUCCESSCAST"] = "|cFF22FFFF%s %s|r sur %s |cFF00AA00réussi !|r"
 L["TARGETUNIT"] = "Cible l'unité"
 L["TIE_LIVELIST"] = "Lier la visibilité de la liste à \"Decursive\""
+L["TOC_VERSION_EXPIRED"] = [=[Votre version de Decursive est périmée. Cette version de Decursive est plus ancienne que la version de World of Warcraft que vous utilisez.
+Vous devez mettre à jour Decursive pour corriger d'éventuelles incompatibilités ou erreurs.
+
+Allez sur curse.com et cherchez "Decursive" ou utilisez le client de Curse.com pour mettre tous vos add-ons à jour.
+
+Cette note sera affichée de nouveau dans deux jours.]=]
 L["TOOFAR"] = "Hors de portée"
 L["TOO_MANY_ERRORS_ALERT"] = [=[Il y a trop d'erreurs Lua dans votre interface utilisateur (%d). Votre expérience de jeu s'en retrouve dégradée. Désactivez ou mettez à jour les add-ons en erreur pour stopper ce message et retrouver une fluidité de jeu correcte.
 Vous devriez activer les rapports d'erreur Lua (section 'Aide' des options d'interface de World of Warcraft) afin d’identifier les add-ons problématiques.]=]
@@ -461,5 +472,4 @@ L["UNSTABLERELEASE"] = "Version instable"
 
 
 
-T._LoadedFiles["frFR.lua"] = "2.7.2.2";
-
+T._LoadedFiles["frFR.lua"] = "2.7.2.3_beta_3";

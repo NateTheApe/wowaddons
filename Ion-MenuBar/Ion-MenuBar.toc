@@ -5,8 +5,8 @@
 ## Notes: Menu bar for Ion
 ## DefaultState: enabled
 ## Dependencies: Ion
-## SavedVariables: IonMenuGDB
-## SavedVariablesPerCharacter: IonMenuCDB
+## SavedVariables: 
+## SavedVariablesPerCharacter: IonMenuCDB, IonMenuGDB
 ## X-Child-Of: Ion
 ## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved..
 ## X-Email: trinityui@live.com

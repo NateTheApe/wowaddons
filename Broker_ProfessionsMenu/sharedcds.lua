@@ -4,9 +4,10 @@ local _, me = ...                                 --Includes all functions and v
 me.P={}
 me.P.SharedCDs = {
 	--<<ALCHEMY>>--
+	--MOP
+	[114780] = me.L["transmute"], --Transmute: Living Steel
 	--Cata
 	[80244] = me.L["transmute"], --Transmute: Pyrium Bar
-	[80243] = me.L["transmute"], --Transmute: Truegold
 	[78866] = me.L["transmute"], --Transmute: Living Elements
 	--WotLk
 	[66659] = me.L["transmute"], --Transmute: Cardinal Ruby
@@ -41,14 +42,13 @@ me.P.SharedCDs = {
 	--Classic 
 	[11479] = me.L["transmute"], --Transmute: Iron to Gold
 	[11480] = me.L["transmute"], --Transmute: Mithril to Truesilver
-	[17566] = me.L["transmute"], --Transmute: Earth to Life
-	[17561] = me.L["transmute"],
-	[17560] = me.L["transmute"],
-	[17565] = me.L["transmute"],
-	[17559] = me.L["transmute"],
-	[17563] = me.L["transmute"],
-	[17562] = me.L["transmute"],
-	[17564] = me.L["transmute"],
+	--<<Juwelcrafting>>--
+	[131593] = me.L["pandaria_research"],
+	[131695] = me.L["pandaria_research"],
+	[131690] = me.L["pandaria_research"],
+	[131688] = me.L["pandaria_research"],
+	[131691] = me.L["pandaria_research"],
+	[131686] = me.L["pandaria_research"],
 }
 
 for id, name in pairs(me.P.SharedCDs) do

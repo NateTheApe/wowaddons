@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.2) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -21,7 +21,7 @@
     Decursive is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY.
 
-    This file was last updated on 2012-09-23T20:33:56Z
+    This file was last updated on 2012-11-13T01:32:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -69,11 +69,12 @@ if not T._LoadedFiles or not T._LoadedFiles["enUS.lua"] then
     DecursiveInstallCorrupted = true;
     return;
 end
+T._LoadedFiles["deDE.lua"] = false;
 
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "deDE");
 
 if not L then
-    T._LoadedFiles["deDE.lua"] = "2.7.2.2";
+    T._LoadedFiles["deDE.lua"] = "2.7.2.3_beta_3";
     return;
 end;
 
@@ -158,7 +159,7 @@ L["GLOR5"] = "Er wird immer in Erinnerung bleiben..."
 L["HANDLEHELP"] = "Alle Mikro-Einheiten-Rahmen (MUFs) bewegen"
 L["HIDE_LIVELIST"] = "Aktuelle Liste verbergen"
 L["HIDE_MAIN"] = "Decursive-Fenster verbergen"
-L["HIDESHOW_BUTTONS"] = "Verbergen-/Anzeigen-Schaltflächen"
+L["HIDESHOW_BUTTONS"] = "Verbergen-/Anzeigen-Schaltflächen" -- Needs review
 L["HLP_LEFTCLICK"] = "Linksklick"
 L["HLP_LL_ONCLICK_TEXT"] = [=[Lies bitte die Dokumentation, um den Umgang mit diesem Addon zu lernen. Suche nach "Decursive" auf WoWAce.com
 (Um diese Liste zu bewegen, bewege die Decursive-Leiste, /dcrshow und Links-Alt-Klick zum Bewegen)]=] -- Needs review
@@ -168,7 +169,7 @@ L["HLP_RIGHTCLICK"] = "Rechtsklick"
 L["HLP_USEXBUTTONTOCURE"] = "Benutze \"%s\", um dieses Gebrechen zu heilen!"
 L["HLP_WRONGMBUTTON"] = "Falscher Mausknopf!"
 L["IGNORE_STEALTH"] = "Ignoriere getarnte Einheiten"
-L["IS_HERE_MSG"] = "Decursive wurde geladen, kontrolliere bitte die Einstellungen"
+L["IS_HERE_MSG"] = "Decursive wurde geladen, kontrolliere bitte die Einstellungen" -- Needs review
 L["LIST_ENTRY_ACTIONS"] = [=[|cFF33AA33[Strg]|r-Klick: Diesen Spieler entfernen
 |cFF33AA33LINKS|r-Klick: Diesen Spieler höher setzen
 |cFF33AA33RECHTS|r-Klick: Diesen Spieler herabsetzen
@@ -265,7 +266,7 @@ Benutze denselben Befehl, um diese wiederherzustellen.]=]
 L["OPT_IGNORESTEALTHED_DESC"] = "Getarnte Einheiten werden ignoriert"
 L["OPTION_MENU"] = "Decursive-Optionsmenü"
 L["OPT_LIVELIST"] = "Aktuelle Liste"
-L["OPT_LIVELIST_DESC"] = "Optionen für die aktuelle Liste"
+L["OPT_LIVELIST_DESC"] = "Optionen für die aktuelle Liste" -- Needs review
 L["OPT_LLALPHA"] = "Transparenz Lder aktuellen Liste"
 L["OPT_LLALPHA_DESC"] = "Verändert die Transparenz der Decursive-Hauptleiste und der aktuellen Liste (Haupotleiste muß dabei angezeigt werden)"
 L["OPT_LLSCALE"] = "Skalierung der aktuellen Liste"
@@ -306,7 +307,7 @@ L["OPT_NEWVERSIONBUGMENOT_DESC"] = "Falls eine neuere Version von Decursive ermi
 L["OPT_NOKEYWARN"] = "Warnen, falls keine Tastenbelegung vorhanden"
 L["OPT_NOKEYWARN_DESC"] = "Eine Warnmeldung ausgeben, wenn keine Taste zugeordnet wurde."
 L["OPT_NOSTARTMESSAGES"] = "Begrüssungsmitteilungen ausschalten"
-L["OPT_NOSTARTMESSAGES_DESC"] = "Die drei Mitteilungen entfernen, die Decursive bei jedem Einloggen im Chat-Rahmen ausgibt."
+L["OPT_NOSTARTMESSAGES_DESC"] = "Die drei Mitteilungen entfernen, die Decursive bei jedem Einloggen im Chat-Rahmen ausgibt." -- Needs review
 L["OPT_PERFOPTIONWARNING"] = "WANUNG: Verändere niemals diese Werte, ausser Du weißt genau was Du machst! Diese Einstellung können massive Auswirkungen auf die Lesitungsfähigkeit des Spiels haben. Für die meisten Spieler genügen die Grundeinstellungen von 0.1 und 10."
 L["OPT_PLAYSOUND_DESC"] = "Einen Ton abspielen, wenn jemand mit einem Fluch belegt worden ist."
 L["OPT_POISONCHECK_DESC"] = "Falls markiert, wirst du in der Lage sein, vergiftete Einheiten zu sehen und zu heilen."
@@ -404,4 +405,4 @@ L["UNSTABLERELEASE"] = "Instabile Veröffentlichung"
 
 
 
-T._LoadedFiles["deDE.lua"] = "2.7.2.2";
+T._LoadedFiles["deDE.lua"] = "2.7.2.3_beta_3";

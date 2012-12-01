@@ -1,0 +1,1778 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+<!--                        Templates                         -->
+<FontString name="CombuMBTrackerValueTemplate" virtual="true" font="Fonts\FRIZQT__.TTF" text="" justifyH="CENTER">
+    <Anchors>
+        <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+            <Offset>
+                <AbsDimension x="0" y="-20"/>
+            </Offset>
+        </Anchor>
+    </Anchors>
+   <FontHeight>
+    <AbsValue val="8" />
+  </FontHeight>
+  <Color r="1" g="1" b="1" />
+  <Shadow>
+    <Color r="0" g="0" b="0" />
+    <Offset>
+      <AbsDimension x="1" y="-1" />
+    </Offset>
+  </Shadow>
+</FontString>
+
+<Button name="CombuMBTrackerPlusButtonTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="14" y="14"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+			<Offset>
+				<AbsDimension x="0" y="10"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+		</OnLoad>
+		<OnClick>
+			self:GetParent():SetValue((self:GetParent():GetValue())+(self:GetParent():GetValueStep()))
+		</OnClick>
+	</Scripts>
+	<NormalTexture name="$parentNormalTexture" urgency="5" file="Interface\Buttons\UI-PlusButton-UP"/>
+	<PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-PlusButton-DOWN"/>
+	<HighlightTexture name="$parentHighlightTexture" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD"/>
+</Button>
+
+<Button name="CombuMBTrackerMinusButtonTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="14" y="14"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+			<Offset>
+				<AbsDimension x="0" y="10"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+		</OnLoad>
+		<OnClick>
+			self:GetParent():SetValue((self:GetParent():GetValue())-(self:GetParent():GetValueStep()))
+		</OnClick>
+	</Scripts>
+	<NormalTexture name="$parentNormalTexture" urgency="5" file="Interface\Buttons\UI-MinusButton-UP"/>
+	<PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-MinusButton-DOWN"/>
+	<HighlightTexture name="$parentHighlightTexture" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD"/>
+</Button>
+
+<Slider name="CombuMBTrackerSliderTemplate" inherits="OptionsSliderTemplate" virtual="true">
+    <Frames>
+        <Button name="$parentMinus" inherits="CombuMBTrackerMinusButtonTemplate" />
+        <Button name="$parentPlus" inherits="CombuMBTrackerPlusButtonTemplate" />
+    </Frames>
+    <Layers>
+        <Layer>
+            <FontString name="$parentValue" inherits="CombuMBTrackerValueTemplate">
+            </FontString>
+        </Layer>
+    </Layers>
+</Slider>
+
+<Button name="CombuMBTrackerSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="150" y="20" />
+     </Size>
+	<Anchors>
+		<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+     <Layers>
+     	<Layer level="ARTWORK" textureSubLevel="0" >
+     		<Texture name="$parentBar">
+			</Texture>
+		</Layer>
+     	<Layer level="ARTWORK" textureSubLevel="1" >
+     		<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" justifyH="CENTER" justifyV="MIDDLE" >
+                 <FontHeight>
+                   <AbsValue val="9" />
+                 </FontHeight>
+                 <Color r="1" g="1" b="1" />
+                 <Shadow>
+                   <Color r="0" g="0" b="0" />
+                   <Offset>
+                     <AbsDimension x="1" y="-1" />
+                   </Offset>
+                </Shadow>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnShow>
+			self:RegisterForClicks("AnyUp","AnyDown")
+		</OnShow>
+	</Scripts>
+</Button>
+
+<Button name="CombuMBTrackerSoundTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="150" y="15" />
+     </Size>
+	<Anchors>
+		<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+     <Layers>
+     	<Layer level="ARTWORK" textureSubLevel="1" >
+     		<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" justifyH="CENTER" justifyV="MIDDLE" >
+                 <Size>
+                   <AbsDimension x="125" y="15" />
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                 <FontHeight>
+                   <AbsValue val="9" />
+                 </FontHeight>
+                 <Color r="1" g="1" b="1" />
+                 <Shadow>
+                   <Color r="0" g="0" b="0" />
+                   <Offset>
+                     <AbsDimension x="1" y="-1" />
+                   </Offset>
+                </Shadow>
+			</FontString>
+		</Layer>
+	</Layers>
+    <Frames>
+        <Button name="$parentSpeaker">
+            <Size>
+                <AbsDimension x="25" y="15"/>
+            </Size>
+            <Anchors>
+                <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+                    <Offset>
+                        <AbsDimension x="0" y="0"/>
+                    </Offset>
+                </Anchor>
+            </Anchors>
+            <Scripts>
+                <OnShow>
+                    self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+                </OnShow>
+                <OnClick>
+                    PlaySoundFile(CombuMBTrackerLSM:Fetch("sound",CombuMBTrackerSoundList[self:GetParent():GetID()])) 
+                </OnClick>
+            </Scripts>
+            <NormalTexture name="$parentNormalTexture" urgency="5" file="Interface\Buttons\UI-GuildButton-MOTD-Up"/>
+            <PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-GuildButton-MOTD-Disabled"/>
+        </Button>
+    </Frames>
+    <Scripts>
+		<OnShow>
+			self:RegisterForClicks("AnyUp","AnyDown")
+		</OnShow>
+		<OnClick>
+			combumbtrackersettingstable["combumbtrackersoundname"] = _G[self:GetName().."Text"]:GetText()
+			CombuMBTrackerSoundDropDownText:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuMBTrackerSoundBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="CombuMBTrackerTextureTemplate" inherits="CombuMBTrackerSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="150" y="20" />
+     </Size>
+	<Scripts>
+		<OnClick>
+			combumbtrackersettingstable[combumbtrackertexturesettings] = _G[self:GetName().."Text"]:GetText()
+			CombuMBTrackerFrameresize();
+			_G[combumbtrackertexturedropdown:GetName().."Text"]:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuMBTrackerTextureBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="CombuMBTrackerFontTemplate" inherits="CombuMBTrackerSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="150" y="15" />
+     </Size>
+	<Scripts>
+		<OnClick>
+			combumbtrackersettingstable["combumbtrackerfontname"] = _G[self:GetName().."Text"]:GetText()
+			CombuMBTrackerFrameresize();
+			CombuMBTrackerFontDropDownText:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuMBTrackerFontBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="CombuMBTrackerEdgeTemplate" inherits="CombuMBTrackerSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="236" y="32" />
+     </Size>
+	<Scripts>
+		<OnClick>
+			combumbtrackersettingstable["edgeFile"] = _G[self:GetName().."Text"]:GetText()
+			CombuMBTrackerFrameresize();
+			CombuMBTrackerBorderDropDownText:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuMBTrackerEdgeBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="CombuMBTrackerBgTemplate" inherits="CombuMBTrackerSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="200" y="30" />
+     </Size>
+	<Scripts>
+		<OnClick>
+			combumbtrackersettingstable["bgFile"] = _G[self:GetName().."Text"]:GetText()
+			CombuMBTrackerFrameresize();
+			CombuMBTrackerBackgroundDropDownText:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuMBTrackerBgBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Frame name="CombuMBTrackerFontBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="190" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuMBTrackerFontScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="190" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuMBTrackerFontFrame">
+					<Size>
+					<AbsDimension x="170" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuMBTrackerSoundBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="190" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuMBTrackerSoundScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="190" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuMBTrackerSoundFrame">
+					<Size>
+					<AbsDimension x="170" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuMBTrackerTextureBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="190" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuMBTrackerTextureScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="190" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuMBTrackerTextureFrame">
+					<Size>
+					<AbsDimension x="170" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuMBTrackerEdgeBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="276" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuMBTrackerEdgeScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="276" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuMBTrackerEdgeFrame">
+					<Size>
+					<AbsDimension x="256" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuMBTrackerBgBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="240" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuMBTrackerBgScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="240" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuMBTrackerBgFrame">
+					<Size>
+					<AbsDimension x="220" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuMBTrackerFrametemplate" virtual="true">
+		<HitRectInsets>
+            <AbsInset left="0" right="0" top="0" bottom="0"/>
+        </HitRectInsets>
+		<Scripts>
+			<OnShow>
+				_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+			</OnShow>
+		</Scripts>
+</Frame>
+
+<!--                        Interface panel Option frame                        -->
+<Frame name="CombuMBTrackerOptionsFrame" parent="InterfaceOptionsFramePanelContainer">
+		<Scripts>
+			<OnLoad function="MageBombTrackerOptions_OnLoad"/>
+		</Scripts>
+		
+		<Frames>
+   			<CheckButton name="CombuMBTrackerButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerOptionsFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+						if (combumbtrackersettingstable["combumbtrackerenable"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuMBTracker()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+			<Slider name="CombuMBTrackerScaleSlider" inherits="CombuMBTrackerSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("300%")
+						_G[self:GetName().."Low"]:SetText("50%")
+						self:SetMinMaxValues(0.5, 3)
+						self:SetValueStep(0.01)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+						if (combumbtrackersettingstable["combumbtrackerscale"] == nil) then self:SetValue(1)
+													combumbtrackersettingstable["combumbtrackerscale"] = 1
+						else self:SetValue(combumbtrackersettingstable["combumbtrackerscale"])
+						end
+                        _G[self:GetName().."Value"]:SetText(format("%.0f%%",self:GetValue()*100))
+					</OnShow>
+					<OnValueChanged>
+						CombuMBTrackerScale(self:GetValue())
+                        _G[self:GetName().."Value"]:SetText(format("%.0f%%",self:GetValue()*100))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+            <CheckButton name="CombuMBTrackerlockButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuMBTrackerScaleSlider" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+						if (combumbtrackersettingstable["combumbtrackerlock"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuMBTrackerlock()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+						
+			<CheckButton name="CombuMBTrackerrefreshButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuMBTrackerScaleSlider" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+						if (combumbtrackersettingstable["combumbtrackerrefreshmode"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuMBTrackerrefresh()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>		
+			
+			<CheckButton name="CombuMBTrackerFlamestrikeButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuMBTrackerrefreshButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+						if (combumbtrackersettingstable["combumbtrackerflamestrike"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuMBTrackerFlamestrike()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="CombuMBTrackerchatButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerrefreshButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-33"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+						if (combumbtrackersettingstable["combumbtrackerchat"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuMBTrackerchat()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="CombuMBTrackertargetButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuMBTrackerchatButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+						if (combumbtrackersettingstable["combumbtrackertarget"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombuMBTrackertarget()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+        
+     <Frame name="CombuMBTrackerDirectionInfo" inherits="CombuMBTrackerFrametemplate">
+        <Size>
+          <AbsDimension x="250" y="9" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerchatButton" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-40" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" />
+              </Anchors>
+              <FontHeight>
+                <AbsValue val="12" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+     </Frame>
+     
+    <Frame name="CombuMBTrackerDirectionDropDown" inherits="UIDropDownMenuTemplate">
+         <Size>
+           <AbsDimension x="400" />
+         </Size>
+         <Anchors>
+           <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerDirectionInfo" relativePoint="TOPLEFT">
+             <Offset>
+               <AbsDimension x="130" y="8" />
+             </Offset>
+           </Anchor>
+         </Anchors>
+        <Scripts>
+                <OnShow>
+                    
+                    CombuMBTrackerDirectionList = {"upward","downward"}
+                    
+                    local function OnClick(self)
+                        UIDropDownMenu_SetSelectedID(CombuMBTrackerDirectionDropDown, self:GetID())
+                       
+                        if (UIDropDownMenu_GetSelectedID(CombuMBTrackerDirectionDropDown, self:GetID()) == 1) then combumbtrackersettingstable["direction"] = "upward"
+                        elseif (UIDropDownMenu_GetSelectedID(CombuMBTrackerDirectionDropDown, self:GetID()) == 2) then combumbtrackersettingstable["direction"] = "downward"
+                        end
+                       
+                        CombuMBTrackerCreateBombRow ()
+                        
+                    end   
+                                    
+                    local function initialize(self, level)
+                       local info = UIDropDownMenu_CreateInfo()
+                       for k,v in pairs(CombuMBTrackerDirectionList) do
+                          info = UIDropDownMenu_CreateInfo()
+                          info.text = v
+                          info.value = v
+                          info.func = OnClick
+                          UIDropDownMenu_AddButton(info, level)
+                       end
+                    end
+                     
+                     
+                    UIDropDownMenu_Initialize(CombuMBTrackerDirectionDropDown, initialize)
+                    UIDropDownMenu_SetWidth(CombuMBTrackerDirectionDropDown, 220);
+                    UIDropDownMenu_SetButtonWidth(CombuMBTrackerDirectionDropDown, 124)
+                    UIDropDownMenu_JustifyText(CombuMBTrackerDirectionDropDown, "LEFT")
+
+                    if (combumbtrackersettingstable["direction"] == "upward") then UIDropDownMenu_SetText(CombuMBTrackerDirectionDropDown, CombuMBTrackerDirectionList[1])
+                    elseif (combumbtrackersettingstable["direction"] == "downward") then UIDropDownMenu_SetText(CombuMBTrackerDirectionDropDown, CombuMBTrackerDirectionList[2])
+                    end
+                </OnShow>
+                </Scripts>
+            </Frame>
+ 
+    <Frame name="CombuMBTrackerAutohideInfo" inherits="CombuMBTrackerFrametemplate">
+        <Size>
+          <AbsDimension x="250" y="9" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerDirectionInfo" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-33" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" />
+              </Anchors>
+              <FontHeight>
+                <AbsValue val="12" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+     </Frame>
+     
+    <Frame name="CombuMBTrackerAutohideDropDown" inherits="UIDropDownMenuTemplate">
+         <Size>
+           <AbsDimension x="400" />
+         </Size>
+         <Anchors>
+           <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerAutohideInfo" relativePoint="TOPLEFT">
+             <Offset>
+               <AbsDimension x="130" y="8" />
+             </Offset>
+           </Anchor>
+         </Anchors>
+        <Scripts>
+                <OnShow>
+
+                    local function OnClick(self)
+                       UIDropDownMenu_SetSelectedID(CombuMBTrackerAutohideDropDown, self:GetID())
+                       
+                       if (UIDropDownMenu_GetSelectedID(CombuMBTrackerAutohideDropDown, self:GetID()) == 1) then combumbtrackersettingstable["combumbtrackerautohide"] = 1
+                       elseif (UIDropDownMenu_GetSelectedID(CombuMBTrackerAutohideDropDown, self:GetID()) == 2) then combumbtrackersettingstable["combumbtrackerautohide"] = 2
+                       elseif (UIDropDownMenu_GetSelectedID(CombuMBTrackerAutohideDropDown, self:GetID()) == 3) then combumbtrackersettingstable["combumbtrackerautohide"] = 3
+                       end
+                       
+                       CombuMBTrackerAutohide()   
+                    end   
+                                    
+                    local function initialize(self, level)
+                       local info = UIDropDownMenu_CreateInfo()
+                       for k,v in pairs(CombuMBTrackerAutohideList) do
+                          info = UIDropDownMenu_CreateInfo()
+                          info.text = v
+                          info.value = v
+                          info.func = OnClick
+                          UIDropDownMenu_AddButton(info, level)
+                       end
+                    end
+                     
+                     
+                    UIDropDownMenu_Initialize(CombuMBTrackerAutohideDropDown, initialize)
+                    UIDropDownMenu_SetWidth(CombuMBTrackerAutohideDropDown, 220);
+                    UIDropDownMenu_SetButtonWidth(CombuMBTrackerAutohideDropDown, 124)
+                    UIDropDownMenu_JustifyText(CombuMBTrackerAutohideDropDown, "LEFT")
+
+                    UIDropDownMenu_SetText(CombuMBTrackerAutohideDropDown, CombuMBTrackerAutohideList[combumbtrackersettingstable["combumbtrackerautohide"]])
+                    
+                </OnShow>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="CombuMBTrackerLanguageInfo" inherits="CombuMBTrackerFrametemplate">
+        <Size>
+          <AbsDimension x="250" y="9" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerAutohideInfo" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-33" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" />
+              </Anchors>
+              <FontHeight>
+                <AbsValue val="12" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+     </Frame>
+     
+    <Frame name="CombuMBTrackerLanguageDropDown" inherits="UIDropDownMenuTemplate">
+         <Size>
+           <AbsDimension x="400" />
+         </Size>
+         <Anchors>
+           <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerLanguageInfo" relativePoint="TOPLEFT">
+             <Offset>
+               <AbsDimension x="130" y="8" />
+             </Offset>
+           </Anchor>
+         </Anchors>
+        <Scripts>
+                <OnShow>
+					CombuMBTrackerLanguage = {
+					   "Default",
+					   "English",
+					   "Francais",
+						}
+					
+					local function OnClick(self)
+					   UIDropDownMenu_SetSelectedID(CombuMBTrackerLanguageDropDown, self:GetID());
+					   
+						combumbtrackersettingstable["language"] = CombuMBTrackerLanguage[UIDropDownMenu_GetSelectedID(CombuMBTrackerLanguageDropDown, self:GetID())]
+						CombuMBTrackerLanguageCheck()
+						CombuMBTrackerOptionsFrame:Hide()
+						CombuMBTrackerOptionsFrame:Show()
+					end   
+									
+					local function initialize(self, level)
+					   local info = UIDropDownMenu_CreateInfo()
+					   for k,v in pairs(CombuMBTrackerLanguage) do
+						  info = UIDropDownMenu_CreateInfo()
+						  info.text = v
+						  info.value = v
+						  info.func = OnClick
+						  UIDropDownMenu_AddButton(info, level)
+					   end
+					end
+					 
+					 
+					UIDropDownMenu_Initialize(CombuMBTrackerLanguageDropDown, initialize)
+					UIDropDownMenu_SetWidth(CombuMBTrackerLanguageDropDown, 220);
+					UIDropDownMenu_SetButtonWidth(CombuMBTrackerLanguageDropDown, 124)
+					UIDropDownMenu_JustifyText(CombuMBTrackerLanguageDropDown, "LEFT")
+					UIDropDownMenu_SetText(CombuMBTrackerLanguageDropDown, combumbtrackersettingstable["language"])
+
+                </OnShow>
+        </Scripts>
+    </Frame>
+                                    
+            <Frame name="CombuMBTrackerTextureInfo" inherits="CombuMBTrackerFrametemplate" >
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerLanguageInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-33" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuMBTrackerTextureDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerTextureInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuMBTrackerTexture = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuMBTrackerCreateTextureList(CombuMBTrackerTextureDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuMBTrackerTexture) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuMBTrackerTextureDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuMBTrackerTextureDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuMBTrackerTextureDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuMBTrackerTextureDropDown, "LEFT")
+                        CombuMBTrackerTextureDropDownButton:SetScript("OnClick", function()
+                            CombuMBTrackerCreateTextureList(CombuMBTrackerTextureDropDown,"combumbtrackertexturename")
+                        end)
+
+                        UIDropDownMenu_SetText(CombuMBTrackerTextureDropDown,combumbtrackersettingstable["combumbtrackertexturename"])
+                    </OnShow>
+                    <OnClick>
+                        CombuMBTrackerCreateTextureList(CombuMBTrackerTextureDropDown,"combumbtrackertexturename")
+                    </OnClick>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="CombuMBTrackerFontInfo" inherits="CombuMBTrackerFrametemplate">
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerTextureInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-33" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuMBTrackerFontDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerFontInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuMBTrackerFont = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuMBTrackerCreateFontList(CombuMBTrackerFontDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuMBTrackerFont) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuMBTrackerFontDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuMBTrackerFontDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuMBTrackerFontDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuMBTrackerFontDropDown, "LEFT")
+                        CombuMBTrackerFontDropDownButton:SetScript("OnClick", function()
+                            CombuMBTrackerCreateFontList()
+                        end)
+                        UIDropDownMenu_SetText(CombuMBTrackerFontDropDown, combumbtrackersettingstable["combumbtrackerfontname"])
+                    </OnShow>
+                    <OnClick>
+                        CombuMBTrackerCreateFontList(CombuMBTrackerFontDropDown)
+                    </OnClick>
+                </Scripts>
+            </Frame>
+            
+			            
+            <Frame name="CombuMBTrackerBorderInfo" inherits="CombuMBTrackerFrametemplate">
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerFontInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-33" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuMBTrackerBorderDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerBorderInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuMBTrackerBorder = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuMBTrackerCreateBorderList(CombuMBTrackerBorderDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuMBTrackerBorder) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuMBTrackerBorderDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuMBTrackerBorderDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuMBTrackerBorderDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuMBTrackerBorderDropDown, "LEFT")
+                        CombuMBTrackerBorderDropDownButton:SetScript("OnClick", function()
+                            CombuMBTrackerCreateBorderList()
+                        end)
+                        UIDropDownMenu_SetText(CombuMBTrackerBorderDropDown,combumbtrackersettingstable["edgeFile"])
+                    </OnShow>
+                    <OnClick>
+                        CombuMBTrackerCreateBorderList(CombuMBTrackerBorderDropDown)
+                    </OnClick>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="CombuMBTrackerBackgroundInfo" inherits="CombuMBTrackerFrametemplate">
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerBorderInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-33" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuMBTrackerBackgroundDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerBackgroundInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuMBTrackerBackground = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuMBTrackerCreateBackgroundList(CombuMBTrackerBackgroundDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuMBTrackerBackground) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuMBTrackerBackgroundDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuMBTrackerBackgroundDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuMBTrackerBackgroundDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuMBTrackerBackgroundDropDown, "LEFT")
+                        CombuMBTrackerBackgroundDropDownButton:SetScript("OnClick", function()
+                            CombuMBTrackerCreateBackgroundList()
+                        end)
+                        UIDropDownMenu_SetText(CombuMBTrackerBackgroundDropDown, combumbtrackersettingstable["bgFile"])
+                    </OnShow>
+                    <OnClick>
+                        CombuMBTrackerCreateBackgroundList(CombuMBTrackerBackgroundDropDown)
+                    </OnClick>
+                </Scripts>
+            </Frame>
+			
+            <Slider name="CombuMBTrackerEdgeSizeSlider" inherits="CombuMBTrackerSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerBackgroundInfo" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-45"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuMBTrackerValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("32")
+						_G[self:GetName().."Low"]:SetText("1")
+						self:SetMinMaxValues(1, 32)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+                        self:SetValue(combumbtrackersettingstable["edgeSize"])
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnShow>
+					<OnValueChanged>
+                        combumbtrackersettingstable["edgeSize"] = self:GetValue()
+						CombuMBTrackerFrameresize()
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            			
+            <Slider name="CombuMBTrackerTileSizeSlider" inherits="CombuMBTrackerSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerEdgeSizeSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="250" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuMBTrackerValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("32")
+						_G[self:GetName().."Low"]:SetText("0")
+						self:SetMinMaxValues(0, 32)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+                        self:SetValue(combumbtrackersettingstable["tileSize"])
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnShow>
+					<OnValueChanged>
+                        combumbtrackersettingstable["tileSize"] = self:GetValue()
+						CombuMBTrackerFrameresize()
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            
+            <Slider name="CombuMBTrackerInsetsSlider" inherits="CombuMBTrackerSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerEdgeSizeSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuMBTrackerValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("32")
+						_G[self:GetName().."Low"]:SetText("0")
+						self:SetMinMaxValues(0, 32)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+                        self:SetValue(combumbtrackersettingstable["insets"])
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnShow>
+					<OnValueChanged>
+                        combumbtrackersettingstable["insets"] = self:GetValue();
+						CombuMBTrackerFrameresize()
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            			
+			<CheckButton name="CombuMBTrackerTileButton" inherits="ChatConfigCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuMBTrackerInsetsSlider" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="250" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+						if (combumbtrackersettingstable["tile"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+							if CombuMBTrackerTileButton:GetChecked(true) then combumbtrackersettingstable["tile"] = true 
+                                                 CombuMBTrackerTileButton:SetChecked(true)
+                            else combumbtrackersettingstable["tile"] = false 
+                                 CombuMBTrackerTileButton:SetChecked(false)
+                            end
+						CombuMBTrackerFrameresize()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+			
+			<Button name="CombuMBTrackerbarcolornormal" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerInsetsSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combumbtrackersettingstable["barcolornormal"]))
+					</OnShow>
+					<OnClick>
+                        combumbtrackercolorinstance = "barcolornormal"
+						CombuMBTrackerColorPicker(unpack(combumbtrackersettingstable[combumbtrackercolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+
+			<Button name="CombuMBTrackerbarcolorwarning" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerbarcolornormal" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combumbtrackersettingstable["barcolorwarning"]))
+					</OnShow>
+					<OnClick>
+                        combumbtrackercolorinstance = "barcolorwarning"
+						CombuMBTrackerColorPicker(unpack(combumbtrackersettingstable[combumbtrackercolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+
+			<Button name="CombuMBTrackeredgecolornormal" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerbarcolornormal" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="220" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combumbtrackersettingstable["edgecolornormal"]))
+					</OnShow>
+					<OnClick>
+                        combumbtrackercolorinstance = "edgecolornormal"
+						CombuMBTrackerColorPicker(unpack(combumbtrackersettingstable[combumbtrackercolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+
+            <Button name="CombuMBTrackerbgcolornormal" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackeredgecolornormal" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combumbtrackersettingstable["bgcolornormal"]))
+					</OnShow>
+					<OnClick>
+                        combumbtrackercolorinstance = "bgcolornormal"
+						CombuMBTrackerColorPicker(unpack(combumbtrackersettingstable[combumbtrackercolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+            
+            <Button name="CombuMBTrackerresetButton" inherits="OptionsButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="180" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerbarcolorwarning" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuMBTrackerOptLoc[self:GetName()])
+					</OnShow>
+					<OnClick>
+						CombuMBTrackerreset()
+                        InterfaceOptionsFrame:Hide()
+                        InterfaceOptionsFrame:Show()
+					</OnClick>				
+				</Scripts>
+			</Button>
+
+       
+		</Frames>
+	</Frame>
+    		
+</Ui>

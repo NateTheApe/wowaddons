@@ -1,6 +1,5 @@
---English localization by Pathur
-
 local _, me = ...
+me.L={}
 local L = me.L
 
 L["addtofav"] = "Add to favorites."
@@ -11,7 +10,6 @@ L["cds"] = "Cooldowns"
 L["ctrl"] = "CTRL"
 L["databaseempty"] = "Database empty"
 L["deletechartooltip"] = "|cffff0000Attention:|r Clears all settings of this character!"
-L["exchangeleftright"] = "Exchange Mousebuttons"
 L["favorites"] = "Favorites"
 L["filter"] = "Hide tradeskills"
 L["infight"] = "You are in fight!"
@@ -21,13 +19,14 @@ L["linktome"] = "Link to me"
 L["linktoother"] = "Link to chat"
 L["nocds"] = "All Ready"
 L["nofavorites"] = [=[No favorites created!
-Open tradeskill window and right-click on your tradeskills to create favorites.]=]
+Open tradeskill window and right-click on
+your tradeskills to create favorites.]=]
 L["nomats"] = "No Mats"
 L["openmenu"] = "Open Menu"
 L["otherchar"] = "Other Characters"
 L["professions"] = "Professions"
-L["quicklaunch"] = "Quicklaunch"
-L["quicklauncher"] = "Separate Quicklaunchers"
+L["quicklaunch"] = "Key combinations (Quickaccess)"
+L["quicklauncher"] = "Create separate quicklaunchers"
 L["relog"] = "Relog is required!"
 L["removefromfav"] = "Remove from favorites."
 L["resetcds"] = "Reset CDs"
@@ -42,5 +41,7 @@ L["ShowIfYouCanCraftThisInItemTooltips"] = "Show in item tooltips, if you can cr
 L["tooltips"] = "Tooltips"
 L["trainer"] = "Trainer"
 L["trainerdisabled"] = "Disable trainer frame"
-L["transmute"] = "Alchemy: Transmute"
+L["transmute"] = "Transmute"
 L["visityourtrainer"] = "Visit your |cff00ff00%s|r trainer"
+L["openLastProfessionWindow"] = "Open last opened profession window"
+L["pandaria_research"] = "Pandaria research"

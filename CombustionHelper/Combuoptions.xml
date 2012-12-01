@@ -1,0 +1,2916 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+<!--                        Templates                         -->
+<FontString name="CombuValueTemplate" virtual="true" font="Fonts\FRIZQT__.TTF" text="" justifyH="CENTER">
+    <Anchors>
+        <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+            <Offset>
+                <AbsDimension x="0" y="-20"/>
+            </Offset>
+        </Anchor>
+    </Anchors>
+   <FontHeight>
+    <AbsValue val="8" />
+  </FontHeight>
+  <Color r="1" g="1" b="1" />
+  <Shadow>
+    <Color r="0" g="0" b="0" />
+    <Offset>
+      <AbsDimension x="1" y="-1" />
+    </Offset>
+  </Shadow>
+</FontString>
+
+<Button name="CombuPlusButtonTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="14" y="14"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+			<Offset>
+				<AbsDimension x="0" y="10"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+		</OnLoad>
+		<OnClick>
+			self:GetParent():SetValue((self:GetParent():GetValue())+(self:GetParent():GetValueStep()))
+		</OnClick>
+	</Scripts>
+	<NormalTexture name="$parentNormalTexture" urgency="5" file="Interface\Buttons\UI-PlusButton-UP"/>
+	<PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-PlusButton-DOWN"/>
+	<HighlightTexture name="$parentHighlightTexture" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD"/>
+</Button>
+
+<Button name="CombuMinusButtonTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="14" y="14"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+			<Offset>
+				<AbsDimension x="0" y="10"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+		</OnLoad>
+		<OnClick>
+			self:GetParent():SetValue((self:GetParent():GetValue())-(self:GetParent():GetValueStep()))
+		</OnClick>
+	</Scripts>
+	<NormalTexture name="$parentNormalTexture" urgency="5" file="Interface\Buttons\UI-MinusButton-UP"/>
+	<PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-MinusButton-DOWN"/>
+	<HighlightTexture name="$parentHighlightTexture" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD"/>
+</Button>
+
+<Slider name="CombuSliderTemplate" inherits="OptionsSliderTemplate" virtual="true">
+    <Frames>
+        <Button name="$parentMinus" inherits="CombuMinusButtonTemplate" />
+        <Button name="$parentPlus" inherits="CombuPlusButtonTemplate" />
+    </Frames>
+    <Layers>
+        <Layer>
+            <FontString name="$parentValue" inherits="CombuValueTemplate">
+            </FontString>
+        </Layer>
+    </Layers>
+	<Scripts>
+		<OnEnter>
+			CombuOptionsTooltipFrame:Show()
+			CombuOptionsTooltipTitle:SetText(_G[self:GetName().."Text"]:GetText())
+			CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()])
+			CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+		</OnEnter>
+		<OnLeave>
+			CombuOptionsTooltipFrame:Hide()
+		</OnLeave>
+	</Scripts>
+</Slider>
+
+<Button name="CombuSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="150" y="20" />
+     </Size>
+	<Anchors>
+		<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+     <Layers>
+     	<Layer level="ARTWORK" textureSubLevel="0" >
+     		<Texture name="$parentBar">
+			</Texture>
+		</Layer>
+     	<Layer level="ARTWORK" textureSubLevel="1" >
+     		<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" justifyH="CENTER" justifyV="MIDDLE" >
+                 <FontHeight>
+                   <AbsValue val="9" />
+                 </FontHeight>
+                 <Color r="1" g="1" b="1" />
+                 <Shadow>
+                   <Color r="0" g="0" b="0" />
+                   <Offset>
+                     <AbsDimension x="1" y="-1" />
+                   </Offset>
+                </Shadow>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnShow>
+			self:RegisterForClicks("AnyUp","AnyDown")
+		</OnShow>
+	</Scripts>
+</Button>
+
+<Button name="CombuSoundTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="150" y="15" />
+     </Size>
+	<Anchors>
+		<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+     <Layers>
+     	<Layer level="ARTWORK" textureSubLevel="1" >
+     		<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" justifyH="CENTER" justifyV="MIDDLE" >
+                 <Size>
+                   <AbsDimension x="125" y="15" />
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                 <FontHeight>
+                   <AbsValue val="9" />
+                 </FontHeight>
+                 <Color r="1" g="1" b="1" />
+                 <Shadow>
+                   <Color r="0" g="0" b="0" />
+                   <Offset>
+                     <AbsDimension x="1" y="-1" />
+                   </Offset>
+                </Shadow>
+			</FontString>
+		</Layer>
+	</Layers>
+    <Frames>
+        <Button name="$parentSpeaker">
+            <Size>
+                <AbsDimension x="25" y="15"/>
+            </Size>
+            <Anchors>
+                <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+                    <Offset>
+                        <AbsDimension x="0" y="0"/>
+                    </Offset>
+                </Anchor>
+            </Anchors>
+            <Scripts>
+                <OnShow>
+                    self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+                </OnShow>
+                <OnClick>
+                    PlaySoundFile(CombuLSM:Fetch("sound",CombuSoundList[self:GetParent():GetID()])) 
+                </OnClick>
+            </Scripts>
+            <NormalTexture name="$parentNormalTexture" urgency="5" file="Interface\Buttons\UI-GuildButton-MOTD-Up"/>
+            <PushedTexture name="$parentPushedTexture" file="Interface\Buttons\UI-GuildButton-MOTD-Disabled"/>
+        </Button>
+    </Frames>
+    <Scripts>
+		<OnShow>
+			self:RegisterForClicks("AnyUp","AnyDown")
+		</OnShow>
+		<OnClick>
+			combusettingstable["combusoundname"] = _G[self:GetName().."Text"]:GetText()
+			CombuSoundDropDownText:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuSoundBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="CombuTextureTemplate" inherits="CombuSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="150" y="20" />
+     </Size>
+	<Scripts>
+		<OnClick>
+			combusettingstable[combutexturesettings] = _G[self:GetName().."Text"]:GetText()
+			CombustionFrameresize();
+			_G[combutexturedropdown:GetName().."Text"]:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuTextureBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="CombuFontTemplate" inherits="CombuSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="150" y="15" />
+     </Size>
+	<Scripts>
+		<OnClick>
+			combusettingstable["combufontname"] = _G[self:GetName().."Text"]:GetText()
+			CombustionFrameresize();
+			CombuFontDropDownText:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuFontBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="CombuEdgeTemplate" inherits="CombuSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="236" y="32" />
+     </Size>
+	<Scripts>
+		<OnClick>
+			combusettingstable["edgeFile"] = _G[self:GetName().."Text"]:GetText()
+			CombustionFrameresize();
+			CombuBorderDropDownText:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuEdgeBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="CombuBgTemplate" inherits="CombuSharedmediaButtonTemplate" virtual="true">
+     <Size>
+       <AbsDimension x="200" y="30" />
+     </Size>
+	<Scripts>
+		<OnClick>
+			combusettingstable["bgFile"] = _G[self:GetName().."Text"]:GetText()
+			CombustionFrameresize();
+			CombuBackgroundDropDownText:SetText(_G[self:GetName().."Text"]:GetText());
+			CombuBgBorderFrame:Hide()
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Frame name="CombuFontBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="190" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuFontScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="190" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuFontFrame">
+					<Size>
+					<AbsDimension x="170" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuSoundBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="190" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuSoundScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="190" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuSoundFrame">
+					<Size>
+					<AbsDimension x="170" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuTextureBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="190" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuTextureScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="190" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuTextureFrame">
+					<Size>
+					<AbsDimension x="170" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuEdgeBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="276" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuEdgeScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="276" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuEdgeFrame">
+					<Size>
+					<AbsDimension x="256" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="CombuBgBorderFrame" parent="UIParent" hidden="true">
+	<Size>
+		<AbsDimension x="240" y="350" />
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5" />
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="16" />
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="16" />
+		</EdgeSize>
+		<Color r="0.1" g="0.1" b="0.1" />
+		<BorderColor r="0.67" g="0.67" b="0.67" />
+	</Backdrop>
+	<Frames>
+		<ScrollFrame name="CombuBgScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+			<Size>
+			<AbsDimension x="240" y="330" />
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" />
+			</Anchors>
+				<Frames>
+					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-30" y="-15"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-30" y="15"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+			<ScrollChild>
+				<Frame name="CombuBgFrame">
+					<Size>
+					<AbsDimension x="220" y="56" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame> 
+		<Button name="$parentClose" inherits="UIPanelCloseButton">
+			<Size>
+				<AbsDimension x="20" y="20" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="3" y="-5"/>
+				</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+</Frame>
+
+<CheckButton name="CombuCheckButtontemplate" inherits="ChatConfigCheckButtonTemplate" virtual="true">
+		<Scripts>
+			<OnEnter>
+				CombuOptionsTooltipFrame:Show()
+				CombuOptionsTooltipTitle:SetText(_G[self:GetName().."Text"]:GetText())
+				CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()])
+				CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+			</OnEnter>
+			<OnLeave>
+				CombuOptionsTooltipFrame:Hide()
+			</OnLeave>
+		</Scripts>
+</CheckButton>
+
+<EditBox name="CombuEditBoxtemplate" virtual="true">
+		<HitRectInsets>
+            <AbsInset left="0" right="0" top="0" bottom="0"/>
+        </HitRectInsets>
+		<Scripts>
+			<OnEnter>
+				local point, relativeTo, relativePoint, xOffset, yOffset = self:GetPoint()
+				CombuOptionsTooltipFrame:Show()
+				CombuOptionsTooltipTitle:SetText(_G[relativeTo:GetName().."Text"]:GetText())
+				CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()])
+				CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+			</OnEnter>
+			<OnLeave>
+				CombuOptionsTooltipFrame:Hide()
+			</OnLeave>
+		</Scripts>
+</EditBox>
+
+<Frame name="CombuFrametemplate" virtual="true">
+		<HitRectInsets>
+            <AbsInset left="0" right="0" top="0" bottom="0"/>
+        </HitRectInsets>
+		<Scripts>
+			<OnShow>
+				_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+			</OnShow>
+			<OnEnter>
+				CombuOptionsTooltipFrame:Show()
+				CombuOptionsTooltipTitle:SetText(_G[self:GetName().."Text"]:GetText())
+				CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()])
+				CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+			</OnEnter>
+			<OnLeave>
+				CombuOptionsTooltipFrame:Hide()
+			</OnLeave>
+		</Scripts>
+</Frame>
+
+<Button name="CombuButtonTemplate" inherits="OptionsButtonTemplate">
+		<Scripts>
+			<OnLoad>
+				self:HookScript("OnEnter", function(self) CombuOptionsTooltipFrame:Show() CombuOptionsTooltipTitle:SetText(_G[self:GetName().."Text"]:GetText()) CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) end)
+			</OnLoad>
+		</Scripts>
+</Button>
+
+<Frame name="CombuDropDowntemplate" inherits="UIDropDownMenuTemplate">
+		<HitRectInsets>
+            <AbsInset left="0" right="0" top="0" bottom="0"/>
+        </HitRectInsets>
+		<Scripts>
+			<OnEnter>
+				CombuOptionsTooltipFrame:Show()
+				CombuOptionsTooltipTitle:SetText(_G[self.."Label"]:GetText())
+				CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()])
+				CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+			</OnEnter>
+			<OnLeave>
+				CombuOptionsTooltipFrame:Hide()
+			</OnLeave>
+		</Scripts>
+</Frame>
+
+
+<!--                        Tooltip Options frame                         -->
+<Frame name="CombuOptionsTooltipFrame" parent="InterfaceOptionsFramePanelContainer" hidden="true">
+    <Size>
+      <AbsDimension x="170" y="56" />
+    </Size>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="InterfaceOptionsFrame" relativePoint="TOPRIGHT">
+			<Offset>
+				<AbsDimension x="5" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+    <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+      <BackgroundInsets>
+        <AbsInset left="5" right="5" top="5" bottom="5" />
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="16" />
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="16" />
+      </EdgeSize>
+          <Color r="0.1" g="0.1" b="0.1" />
+          <BorderColor r="0.67" g="0.67" b="0.67" />
+    </Backdrop>
+    <Layers>
+    	<Layer>
+    		
+    		 <FontString name="CombuOptionsTooltipTitle" font="Fonts\FRIZQT__.TTF" justifyV="TOP" text="" justifyH="LEFT">
+		        <Size>
+		          <AbsDimension x="158" y="15" />
+		        </Size>
+		        <Anchors>
+		           <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+		            <Offset>
+		              <AbsDimension x="6" y="-5" />
+		            </Offset>
+		          </Anchor>
+		        </Anchors>
+		        <FontHeight>
+				   <AbsValue val="11" />
+				 </FontHeight>
+				 <Color r="0.3" g="1" b="0.8" />
+				 <Shadow>
+				   <Color r="0" g="0" b="0" />
+				   <Offset>
+				     <AbsDimension x="1" y="-1" />
+				   </Offset>
+				 </Shadow>
+            </FontString>
+            
+    		 <FontString name="CombuOptionsTooltipText" font="Fonts\FRIZQT__.TTF" text="" justifyV="TOP" justifyH="LEFT">
+		        <Size>
+		          <AbsDimension x="158" y="400" />
+		        </Size>
+		        <Anchors>
+		           <Anchor point="TOPLEFT" relativeTo="CombuOptionsTooltipTitle" relativePoint="BOTTOMLEFT">
+		            <Offset>
+		              <AbsDimension x="0" y="0" />
+		            </Offset>
+		          </Anchor>
+		        </Anchors>
+		        <FontHeight>
+				   <AbsValue val="11" />
+				 </FontHeight>
+				 <Color r="1" g="1" b="1" />
+				 <Shadow>
+				   <Color r="0" g="0" b="0" />
+				   <Offset>
+				     <AbsDimension x="1" y="-1" />
+				   </Offset>
+				 </Shadow>
+            </FontString>
+        </Layer>
+    </Layers>
+    		
+</Frame>
+
+
+<!--                        Interface panel Option frame                        -->
+<Frame name="CombuOptionsFrame" parent="InterfaceOptionsFramePanelContainer">
+		<Scripts>
+			<OnLoad function="CombustionHelperOptions_OnLoad"/>
+		</Scripts>
+		
+		<Frames>
+			<Slider name="CombuScaleSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuOptionsFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("300%")
+						_G[self:GetName().."Low"]:SetText("50%")
+						self:SetMinMaxValues(0.5, 3)
+						self:SetValueStep(0.01)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combuscale"] == nil) then self:SetValue(1)
+													combusettingstable["combuscale"] = 1
+						else self:SetValue(combusettingstable["combuscale"])
+						end
+                        _G[self:GetName().."Value"]:SetText(format("%.0f%%",self:GetValue()*100))
+					</OnShow>
+					<OnValueChanged>
+						CombustionScale(self:GetValue())
+                        _G[self:GetName().."Value"]:SetText(format("%.0f%%",self:GetValue()*100))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+            <CheckButton name="CombulockButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuScaleSlider" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="238" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combulock"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						Combustionlock()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+			            
+			<CheckButton name="CombureportButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuScaleSlider" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combureport"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						Combustionreport()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="Combureportthreshold" inherits="CombuCheckButtontemplate">
+					<Anchors>
+					<Anchor point="LEFT" relativeTo="CombureportButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="-50" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combureportthreshold"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						Combustionthreshold()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+		    <EditBox name="Combureportvalue" inherits="CombuEditBoxtemplate" letters="10" ignoreArrows="false" autoFocus="false">
+		 	  <Size>
+				 <AbsDimension x="50" y="32" ></AbsDimension>
+			  </Size>
+			  <Anchors>
+		          <Anchor point="LEFT" relativeTo="Combureportthreshold" relativePoint="RIGHT">
+		              <Offset>
+		                  <AbsDimension x="81" y="1"/>
+		              </Offset>
+		          </Anchor>
+		      </Anchors>
+		      <Layers>
+				<Layer level="BACKGROUND">
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+						<Size>
+							<AbsDimension x="35" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-10" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0" right="0.2" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+						<Size>
+							<AbsDimension x="35" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0.7" right="1.0" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+				</Layer>
+			</Layers>
+				<FontString inherits="ChatFontNormal"></FontString>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="25" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+			    <Scripts>
+					<OnShow>
+						Combureportvalue:SetText(combusettingstable["combureportvalue"])
+						Combureportvalue:SetCursorPosition(0)
+					</OnShow>
+			        <OnEscapePressed>
+			            self:ClearFocus()
+			        </OnEscapePressed>
+			        <OnEnterPressed>
+			            combusettingstable["combureportvalue"] = tonumber(self:GetText())
+			            print(format(CombuLoc["comburepthres"], combusettingstable["combureportvalue"]))
+			            self:ClearFocus()           
+			        </OnEnterPressed>
+				</Scripts>
+			</EditBox>
+			<Button name="CombuvalueokButton" inherits="OptionsButtonTemplate" text="ok">
+				<Size>
+					<AbsDimension x="25" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Combureportvalue" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						combusettingstable["combureportvalue"] = tonumber(Combureportvalue:GetText())
+						print(format(CombuLoc["comburepthres"], combusettingstable["combureportvalue"]))
+						Combureportvalue:ClearFocus()           
+   					</OnClick>				
+				</Scripts>
+			</Button>
+                        
+            <CheckButton name="CombuMunchingButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombureportButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combureportmunching"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombustionMunching()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+						
+		     <Frame name="CombuTimerbutton" inherits="CombuFrametemplate" >
+		        <Size>
+		          <AbsDimension x="118" y="9" />
+		        </Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuMunchingButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+		        <Layers>
+		          <Layer>
+		            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+		              <Anchors>
+		                <Anchor point="TOPLEFT" />
+		                <Anchor point="BOTTOMRIGHT" />
+		              </Anchors>
+		              <FontHeight>
+		                <AbsValue val="12" />
+		              </FontHeight>
+		              <Color r="1" g="1" b="1" />
+		              <Shadow>
+		                <Color r="0" g="0" b="0" />
+		                <Offset>
+		                  <AbsDimension x="1" y="-1" />
+		                </Offset>
+		              </Shadow>
+		            </FontString>
+		            </Layer>
+		        </Layers>
+		     </Frame>
+		    <EditBox name="CombuTimervalue" inherits="CombuEditBoxtemplate" letters="5" ignoreArrows="false" autoFocus="false">
+			 	<Size>
+					<AbsDimension x="37" y="32" ></AbsDimension>
+				</Size>
+				  <Anchors>
+			          <Anchor point="LEFT" relativeTo="CombuTimerbutton" relativePoint="RIGHT">
+			              <Offset>
+			                  <AbsDimension x="0" y="0"/>
+			              </Offset>
+			          </Anchor>
+			      </Anchors>
+		      <Layers>
+				<Layer level="BACKGROUND">
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+						<Size>
+							<AbsDimension x="35" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-10" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0" right="0.2" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+					<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+						<Size>
+							<AbsDimension x="35" y="32"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0.7" right="1.0" top="0" bottom="1.0"></TexCoords>
+					</Texture>
+				</Layer>
+			</Layers>
+				<FontString inherits="ChatFontNormal"></FontString>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="25" y="0"></AbsDimension>
+								</Offset>
+							</Anchor>
+						</Anchors>
+			    <Scripts>
+					<OnShow>
+						CombuTimervalue:SetText(combusettingstable["combutimervalue"])
+						CombuTimervalue:SetCursorPosition(0)
+					</OnShow>
+			        <OnEscapePressed>
+			            self:ClearFocus()
+			        </OnEscapePressed>
+			        <OnEnterPressed>
+			            combusettingstable["combutimervalue"] = tonumber(self:GetText())
+			            print(format(CombuLoc["redzonetimer"], combusettingstable["combutimervalue"]))
+			            self:ClearFocus()           
+			        </OnEnterPressed>
+				</Scripts>
+			</EditBox>
+			<Button name="CombutimerokButton" inherits="OptionsButtonTemplate" text="ok">
+				<Size>
+					<AbsDimension x="25" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuTimervalue" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						combusettingstable["combutimervalue"] = tonumber(CombuTimervalue:GetText())
+						print(format(CombuLoc["redzonetimer"], combusettingstable["combutimervalue"]))
+						CombuTimervalue:ClearFocus()           
+   					</OnClick>				
+				</Scripts>
+			</Button>
+			
+			<CheckButton name="ComburefreshpyroButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuMunchingButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combureportpyro"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombustionrefreshPyro()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="CombuimpactButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ComburefreshpyroButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combuimpact"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						Combustionimpact()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+            
+			<CheckButton name="CombutrackerButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ComburefreshpyroButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combutrack"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						Combustiontracker()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+            
+			<CheckButton name="CombuchatButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombutrackerButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combuchat"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						Combustionchat()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+            
+			<CheckButton name="CombuThresholdSoundButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombutrackerButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["thresholdalert"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						 CombustionThresholdSound()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+            			
+			<CheckButton name="CombuTickPredictButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuThresholdSoundButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combutickpredict"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombustionTickPredict()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+            
+			<CheckButton name="CombuPyromaniacButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuThresholdSoundButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["pyromaniac"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						 CombustionPyromaniac()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+            <CheckButton name="CombuHotStreakButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuPyromaniacButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["hotstreak"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombustionHotstreak()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+	   <Frame name="LBtrackerPosition" inherits="CombuFrametemplate">
+        <Size>
+          <AbsDimension x="250" y="9" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="CombuPyromaniacButton" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-40" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" />
+              </Anchors>
+              <FontHeight>
+                <AbsValue val="12" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+            </Frame>
+    <Frame name="LBtrackerDropDown" inherits="UIDropDownMenuTemplate">
+                <Size>
+                  <AbsDimension x="400" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="LBtrackerPosition" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="150" y="8" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+               <Scripts>
+                <OnShow>
+
+local function LBpositionOnClick(self)
+
+   UIDropDownMenu_SetSelectedID(LBtrackerDropDown, self:GetID())
+   
+   if (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 1) then combusettingstable["MageBombTrackerPosition"] = "upside"
+   elseif (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 2) then combusettingstable["MageBombTrackerPosition"] = "downside"
+   elseif (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 3) then combusettingstable["MageBombTrackerPosition"] = "rightside"
+   elseif (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 4) then combusettingstable["MageBombTrackerPosition"] = "leftside"
+   elseif (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 5) then combusettingstable["MageBombTrackerPosition"] = "free"
+   end
+ 
+   CombustionFrameresize()
+   CombuMBTrackerCreateBombRow()
+   
+end   
+                
+local function initialize(self, level)
+   local info = UIDropDownMenu_CreateInfo()
+   for k,v in pairs(CombuLBposition) do
+      info = UIDropDownMenu_CreateInfo()
+      info.text = v
+      info.value = v
+      info.func = LBpositionOnClick
+      UIDropDownMenu_AddButton(info, level)
+   end
+end
+ 
+ 
+UIDropDownMenu_Initialize(LBtrackerDropDown, initialize)
+UIDropDownMenu_SetWidth(LBtrackerDropDown, 220);
+UIDropDownMenu_SetButtonWidth(LBtrackerDropDown, 124)
+UIDropDownMenu_JustifyText(LBtrackerDropDown, "LEFT")
+                
+   if combusettingstable["MageBombTrackerPosition"] == "upside" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[1])
+   elseif combusettingstable["MageBombTrackerPosition"] == "downside" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[2])
+   elseif combusettingstable["MageBombTrackerPosition"] == "rightside" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[3])
+   elseif combusettingstable["MageBombTrackerPosition"] == "leftside" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[4])
+   elseif combusettingstable["MageBombTrackerPosition"] == "free" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[5])
+   end
+                </OnShow>
+                </Scripts>
+        </Frame>
+        
+    <Frame name="CombuAutohideInfo" inherits="CombuFrametemplate">
+        <Size>
+          <AbsDimension x="250" y="9" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="LBtrackerPosition" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-33" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" />
+              </Anchors>
+              <FontHeight>
+                <AbsValue val="12" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+     </Frame>
+     
+    <Frame name="CombuAutohideDropDown" inherits="UIDropDownMenuTemplate">
+         <Size>
+           <AbsDimension x="400" />
+         </Size>
+         <Anchors>
+           <Anchor point="TOPLEFT" relativeTo="CombuAutohideInfo" relativePoint="TOPLEFT">
+             <Offset>
+               <AbsDimension x="150" y="8" />
+             </Offset>
+           </Anchor>
+         </Anchors>
+        <Scripts>
+                <OnShow>
+
+local function OnClick(self)
+   UIDropDownMenu_SetSelectedID(CombuAutohideDropDown, self:GetID())
+   
+   if (UIDropDownMenu_GetSelectedID(CombuAutohideDropDown, self:GetID()) == 1) then combusettingstable["combuautohide"] = 1
+   elseif (UIDropDownMenu_GetSelectedID(CombuAutohideDropDown, self:GetID()) == 2) then combusettingstable["combuautohide"] = 2
+   elseif (UIDropDownMenu_GetSelectedID(CombuAutohideDropDown, self:GetID()) == 3) then combusettingstable["combuautohide"] = 3
+   end
+   
+   CombustionAutohide()   
+end   
+                
+local function initialize(self, level)
+   local info = UIDropDownMenu_CreateInfo()
+   for k,v in pairs(CombuAutohideList) do
+      info = UIDropDownMenu_CreateInfo()
+      info.text = v
+      info.value = v
+      info.func = OnClick
+      UIDropDownMenu_AddButton(info, level)
+   end
+end
+ 
+ 
+UIDropDownMenu_Initialize(CombuAutohideDropDown, initialize)
+UIDropDownMenu_SetWidth(CombuAutohideDropDown, 220);
+UIDropDownMenu_SetButtonWidth(CombuAutohideDropDown, 124)
+UIDropDownMenu_JustifyText(CombuAutohideDropDown, "LEFT")
+
+				   if (combusettingstable["combuautohide"] == 1) then UIDropDownMenu_SetText(CombuAutohideDropDown, CombuAutohideList[1])
+				   elseif (combusettingstable["combuautohide"] == 2) then UIDropDownMenu_SetText(CombuAutohideDropDown, CombuAutohideList[2])
+				   elseif (combusettingstable["combuautohide"] == 3) then UIDropDownMenu_SetText(CombuAutohideDropDown, CombuAutohideList[3])
+				   end
+                </OnShow>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="CombuLanguageInfo" inherits="CombuFrametemplate">
+        <Size>
+          <AbsDimension x="250" y="9" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="CombuAutohideInfo" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-33" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" />
+              </Anchors>
+              <FontHeight>
+                <AbsValue val="12" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+     </Frame>
+     
+    <Frame name="CombuLanguageDropDown" inherits="UIDropDownMenuTemplate">
+         <Size>
+           <AbsDimension x="400" />
+         </Size>
+         <Anchors>
+           <Anchor point="TOPLEFT" relativeTo="CombuLanguageInfo" relativePoint="TOPLEFT">
+             <Offset>
+               <AbsDimension x="150" y="8" />
+             </Offset>
+           </Anchor>
+         </Anchors>
+        <Scripts>
+                <OnShow>
+CombuLanguage = {
+   "Default",
+   "English",
+   "Francais",
+   "Deutsch",
+   "Chinese"
+	}
+
+local function OnClick(self)
+   UIDropDownMenu_SetSelectedID(CombuLanguageDropDown, self:GetID());
+   
+    combusettingstable["language"] = CombuLanguage[UIDropDownMenu_GetSelectedID(CombuLanguageDropDown, self:GetID())]
+    CombuLanguageCheck()
+    CombuOptionsFrame:Hide()
+    CombuOptionsFrame:Show()
+end   
+                
+local function initialize(self, level)
+   local info = UIDropDownMenu_CreateInfo()
+   for k,v in pairs(CombuLanguage) do
+      info = UIDropDownMenu_CreateInfo()
+      info.text = v
+      info.value = v
+      info.func = OnClick
+      UIDropDownMenu_AddButton(info, level)
+   end
+end
+ 
+ 
+UIDropDownMenu_Initialize(CombuLanguageDropDown, initialize)
+UIDropDownMenu_SetWidth(CombuLanguageDropDown, 220);
+UIDropDownMenu_SetButtonWidth(CombuLanguageDropDown, 124)
+UIDropDownMenu_JustifyText(CombuLanguageDropDown, "LEFT")
+UIDropDownMenu_SetText(CombuLanguageDropDown, combusettingstable["language"])
+
+                    </OnShow>
+                </Scripts>
+            </Frame>
+            
+			<CheckButton name="CombuBarButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuLanguageInfo" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combubartimers"] == true) then self:SetChecked(true)
+														 CombuBarSlider:Enable()
+							 							 CombuBarSlider:SetAlpha(1)
+						else self:SetChecked(false)
+							 CombuBarSlider:Disable()
+							 CombuBarSlider:SetAlpha(0.5)
+						end
+					</OnShow>
+					<OnClick>
+						Combustionbar()
+						if (combusettingstable["combubartimers"] == true) then CombuBarSlider:Enable()
+                                                                                CombuBarSlider:SetAlpha(1)
+						else CombuBarSlider:Disable()
+							 CombuBarSlider:SetAlpha(0.5)
+						end
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+			
+		<Slider name="CombuBarSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="190" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuBarButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="205" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("80")
+						_G[self:GetName().."Low"]:SetText("10")
+						self:SetMinMaxValues(10, 80)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combubarwidth"] == nil) then self:SetValue(24)
+													   combusettingstable["combubarwidth"] = 24
+						else self:SetValue(combusettingstable["combubarwidth"])
+						end
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnShow>
+					<OnValueChanged>
+						combusettingstable["combubarwidth"] = (self:GetValue())
+						CombustionFrameresize()
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+									
+	   <Frame name="CombuSliderInfo">
+        <Size>
+          <AbsDimension x="500" y="9" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="CombuBarButton" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-40" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="CENTER">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" />
+              </Anchors>
+              <FontHeight>
+                <AbsValue val="9" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+		<Scripts>
+			<OnShow>
+				_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+			</OnShow>
+		</Scripts>
+      </Frame>
+      
+			<Slider name="CombubeforefadeSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="90" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuSliderInfo" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("30")
+						_G[self:GetName().."Low"]:SetText("1")
+						self:SetMinMaxValues(1, 30)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combubeforefade"] == nil) then self:SetValue(15)
+													combusettingstable["combubeforefade"] = 15
+						else self:SetValue(combusettingstable["combubeforefade"])
+						end
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnShow>
+					<OnValueChanged>
+						combusettingstable["combubeforefade"] = (self:GetValue())
+		             	CombufadedtimeFrameText:SetText(format("%d",120-combusettingstable["combubeforefade"]-combusettingstable["combuafterfade"]-combusettingstable["combufadeoutspeed"]-combusettingstable["combufadeinspeed"]))
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            
+			<Slider name="CombufadeoutspeedSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="90" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombubeforefadeSlider" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("30")
+						_G[self:GetName().."Low"]:SetText("0")
+						self:SetMinMaxValues(0, 30)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combufadeoutspeed"] == nil) then self:SetValue(2)
+													combusettingstable["combufadeoutspeed"] = 2
+						else self:SetValue(combusettingstable["combufadeoutspeed"])
+						end
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnShow>
+					<OnValueChanged>
+						combusettingstable["combufadeoutspeed"] = (self:GetValue())
+                CombufadedtimeFrameText:SetText(format("%d",120-combusettingstable["combubeforefade"]-combusettingstable["combuafterfade"]-combusettingstable["combufadeoutspeed"]-combusettingstable["combufadeinspeed"]))
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+      <Frame name="CombufadedtimeText" inherits="CombuFrametemplate">
+        <Size>
+          <AbsDimension x="70" y="30" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="CombufadeoutspeedSlider" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="15" y="0" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="CENTER">
+		        <Anchors>
+				  <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+		            <Offset>
+		              <AbsDimension x="0" y="0" />
+		            </Offset>
+		          </Anchor>
+		        </Anchors>
+              <FontHeight>
+                <AbsValue val="11" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            <FontString name="CombufadedtimeFrameText" font="Fonts\FRIZQT__.TTF" text="" justifyH="CENTER">
+		        <Size>
+		          <AbsDimension x="70" y="9" />
+		        </Size>
+		        <Anchors>
+				  <Anchor point="TOP" relativeTo="$parentText" relativePoint="BOTTOM">
+		            <Offset>
+		              <AbsDimension x="0" y="-5" />
+		            </Offset>
+		          </Anchor>
+		        </Anchors>
+              <FontHeight>
+                <AbsValue val="11" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+      </Frame>
+      
+			<Slider name="CombufadeinspeedSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="90" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombufadedtimeText" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("30")
+						_G[self:GetName().."Low"]:SetText("0")
+						self:SetMinMaxValues(0, 30)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combufadeinspeed"] == nil) then self:SetValue(2)
+													combusettingstable["combufadeinspeed"] = 2
+						else self:SetValue(combusettingstable["combufadeinspeed"])
+						end
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnShow>
+					<OnValueChanged>
+						combusettingstable["combufadeinspeed"] = (self:GetValue())
+		             	CombufadedtimeFrameText:SetText(format("%d",120-combusettingstable["combubeforefade"]-combusettingstable["combuafterfade"]-combusettingstable["combufadeoutspeed"]-combusettingstable["combufadeinspeed"]))
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            
+			<Slider name="CombuafterfadeSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="90" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombufadeinspeedSlider" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("30")
+						_G[self:GetName().."Low"]:SetText("1")
+						self:SetMinMaxValues(1, 30)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["combubafterfade"] == nil) then self:SetValue(15)
+													combusettingstable["combubafterfade"] = 15
+						else self:SetValue(combusettingstable["combuafterfade"])
+						end
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnShow>
+					<OnValueChanged>
+						combusettingstable["combuafterfade"] = (self:GetValue())
+		             	CombufadedtimeFrameText:SetText(format("%d",120-combusettingstable["combubeforefade"]-combusettingstable["combuafterfade"]-combusettingstable["combufadeoutspeed"]-combusettingstable["combufadeinspeed"]))
+                        _G[self:GetName().."Value"]:SetText(self:GetValue())
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            
+			<Button name="ComburesetButton" inherits="OptionsButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="180" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombubeforefadeSlider" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						self:HookScript("OnEnter", function(self) 
+														CombuOptionsTooltipFrame:Show() 
+														CombuOptionsTooltipTitle:SetText(_G[self:GetName().."Text"]:GetText()) 
+														CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) 
+														CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+													end)
+						self:HookScript("OnLeave", function() CombuOptionsTooltipFrame:Hide() end)
+					</OnShow>
+					<OnClick>
+						Combustionreset()
+                        InterfaceOptionsFrame:Hide()
+                        InterfaceOptionsFrame:Show()
+					</OnClick>				
+				</Scripts>
+			</Button>
+	        </Frames>
+	</Frame>
+
+
+<!--                        Graphical options                        -->
+<Frame name="CombuCustomOptionsFrame" parent="InterfaceOptionsFramePanelContainer">
+		<Scripts>
+			<OnLoad function="CombustionHelperCustomOptions_OnLoad"/>
+		</Scripts>		
+		<Frames>
+            
+            <Frame name="CombuTextureInfo" inherits="CombuFrametemplate" >
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuCustomOptionsFrame" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="20" y="-30" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuTextureDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuTextureInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuTexture = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuCreateTextureList(CombuTextureDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuTexture) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuTextureDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuTextureDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuTextureDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuTextureDropDown, "LEFT")
+                        CombuTextureDropDownButton:SetScript("OnClick", function()
+                            CombuCreateTextureList(CombuTextureDropDown,"combutexturename")
+                        end)
+
+                        UIDropDownMenu_SetText(CombuTextureDropDown,combusettingstable["combutexturename"])
+                    </OnShow>
+                    <OnClick>
+                        CombuCreateTextureList(CombuTextureDropDown,"combutexturename")
+                    </OnClick>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="CombuFontInfo" inherits="CombuFrametemplate">
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuTextureInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-33" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuFontDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuFontInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuFont = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuCreateFontList(CombuFontDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuFont) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuFontDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuFontDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuFontDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuFontDropDown, "LEFT")
+                        CombuFontDropDownButton:SetScript("OnClick", function()
+                            CombuCreateFontList()
+                        end)
+                        UIDropDownMenu_SetText(CombuFontDropDown, combusettingstable["combufontname"])
+                    </OnShow>
+                    <OnClick>
+                        CombuCreateFontList(CombuFontDropDown)
+                    </OnClick>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="CombuSoundInfo" inherits="CombuFrametemplate">
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuFontInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-33" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuSoundDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuSoundInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuFont = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuCreateSoundList(CombuSoundDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuFont) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuSoundDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuSoundDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuSoundDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuSoundDropDown, "LEFT")
+                        CombuSoundDropDownButton:SetScript("OnClick", function()
+                            CombuCreateSoundList()
+                        end)
+                        UIDropDownMenu_SetText(CombuSoundDropDown, combusettingstable["combusoundname"])
+                    </OnShow>
+                    <OnClick>
+                        CombuCreateSoundList(CombuSoundDropDown)
+                    </OnClick>
+                </Scripts>
+            </Frame>
+			            
+            <Frame name="CombuBorderInfo" inherits="CombuFrametemplate">
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuSoundInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-33" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuBorderDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuBorderInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuBorder = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuCreateBorderList(CombuBorderDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuBorder) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuBorderDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuBorderDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuBorderDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuBorderDropDown, "LEFT")
+                        CombuBorderDropDownButton:SetScript("OnClick", function()
+                            CombuCreateBorderList()
+                        end)
+                        UIDropDownMenu_SetText(CombuBorderDropDown,combusettingstable["edgeFile"])
+                    </OnShow>
+                    <OnClick>
+                        CombuCreateBorderList(CombuBorderDropDown)
+                    </OnClick>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="CombuBackgroundInfo" inherits="CombuFrametemplate">
+                <Size>
+                  <AbsDimension x="250" y="9" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuBorderInfo" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-33" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Layers>
+                  <Layer>
+                    <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+                      <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                      </Anchors>
+                      <FontHeight>
+                        <AbsValue val="12" />
+                      </FontHeight>
+                      <Color r="1" g="1" b="1" />
+                      <Shadow>
+                        <Color r="0" g="0" b="0" />
+                        <Offset>
+                          <AbsDimension x="1" y="-1" />
+                        </Offset>
+                      </Shadow>
+                    </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CombuBackgroundDropDown" inherits="UIDropDownMenuTemplate">
+                 <Size>
+                   <AbsDimension x="400" />
+                 </Size>
+                 <Anchors>
+                   <Anchor point="TOPLEFT" relativeTo="CombuBackgroundInfo" relativePoint="TOPLEFT">
+                     <Offset>
+                       <AbsDimension x="130" y="8" />
+                     </Offset>
+                   </Anchor>
+                 </Anchors>
+                <Scripts>
+                    <OnShow>
+                        
+                        CombuBackground = {
+                            "No Autohide",
+                            "Autohide only out of Combat",
+                            "Autohide for Frost/Fire spec",
+                            "Autohide OOC and Frost/Fire spec",
+                        }
+                        
+                        local function OnClick(self)
+                        
+                           CombuCreateBackgroundList(CombuBackgroundDropDown)
+                        
+                        end
+                           
+                        local function initialize(self, level)
+                           local info = UIDropDownMenu_CreateInfo()
+                           for k,v in pairs(CombuBackground) do
+                              info = UIDropDownMenu_CreateInfo()
+                              info.text = v
+                              info.value = v
+                              info.func = OnClick
+                              UIDropDownMenu_AddButton(info, level)
+                           end
+                        end
+                        
+                        UIDropDownMenu_Initialize(CombuBackgroundDropDown, initialize) 
+                        UIDropDownMenu_SetWidth(CombuBackgroundDropDown, 220);
+                        UIDropDownMenu_SetButtonWidth(CombuBackgroundDropDown, 124)
+                        UIDropDownMenu_JustifyText(CombuBackgroundDropDown, "LEFT")
+                        CombuBackgroundDropDownButton:SetScript("OnClick", function()
+                            CombuCreateBackgroundList()
+                        end)
+                        UIDropDownMenu_SetText(CombuBackgroundDropDown, combusettingstable["bgFile"])
+                    </OnShow>
+                    <OnClick>
+                        CombuCreateBackgroundList(CombuBackgroundDropDown)
+                    </OnClick>
+                </Scripts>
+            </Frame>
+			
+            <Slider name="CombuEdgeSizeSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuBackgroundInfo" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("32")
+						_G[self:GetName().."Low"]:SetText("1")
+						self:SetMinMaxValues(1, 32)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+                        self:SetValue(combusettingstable["edgeSize"])
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnShow>
+					<OnValueChanged>
+                        combusettingstable["edgeSize"] = self:GetValue()
+						CombustionFrameresize()
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            			
+            <Slider name="CombuTileSizeSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuEdgeSizeSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="250" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("32")
+						_G[self:GetName().."Low"]:SetText("0")
+						self:SetMinMaxValues(0, 32)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+                        self:SetValue(combusettingstable["tileSize"])
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnShow>
+					<OnValueChanged>
+                        combusettingstable["tileSize"] = self:GetValue()
+						CombustionFrameresize()
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            
+            <Slider name="CombuInsetsSlider" inherits="CombuSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuEdgeSizeSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                <Layers>
+                    <Layer>
+                        <FontString name="$parentValue" inherits="CombuValueTemplate" />
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."High"]:SetText("32")
+						_G[self:GetName().."Low"]:SetText("0")
+						self:SetMinMaxValues(0, 32)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+                        self:SetValue(combusettingstable["insets"])
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnShow>
+					<OnValueChanged>
+                        combusettingstable["insets"] = self:GetValue();
+						CombustionFrameresize()
+                        _G[self:GetName().."Value"]:SetText(format("%.0f",self:GetValue()))
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+            			
+			<CheckButton name="CombuTileButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuInsetsSlider" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="250" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["tile"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+							if CombuTileButton:GetChecked(true) then combusettingstable["tile"] = true 
+                                                 CombuTileButton:SetChecked(true)
+                            else combusettingstable["tile"] = false 
+                                 CombuTileButton:SetChecked(false)
+                            end
+						CombustionFrameresize()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+			
+			<Button name="Combubarcolornormal" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuInsetsSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+                        self:HookScript("OnEnter", function(self) 
+								CombuOptionsTooltipFrame:Show() 
+								CombuOptionsTooltipTitle:SetText(CombuOptLoc[self:GetName()]) 
+								CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) 
+							    CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+							end)
+						self:HookScript("OnLeave", function() CombuOptionsTooltipFrame:Hide() end)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combusettingstable["barcolornormal"]))
+					</OnShow>
+					<OnClick>
+                        combucolorinstance = "barcolornormal"
+						CombuColorPicker(unpack(combusettingstable[combucolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+
+			<Button name="Combubarcolorwarning" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Combubarcolornormal" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+                        self:HookScript("OnEnter", function(self) 
+								CombuOptionsTooltipFrame:Show() 
+								CombuOptionsTooltipTitle:SetText(CombuOptLoc[self:GetName()]) 
+								CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) 
+							    CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+							end)
+						self:HookScript("OnLeave", function() CombuOptionsTooltipFrame:Hide() end)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combusettingstable["barcolorwarning"]))
+					</OnShow>
+					<OnClick>
+                        combucolorinstance = "barcolorwarning"
+						CombuColorPicker(unpack(combusettingstable[combucolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+
+			<Button name="Combuedgecolornormal" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Combubarcolornormal" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="220" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+                        self:HookScript("OnEnter", function(self) 
+								CombuOptionsTooltipFrame:Show() 
+								CombuOptionsTooltipTitle:SetText(CombuOptLoc[self:GetName()]) 
+								CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) 
+							    CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+							end)
+						self:HookScript("OnLeave", function() CombuOptionsTooltipFrame:Hide() end)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combusettingstable["edgecolornormal"]))
+					</OnShow>
+					<OnClick>
+                        combucolorinstance = "edgecolornormal"
+						CombuColorPicker(unpack(combusettingstable[combucolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+
+            <Button name="Combubgcolornormal" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Combuedgecolornormal" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+                        self:HookScript("OnEnter", function(self) 
+								CombuOptionsTooltipFrame:Show() 
+								CombuOptionsTooltipTitle:SetText(CombuOptLoc[self:GetName()]) 
+								CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) 
+							    CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+							end)
+						self:HookScript("OnLeave", function() CombuOptionsTooltipFrame:Hide() end)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combusettingstable["bgcolornormal"]))
+					</OnShow>
+					<OnClick>
+                        combucolorinstance = "bgcolornormal"
+						CombuColorPicker(unpack(combusettingstable[combucolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+
+			<Button name="Combubgcolorimpact" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Combubgcolornormal" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+                        self:HookScript("OnEnter", function(self) 
+								CombuOptionsTooltipFrame:Show() 
+								CombuOptionsTooltipTitle:SetText(CombuOptLoc[self:GetName()]) 
+								CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) 
+							    CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+							end)
+						self:HookScript("OnLeave", function() CombuOptionsTooltipFrame:Hide() end)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combusettingstable["bgcolorimpact"]))
+					</OnShow>
+					<OnClick>
+                        combucolorinstance = "bgcolorimpact"
+						CombuColorPicker(unpack(combusettingstable[combucolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+
+			<Button name="Combubgcolorcombustion" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Combubgcolorimpact" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+                        self:HookScript("OnEnter", function(self) 
+								CombuOptionsTooltipFrame:Show() 
+								CombuOptionsTooltipTitle:SetText(CombuOptLoc[self:GetName()]) 
+								CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) 
+							    CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+							end)
+						self:HookScript("OnLeave", function() CombuOptionsTooltipFrame:Hide() end)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combusettingstable["bgcolorcombustion"]))
+					</OnShow>
+					<OnClick>
+                        combucolorinstance = "bgcolorcombustion"
+						CombuColorPicker(unpack(combusettingstable[combucolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+       
+			<Button name="Combubgcolorwarning" inherits="OptionsButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Combubgcolorcombustion" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1"/>
+						</Texture>
+						
+						<FontString name="$parentInfo" font="Fonts\FRIZQT__.TTF" justifyH="LEFT" text="">
+							 <Anchors>
+								 <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									 <Offset>
+										 <AbsDimension x="15" y="0"/>
+									 </Offset>
+								 </Anchor>
+							 </Anchors>
+							 <FontHeight>
+								 <AbsValue val="12" />
+							 </FontHeight>
+							 <Color r="1" g="1" b="1" />
+							 <Shadow>
+								 <Color r="0" g="0" b="0" />
+								 <Offset>
+									 <AbsDimension x="1" y="-1" />
+								 </Offset>
+							 </Shadow>
+						 </FontString>
+
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+                        self:HookScript("OnEnter", function(self) 
+								CombuOptionsTooltipFrame:Show() 
+								CombuOptionsTooltipTitle:SetText(CombuOptLoc[self:GetName()]) 
+								CombuOptionsTooltipText:SetText(combuoptioninfotable[self:GetName()]) 
+							    CombuOptionsTooltipFrame:SetHeight(CombuOptionsTooltipText:GetStringHeight() + 30)
+							end)
+						self:HookScript("OnLeave", function() CombuOptionsTooltipFrame:Hide() end)
+					</OnLoad>
+					<OnShow>
+						_G[self:GetName().."Info"]:SetText(CombuOptLoc[self:GetName()])
+                        _G[self:GetName().."SwatchTexture"]:SetVertexColor(unpack(combusettingstable["bgcolorwarning"]))
+					</OnShow>
+					<OnClick>
+                        combucolorinstance = "bgcolorwarning"
+						CombuColorPicker(unpack(combusettingstable[combucolorinstance]));
+					</OnClick>
+				</Scripts>
+				<NormalTexture name="$parentSwatchTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+   
+        </Frames>
+	</Frame>
+		
+</Ui>

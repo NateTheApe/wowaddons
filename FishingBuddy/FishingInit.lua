@@ -424,7 +424,7 @@ FishingInit.UpdateFishingDB = function()
 		end
 	end
 
-	if ( version < 10002 ) then
+	if ( version < 10003 ) then
 		FishingBuddy_Player["MinimapButtonVisible"] = nil;
 	end
 	
@@ -524,6 +524,33 @@ FishingInit.InitSortHelpers = function()
 	table.sort(FishingBuddy.SortedSubZones);
 end
 
+FishingInit.SetupSchoolCounts = function()
+	local counts = {};
+	local zmto = FishingBuddy.ZoneMarkerTo;
+	if ( FishingBuddy_Info["FishSchools"] ) then
+		for zidx,holes in pairs(FishingBuddy_Info["FishSchools"]) do
+			for _,hole in pairs(holes) do
+				local sidx = hole.sidx;
+				if ( sidx ) then
+					-- Fix bad data
+					if ( sidx < 1000 ) then
+						sidx = zmto(zidx, sidx);
+						hole.sidx = sidx;
+					end
+					if ( hole.fish ) then
+						counts[sidx] = counts[sidx] or {};
+						for fishid,count in pairs(hole.fish) do
+							counts[sidx][fishid] = counts[sidx][fishid] or 0;
+							counts[sidx][fishid] = counts[sidx][fishid] + count;
+						end
+					end
+				end
+			end
+		end
+	end
+	FishingBuddy.SZSchoolCounts = counts;
+end
+
 FishingInit.InitSettings = function()
 	if( not FishingBuddy_Info ) then
 		FishingBuddy_Info = { };
@@ -550,6 +577,7 @@ FishingInit.InitSettings = function()
 	FishingInit.UpdateFishingDB();
 	FishingInit.SetupByFishie();
 	FishingInit.InitSortHelpers();
+	FishingInit.SetupSchoolCounts();
 end
 
 FishingInit.RegisterMyAddOn = function()

@@ -21,6 +21,8 @@ local Crayon = LibStub("LibCrayon-3.0");
 local FL = LibStub("LibFishing-1.0");
 local LT = LibStub("LibTourist-3.0");
 
+local FBAPI = LibStub("FishingBuddyApi-1.0");
+
 local timerframe;
 
 -- options for fish watcher
@@ -221,6 +223,7 @@ FishingBuddy.Commands[FBConstants.WATCHER].func =
 -- handle tracking the fish that are in the current zone
 -- we'll handle mutlti-zone watching without reset later (i.e a future option)
 local totalCount = 0;
+local totalSchool = 0;
 local totalCurrent = 0;
 local gotDiffs = false;
 
@@ -290,10 +293,10 @@ local function UpdateUnknownZone(zone, subzone, zidx, sidx)
 	end
 end
 
--- build a single info entry for a given FishingBuddy.WatchFrame.OnClick 
+-- build a single info entry for a given fish
 local function BuildInfoEntry(fishid, count)
-	local IsCountedFish = FishingBuddy.API.IsCountedFish;
-	local IsQuestFish = FishingBuddy.API.IsQuestFish;
+	local IsCountedFish = FishingBuddy.IsCountedFish;
+	local IsQuestFish = FishingBuddy.IsQuestFish;
 
 	local fz = FishingBuddy_Info["FishingHoles"];
 	local ff = FishingBuddy_Info["Fishies"];
@@ -349,7 +352,9 @@ local function BuildCurrentData(zone, subzone, zidx, sidx)
 
 	local idx = zmto(zidx, sidx);
 	local fz = FishingBuddy_Info["FishingHoles"];
+	local fszc = FishingBuddy.SZSchoolCounts;
 	if ( fz and fz[idx] ) then
+		local sc = fszc[idx];
 		local ff = FishingBuddy_Info["Fishies"];
 		for fishid,count in pairs(fz[idx]) do
 			local itemTexture = ff[fishid].texture;
@@ -360,6 +365,10 @@ local function BuildCurrentData(zone, subzone, zidx, sidx)
 					totalCount = totalCount + count;
 				end
 			else
+				if (sc and sc[fishid]) then
+					count = count - sc[fishid];
+					totalSchool = totalSchool + sc[fishid];
+				end
 				info = BuildInfoEntry(fishid, count);
 				fishdata[fishid] = info;
 				tinsert(fishsort, fishid);
@@ -376,7 +385,7 @@ local function HandleZoneChange()
 	fishsort = nil
 	fishdata = nil;
 	FishingBuddy.WatchUpdate();
-	if ( FL:IsFishingGear() and TotalTimeFishing ) then
+	if ( FishingBuddy.ReadyForFishing() and TotalTimeFishing ) then
 		TotalTimeFishing = TotalTimeFishing + ZoneFishingTime;
 		ZoneFishingTime = 0;
 		FishingBuddy.SetSetting("TotalTimeFishing", TotalTimeFishing);
@@ -384,8 +393,6 @@ local function HandleZoneChange()
 end
 
 -- keep track of what's going on
-local lastSkillCheck = 0;
-local lastSkillMax = 0;
 local WatchEvents = {};
 
 WatchEvents["SKILL_LINES_CHANGED"] = function()
@@ -403,7 +410,7 @@ WatchEvents["SPELLCAST_STOP"] = function()
 	end
 end
 
-WatchEvents[FBConstants.ADD_FISHIE_EVT] = function(id, name, zone, subzone, texture, quantity, quality, level, idx)
+WatchEvents[FBConstants.ADD_FISHIE_EVT] = function(id, name, zone, subzone, texture, quantity, quality, level, idx, poolhint)
 	if ( FishingWatchFrame:IsVisible() ) then
 		if ( fishdata[id] ) then
 			info = fishdata[id];
@@ -416,9 +423,10 @@ WatchEvents[FBConstants.ADD_FISHIE_EVT] = function(id, name, zone, subzone, text
 				tinsert(fishsort, id);
 			end
 		end
+		
 		info.count = info.count + quantity;
 		info.current = info.current + quantity;
-		if ( FishingBuddy.API.IsCountedFish(id) ) then
+		if ( FishingBuddy.IsCountedFish(id) ) then
 			totalCount = totalCount + quantity;
 			totalCurrent = totalCurrent + quantity;
 			gotDiffs = true;
@@ -430,7 +438,6 @@ end
 
 WatchEvents["VARIABLES_LOADED"] = function()
 	ZoneFishingTime = 0;
-	lastSkillCheck, _, lastSkillMax = FL:GetCurrentSkill();
 
 	-- Make everything draw at least once
 	ShowDraggerFrame();
@@ -453,8 +460,8 @@ WatchEvents[FBConstants.FISHING_DISABLED_EVT] = function(started)
 		TotalTimeFishing = TotalTimeFishing + ZoneFishingTime;
 		ZoneFishingTime = 0;
 		FishingBuddy.SetSetting("TotalTimeFishing", TotalTimeFishing);
-		FishingBuddy.SetSetting("CaughtSoFar", FL:GetCaughtSoFar());
 	end
+	FishingBuddy.SetSetting("CaughtSoFar", FL:GetCaughtSoFar());
 end
 
 -- Handle display elapsed time in some reasonable fashion
@@ -499,7 +506,7 @@ end
 -- Fish watcher functions
 local function NoShow()
 	local GSB = FishingBuddy.GetSettingBool;
-	return (not GSB("WatchFishies") or (GSB("WatchOnlyWhenFishing") and not FL:IsFishingGear()));
+	return (not GSB("WatchFishies") or (GSB("WatchOnlyWhenFishing") and not FishingBuddy.AreWeFishing()));
 end
 
 local function UpdateTimerLine()
@@ -530,11 +537,9 @@ function UpdateTotalsLine(index)
 		end
 		local GSB = FishingBuddy.GetSettingBool;
 		if ( GSB("WatchCurrentSkill") ) then
-			local _, playerskill = FL:GetFishingSkillLine(false, true);
+			local _, playerskill = FL:GetFishingSkillLine(false, true, true);
 			line = line..Crayon:White(" | ")..CHAT_MSG_SKILL..": "..playerskill;
-			local needed;
-			local caughtSoFar;
-			lastSkillCheck, caughtSoFar, needed = FL:GetSkillUpInfo(lastSkillCheck);
+			local caughtSoFar, needed = FL:GetSkillUpInfo();
 			if ( needed ) then
 				line = line.." ("..caughtSoFar.."/~"..needed..")";
 			end
@@ -713,7 +718,7 @@ FishingBuddy.WatchFrame.OnLoad = function(self)
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
 	self:SetScript("OnEvent", HandleZoneChange);
 
-	FishingBuddy.API.RegisterHandlers(WatchEvents);
+	FishingBuddy.RegisterHandlers(WatchEvents);
 end
 
 local isDragging = nil;
