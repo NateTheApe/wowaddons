@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.4) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-11-19T01:19:56Z
+    This file was last updated on 2012-12-01T16:15:12Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -109,9 +109,7 @@ function D:GetDefaultsSettings()
             NewerVersionAlert = 0,
             NewVersionsBugMeNot = false,
             LastVersionAnnounce = 0,
-            --[===[@debug@
             LastUnpackagedAlert = 0,
-            --@end-debug@]===]
 
             -- the key to bind the macro to
             MacroBind = false,
@@ -1693,7 +1691,7 @@ local function GetStaticOptions ()
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"..
                                     "\n\n|cFFDDDD00 %s|r:\n   %s"
                                 ):format(
-                                    "2.7.2.3_beta_3", "John Wellesz", ("2012-11-19T01:19:56Z"):sub(1,10),
+                                    "2.7.2.4", "John Wellesz", ("2012-12-25T22:37:36Z"):sub(1,10),
                                     L["ABOUT_NOTES"],
                                     L["ABOUT_LICENSE"],         GetAddOnMetadata("Decursive", "X-License") or 'MoP is buggy',
                                     L["ABOUT_SHAREDLIBS"],      GetAddOnMetadata("Decursive", "X-Embeds") or 'MoP is buggy',
@@ -1712,7 +1710,6 @@ local function GetStaticOptions ()
                         type = "execute",
                         name = L["OPT_CHECKOTHERPLAYERS"],
                         desc = L["OPT_CHECKOTHERPLAYERS_DESC"],
-                        hidden = function () return not DC.COMMAVAILABLE; end,
                         disabled = function () return InCombatLockdown() or GetTime() - T.LastVCheck < 60; end,
                         func = function () if D:AskVersion() then D.versions = false; end GameTooltip:Hide(); end,
                         order = 10,
@@ -2783,7 +2780,7 @@ do
                     end
 
                     if not v:find(info[#info-1], 0, true) then
-                        StaticPopup_Show("Decursive_Notice_Frame", error((L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"]):format(info[#info-1])));
+                        T._ShowNotice(error((L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"]):format(info[#info-1])));
                     end
 
                     return 0;
@@ -2968,6 +2965,6 @@ function D:QuickAccess (CallingObject, button) -- {{{
 end -- }}}
 
 
-T._LoadedFiles["Dcr_opt.lua"] = "2.7.2.3_beta_3";
+T._LoadedFiles["Dcr_opt.lua"] = "2.7.2.4";
 
 -- Closer

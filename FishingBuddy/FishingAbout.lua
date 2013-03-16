@@ -11,7 +11,7 @@ credits[FBConstants.ROLE_TRANSLATE_ZHTW] = {
 	["smartdavislin"] = { "V1.0.2", },
 	["Andyca"] = { "V1.0.7a" },
 	["zhTW"] = { "V1.0.9e", },
-	["titanium0107"] = { "V1.1e", "V1.2", "V1.2a", "V1.2c", },
+	["titanium0107"] = { "V1.1e", "V1.2", "V1.2a", "V1.2c", "V1.2e", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_ITIT] = {
@@ -33,7 +33,7 @@ credits[FBConstants.ROLE_TRANSLATE_DEDE] = {
 	["blackrat"] = { "v0.8.1d", },
 	["RustyXXL"] = { "V1.0.4", },
 	["Ithilrandir"] = { "V1.0.5", },
-	["DirtyHarryGermany"] = { "V1.0.7h", "V1.0.9e", "V1.1e", "V1.2a", "V1.2c", },
+	["DirtyHarryGermany"] = { "V1.0.7h", "V1.0.9e", "V1.1e", "V1.2a", "V1.2c", "V1.2d", "V1.2f", "V1.2g", },
 	["Freydis88"] = { "V1.0.9e", },
 	["Frontiii"] = { "V1.0.9e", },
 };
@@ -51,6 +51,7 @@ credits[FBConstants.ROLE_TRANSLATE_ESES] = {
 	["Valdesca"] = { "v0.9.9e6", },
 	["Winderfind Drakkari"] = { "v1.0.7a" },
 	["jmaister"] = { "V1.0.9e", },
+	["karrash76"] = { "V1.2f", "V1.2g", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_KOKR] = {
@@ -68,6 +69,8 @@ credits[FBConstants.ROLE_TRANSLATE_RURU] = {
 	["frodo10"] = { "V1.0" },
 	["DVK"] = { "V1.1f" },
 	["Ant1dotE"] = { "V1.0.1", "V1.0.2", "V1.0.4" },
+	["BloodyFess"] = { "V1.2d", "V1.2h" },
+	["Turbid121"] = { "V1.2h", "V1.2i" },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_PTBR] = {
@@ -92,6 +95,7 @@ credits[FBConstants.ROLE_HELP_BUGS] = {
 	["callumw"] = { "Typo identification in fishing lib" },
 	["Ninmah"] = { "Beta tester", "Auto-loot reset bug" },
 	["WildCard_25"] = { "Fish Watcher update bug" },
+	["Grizzly_UK"] = { "Forum support and understanding" },
 };
 
 -- Ideas and suggestions
@@ -327,7 +331,6 @@ local function AboutSetup(self)
 		credits = nil;
 		table.sort(self.credits, function (a, b) return a.sort < b.sort; end)
 	end
-	FishingAboutFrame:SetAllPoints();
 end
 
 local AboutOptions = {
@@ -342,7 +345,7 @@ local function OnEvent(self, event)
 	self:UnregisterEvent("VARIABLES_LOADED");
 end
 
-local frame = CreateFrame("FRAME", "FishingAboutFrame")
+local frame = CreateFrame("FRAME", "FishingAboutFrame", FishingBuddyFrameInset)
 frame:SetScript("OnEvent", OnEvent)
 frame:RegisterEvent("VARIABLES_LOADED")
 frame:Hide()

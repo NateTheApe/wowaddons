@@ -1,11 +1,11 @@
-﻿## Interface: 50001
+﻿## Interface: 50100
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
-## Version: v2.3.1
+## Version: v2.3.3
 ## X-Email: starfire@fantasymail.de
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibJostle-3.0
-## X-Curse-Packaged-Version: v2.3.1
+## X-Curse-Packaged-Version: v2.3.3
 ## X-Curse-Project-Name: ChocolateBar Broker Display
 ## X-Curse-Project-ID: chocolatebar
 ## X-Curse-Repository-ID: wow/chocolatebar/mainline

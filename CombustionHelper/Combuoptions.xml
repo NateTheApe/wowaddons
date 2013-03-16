@@ -1,7 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 <!--                        Templates                         -->
-<FontString name="CombuValueTemplate" virtual="true" font="Fonts\FRIZQT__.TTF" text="" justifyH="CENTER">
+
+<FontString name="CombuValueTemplate" font="Fonts\FRIZQT__.TTF" virtual="true" text="" justifyH="CENTER">
     <Anchors>
         <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
             <Offset>
@@ -1260,13 +1261,58 @@
 					</OnClick>				
 				</Scripts>
 			</CheckButton>
+            
+			<CheckButton name="CombuPyroEnableButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CombuPyromaniacButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["PyroEnable"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						 CombustionPyroEnable()
+                         CombustionFrameresize()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
+            <CheckButton name="CombuLBEnableButton" inherits="CombuCheckButtontemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CombuPyroEnableButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						_G[self:GetName().."Text"]:SetText(CombuOptLoc[self:GetName()])
+						if (combusettingstable["LBEnable"] == true) then self:SetChecked(true)
+						else self:SetChecked(false)
+						end
+					</OnShow>
+					<OnClick>
+						CombustionLBEnable()
+                        CombustionFrameresize()
+					</OnClick>				
+				</Scripts>
+			</CheckButton>
+
 
 	   <Frame name="LBtrackerPosition" inherits="CombuFrametemplate">
         <Size>
           <AbsDimension x="250" y="9" />
         </Size>
         <Anchors>
-		  <Anchor point="TOPLEFT" relativeTo="CombuPyromaniacButton" relativePoint="TOPLEFT">
+		  <Anchor point="TOPLEFT" relativeTo="CombuPyroEnableButton" relativePoint="TOPLEFT">
             <Offset>
               <AbsDimension x="0" y="-40" />
             </Offset>
@@ -1293,6 +1339,7 @@
             </Layer>
         </Layers>
             </Frame>
+            
     <Frame name="LBtrackerDropDown" inherits="UIDropDownMenuTemplate">
                 <Size>
                   <AbsDimension x="400" />
@@ -1484,7 +1531,9 @@ CombuLanguage = {
    "English",
    "Francais",
    "Deutsch",
-   "Chinese"
+   "Chinese Traditional 繁體中文",
+   "Chinese Simplified 简体中文",
+   "Korean"
 	}
 
 local function OnClick(self)

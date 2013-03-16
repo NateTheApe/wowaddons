@@ -45,6 +45,8 @@ end
 
 local FL = LibStub("LibFishing-1.0");
 
+local uselocale = FishingBuddy.DebugLocale;
+
 local major,_,_ = FL:WOWVersion();
 local printfunc;
 if ( major > 1 ) then
@@ -59,7 +61,7 @@ else
 	FishingBuddy.DebugOutput("Print function failed "..err);
 end
 
-FL:Translate("FishingBuddy", FishingTranslations, FBConstants);
+FL:Translate("FishingBuddy", FishingTranslations, FBConstants, uselocale);
 FishingBuddy.Missing = nil;
 
 -- FishingBuddy.Missing = FL:Translate("FishingBuddy", FishingTranslations, FBConstants, "frFR");

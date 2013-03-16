@@ -77,23 +77,16 @@ function CombuMBTrackerLanguageCheck()
             CombuMBTrackerAutohideList = CombuMBTrackerAutohideListFR
             CombuMBTrackerLabel = CombuMBTrackerLabelFR
                 
---~         elseif combumbtrackersettingstable["language"] == "Deutsch" or combumbtrackersettingstable["language"] == "Default" and GetLocale() == "deDE" then
---~             
---~             CombuMBTrackerLoc = CombuMBTrackerLocDE
---~             combumbtrackeroptioninfotable = combumbtrackeroptioninfotableDE
---~             CombuMBTrackerOptLoc = CombuMBTrackerOptLocDE
---~             CombuMBTrackerLBposition = CombuMBTrackerLBpositionDE
---~             CombuMBTrackerAutohideList = CombuMBTrackerAutohideListDE
---~             CombuMBTrackerLabel = CombuMBTrackerLabelDE
---~             
---~         elseif combumbtrackersettingstable["language"] == "Chinese" or combumbtrackersettingstable["language"] == "Default" and GetLocale() == "zhTW" then
---~             
---~             CombuMBTrackerLoc = CombuMBTrackerLocTW
---~             combumbtrackeroptioninfotable = combumbtrackeroptioninfotableTW
---~             CombuMBTrackerOptLoc = CombuMBTrackerOptLocTW
---~             CombuMBTrackerLBposition = CombuMBTrackerLBpositionTW
---~             CombuMBTrackerAutohideList = CombuMBTrackerAutohideListTW
---~             CombuMBTrackerLabel = CombuMBTrackerLabelTW
+        elseif combumbtrackersettingstable["language"] == "Chinese Simplified 简体中文" or combumbtrackersettingstable["language"] == "Default" and GetLocale() == "zhCN" then
+             
+			CombuMBTrackerLoc = CombuMBTrackerLocCN
+			combumbtrackeroptioninfotable = combumbtrackeroptioninfotableCN
+			CombuMBTrackerOptLoc = CombuMBTrackerOptLocCN
+			CombuMBTrackerLBposition = CombuMBTrackerLBpositionCN
+			CombuMBTrackerAutohideList = CombuMBTrackerAutohideListCN
+			CombuMBTrackerLabel = CombuMBTrackerLabelCN
+			
+		--	CombuMBTMainFontstring:SetFont("Fonts\\ARKai_C.ttf",nil)
 
         else CombuMBTrackerLoc = CombuMBTrackerLocEN
             combumbtrackeroptioninfotable = combumbtrackeroptioninfotableEN
@@ -789,7 +782,7 @@ local function CombuMBTrackerUpdate()
             _G["CombuMBTrack"..i.."InfoSymbol"]:SetTexture("")
         end
 
-   		CombuMBTrack1InfoText:SetText("-- no bomb --")
+   		CombuMBTrack1InfoText:SetText(CombuMBTrackerLabel["nobomb"])
         combumbtrackerenableheight = 9
         combumbtrackerenableclean = true
         

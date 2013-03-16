@@ -97,6 +97,7 @@ if not L then return end
 	L["STATUS_NAME_MOUNT"] = "Monture"
 	L["STATUS_NAME_TOKEN"] = "Insigne"
 --	L["STATUS_NAME_TACKLE"] = ""
+--	L["STATUS_NAME_COOKING"] = ""
 	
 	
 --	main menu
@@ -284,6 +285,7 @@ if not L then return end
 --	L["CONFIG_CONTROL_NOTIFY_ERASE_TEXT"] = ""
 	L["CONFIG_CONTROL_OVERRIDE"] = "Remplacer"
 	L["CONFIG_CONTROL_OVERRIDE_TEXT"] = "Remplacer le %2$s original de Blizzard pour qu'%1$s le contrôle\n\nDésactiver cette option vous fera revenir aux fonctionnalitées de %2$s standards de Blizzard\n\nIl sera toujours possible d'ouvrir le %2$s d'%1$s quand cette option est désactivée mais vous devrez configurer et utiliser une combinaison de touche à la place"
+--	L["CONFIG_CONTROL_SPECIAL_TEXT"] = ""
 	L["CONFIG_CONTROL_ANCHOR_LOCK_TEXT"] = "Vérrouiller la fenêtre %1$s pour qu'elle ne puisse plus être déplacée"
 --	L["CONFIG_CONTROL_REPOSITION_NOW"] = ""
 --	L["CONFIG_CONTROL_REPOSITION_NOW_TEXT"] = ""
@@ -347,6 +349,8 @@ if not L then return end
 	L["CONFIG_SETTINGS_ITEMS_FADE_TEXT"] = "Assombrir les objets inaccessibles"
 	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE"] = "Teinter inutilisable"
 	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE_TEXT"] = "Teinter les objets inutilisables en rouge"
+--	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW"] = ""
+--	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW_TEXT"] = ""
 	L["CONFIG_SETTINGS_ITEMS_BORDER_SHOW_TEXT"] = "Montrer une bordure autour des objets"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_STYLE_TEXT"] = "Définir le style de bordure des objets"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_RARITY"] = "Couleur de rareté"
@@ -414,6 +418,8 @@ if not L then return end
 --	L["CONFIG_SORTMETHOD_INCLUDE_ITEMAGE_TEXT"] = ""
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE"] = "Prix du vendeur"
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE_TEXT"] = "inclure le prix des vendeurs (par taille de pile) pour trier l'inventaire"
+--	L["CONFIG_SORTMETHOD_INCLUDE_ID"] = ""
+--	L["CONFIG_SORTMETHOD_INCLUDE_ID_TEXT"] = ""
 	
 	L["CONFIG_SORTMETHOD_DIRECTION_TEXT"] = "Définir dans quel sens vous voulez trier vos objets"
 	L["CONFIG_SORTMETHOD_ORDER"] = "Ordre de tri"

@@ -8,7 +8,7 @@
 ## X-Category: Development Tools
 ## X-Email: rabbit.magtheridon@gmail.com
 ## SavedVariables: BugGrabberDB
-## X-Curse-Packaged-Version: r188
+## X-Curse-Packaged-Version: r189
 ## X-Curse-Project-Name: !BugGrabber
 ## X-Curse-Project-ID: bug-grabber
 ## X-Curse-Repository-ID: wow/bug-grabber/mainline

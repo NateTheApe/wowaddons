@@ -1,0 +1,8 @@
+2013-01-29  James D. Callahan III  <jcallahan@curse.com>
+
+[3dd05b29bc6f] [1.0.38]
+* Main.lua:
+
+Make sure the NPC entry is non-nil before attempting to set its metatable.
+
+

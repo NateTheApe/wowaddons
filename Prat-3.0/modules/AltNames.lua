@@ -633,7 +633,7 @@ Prat:AddModuleToLoad(function()
 	["alt name exists: %s -> %s; not overwriting as set in preferences"] = "имя альта уже существует: %s -> %s; перезапись запрещена настройками",
 	AltNames = "Имя альтов",
 	["Alts:"] = "Альты:",
-	-- autoguildalts_desc = "",
+	autoguildalts_desc = "Автоматически и без отчета выполнять команду импорта из списка гильдии", -- Needs review
 	autoguildalts_name = "Авто-импорт альтов гильдии",
 	["Be quiet"] = "Молчи",
 	["character removed: %s"] = "персонаж удалён: %s",
@@ -684,17 +684,17 @@ Prat:AddModuleToLoad(function()
 	["Main name position"] = "Позиция основного имени",
 	mainpos_desc = "Где отображать имя главного персонажа если он на альте.",
 	mainpos_name = "Позиция основного имени",
-	-- module_desc = "",
+	module_desc = "Позволяет привязывать имена альтов к именам основных персонажей, а потом отображать их рядом в сообщениях в чате (по умолчанию=выключено).", -- Needs review
 	["no alts found for character "] = "не найдено альтов для персонажа",
 	["no alts or mains found matching \"%s\""] = "совпавших альтов или основных \"%s\"",
-	-- ["No arg string given to :addAlt()"] = "",
+	["No arg string given to :addAlt()"] = "Не задано значение строки для: :addAlt()", -- Needs review
 	["no characters called \"%s\" found; nothing deleted"] = "не найден персонаж по имени \"%s\"; нечего удалять",
 	["No Guild Greet database found"] = "База данных Guild Greet не найдена",
 	["No main name supplied to link %s to"] = "Не предоставлено основное имя для связки %s к",
 	["no matches found"] = "совпадений не найдено",
 	quiet = "тихий",
-	-- quiet_desc = "",
-	-- quiet_name = "",
+	quiet_desc = "Отчитываться о действиях в чат или нет.", -- Needs review
+	quiet_name = "тихое_имя", -- Needs review
 	Right = "Справа",
 	["(.-)'s? [Aa]lt"] = "(.-)'s? [Аа]льт", -- Needs review
 	["%s alts imported from LOKWhoIsWho"] = "Импортировано альтов из LOKWhoIsWho: %s",

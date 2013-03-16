@@ -1,8 +1,0 @@
-2012-11-01  elchefe <>  <>
-
-[6e3a01bc707e] [v3.25]
-* Gnosis.lua:
-
-minor change
-
-

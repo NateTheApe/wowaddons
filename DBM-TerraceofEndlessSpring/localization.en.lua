@@ -19,7 +19,7 @@ L= DBM:GetModLocalization(742)
 L:SetMiscLocalization{
 	Victory	= "I thank you, strangers. I have been freed."
 }
-
+ 
 
 -------------------------------
 -- Lei Shi --
@@ -27,7 +27,8 @@ L:SetMiscLocalization{
 L= DBM:GetModLocalization(729)
 
 L:SetWarningLocalization({
-	warnHideOver			= "%s has ended"
+	warnHideOver			= "%s has ended",
+	warnHideProgress		= "Hits: %s. Damage: %s. Time: %s"
 })
 
 L:SetTimerLocalization({
@@ -36,7 +37,11 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	warnHideOver			= "Show warning when $spell:123244 has ended",
-	timerSpecialCD			= "Show timer for when next special ability will be cast."
+	warnHideProgress		= "Show warning debug for $spell:123244 progress",
+	timerSpecialCD			= "Show timer for when next special ability will be cast",
+	SetIconOnGuard			= "Set icons on $journal:6224",
+	RangeFrame				= "Show range frame (3) for $spell:123121\n(Shows everyone during Hide, otherwise, only shows tanks)",
+	GWHealthFrame			= "Show remaining health frame for $spell:123461 fades\n(Requires boss health frame enabled)" -- maybe bad wording, needs review
 })
 
 L:SetMiscLocalization{
@@ -49,3 +54,6 @@ L:SetMiscLocalization{
 ----------------------
 L= DBM:GetModLocalization(709)
 
+L:SetOptionLocalization({
+	RangeFrame			= "Show range frame (2) for $spell:119519"
+})

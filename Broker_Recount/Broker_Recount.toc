@@ -1,4 +1,4 @@
-## Interface: 50001
+## Interface: 50100
 ## X-Min-Interface: 50000
 ## Title: Broker: Recount
 ## Notes: Broker launcher plugin for Recount
@@ -6,7 +6,7 @@
 ## Author: Elsia
 ## X-Category: Miscellaneous
 ## Version: 1.0
-## X-Curse-Packaged-Version: v5.0.4 release
+## X-Curse-Packaged-Version: v5.1.0 release
 ## X-Curse-Project-Name: Broker_Recount
 ## X-Curse-Project-ID: broker_recount
 ## X-Curse-Repository-ID: wow/broker_recount/mainline

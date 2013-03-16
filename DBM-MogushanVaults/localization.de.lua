@@ -7,7 +7,7 @@ local L
 L= DBM:GetModLocalization(679)
 
 L:SetWarningLocalization({
-	SpecWarnOverloadSoon		= "%s wirkbar in 7 Sek!",
+	SpecWarnOverloadSoon		= "%s bald!",
 	specWarnBreakJasperChains	= "Sprenge Jaspisketten!"
 })
 
@@ -65,7 +65,17 @@ L:SetMiscLocalization({
 ----------------------
 L = DBM:GetModLocalization(687)
 
+L:SetWarningLocalization({
+	DarknessSoon		= "Schild der Dunkelheit in %d Sekunden"
+})
+
+L:SetTimerLocalization({
+	timerUSRevive		= "Unsterblicher Schatten Neuformung"
+})
+
 L:SetOptionLocalization({
+	DarknessSoon		= "Zeige Vorwarnungscountdown für $spell:117697 (5s zuvor)",
+	timerUSRevive		= "Zeige Zeit bis sich $spell:117506 neu formen",
 	RangeFrame			= "Zeige Abstandsfenster (8m)"
 })
 
@@ -76,11 +86,11 @@ L:SetOptionLocalization({
 L = DBM:GetModLocalization(726)
 
 L:SetWarningLocalization({
-	specWarnDespawnFloor	= "Paß auf, wo du hintrittst!"
+	specWarnDespawnFloor	= "Der Boden verschwindet in 6 Sekunden!"
 })
 
 L:SetTimerLocalization({
-	timerDespawnFloor		= "Paß auf, wo du hintrittst!"
+	timerDespawnFloor		= "Boden verschwindet"
 })
 
 L:SetOptionLocalization({
@@ -97,6 +107,7 @@ L= DBM:GetModLocalization(677)
 
 L:SetOptionLocalization({
 	InfoFrame		= "Zeige Infofenster für Spieler, welche von $spell:116525 betroffen sind",
+	CountOutCombo	= "Zähle akkustisch die Anzahl der $journal:5673 Wirkungen\nHINWEIS: Dafür ist derzeit nur die weibliche Stimme verfügbar.",
 	ArrowOnCombo	= "Zeige DBM-Pfeil während $journal:5673  HINWEIS: Nimmt an,\ndass sich der Tank vor dem Boss befindet und alle anderen dahinter."
 })
 

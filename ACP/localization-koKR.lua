@@ -58,7 +58,7 @@ if (GetLocale() == "koKR") then
 	Recursive = "반복",
 	["Recursive Enable is now %s"] = "반복 사용이 %s",
 	Reload = "재실행",
-	ReloadUI = "UI 재시작", -- Needs review
+	ReloadUI = "UI 재시작",
 	["Reload your User Interface?"] = "당신의 사용자 인터페이스를 재시작 하시겠습니까?",
 	["Remove from current selection"] = "현재 선택된 것에서 삭제",
 	Rename = "이름바꾸기",

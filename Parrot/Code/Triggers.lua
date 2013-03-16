@@ -1,5 +1,5 @@
 local Parrot = Parrot
-local Parrot_Triggers = Parrot:NewModule("Triggers", "AceTimer-3.0")
+local Parrot_Triggers = Parrot:NewModule("Triggers", "AceTimer-3.0", "AceEvent-3.0")
 local self = Parrot_Triggers
 
 --[===[@debug@
@@ -14,6 +14,26 @@ local newSet = Parrot.newSet
 local newDict = Parrot.newDict
 local del = Parrot.del
 local unpackDictAndDel= Parrot.unpackDictAndDel
+
+local function setToList(set)
+	local tmp = newList()
+	for k in pairs(set) do
+		table.insert(tmp, k)
+	end
+	del(set)
+	return tmp
+end
+
+local function deserializeSet(setstring)
+	return newSet((";"):split(setstring))
+end
+
+local function serializeSet(set)
+	local list = setToList(set)
+	local result = table.concat(list, ";")
+	del(list)
+	return result
+end
 
 local debug = Parrot.debug
 local deepCopy = Parrot.deepCopy
@@ -35,7 +55,10 @@ local defaultTriggers = {
 		-- 16246 = Clearcasting (Priest) TODO
 		name = L["%s!"]:format(GetSpellInfo(16246)),
 		icon = 16246,
-		class = "MAGE;PRIEST;SHAMAN",
+		spec = {
+			SHAMAN = "262",
+			DRUID = "103;105",
+		},
 		conditions = {
 			["Aura gain"] = {
 				{
@@ -52,7 +75,7 @@ local defaultTriggers = {
 		-- 5308 = Execute
 		name = L["%s!"]:format(GetSpellInfo(5308)),
 		icon = 5308,
-		class = "WARRIOR",
+		spec = { WARRIOR = "71;72;73", },
 		conditions = {
 			["Unit health"] = {
 				{
@@ -75,7 +98,7 @@ local defaultTriggers = {
 		-- 24275 - Hammer of Wrath
 		name = L["%s!"]:format(GetSpellInfo(24275)),
 		icon = 24275,
-		class = "PALADIN",
+		spec = { PALADIN = "66;70" },
 		conditions = {
 			["Unit health"] = {
 				{
@@ -96,7 +119,19 @@ local defaultTriggers = {
 	}]],
 	[1008] = [[{
 		name = L["Low Health!"],
-		class = "DRUID;HUNTER;MAGE;PALADIN;PRIEST;ROGUE;SHAMAN;WARLOCK;WARRIOR;DEATHKNIGHT",
+		spec = {
+			DRUID = "102;103;104;105",
+			HUNTER = "253;254;255",
+			MAGE = "62;63;64",
+			PALADIN = "65;66;70",
+			PRIEST = "256;257;258",
+			ROGUE = "259;260;261",
+			SHAMAN = "262;263;264",
+			WARLOCK = "265;266;267",
+			WARRIOR = "71;72;73",
+			DEATHKNIGHT = "250;251;252",
+			MONK = "268;269;270",
+		},
 		conditions = {
 			["Unit health"] = {
 				{
@@ -115,7 +150,14 @@ local defaultTriggers = {
 	}]],
 	[1009] = [[{
 		name = L["Low Mana!"],
-		class = "DRUID;MAGE;PALADIN;PRIEST;SHAMAN;WARLOCK",
+		spec = {
+			DRUID = "102;103;104;105",
+			MAGE = "62;63;64",
+			PALADIN = "65;66;70",
+			PRIEST = "256;257;258",
+			SHAMAN = "262;263;264",
+			WARLOCK = "265;266;267",
+		},
 		conditions = {
 			["Unit power"] = {
 				{
@@ -135,7 +177,12 @@ local defaultTriggers = {
 	}]],
 	[1010] = [[{
 		name = L["Low Pet Health!"],
-		class = "HUNTER;MAGE;WARLOCK;DEATHKNIGHT",
+		spec = {
+			HUNTER = "253;254;255",
+			MAGE = "64",
+			WARLOCK = "265;266;267",
+			DEATHKNIGHT = "250;251;252",
+		},
 		conditions = {
 			["Unit health"] = {
 				[1] = {
@@ -155,16 +202,13 @@ local defaultTriggers = {
 		-- Overpower = 7384
 		name = L["%s!"]:format(GetSpellInfo(7384)),
 		icon = 7384,
-		class = "WARRIOR",
+		spec = { WARRIOR = "71" },
 		conditions = {
 			["Outgoing miss"] = { "DODGE", },
 		},
 		secondaryConditions = {
 			["Spell ready"] = {
 				[1] = GetSpellInfo(7384),
-			},
-			["Warrior stance"] = {
-				[1] = "Battle Stance",
 			},
 		},
 		sticky = true,
@@ -174,16 +218,13 @@ local defaultTriggers = {
 		-- Revenge = 6572
 		name = L["%s!"]:format(GetSpellInfo(6572)),
 		icon = 6572,
-		class = "WARRIOR",
+		spec = { WARRIOR = "73" },
 		conditions = {
 			["Incoming miss"] = { "BLOCK", "DODGE", "PARRY", },
 		},
 		secondaryConditions = {
 			["Spell ready"] = {
 				[1] = GetSpellInfo(6572),
-			},
-			["Warrior stance"] = {
-				"Defensive Stance",
 			},
 		},
 		sticky = true,
@@ -194,7 +235,7 @@ local defaultTriggers = {
 		-- Maelstrom Weapon = 51532
 		name = L["%s!"]:format(GetSpellInfo(53817)),
 		icon = 51532,
-		class = "SHAMAN",
+		spec = { SHAMAN = "263" },
 		conditions = {
 			["Aura stack gain"] = {
 				{
@@ -213,7 +254,7 @@ local defaultTriggers = {
 		-- Freezing Fog = 59052
 		name = L["%s!"]:format(GetSpellInfo(59052)),
 		icon = 59052,
-		class = "DEATHKNIGHT",
+		spec = { DEATHKNIGHT = "251" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -230,7 +271,7 @@ local defaultTriggers = {
 		-- Killing Machine	= 51128
 		name = L["%s!"]:format(GetSpellInfo(51128)),
 		icon = 51130,
-		class = "DEATHKNIGHT",
+		spec = { DEATHKNIGHT = "251" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -247,7 +288,7 @@ local defaultTriggers = {
 		-- Rune Strike = 56816
 		name = L["%s!"]:format(GetSpellInfo(56816)),
 		icon = 56816,
-		class = "DEATHKNIGHT",
+		spec = { DEATHKNIGHT = "251;252" },
 		conditions = {
 			["Incoming miss"] = { "DODGE", "PARRY", },
 		},
@@ -259,7 +300,7 @@ local defaultTriggers = {
 		-- Lock and Load = 56453
 		name = L["%s!"]:format(GetSpellInfo(56453)),
 		icon = 56453,
-		class = "HUNTER",
+		spec = { HUNTER = "255" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -276,7 +317,7 @@ local defaultTriggers = {
 		-- Brain Freeze = 57761
 		name = L["%s!"]:format(GetSpellInfo(44549)),
 		icon = 57761,
-		class = "MAGE",
+		spec = { MAGE = "64" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -293,7 +334,7 @@ local defaultTriggers = {
 		-- Sudden Death 52437
 		name = L["%s!"]:format(GetSpellInfo(52437)),
 		icon = 52437,
-		class = "WARRIOR",
+		spec = { WARRIOR = "71" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -311,7 +352,7 @@ local defaultTriggers = {
 		id = 28,
 		name = L["%s!"]:format(GetSpellInfo(48518)), -- Starfire
 		icon = 48518,
-		class = "DRUID",
+		spec = { DRUID = "102" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -327,7 +368,7 @@ local defaultTriggers = {
 	[1024] = [[{
 		name = L["%s!"]:format(GetSpellInfo(48517)), -- Wrath
 		icon = 48517,
-		class = "DRUID",
+		spec = { DRUID = "102" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -344,7 +385,7 @@ local defaultTriggers = {
 		-- The Art of War
 		name = L["%s!"]:format(GetSpellInfo(59578)),
 		icon = 59578,
-		class = "PALADIN",
+		spec = { PALADIN = "70" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -361,7 +402,7 @@ local defaultTriggers = {
 		-- Kill shot
 		name = L["%s!"]:format(GetSpellInfo(53351)),
 		icon = 53351,
-		class = "HUNTER",
+		spec = { HUNTER = "253;254;255" },
 		conditions = {
 			["Unit health"] = {
 				[1] = {
@@ -383,7 +424,7 @@ local defaultTriggers = {
 	[1028] = [[{ -- Serendipity
 		name = L["%s!"]:format(GetSpellInfo(63733)),
 		icon = 63733,
-		class = "PRIEST",
+		spec = { PRIEST = "257" },
 		conditions = {
 			["Aura stack gain"] = {
 				[1] = {
@@ -402,7 +443,7 @@ local defaultTriggers = {
 		-- 44544 = Fingers of frost
 		name = L["%s!"]:format(GetSpellInfo(44544)),
 		icon = 44544,
-		class = "MAGE",
+		spec = { MAGE = "64" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -418,7 +459,7 @@ local defaultTriggers = {
 	[1033] = [[{
 		name = L["%s!"]:format(GetSpellInfo(81141)), -- Blood Swarm
 		icon = 81141,
-		class = "DEATHKNIGHT",
+		spec = { DEATHKNIGHT = "250" },
 		conditions = {
 			["Aura gain"] = {
 				[1] = {
@@ -434,7 +475,7 @@ local defaultTriggers = {
 	[1034] = [[{
 		name = L["%s!"]:format(GetSpellInfo(91342)), -- Shadow Infusion
 		icon = 91342,
-		class = "DEATHKNIGHT",
+		spec = { DEATHKNIGHT = "250" },
 		conditions = {
 			["Aura stack gain"] = {
 				[1] = {
@@ -451,7 +492,7 @@ local defaultTriggers = {
 	[1035] = [[{
 		name = L["%s!"]:format(GetSpellInfo(82692)), -- Focus Fire
 		icon = 82692,
-		class = "HUNTER",
+		spec = { HUNTER = "253" },
 		conditions = {
 			["Aura stack gain"] = {
 				[1] = {
@@ -465,53 +506,282 @@ local defaultTriggers = {
 		sticky = true,
 		color = "ff7563",
 	}]],
-	--[==[ [1036] = [[{
-		name = L["%s!"]:format(GetSpellInfo(94006)),
-		icon = 94006,
-		class = "HUNTER",
-		conditions = {
-			["Aura gain"] = {
-				[1] = {
-					unit = "player",
-					spell = GetSpellInfo(94006),
-					auraType = "BUFF",
-				},
-			},
-			["Spell ready"] = {
-				GetSpellInfo(34026),
-			},
-		},
-		secondaryConditions = {
-			["Buff active"] = {
-				[1] = {
-					spell = GetSpellInfo(94006),
-					unit = "player",
-				}
-			},
-			["Spell ready"] = {
-				GetSpellInfo(34026),
-			}
-		}
-		sticky = true,
-		color = "ffab96",
-	}]],--]==]
 	[1037] = [[{
 		name = L["%s!"]:format(GetSpellInfo(82925)), -- Ready, Set, Aim...
 		icon = 82925,
-		class = "HUNTER",
+		spec = { HUNTER = "254" },
 		conditions = {
 			["Aura stack gain"] = {
 				{
 					spell = GetSpellInfo(82925),
 					unit = "player",
 					auraType = "BUFF",
-					amount = 5,
+					amount = 3,
 				},
 			},
 		},
 		sticky = true,
 		color = "00cc00",
 	}]],
+	[1038] = [[{
+		name = L["%s!"]:format(GetSpellInfo(122510)), -- Ultimatum
+		icon = 122510,
+		spec = { WARRIOR = "73" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(122510),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "00d0ff",
+	}]],
+	[1039] = [[{
+		name = L["%s!"]:format(GetSpellInfo(46916)), -- Bloodsurge
+		icon = 46916,
+		spec = { WARRIOR = "72" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(46916),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "ff0300",
+	}]],
+	[1040] = [[{
+		name = L["%s!"]:format(GetSpellInfo(131116)), -- Raging Blow!
+		icon = 131116,
+		spec = { WARRIOR = "72" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(131116),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+			["Aura stack gain"] = {
+				{
+					spell = GetSpellInfo(131116),
+					unit = "player",
+					auraType = "BUFF",
+					amount = 0,
+				},
+			},
+		},
+		sticky = true,
+		color = "6e0511",
+	}]],
+	[1041] = [[{
+		name = L["%s!"]:format(GetSpellInfo(81340)), -- Sudden Doom!
+		icon = 81340,
+		spec = { DEATHKNIGHT = "252" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(81340),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "9b00b3",
+	}]],
+	[1042] = [[{
+		name = L["%s!"]:format(GetSpellInfo(7268)), -- Arcane Missiles!
+		icon = 7268,
+		spec = { MAGE = "62" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(7268),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "59006c",
+	}]],
+	[1043] = [[{
+		name = L["%s!"]:format(GetSpellInfo(48108)), -- Pyroblast!
+		icon = 48108,
+		spec = { MAGE = "63" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(48108),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "b33f00",
+	}]],
+	[1044] = [[{
+		name = L["%s!"]:format(GetSpellInfo(48107)), -- Heating Up
+		icon = 48107,
+		spec = { MAGE = "63" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(48107),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "ff5900",
+	}]],
+	[1045] = [[{
+		name = L["%s!"]:format(GetSpellInfo(115636)), -- Combo Breaker
+		icon = 115636,
+		spec = { MONK = "269" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(115636),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "158f00",
+	}]],
+	[1046] = [[{
+		name = L["%s!"]:format(GetSpellInfo(85416)), -- Grand Crusader
+		icon = 85416,
+		spec = { PALADIN = "66" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(85416),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "0038cd",
+	}]],
+	[1047] = [[{
+		name = L["%s!"]:format(GetSpellInfo(77756)), -- Lava Surge
+		icon = 77756,
+		spec = { SHAMAN = "262" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(77756),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "ddb800",
+	}]],
+	[1048] = [[{
+		name = L["%s!"]:format(GetSpellInfo(122351)), -- Molten Core
+		icon = 122351,
+		spec = { WARLOCK = "266" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(122351),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "8d2e00",
+	}]],
+	[1049] = [[{
+		name = L["%s!"]:format(GetSpellInfo(34936)), -- Backlash
+		icon = 34936,
+		spec = { WARLOCK = "267" },
+		conditions = {
+			["Aura gain"] = {
+				{
+					spell = GetSpellInfo(34936),
+					unit = "player",
+					auraType = "BUFF",
+				},
+			},
+		},
+		sticky = true,
+		color = "ff8200",
+	}]],
+}
+
+local specChoices = {
+	DRUID = {
+		102, -- Balance
+		103, -- Feral Combat
+		104, -- Guardian
+		105, -- Restoration
+	},
+	ROGUE = {
+		259, -- Assassination
+		260, -- Combat
+		261, -- Subtlety
+	},
+	SHAMAN = {
+		262, -- Elemental
+		263, -- Enhancement
+		264, -- Restoration
+	},
+	PALADIN = {
+		65, -- Holy
+		66, -- Protection
+		70, -- Retribution
+	},
+	MAGE = {
+		62, -- Arcane
+		63, -- Fire
+		64, -- Frost
+	},
+	WARLOCK = {
+		265, -- Affliction
+		266, -- Demonology
+		267, -- Destruction
+	},
+	PRIEST = {
+		256, --Discipline
+		257, --Holy
+		258, --Shadow
+	},
+	WARRIOR = {
+		71, -- Arms
+		72, -- Furry
+		73, -- Protection
+	},
+	HUNTER = {
+		253, -- Beast Mastery
+		254, -- Marksmanship
+		255, -- Survival
+	},
+	DEATHKNIGHT = {
+		250, -- Blood
+		251, -- Frost
+		252, -- Unholy
+	},
+	MONK = {
+		268, -- Brewmaster
+		269, -- Windwalker
+		270, -- Mistweaver
+	},
 }
 
 local dbDefaults = {
@@ -548,6 +818,9 @@ local function makeDefaultTrigger(index, code)
 		ScriptEnv.GetSpellInfo = _G.GetSpellInfo
 	end
 	local func = loadstring(("return %s"):format(code))
+	if not func then
+		debug("func ", index, " could not be loaded")
+	end
 	setfenv(func, ScriptEnv)
 	dbDefaults.profile.triggers2[index] = func()
 end
@@ -556,9 +829,33 @@ for k,v in pairs(defaultTriggers) do
 	makeDefaultTrigger(k,v)
 end
 
+local function getPlayerSpec()
+	if not GetSpecialization() then
+		return "0"
+	end
+	return tostring(GetSpecializationInfo(GetSpecialization()))
+end
+
+
 local effectiveRegistry = {}
 local periodicCheckTimer
+
+local function checkTriggerEnabled(v)
+	if v.disabled then
+		return false
+	end
+	local specstring = v.spec[playerClass]
+	if not specstring then
+		return false
+	end
+	local sets = deserializeSet(specstring)
+	local result = sets[getPlayerSpec()]
+	del(sets)
+	return result
+end
+
 local function rebuildEffectiveRegistry()
+	local playerspec = getPlayerSpec()
 	for i = 1, #effectiveRegistry do
 		effectiveRegistry[i] = nil
 	end
@@ -566,15 +863,11 @@ local function rebuildEffectiveRegistry()
 	periodicCheckTimer = nil
 	local containsPeriodic = false
 	for _,v in pairs(Parrot_Triggers.db1.profile.triggers2) do
-		if not v.disabled then
-			local classes = newSet((';'):split(v.class))
-			if classes[playerClass] then
-				effectiveRegistry[#effectiveRegistry+1] = v
-				if v.conditions["Check every XX seconds"] then
-					containsPeriodic = true
-				end
+		if checkTriggerEnabled(v) then
+			effectiveRegistry[#effectiveRegistry+1] = v
+			if v.conditions["Check every XX seconds"] then
+				containsPeriodic = true
 			end
-			classes = del(classes)
 		end
 	end
 	if containsPeriodic then
@@ -1106,6 +1399,19 @@ local updateFuncs = {
 	[8] = function()
 			Parrot_Triggers.db1.profile.triggers2[1012] = nil
 		end,
+	[9] = function()
+			for _,v in pairs(Parrot_Triggers.db1.profile.triggers2) do
+				if v.class then
+					v.spec = {}
+					local classes = deserializeSet(v.class)
+					classes[""] = nil
+					for class in pairs(classes) do
+						v.spec[class] = table.concat(specChoices[class], ";")
+					end
+					del(classes)
+				end
+			end
+		end,
 }
 
 function Parrot_Triggers:OnNewProfile(t, key)
@@ -1177,12 +1483,15 @@ function Parrot_Triggers:OnEnable()
 		}
 		first = false
 	end
-
+	self:RegisterEvent("PLAYER_TALENT_UPDATE", rebuildEffectiveRegistry)
 	rebuildEffectiveRegistry()
 end
 
 local function hexColorToTuple(color)
 	local num = tonumber(color, 16)
+	if not num then
+		return 0, 0, 0
+	end
 	return math.floor(num / 256^2)/255, math.floor((num / 256)%256)/255, (num%256)/255
 end
 
@@ -1415,12 +1724,14 @@ function Parrot_Triggers:OnOptionsCreate()
 				func = function()
 					local t = {
 						name = L["New trigger"],
-						class = select(2, UnitClass("player")),
+						spec = {
+							[playerClass] = table.concat(specChoices[playerClass], ";"),
+						},
 						conditions = {},
 					}
 					local registry = self.db1.profile.triggers2
 					registry[#registry+1] = t
-					makeOption(t)
+					makeOption(#registry, t)
 					rebuildEffectiveRegistry()
 				end,
 				disabled = function()
@@ -1439,49 +1750,64 @@ function Parrot_Triggers:OnOptionsCreate()
 	}
 	Parrot:AddOption('triggers', triggers_opt)
 
-	local function getFontFace(t)
-		local font = t.arg.font
+	local function getTriggerId(info)
+		local i = 0
+		while i < #info and not info[#info - i]:match("^%d+$") do
+			i = i + 1
+		end
+		return info[#info-i]
+	end
+	
+	local function getTriggerTable(info)
+		return self.db1.profile.triggers2[tonumber(getTriggerId(info))]
+	end
+	
+	local function getFontFace(info)
+		local t = getTriggerTable(info)
+		local font = t.font
 		if font == nil then
 			return "1"
 		else
 			return font
 		end
 	end
-	local function setFontFace(t, value)
+	local function setFontFace(info, value)
+		local t = getTriggerTable(info)
 		if value == "1" then
 			value = nil
 		end
-		t.arg.font = value
+		t.font = value
 	end
-	local function getFontSize(t)
-		return t.arg.fontSize
+	local function getFontSize(info)
+		return getTriggerTable(info).fontSize
 	end
-	local function setFontSize(t, value)
-		t.arg.fontSize = value
+	local function setFontSize(info, value)
+		getTriggerTable(info).fontSize = value
 	end
-	local function getFontSizeInherit(t)
-		return t.arg.fontSize == nil
+	local function getFontSizeInherit(info)
+		return getTriggerTable(info).fontSize == nil
 	end
-	local function setFontSizeInherit(t, value)
+	local function setFontSizeInherit(info, value)
+		local t = getTriggerTable(info)
 		if value then
-			t.arg.fontSize = nil
+			t.fontSize = nil
 		else
-			t.arg.fontSize = 18
+			t.fontSize = 18
 		end
 	end
-	local function getFontOutline(t)
-		local outline = t.arg.fontOutline
+	local function getFontOutline(info)
+		local outline = getTriggerTable(info).fontOutline
 		if outline == nil then
 			return L["Inherit"]
 		else
 			return outline
 		end
 	end
-	local function setFontOutline(t, value)
+	local function setFontOutline(info, value)
 		if value == L["Inherit"] then
 			value = nil
 		end
-		t.arg.fontOutline = value
+		getTriggerTable(info).fontOutline = value
 	end
 	local fontOutlineChoices = {
 		NONE = L["None"],
@@ -1489,140 +1815,118 @@ function Parrot_Triggers:OnOptionsCreate()
 		THICKOUTLINE = L["Thick"],
 		[L["Inherit"]] = L["Inherit"],
 	}
-	local function getEnabled(t)
-		return not t.arg.disabled
+	local function getEnabled(info)
+		return not getTriggerTable(info).disabled
 	end
-	local function setEnabled(t, value)
-		t.arg.disabled = not value
+	local function setEnabled(info, value)
+		getTriggerTable(info).disabled = not value
 		rebuildEffectiveRegistry()
 	end
-	local function getScrollArea(t)
-		return t.arg.scrollArea or "Notification"
+	local function getScrollArea(info)
+		return getTriggerTable(info).scrollArea or "Notification"
 	end
-	local function setScrollArea(t, value)
+	local function setScrollArea(info, value)
 		if value == "Notification" then
 			value = nil
 		end
-		t.arg.scrollArea = value
+		getTriggerTable(info).scrollArea = value
 	end
 	-- not local, declared above
-	function remove(t)
-		triggers_opt.args[tostring(t.arg)] = nil
-		for i,v in ipairs(self.db1.profile.triggers2) do
-			if v == t.arg then
-				table.remove(self.db1.profile.triggers2, i)
-				break
-			end
+	function remove(info)
+		local idstring = getTriggerId(info)
+		local id = tonumber(idstring)
+		-- first remove it from DB
+		local triggers = self.db1.profile.triggers2
+		del(triggers[tonumber(id)])
+		table.remove(triggers, tonumber(id))
+		-- then remove it from options
+		triggers_opt.args[idstring] = del(triggers_opt.args[idstring])
+		-- and fix ids for other triggers
+		while triggers_opt.args[tostring(id+1)] do
+			local nextoptid = tostring(id + 1)
+			triggers_opt.args[tostring(id)] = triggers_opt.args[nextoptid]
+			triggers_opt.args[nextoptid] = nil
+			id = id + 1
 		end
 		rebuildEffectiveRegistry()
 	end
-	local function getSticky(t)
-		return t.arg.sticky
+	local function getSticky(info)
+		return getTriggerTable(info).sticky
 	end
-	local function setSticky(t, value)
-		t.arg.sticky = value
+	local function setSticky(info, value)
+		getTriggerTable(info).sticky = value
 	end
-	local function getName(t)
-		return t.arg.name
+	local function getName(info)
+		return getTriggerTable(info).name
 	end
-	local function setName(t, value)
-		t.arg.name = value
-		local opt = triggers_opt.args[tostring(t.arg)]
-		opt.name = value
-		opt.desc = value
-		opt.order = value == L["New trigger"] and -110 or -100
+	local function setName(info, value)
+		getTriggerTable(info).name = value
 	end
 
-	local function getIcon(t)
-		return tostring(t.arg.icon or "")
+	local function getIcon(info)
+		return tostring(getTriggerTable(info).icon or "")
 	end
-	local function setIcon(t, value)
+	local function setIcon(info, value)
 		if value == '' then
 			value = nil
 		end
-		t.arg.icon = tonumber(value) or value
+		getTriggerTable(info).icon = tonumber(value) or value
 	end
 
 	local function tupleToHexColor(r, g, b)
 		return ("%02x%02x%02x"):format(r * 255, g * 255, b * 255)
 	end
 
-	local function getColor(t)
-		return hexColorToTuple(t.arg.color or "ffffff")
+	local function getColor(info)
+		return hexColorToTuple(getTriggerTable(info).color or "ffffff")
 	end
-	local function setColor(t, r, g, b)
+	local function setColor(info, r, g, b)
 		local color = tupleToHexColor(r, g, b)
 		if color == "ffffff" then
 			color = nil
 		end
-		t.arg.color = color
+		getTriggerTable(info).color = color
 	end
 
 	local function getColor2(info)
-		return info.arg.color
+		return getTriggerTable(info).color
 	end
 	local function setColor2(info, value)
-		info.arg.color = value
+		if not tonumber(value, 16) then return end
+		getTriggerTable(info).color = value
 	end
 
-	local function getFlashColor(t)
-		return hexColorToTuple(t.arg.flashcolor or "ffffff")
+	local function getFlashColor(info)
+		return hexColorToTuple(getTriggerTable(info).flashcolor or "ffffff")
 	end
-	local function setFlashColor(t, r, g, b)
+	local function setFlashColor(info, r, g, b)
 		local color = tupleToHexColor(r, g, b)
 		if color == "ffffff" then
 			color = nil
 		end
-		t.arg.flashcolor = color
+		getTriggerTable(info).flashcolor = color
 	end
 
 	local function getUseFlash(info)
-		return info.arg.useflash
+		return getTriggerTable(info).useflash
 	end
 	local function setUseFlash(info, value)
-		info.arg.useflash = value
+		getTriggerTable(info).useflash = value
+	end
+	local function getSound(info)
+		return getTriggerTable(info).sound or "None"
 	end
 
-
-	local function getClass(t, class)
-		local tmp = newSet((";"):split(t.arg.class))
-		local value = tmp[class]
-		tmp = del(tmp)
-		return value
-	end
-
-	local function setClass(t, class, value)
-		local tmp = newSet((";"):split(t.arg.class))
-		tmp[class] = value or nil
-		local tmp2 = newList()
-		for k in pairs(tmp) do
-			tmp2[#tmp2+1] = k
-		end
-		tmp = del(tmp)
-		t.arg.class = table.concat(tmp2, ";")
-		tmp2 = del(tmp2)
-		if class == playerClass then
-			rebuildEffectiveRegistry()
-		end
-	end
-
-	local function getSound(t)
-		return t.arg.sound or "None"
-	end
-
-	local function setSound(t, value)
+	local function setSound(info, value)
 		PlaySoundFile(SharedMedia:Fetch('sound', value), "MASTER")
 		if value == "None" then
 			value = nil
 		end
-		t.arg.sound = value
+		getTriggerTable(info).sound = value
 	end
 
-	local function test(t)
-		local t = t
-		if t.arg then
-			t = t.arg
-		end
+	local function test(info)
+		local t = getTriggerTable(info)
 		local r, g, b = hexColorToTuple(t.color or 'ffffff')
 		--TODO
 		if t.useflash then
@@ -1649,6 +1953,7 @@ function Parrot_Triggers:OnOptionsCreate()
 		WARRIOR = LC["WARRIOR"],
 		HUNTER = LC["HUNTER"],
 		DEATHKNIGHT = LC["DEATHKNIGHT"],
+		MONK = LC["MONK"],
 	}
 
 	local function getConditionValue(info)
@@ -1743,8 +2048,9 @@ function Parrot_Triggers:OnOptionsCreate()
 	end
 
 	local function removePrimaryCondition(info)
+		local i = getTriggerId(info)
 		local t, name, index = unpack(info.arg)
-		local opt = triggers_opt.args[tostring(t)].args.primary
+		local opt = triggers_opt.args[tostring(i)].args.primary
 		if index then
 			opt.args[name .. index] = del(opt.args[name .. index])
 			t.conditions[name][index] = nil
@@ -1758,8 +2064,9 @@ function Parrot_Triggers:OnOptionsCreate()
 	end -- removeCondition()
 
 	local function removeSecondaryCondition(info)
+		local i = getTriggerId(info)
 		local t, name, index = unpack(info.arg)
-		local opt = triggers_opt.args[tostring(t)].args.secondary
+		local opt = triggers_opt.args[tostring(i)].args.secondary
 		if index then
 			opt.args[name .. index] = del(opt.args[name .. index])
 			t.secondaryConditions[name][index] = nil
@@ -1772,17 +2079,17 @@ function Parrot_Triggers:OnOptionsCreate()
 		end
 	end -- removeCondition()
 
-	local function addCondition(t, name, localName, index, primary)
+	local function addCondition(i, t, name, localName, index, primary)
 		-- the only stuff that is different about adding primary and secondary conditions
 		local opt, param, default
 		local set, get, remove
 		if primary then
-			opt = triggers_opt.args[tostring(t)].args.primary
+			opt = triggers_opt.args[tostring(i)].args.primary
 			param, default = Parrot_TriggerConditions:GetPrimaryConditionParamDetails(name)
 			set, get = setConditionValue, getConditionValue
 			remove = removePrimaryCondition
 		else
-			opt = triggers_opt.args[tostring(t)].args.secondary
+			opt = triggers_opt.args[tostring(i)].args.secondary
 			param, default = Parrot_TriggerConditions:GetSecondaryConditionParamDetails(name)
 			set, get = setSecondaryConditionValue, getSecondaryConditionValue
 			remove = removeSecondaryCondition
@@ -1868,15 +2175,16 @@ function Parrot_Triggers:OnOptionsCreate()
 		end
 	end
 
-	local function addPrimaryCondition(t, name, localName, index)
-		return addCondition(t, name, localName, index, true)
+	local function addPrimaryCondition(i, t, name, localName, index)
+		return addCondition(i, t, name, localName, index, true)
 	end
 	local function newPrimaryCondition(info, name)
+		local i = getTriggerId(info)
 		local t = info.arg
-		local opt = triggers_opt.args[tostring(t)].args.primary
+		local opt = triggers_opt.args[tostring(i)].args.primary
 		local localName = Parrot_TriggerConditions:GetPrimaryConditionChoices()[name]
 		if Parrot_TriggerConditions:IsExclusive(name) then
-			t.conditions[name] = addPrimaryCondition(t, name, localName)
+			t.conditions[name] = addPrimaryCondition(i, t, name, localName)
 			if name == "Check every XX seconds" then
 				if not periodicCheckTimer then
 					periodicCheckTimer = self:ScheduleRepeatingTimer(function()
@@ -1892,7 +2200,7 @@ function Parrot_Triggers:OnOptionsCreate()
 				t.conditions[name] = {}
 				index = 1
 			end
-			t.conditions[name][index] = addPrimaryCondition(t, name, localName, index)
+			t.conditions[name][index] = addPrimaryCondition(i, t, name, localName, index)
 		end
 	end
 	local function getAvailablePrimaryConditions(info)
@@ -1913,15 +2221,16 @@ function Parrot_Triggers:OnOptionsCreate()
 		return addCondition(...)
 	end
 
-	local function newSecondaryCondition(t, name)
-		local t = t.arg
+	local function newSecondaryCondition(info, name)
+		local t = info.arg
 		local opt = triggers_opt.args[tostring(t)].args.secondary
 		local localName = Parrot_TriggerConditions:GetSecondaryConditionChoices()[name]
 		if not t.secondaryConditions then
 			t.secondaryConditions = {}
 		end
+		local i = getTriggerId(info)
 		if Parrot_TriggerConditions:SecondaryIsExclusive(name) then
-			t.secondaryConditions[name] = addSecondaryCondition(t, name, localName)
+			t.secondaryConditions[name] = addSecondaryCondition(i, t, name, localName)
 		else
 			local index
 			if t.secondaryConditions[name] then
@@ -1930,7 +2239,7 @@ function Parrot_Triggers:OnOptionsCreate()
 				t.secondaryConditions[name] = {}
 				index = 1
 			end
-			local tmp = addSecondaryCondition(t, name, localName, index)
+			local tmp = addSecondaryCondition(i, t, name, localName, index)
 			t.secondaryConditions[name][index] = tmp
 		end
 	end
@@ -1954,23 +2263,117 @@ function Parrot_Triggers:OnOptionsCreate()
 		return tmp
 	end
 
-	function makeOption(t)
-		local opt = {
+	local function getClass(info)
+		local class = info[#info]
+		local t = getTriggerTable(info)
+		return t.spec[class] ~= nil
+	end
+
+	local function doSetClass(t, class, value)
+		if not value then
+			t.spec[class] = nil
+		else
+			t.spec[class] = table.concat(specChoices[class], ";")
+		end
+		if class == playerClass then
+			rebuildEffectiveRegistry()
+		end
+	end
+
+	local function setClass(info, value)
+		local class = info[#info]
+		local t = getTriggerTable(info)
+		doSetClass(t, class, value)
+	end
+
+	local function notIsClass(info)
+		local class = info[#info]:gsub("-$", "")
+		local t = getTriggerTable(info)
+		return t.spec[class] == nil
+	end
+	
+	local function doGetSpec(t, class, specid)
+		local specs = deserializeSet(t.spec[class])
+		local result = specs[specid]
+		del(specs)
+		return result
+	end
+
+	local function getSpec(info)
+		local specid = info[#info]:gsub("^Spec", "")
+		local class = info[#info-1]:gsub("-$", "")
+		local t = getTriggerTable(info)
+		return doGetSpec(t, class, specid)
+	end
+
+	local function setSpec(info, value)
+		local specid = info[#info]:gsub("^Spec", "")
+		local class = info[#info-1]:gsub("-$", "")
+		local t = getTriggerTable(info)
+		local specs = deserializeSet(t.spec[class])
+		specs[specid] = value or nil
+		if not next(specs) then
+			t.spec[class] = nil
+		else
+			t.spec[class] = serializeSet(specs)
+		end
+		if specid == getPlayerSpec() then
+			rebuildEffectiveRegistry()
+		end
+	end
+
+	local function getColoredName(info)
+		local t = getTriggerTable(info)
+		if t.disabled or not t.spec[playerClass] then
+			return ("|c02888888%s|r"):format(t.name)
+		end
+		if doGetSpec(t, playerClass, getPlayerSpec()) then
+			return ("|c0000dd00%s|r"):format(t.name)
+		end
+		return ("|c01006600%s|r"):format(t.name)
+	end
+	
+	local tsharedopt = {
+		output = {
+			type = 'input',
+			name = L["Output"],
+			desc = L["The text that is shown"],
+			usage = L["<Text to show>"],
+			get = getName,
+			set = setName,
+			order = 1,
+		},
+		enabled = {
+			type = 'toggle',
+			name = L["Enabled"],
+			desc = L["Whether the trigger is enabled or not."],
+			get = getEnabled,
+			set = setEnabled,
+			order = 3,
+		},
+		remove = {
+			type = 'execute',
+			-- buttonText = L["Remove"],
+			name = L["Remove trigger"],
+			desc = L["Remove this trigger completely."],
+			func = remove,
+			-- TODO confirm
+			-- confirm = L["Are you sure?"],
+			order = -2,
+		},
+		classes = {
 			type = 'group',
-			name = t.name,
-			desc = t.name,
-			order = t.name == L["New trigger"] and -110 or -100,
+			name = L["Classes"],
+			desc = L["Classes affected by this trigger."],
+			order = 7,
+			inline = true,
+			args = {},
+		},
+		style = {
+			type = 'group',
+			name = L["Style"],
+			desc = L["Configure what the Trigger should look like"],
 			args = {
-				output = {
-					type = 'input',
-					name = L["Output"],
-					desc = L["The text that is shown"],
-					usage = L["<Text to show>"],
-					get = getName,
-					set = setName,
-					arg = t,
-					order = 1,
-				},
 				icon = {
 					type = 'input',
 					name = L["Icon"],
@@ -1978,28 +2381,7 @@ function Parrot_Triggers:OnOptionsCreate()
 					usage = L["<Spell name> or <Item name> or <Path> or <SpellId>"],
 					get = getIcon,
 					set = setIcon,
-					arg = t,
 					order = 2,
-				},
-				enabled = {
-					type = 'toggle',
-					name = L["Enabled"],
-					desc = L["Whether the trigger is enabled or not."],
-					get = getEnabled,
-					set = setEnabled,
-					arg = t,
-					order = 3,
-				},
-				remove = {
-					type = 'execute',
-					-- buttonText = L["Remove"],
-					name = L["Remove trigger"],
-					desc = L["Remove this trigger completely."],
-					func = remove,
-					arg = t,
-					-- TODO confirm
-					-- confirm = L["Are you sure?"],
-					order = -2,
 				},
 				color = {
 					name = L["Color"],
@@ -2007,7 +2389,6 @@ function Parrot_Triggers:OnOptionsCreate()
 					type = 'color',
 					get = getColor,
 					set = setColor,
-					arg = t,
 					order = 5,
 				},
 				color2 = {
@@ -2016,7 +2397,6 @@ function Parrot_Triggers:OnOptionsCreate()
 					type = 'input',
 					get = getColor2,
 					set = setColor2,
-					arg = t,
 					order = 6,
 				},
 				sticky = {
@@ -2025,18 +2405,7 @@ function Parrot_Triggers:OnOptionsCreate()
 					desc = L["Whether to show this trigger as a sticky."],
 					get = getSticky,
 					set = setSticky,
-					arg = t,
 					order = 9,
-				},
-				classes = {
-					type = 'multiselect',
-					values = classChoices,
-					name = L["Classes"],
-					desc = L["Classes affected by this trigger."],
-					get = getClass,
-					set = setClass,
-					arg = t,
-					order = 7,
 				},
 				scrollArea = {
 					type = 'select',
@@ -2045,7 +2414,6 @@ function Parrot_Triggers:OnOptionsCreate()
 					desc = L["Which scroll area to output to."],
 					get = getScrollArea,
 					set = setScrollArea,
-					arg = t,
 					order = 8,
 				},
 				sound = {
@@ -2056,8 +2424,16 @@ function Parrot_Triggers:OnOptionsCreate()
 					desc = L["What sound to play when the trigger is shown."],
 					get = getSound,
 					set = setSound,
-					arg = t,
 					order = 4,
+				},
+				test = {
+					type = 'execute',
+					-- buttonText = L["Test"],
+					name = L["Test"],
+					desc = L["Test how the trigger will look and act."],
+					func = test,
+					order = 1,
+					width = 'full',
 				},
 				useflash = {
 					type = 'toggle',
@@ -2065,7 +2441,6 @@ function Parrot_Triggers:OnOptionsCreate()
 					desc = L["Flash screen in specified color"],
 					get = getUseFlash,
 					set = setUseFlash,
-					arg = t,
 					order = 101,
 				},
 				flashcolor = {
@@ -2074,17 +2449,7 @@ function Parrot_Triggers:OnOptionsCreate()
 					desc = L["Color in which to flash"],
 					get = getFlashColor,
 					set = setFlashColor,
-					arg = t,
 					order = 102,
-				},
-				test = {
-					type = 'execute',
-					-- buttonText = L["Test"],
-					name = L["Test"],
-					desc = L["Test how the trigger will look and act."],
-					func = test,
-					arg = t,
-					order = -1,
 				},
 				font = {
 					type = 'group',
@@ -2100,7 +2465,6 @@ function Parrot_Triggers:OnOptionsCreate()
 							--							choiceFonts = SharedMedia:HashTable('font'),
 							get = getFontFace,
 							set = setFontFace,
-							arg = t,
 							order = 1,
 						},
 						fontSizeInherit = {
@@ -2109,7 +2473,6 @@ function Parrot_Triggers:OnOptionsCreate()
 							desc = L["Inherit font size"],
 							get = getFontSizeInherit,
 							set = setFontSizeInherit,
-							arg = t,
 							order = 2,
 						},
 						fontSize = {
@@ -2122,7 +2485,6 @@ function Parrot_Triggers:OnOptionsCreate()
 							get = getFontSize,
 							set = setFontSize,
 							disabled = getFontSizeInherit,
-							arg = t,
 							order = 3,
 						},
 						fontOutline = {
@@ -2132,11 +2494,55 @@ function Parrot_Triggers:OnOptionsCreate()
 							get = getFontOutline,
 							set = setFontOutline,
 							values = fontOutlineChoices,
-							arg = t,
 							order = 4,
 						},
 					},
 				},
+			},
+		},
+	}
+	local j = 0
+	for class, localized in pairs(classChoices) do
+		j = j + 1
+		tsharedopt.classes.args[class] = {
+			type = 'toggle',
+			name = localized,
+			desc = localized,
+			get = getClass,
+			set = setClass,
+			order = j * 10,
+		}
+		tsharedopt.classes.args[class .. "-"] = {
+			type = 'group',
+			inline = true,
+			width = 'half',
+			name = localized,
+			desc = localized,
+			hidden = notIsClass,
+			order = j * 10 + 1,
+			args = {}
+		}
+		for i,v in ipairs(specChoices[class]) do
+			local _, name, desc = GetSpecializationInfoByID(v)
+			tsharedopt.classes.args[class .. "-"].args["Spec" .. v] = {
+				type = 'toggle',
+				name = name,
+				desc = desc,
+				get = getSpec,
+				set = setSpec,
+				hidden = false,
+			}
+		end
+	end
+	
+	function makeOption(id, t)
+		local opt = {
+			type = 'group',
+			name = getColoredName,
+			desc = t.name,
+			order = t.name == L["New trigger"] and -110 or -100,
+			arg = t,
+			args = {
 				primary = {
 					type = 'group',
 					--					inline = true,
@@ -2175,16 +2581,19 @@ function Parrot_Triggers:OnOptionsCreate()
 				},
 			}
 		}
-		triggers_opt.args[tostring(t)] = opt
+		for k,v in pairs(tsharedopt) do
+			opt.args[k] = v
+		end
+		triggers_opt.args[tostring(id)] = opt
 		for k,v in pairs(t.conditions) do
 			if type(v) == 'table' then
 				for i,cond in pairs(v) do
 					local localName = Parrot_TriggerConditions:GetPrimaryConditionChoices()[k]
-					addPrimaryCondition(t, k, localName, i)
+					addPrimaryCondition(id, t, k, localName, i)
 				end
 			else
 				local localName = Parrot_TriggerConditions:GetPrimaryConditionChoices()[k]
-				addPrimaryCondition(t, k, localName)
+				addPrimaryCondition(id, t, k, localName)
 			end
 		end
 		if t.secondaryConditions then
@@ -2192,16 +2601,16 @@ function Parrot_Triggers:OnOptionsCreate()
 				local localName = Parrot_TriggerConditions:GetSecondaryConditionChoices()[k]
 				if type(v) == 'table' then
 					for i in pairs(v) do
-						addSecondaryCondition(t, k, localName, i)
+						addSecondaryCondition(id, t, k, localName, i)
 					end
 				else
-					addSecondaryCondition(t, k, localName)
+					addSecondaryCondition(id, t, k, localName)
 				end
 			end
 		end
 	end
 
-	for _,t in pairs(self.db1.profile.triggers2) do
-		makeOption(t)
+	for i, t in pairs(self.db1.profile.triggers2) do
+		makeOption(i, t)
 	end
 end

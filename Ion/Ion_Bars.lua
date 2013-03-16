@@ -159,6 +159,7 @@ local gDef = {
 		point = "BOTTOM",
 		x = 0,
 		y = 55,
+		showGrid = true,
 	},
 
 	[2] = {
@@ -169,6 +170,7 @@ local gDef = {
 		point = "BOTTOM",
 		x = 0,
 		y = 100,
+		showGrid = true,
 	},
 }
 
@@ -235,32 +237,48 @@ local function controlOnUpdate(self, elapsed)
 
 	for k,v in pairs(alphaupIndex) do
 		if (v~=nil) then
-			if (k.alphaUp == alphaUps[3] or k.alphaUp == alphaUps[4]) then
 
-				if (InCombatLockdown()) then
+			if (k:IsShown()) then
+				v:SetAlpha(1)
+			else
 
-					if (v:GetAlpha() < 1) then
-						if (v:GetAlpha()+v.fadeSpeed <= 1) then
-							v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
+				if (k.alphaUp == alphaUps[3] or k.alphaUp == alphaUps[4]) then
+
+					if (InCombatLockdown()) then
+
+						if (v:GetAlpha() < 1) then
+							if (v:GetAlpha()+v.fadeSpeed <= 1) then
+								v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
+							else
+								v:SetAlpha(1)
+							end
 						else
-							v:SetAlpha(1)
+							k.seen = 1;
 						end
+
 					else
-						k.seen = 1;
-					end
+						if (k.alphaUp == alphaUps[4]) then
 
-				else
-					if (k.alphaUp == alphaUps[4]) then
-
-						if (IsMouseOverSelfOrWatchFrame(k)) then
-							if (v:GetAlpha() < 1) then
-								if (v:GetAlpha()+v.fadeSpeed <= 1) then
-									v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
+							if (IsMouseOverSelfOrWatchFrame(k)) then
+								if (v:GetAlpha() < 1) then
+									if (v:GetAlpha()+v.fadeSpeed <= 1) then
+										v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
+									else
+										v:SetAlpha(1)
+									end
 								else
-									v:SetAlpha(1)
+									k.seen = 1;
 								end
 							else
-								k.seen = 1;
+								if (v:GetAlpha() > k.alpha) then
+									if (v:GetAlpha()-v.fadeSpeed >= k.alpha) then
+										v:SetAlpha(v:GetAlpha()-v.fadeSpeed)
+									else
+										v:SetAlpha(k.alpha)
+									end
+								else
+									k.seen = 0;
+								end
 							end
 						else
 							if (v:GetAlpha() > k.alpha) then
@@ -273,45 +291,45 @@ local function controlOnUpdate(self, elapsed)
 								k.seen = 0;
 							end
 						end
-					else
-						if (v:GetAlpha() > k.alpha) then
-							if (v:GetAlpha()-v.fadeSpeed >= k.alpha) then
-								v:SetAlpha(v:GetAlpha()-v.fadeSpeed)
+					end
+
+				elseif (k.alphaUp == alphaUps[5] or k.alphaUp == alphaUps[6]) then
+
+					if (not InCombatLockdown()) then
+
+						if (v:GetAlpha() < 1) then
+							if (v:GetAlpha()+v.fadeSpeed <= 1) then
+								v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
 							else
-								v:SetAlpha(k.alpha)
+								v:SetAlpha(1)
 							end
 						else
-							k.seen = 0;
+							k.seen = 1;
 						end
-					end
-				end
 
-			elseif (k.alphaUp == alphaUps[5] or k.alphaUp == alphaUps[6]) then
-
-				if (not InCombatLockdown()) then
-
-					if (v:GetAlpha() < 1) then
-						if (v:GetAlpha()+v.fadeSpeed <= 1) then
-							v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
-						else
-							v:SetAlpha(1)
-						end
 					else
-						k.seen = 1;
-					end
+						if (k.alphaUp == alphaUps[6]) then
 
-				else
-					if (k.alphaUp == alphaUps[6]) then
-
-						if (IsMouseOverSelfOrWatchFrame(k)) then
-							if (v:GetAlpha() < 1) then
-								if (v:GetAlpha()+v.fadeSpeed <= 1) then
-									v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
+							if (IsMouseOverSelfOrWatchFrame(k)) then
+								if (v:GetAlpha() < 1) then
+									if (v:GetAlpha()+v.fadeSpeed <= 1) then
+										v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
+									else
+										v:SetAlpha(1)
+									end
 								else
-									v:SetAlpha(1)
+									k.seen = 1;
 								end
 							else
-								k.seen = 1;
+								if (v:GetAlpha() > k.alpha) then
+									if (v:GetAlpha()-v.fadeSpeed >= k.alpha) then
+										v:SetAlpha(v:GetAlpha()-v.fadeSpeed)
+									else
+										v:SetAlpha(k.alpha)
+									end
+								else
+									k.seen = 0;
+								end
 							end
 						else
 							if (v:GetAlpha() > k.alpha) then
@@ -324,6 +342,20 @@ local function controlOnUpdate(self, elapsed)
 								k.seen = 0;
 							end
 						end
+					end
+
+				elseif (k.alphaUp == alphaUps[2]) then
+
+					if (IsMouseOverSelfOrWatchFrame(k)) then
+						if (v:GetAlpha() < 1) then
+							if (v:GetAlpha()+v.fadeSpeed <= 1) then
+								v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
+							else
+								v:SetAlpha(1)
+							end
+						else
+							k.seen = 1;
+						end
 					else
 						if (v:GetAlpha() > k.alpha) then
 							if (v:GetAlpha()-v.fadeSpeed >= k.alpha) then
@@ -334,30 +366,6 @@ local function controlOnUpdate(self, elapsed)
 						else
 							k.seen = 0;
 						end
-					end
-				end
-
-			elseif (k.alphaUp == alphaUps[2]) then
-
-				if (IsMouseOverSelfOrWatchFrame(k)) then
-					if (v:GetAlpha() < 1) then
-						if (v:GetAlpha()+v.fadeSpeed <= 1) then
-							v:SetAlpha(v:GetAlpha()+v.fadeSpeed)
-						else
-							v:SetAlpha(1)
-						end
-					else
-						k.seen = 1;
-					end
-				else
-					if (v:GetAlpha() > k.alpha) then
-						if (v:GetAlpha()-v.fadeSpeed >= k.alpha) then
-							v:SetAlpha(v:GetAlpha()-v.fadeSpeed)
-						else
-							v:SetAlpha(k.alpha)
-						end
-					else
-						k.seen = 0;
 					end
 				end
 			end
@@ -405,6 +413,7 @@ end
 function HANDLER:AddVisibilityDriver(bar, state, conditions)
 
 	if (MBS[state]) then
+
 		RegisterStateDriver(self, state, conditions)
 
 		if (self:GetAttribute("activestates"):find(state)) then
@@ -486,10 +495,6 @@ function HANDLER:BuildStateMap(bar, remapState)
 			end
 		end
 
-		if (map == "1" and bar.cdata.prowl and remapState == "stance") then
-			statemap = statemap.."[stance:2/3,stealth] stance8; "
-		end
-
 	end
 
 	statemap = gsub(statemap, "; $", "")
@@ -552,6 +557,10 @@ function HANDLER:UpdateStates(bar)
 
 				if (bar.cdata.remap and (state == "paged" or state == "stance")) then
 					statemap = self:BuildStateMap(bar, state)
+				end
+
+				if (state == "prowl" and bar.cdata.prowl and ION.kitty) then
+					statemap = values.states:gsub("KITTY", ION.kitty)
 				end
 
 				if (state == "custom" and bar.cdata.custom) then
@@ -648,6 +657,23 @@ function BAR:CreateDriver()
 							end
 
 							control:ChildUpdate("stealth", self:GetAttribute("activestates"))
+						end
+
+						]])
+
+	driver:SetAttribute("_onstate-prowl", [[
+
+						local state = self:GetAttribute("state-prowl"):match("%a+")
+
+						if (state) then
+
+							if (self:GetAttribute("activestates"):find(state)) then
+								self:SetAttribute("activestates", self:GetAttribute("activestates"):gsub(state.."%d+;", self:GetAttribute("state-prowl")..";"))
+							else
+								self:SetAttribute("activestates", self:GetAttribute("activestates")..self:GetAttribute("state-prowl")..";")
+							end
+
+							control:ChildUpdate("prowl", self:GetAttribute("activestates"))
 						end
 
 						]])
@@ -1028,7 +1054,7 @@ function BAR:CreateHandler()
 
 							if (self:GetAttribute("statestack")) then
 								if (self:GetAttribute("statestack"):find("stealth")) then
-									self:SetAttribute("statestack", self:GetAttribute("statestack"):gsub("stealth%d+", self:GetAttribute("state-restealthction")))
+									self:SetAttribute("statestack", self:GetAttribute("statestack"):gsub("stealth%d+", self:GetAttribute("state-stealth")))
 								else
 									self:SetAttribute("statestack", self:GetAttribute("state-stealth")..";"..self:GetAttribute("statestack"))
 								end
@@ -1044,6 +1070,62 @@ function BAR:CreateHandler()
 								control:ChildUpdate("stealth", self:GetAttribute("state-priority"))
 							else
 								control:ChildUpdate("stealth", self:GetAttribute("state-stealth"))
+							end
+
+						end
+
+						]])
+
+	handler:SetAttribute("_onstate-prowl", [[
+
+						if (self:GetAttribute("state-prowl") == "laststate") then
+
+							if (self:GetAttribute("statestack")) then
+
+								if (self:GetAttribute("statestack"):find("prowl")) then
+									self:SetAttribute("statestack", self:GetAttribute("statestack"):gsub("prowl%d+;", ""))
+								end
+
+								local laststate = (";"):split(self:GetAttribute("statestack"))
+
+								self:SetAttribute("state-last", laststate)
+
+							end
+
+							self:SetAttribute("state-current", self:GetAttribute("state-last") or "homestate")
+
+							if (self:GetAttribute("state-last")) then
+								self:SetAttribute("assertstate", self:GetAttribute("state-last"):gsub("%d+", ""))
+							else
+								self:SetAttribute("assertstate", "homestate")
+							end
+
+							if (self:GetAttribute("state-priority")) then
+								control:ChildUpdate("prowl", self:GetAttribute("state-priority"))
+							else
+								control:ChildUpdate("prowl", self:GetAttribute("state-last") or "homestate")
+							end
+
+						elseif (self:GetAttribute("state-prowl")) then
+
+							if (self:GetAttribute("statestack")) then
+								if (self:GetAttribute("statestack"):find("prowl")) then
+									self:SetAttribute("statestack", self:GetAttribute("statestack"):gsub("prowl%d+", self:GetAttribute("state-prowl")))
+								else
+									self:SetAttribute("statestack", self:GetAttribute("state-prowl")..";"..self:GetAttribute("statestack"))
+								end
+							else
+								self:SetAttribute("statestack", self:GetAttribute("state-prowl"))
+							end
+
+							self:SetAttribute("state-current", self:GetAttribute("state-prowl"))
+
+							self:SetAttribute("assertstate", "prowl")
+
+							if (self:GetAttribute("state-priority")) then
+								control:ChildUpdate("prowl", self:GetAttribute("state-priority"))
+							else
+								control:ChildUpdate("prowl", self:GetAttribute("state-prowl"))
 							end
 
 						end
@@ -1848,7 +1930,13 @@ end
 
 function BAR:LoadObjects(init)
 
-	local object
+	local object, spec
+
+	if (self.cdata.dualSpec) then
+		spec = SPEC.cSpec
+	else
+		spec = 1
+	end
 
 	self.objCount = 0
 
@@ -1862,7 +1950,7 @@ function BAR:LoadObjects(init)
 
 			object:SetData(self)
 
-			object:LoadData(SPEC.cSpec, self.handler:GetAttribute("activestate"))
+			object:LoadData(spec, self.handler:GetAttribute("activestate"))
 
 			object:SetAux()
 
@@ -2569,6 +2657,33 @@ function BAR:UpdateObjectGrid(show)
 	end
 end
 
+function BAR:UpdateObjectSpec()
+
+	local object, spec
+
+	for objID in gmatch(self.gdata.objectList, "[^;]+") do
+
+		object = _G[self.objPrefix..objID]
+
+		if (object) then
+
+			if (self.cdata.dualSpec) then
+				spec = SPEC.cSpec
+			else
+				spec = 1
+			end
+
+			self:Show()
+
+			object:SetData(self)
+			object:LoadData(spec, self.handler:GetAttribute("activestate"))
+			object:UpdateFlyout()
+			object:SetType()
+			object:SetGrid()
+		end
+	end
+end
+
 function BAR:DeleteBar()
 
 	local handler = self.handler
@@ -2849,6 +2964,13 @@ function BAR:SetState(msg, gui, checked, query)
 				self:SetRemap_Stance()
 			else
 				self.cdata.remap = false
+			end
+		end
+
+		if (state == "prowl") then
+
+			if (not self.cdata.stance and self.cdata.prowl) then
+				self.cdata.prowl = false
 			end
 		end
 
@@ -3259,11 +3381,6 @@ function BAR:DualSpecSet(msg, gui, checked, query)
 		return self.cdata.dualSpec
 	end
 
-	if (true) then
-		print("Feature Not In Yet")
-		return
-	end
-
 	if (gui) then
 
 		if (checked) then
@@ -3281,6 +3398,8 @@ function BAR:DualSpecSet(msg, gui, checked, query)
 			self.cdata.dualSpec = true
 		end
 	end
+
+	self:UpdateObjectSpec()
 
 	self:Update()
 end

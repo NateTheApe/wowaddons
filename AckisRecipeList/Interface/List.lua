@@ -280,7 +280,7 @@ function private.InitializeListFrame()
 					edit_box:Insert(_G.GetSpellLink(profession_recipes[clicked_line.recipe_id].spell_id))
 				end
 			elseif _G.IsShiftKeyDown() then
-				local crafted_item_id = profession_recipes[clicked_line.recipe_id]:CraftedItemID()
+				local crafted_item_id = profession_recipes[clicked_line.recipe_id]:CraftedItem()
 
 				if crafted_item_id then
 					local _, item_link = _G.GetItemInfo(crafted_item_id)
@@ -518,15 +518,6 @@ function private.InitializeListFrame()
 		-- of its saved_var.
 		private.HARD_FILTERS = {
 			------------------------------------------------------------------------------------------------
-			-- Binding flags.
-			------------------------------------------------------------------------------------------------
-			["itemboe"]	= { flag = COMMON1.IBOE,	field = "common1",	sv_root = binding_filters },
-			["itembop"]	= { flag = COMMON1.IBOP,	field = "common1",	sv_root = binding_filters },
-			["itemboa"]	= { flag = COMMON1.IBOA,	field = "common1",	sv_root = binding_filters },
-			["recipeboe"]	= { flag = COMMON1.RBOE,	field = "common1",	sv_root = binding_filters },
-			["recipebop"]	= { flag = COMMON1.RBOP,	field = "common1",	sv_root = binding_filters },
-			["recipeboa"]	= { flag = COMMON1.RBOA,	field = "common1",	sv_root = binding_filters },
-			------------------------------------------------------------------------------------------------
 			-- Player Type flags.
 			------------------------------------------------------------------------------------------------
 			["melee"]	= { flag = COMMON1.DPS,		field = "common1",	sv_root = player_filters },
@@ -686,6 +677,24 @@ function private.InitializeListFrame()
 			local item_filter_type = recipe:ItemFilterType()
 
 			if item_filter_type and not addon.db.profile.filters.item[item_filter_type] then
+				return false
+			end
+
+			------------------------------------------------------------------------------------------------
+			-- Binding types.
+			------------------------------------------------------------------------------------------------
+			local _, recipe_item_binding = recipe:RecipeItem()
+
+			-- Assume that recipes without a recipe item are obtained via trainers, and treat them as bind on pickup.
+			if recipe_item_binding and not addon.db.profile.filters.binding["recipe_" .. recipe_item_binding:lower()] then
+				return false
+			elseif not recipe_item_binding and not addon.db.profile.filters.binding.recipe_bind_on_pickup then
+				return false
+			end
+
+			local _, crafted_item_binding = recipe:CraftedItem()
+
+			if crafted_item_binding and not addon.db.profile.filters.binding["item_" .. crafted_item_binding:lower()] then
 				return false
 			end
 
@@ -1235,7 +1244,7 @@ function private.InitializeListFrame()
 		local drop_location = type(identifier) == "string" and SetTextColor(CATEGORY_COLORS["location"], identifier)
 
 		if drop_location then
-			local recipe_item_id = private.recipe_list[recipe_id]:RecipeItemID()
+			local recipe_item_id = private.recipe_list[recipe_id]:RecipeItem()
 			local recipe_item_level = recipe_item_id and select(4, _G.GetItemInfo(recipe_item_id))
 
 			if recipe_item_level then
@@ -1701,7 +1710,7 @@ do
 				return
 			end
 			local recipe = private.recipe_list[recipe_id]
-			local recipe_item_id = recipe:RecipeItemID()
+			local recipe_item_id = recipe:RecipeItem()
 			local recipe_item_level = recipe_item_id and select(4, _G.GetItemInfo(recipe_item_id))
 			local quality_color = select(4, _G.GetItemQualityColor(recipe.quality)):sub(3)
 			local location_text
@@ -1842,13 +1851,14 @@ do
 		end
 	end
 
-	local BINDING_FLAGS = {
-		[COMMON1.IBOE] = L["BOEFilter"],
-		[COMMON1.IBOP] = L["BOPFilter"],
-		[COMMON1.IBOA] = L["BOAFilter"],
-		[COMMON1.RBOE] = L["RecipeBOEFilter"],
-		[COMMON1.RBOP] = L["RecipeBOPFilter"],
-		[COMMON1.RBOA] = L["RecipeBOAFilter"]
+	local ITEM_BINDING_TYPES = {
+		BIND_ON_EQUIP = L["BOEFilter"],
+		BIND_ON_PICKUP = L["BOPFilter"],
+	}
+
+	local RECIPE_BINDING_TYPES = {
+		BIND_ON_EQUIP = L["RecipeBOEFilter"],
+		BIND_ON_PICKUP = L["RecipeBOPFilter"],
 	}
 
 	local NON_COORD_ACQUIRES = {
@@ -1906,11 +1916,18 @@ do
 		ttAdd(0, -1, false, ("%s:"):format(_G.SKILL_LEVEL), BASIC_COLORS["normal"], recipe.skill_level, private.DIFFICULTY_COLORS[color_type])
 		acquire_tip:AddSeparator()
 
-		for flag, label in pairs(BINDING_FLAGS) do
-			if _G.bit.band(recipe.flags.common1, flag) == flag then
-				ttAdd(0, -1, true, label, BASIC_COLORS["normal"])
-			end
+		local _, recipe_item_binding = recipe:RecipeItem()
+
+		if recipe_item_binding then
+			ttAdd(0, -1, true, RECIPE_BINDING_TYPES[recipe_item_binding], BASIC_COLORS["normal"])
 		end
+
+		local _, crafted_item_binding = recipe:RecipeItem()
+
+		if crafted_item_binding then
+			ttAdd(0, -1, true, ITEM_BINDING_TYPES[crafted_item_binding], BASIC_COLORS["normal"])
+		end
+
 		acquire_tip:AddSeparator()
 
 		local recipe_specialty = recipe.specialty

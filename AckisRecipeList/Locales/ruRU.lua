@@ -6,7 +6,7 @@ ruRU localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.2
+Project version: 2.4.4
 ************************************************************************
 Currently maintained by:
 http://www.wowace.com/addons/arl/localization/translators/
@@ -186,7 +186,8 @@ L["Bradley Towns"] = "Бредли Таунс"
 L["Braeg Stoutbeard"] = "Брейг Пивобород"
 L["Brandig"] = "Брандиг"
 L["Brawn"] = "Браун"
-L["BRD_RANDOM_ROOM"] = "Существует вероятность, что вы найдете его в 5 различных комнатах в Глубинах Черной горы, его появление случайно, а иногда он вообще не появляется."
+L["BRD_MAIL"] = "Существуют 4 точки появления в Глубинах Черной горы: прямо перед входом в Мануфакторий, в комнате Повелителя големов Аргелмаха, в  Мануфактории на скамейке, или в Литейной." -- Needs review
+L["BRD_SHOULDERS"] = "Существует 1 редкая точка появления в Глубинах Черной горы: комната сразу после замка' Тенегорна  и прямо перед ареной, в углу двухъярусных кроватей." -- Needs review
 L["Brek Stonehoof"] = "Брек Каменное Копыто"
 L["Brikk Keencraft"] = "Брикк Мастерец"
 L["Brock Stoneseeker"] = "Брок Камнекоп"

@@ -305,8 +305,17 @@ local function orderbuttons(btnlist)
 			return a.width and b.width and a.width < b.width;
 		end
 	end);
+	
 	local order = {};
 	local used = {};
+	for idx=1,#btnlist do
+		local b = btnlist[idx];
+		if ( b.alone ) then
+			tinsert(order, idx);
+			used[b.name] = 1;
+		end
+	end
+	
 	for idx=1,#btnlist do
 		local b = btnlist[idx];
 		if (b.deps and not used[b.name] ) then
@@ -371,8 +380,86 @@ local function orderbuttons(btnlist)
 	return order;
 end
 
+local RIGHT_OFFSET = 16;
+local BUTTON_SEP = 8;
+local function layoutorder(btnlist, maxwidth)
+	if not btnlist then
+		return {};
+	end
+
+	local order = orderbuttons(btnlist);
+	local layout = {};
+	local used = {};
+
+	local idx = 1;
+	while (idx <= #order ) do
+		if ( not used[idx] ) then
+			local left = order[idx];
+			local leftbut = btnlist[left];
+			local rightbut = nil;
+			if ( not leftbut.alone ) then
+				local tw = RIGHT_OFFSET + BUTTON_SEP + leftbut.width;
+				for jdx=#order,idx+1,-1 do
+					if ( not rightbut and not used[jdx] ) then
+						local tr = order[jdx];
+						local tb = btnlist[tr];
+						if ((tb.width + tw) <= maxwidth) then
+							used[jdx] = 1;
+							rightbut = tb;
+						end
+					end
+				end
+			end
+			
+			tinsert(layout, { leftbut, rightbut } );
+		end
+		idx = idx + 1;
+	end
+	
+	return layout;
+end
+
+local function FirstPosition(button)
+	button:SetPoint("TOPLEFT", FishingBuddyFrameInset, "TOPLEFT", 4, -4);
+end
+
+local SQUISH_OFF = 6;
+local function dolayout(layout, lastbutton, firstoff)
+	for idx,line in ipairs(layout) do
+		local lb, rb = line[1], line[2];
+		local yoff = SQUISH_OFF;
+		if ( lb.margin ) then
+			yoff = yoff - lb.margin[1] or 0;
+		end
+		if ( not lastbutton ) then
+			FirstPosition(lb);
+		else
+			lb:SetPoint("TOPLEFT", lastbutton, "BOTTOMLEFT", firstoff, yoff);
+			firstoff = 0;
+		end
+		lastbutton = lb;
+		if ( rb ) then
+			rb.right = 1;
+			rb.adjacent = lastbutton;
+			if ( rb.margin ) then
+				yoff = yoff + rb.margin[1] or 0;
+			end
+			rb:SetPoint("TOP", lb, "TOP");
+			if ( rb.checkbox ) then
+				rb:SetPoint("RIGHT", FishingBuddyFrameInset, "RIGHT", -rb.width, 0);
+				rb:SetHitRectInsets(0, -rb.width, 0, 0);
+			else
+				rb:SetPoint("RIGHT", FishingBuddyFrameInset, "RIGHT", -rb.slider, 0);
+			end
+		end
+	end
+	
+	return lastbutton;
+end
+
 local function CleanupButton(button)
 	button.name = nil;
+	button.alone = nil;
 	button.width = 0;
 	button.slider = 0;
 	button.update = nil;
@@ -406,9 +493,12 @@ local function CleanupButton(button)
 	button:SetParent(nil);
 end
 
+local insidewidth = 0;
 local function Setup(options, nomap)
 	FishingOptionsFrame.groupoptions = options;
-	
+
+	insidewidth = FishingBuddyFrameInset:GetWidth();
+
 -- Clear out all the stuff we put on the old buttons
 	for name,button in pairs(optionmap) do
 		CleanupButton(button);
@@ -428,10 +518,6 @@ local function Setup(options, nomap)
 			if ( button ) then
 				button.custom = 1;
 				button.checkbox = (button:GetObjectType() == "CheckButton");
-				if ( not nomap ) then
-					button:ClearAllPoints();
-					button:SetParent(FishingOptionsFrame);
-				end
 			end
 		elseif ( option.v ) then
 			button = optionbuttons[index];
@@ -440,15 +526,15 @@ local function Setup(options, nomap)
 					"CheckButton", "FishingBuddyOption"..index,
 					FishingOptionsFrame, "OptionsSmallCheckButtonTemplate");
 				optionbuttons[index] = button;
-			else
-				button:SetParent(FishingOptionsFrame);
 			end
 			button.checkbox = 1;
 			index = index + 1;
 		end
-		if ( button ) then
+		if ( button and (not option.visible or option.visible(button) == 1) ) then
 			if ( not nomap ) then
 				optionmap[name] = button;
+				button:ClearAllPoints();
+				button:SetParent(FishingOptionsFrame);
 				button:SetFrameLevel(FishingOptionsFrame:GetFrameLevel() + 2);
 			end
 
@@ -464,6 +550,7 @@ local function Setup(options, nomap)
 			
 			button.option = option;
 			button.name = name;
+			button.alone = option.alone;
 			button.layoutright = option.layoutright;
 			button.margin = option.margin;
 			button.name = name;
@@ -486,6 +573,7 @@ local function Setup(options, nomap)
 			
 			if ( button.checkbox ) then
 				button:SetChecked(GetSetting(name));
+				button:SetHitRectInsets(0, -button.width, 0, 0);
 			end
 			-- hack for sliders (why?)
 			if (button:GetObjectType() == "Slider") then
@@ -511,7 +599,7 @@ local function Setup(options, nomap)
 						overlay:SetScript("OnLeave", Handle_OnLeave);
 					end
 					overlay:SetSize(button.width or button:GetWidth(), button:GetHeight());
-					overlay:SetPoint("CENTER", button, "CENTER");
+					overlay:SetPoint("LEFT", button, "LEFT");
 					overlay.tooltipText = tooltip;
 					button.overlay = overlay;
 					overlayidx = overlayidx + 1;
@@ -540,63 +628,19 @@ local function Setup(options, nomap)
 	-- move the primaries with no dependents to the top, and stack them next to other
 	-- then put everything else underneath. need to make the dep button layout code
 	-- useful for the toplevel non-dep buttons then
-	local primaries = {};
 	local pb = {};
 	local maxwidth = 0;
 	for _,name in pairs(toplevel) do
 		local button = optionmap[name];
 		if ( button and not button.deps and not button.custom ) then
-			tinsert(primaries, name);
 			tinsert(pb, button);
-			if ( not button.custom and button.width > maxwidth ) then
-				maxwidth = button.width;
-			end
 		end
 	end
 
-	local lastbutton = nil;
-	local order = orderbuttons(pb);
-	local right = false;
-	for iorder,which in ipairs(order) do
-		local name = primaries[which];
-		local button = optionmap[name];
-		if ( not lastbutton ) then
-			button:SetPoint("TOPLEFT", 32, -82);
-			lastbutton = button;
-		else
-			local yoff = 0;
-			if ( button.margin ) then
-				yoff = yoff - button.margin[1] or 0;
-			end
-			if ( right) then
-				if (lastbutton.margin) then
-					yoff = yoff + lastbutton.margin[1] or 0;
-				end
-				button.adjacent = lastbutton;
-				button:SetPoint("TOP", lastbutton, "TOP", 0, 0);
-				button.right = 1;
-				right = false;
-			else
-				button:SetPoint("TOPLEFT", lastbutton, "BOTTOMLEFT", lastoff, yoff);
-				lastbutton = button;
-				right = true;
-			end
-		end
-	end
-	for iorder,which in ipairs(order) do
-		local name = primaries[which];
-		local button = optionmap[name];
-		if (button.right) then
-			if ( button.checkbox ) then
-				button:SetPoint("RIGHT", FishingOptionsFrame, "RIGHT", -32-maxwidth, 0);
-				button:SetHitRectInsets(0, -maxwidth, 0, 0);
-			else
-				button:SetPoint("LEFT", FishingOptionsFrame, "RIGHT", -32-button.width-button.slider, 0);
-			end
-		end
-	end
+	local layout = layoutorder(pb, insidewidth);	
+	local lastbutton = dolayout(layout, nil, 0);
 	
-	primaries = {};
+	local primaries = {};
 	for _,name in pairs(toplevel) do
 		local button = optionmap[name];
 		if ( button and button.deps ) then
@@ -614,9 +658,9 @@ local function Setup(options, nomap)
 	for _,name in pairs(primaries) do
 		local button = optionmap[name];
 		if ( not lastbutton ) then
-			button:SetPoint("TOPLEFT", 32, -82);
+			FirstPosition(button);
 		else
-			local yoff = 2;
+			local yoff = SQUISH_OFF;
 			if ( button.margin ) then
 				yoff = yoff - button.margin[1];
 			end
@@ -634,57 +678,16 @@ local function Setup(options, nomap)
 					tinsert(deps, b);
 				end
 			end
-			local order = orderbuttons(deps);
-			maxwidth = 0;
-			local rlast = nil;
-			local llast = nil;
-			for iorder,which in ipairs(order) do
-				local colbut = deps[which];
-				if ( colbut ) then
-					local yoff = 0;
-					if ( colbut.margin ) then
-						yoff = yoff - colbut.margin[1] or 0;
-					end
-					if ( (iorder % 2) == 1 ) then
-						if (lastbutton.margin) then
-							yoff = yoff - lastbutton.margin[2] or 0;
-						end
-						colbut:SetPoint("TOPLEFT", lastbutton, "BOTTOMLEFT", 16+lastoff, yoff);
-						lastbutton = colbut;
-						llast = colbut;
-						lastoff = -16;
-					else
-						-- we're already down by the adjacent buttons offset
-						if (lastbutton.margin) then
-							yoff = yoff + lastbutton.margin[1] or 0;
-						end
-						colbut.adjacent = lastbutton;
-						colbut:SetPoint("TOP", lastbutton, "TOP", 0, yoff);
-						if ( not colbut.custom and colbut.width > maxwidth ) then
-							maxwidth = colbut.width;
-						end
-						colbut.right = 1;
-					end
-				end
-			end
-			for which=1,#deps do
-				local colbut = deps[which];
-				if (colbut.right) then
-					if ( colbut.checkbox ) then
-						colbut:SetPoint("RIGHT", FishingOptionsFrame, "RIGHT", -32-maxwidth, 0);
-						colbut:SetHitRectInsets(0, -maxwidth, 0, 0);
-					else
-						colbut:SetPoint("LEFT", FishingOptionsFrame, "RIGHT", -32-colbut.width-colbut.slider, 0);
-					end
-				end
-			end
+			layout = layoutorder(deps, insidewidth - RIGHT_OFFSET);
+			lastbutton = dolayout(layout, lastbutton, RIGHT_OFFSET);
+			lastoff = -RIGHT_OFFSET;
 		end
 		if ( button.layoutright ) then
 			 local toright = optionmap[button.layoutright];
 			 if (toright) then
 				 toright:ClearAllPoints();
 				 toright:SetPoint("CENTER", button, "CENTER", 0, 0);
-				 toright:SetPoint("RIGHT", FishingOptionsFrame, "RIGHT", -32, 0);
+				 toright:SetPoint("RIGHT", FishingBuddyFrameInset, "RIGHT", -32, 0);
 			 end
 		end
 	end
@@ -742,7 +745,7 @@ local function PositionTab(tab, prevtab)
 	if ( prevtab ) then
 		tab:SetPoint("TOPLEFT", prevtab, "BOTTOMLEFT", 0, -17);
 	else
-		tab:SetPoint("TOPLEFT", FishingOptionsFrame, "TOPRIGHT", -32, -65);
+		tab:SetPoint("TOPLEFT", FishingBuddyFrameInset, "TOPRIGHT", 6, -3);
 	end
 	tab:Show();
 end
@@ -960,7 +963,7 @@ FishingBuddy.CreateFBDropDownMenu = function(holdername, menuname)
 	local holder = CreateFrame("Frame", holdername);
 	holder.menu = CreateFrame("Frame", menuname, holder, "FishingBuddyDropDownMenuTemplate");
 	holder.menu:ClearAllPoints();
-	holder.menu:SetPoint("TOPLEFT", holder, "TOPLEFT", 48, 0);
+	holder.menu:SetPoint("TOPRIGHT", holder, "TOPRIGHT", 0, 0);
 	holder.html = CreateFrame("SimpleHTML", nil, holder);
 	holder.html:ClearAllPoints();
 	holder.html:SetPoint("TOPLEFT", holder, "TOPLEFT", 0, -4);
@@ -968,6 +971,22 @@ FishingBuddy.CreateFBDropDownMenu = function(holdername, menuname)
 	holder.fontstring = holder.html:CreateFontString(nil, nil, "GameFontNormalSmall");
 	holder.fontstring:SetAllPoints(holder.html);
 	holder.fontstring:SetSize(183, 0);
+	
+	function holder:FixSizes()
+		self:SetWidth(self.menu:GetWidth() + self.menu.label:GetWidth() + 4);
+		self:SetHeight(self.menu:GetHeight());
+	end
+	
+	function holder:SetLabel(text)
+		if (text) then
+			self.menu.label:Show();
+			self.menu.label:SetText(text);
+		else
+			self.menu.label:SetText("");
+			self.menu.label:Hide();
+		end
+		self:FixSizes();
+	end
 	
 	return holder;
 end
@@ -980,6 +999,17 @@ FishingBuddy.GetOptionList = function()
 		end
 	end
 	return options;
+end
+
+-- Helper function
+FishingBuddy.FitInOptionFrame = function(width)
+	local check = insidewidth;
+	-- Default to something that should be close in case we haven't
+	-- seen the window yet
+	if (check == 0) then
+		check = 327;
+	end
+	return width < (check - RIGHT_OFFSET - BUTTON_SEP);
 end
 
 -- Create the options frame, unmanaged -- we get managed specially later

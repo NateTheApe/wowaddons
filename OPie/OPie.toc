@@ -1,10 +1,10 @@
-## Interface: 50001
+## Interface: 50100
 ## Title: OPie
 ## Notes: Group abilities into rings that appear when you trigger a binding.
 ## Author: foxlit
 ## SavedVariables: OneRing_Config
 ## OptionalDeps: Masque
-## Version: Kiwi 2
+## Version: Kiwi 5
 ## X-Update-FeedURL: http://www.go-hero.net/opie/rss/beta
 ## X-Website: http://www.go-hero.net/opie/
 EventLib.lua

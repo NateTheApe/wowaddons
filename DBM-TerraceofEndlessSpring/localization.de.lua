@@ -18,7 +18,7 @@ L:SetOptionLocalization({
 L= DBM:GetModLocalization(742)
 
 L:SetMiscLocalization{
-	Victory	= "I thank you, strangers. I have been freed." --translate (trigger)
+	Victory	= "Ich danke Euch, Fremdlinge. Ich wurde befreit."
 }
 
 
@@ -37,11 +37,14 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	warnHideOver			= "Zeige Warnung, wenn $spell:123244 beendet ist",
-	timerSpecialCD			= "Zeige Zeit bis nächste Spezialfähigkeit gewirkt wird"
+	timerSpecialCD			= "Zeige Zeit bis nächste Spezialfähigkeit gewirkt wird",
+	SetIconOnGuard			= "Setze Zeichen auf $journal:6224",
+	RangeFrame				= "Zeige Abstandsfenster (3m) für $spell:123121\n(zeigt jeden während $spell:123244, sonst nur die Tanks)",
+	GWHealthFrame			= "Zeige Lebensanzeige für den benötigten Schaden bis $spell:123461 endet\n(benötigt aktivierte Lebensanzeige)"
 })
 
 L:SetMiscLocalization{
-	Victory	= "I... ah... oh! Did I...? Was I...? It was... so... cloudy." --translate (trigger)
+	Victory	= "Ich... ah... oh! Hab ich...? War ich...? Es war... so... trüb."
 }
 
 
@@ -50,3 +53,6 @@ L:SetMiscLocalization{
 ----------------------
 L= DBM:GetModLocalization(709)
 
+L:SetOptionLocalization({
+	RangeFrame			= "Zeige Abstandsfenster (2m) für $spell:119519"
+})

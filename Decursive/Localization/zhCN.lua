@@ -1,7 +1,7 @@
 ﻿--[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.4) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -74,7 +74,7 @@ T._LoadedFiles["zhCN.lua"] = false;
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhCN");
 
 if not L then
-    T._LoadedFiles["zhCN.lua"] = "2.7.2.3_beta_3";
+    T._LoadedFiles["zhCN.lua"] = "2.7.2.4";
     return;
 end;
 
@@ -162,7 +162,7 @@ L["GLOR5"] = "他将永远被我们所铭记……"
 L["HANDLEHELP"] = "拖动所有微单位框体"
 L["HIDE_LIVELIST"] = "隐藏实时列表"
 L["HIDE_MAIN"] = "隐藏 Decursive 窗口"
-L["HIDESHOW_BUTTONS"] = "显示/隐藏按钮" -- Needs review
+L["HIDESHOW_BUTTONS"] = "显示/隐藏按钮和锁定/解锁“Decursive”条"
 L["HLP_LEFTCLICK"] = "鼠标左键"
 L["HLP_LL_ONCLICK_TEXT"] = [=[实时列表不代表能被点击。请先阅读此文档来学习如何使用此插件。在 WoWAce.com 网站搜索“Decursive”
 （从 Decursive 计时条移除此列表，/dcrshow 命令并左Alt+点击移除）]=]
@@ -469,4 +469,4 @@ L["UNSTABLERELEASE"] = "不稳定版本"
 
 
 
-T._LoadedFiles["zhCN.lua"] = "2.7.2.3_beta_3";
+T._LoadedFiles["zhCN.lua"] = "2.7.2.4";

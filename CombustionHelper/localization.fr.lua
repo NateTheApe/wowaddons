@@ -49,6 +49,10 @@ CombuLocFR = {["lockon"] = "|cff00ffffCombustionHelper verrouillé|r",
 			["interfaceGraph"] = "Options Graphiques",
 			["combureport1"] = "|cffff0000 -- Total Combustion : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Cibles : |cffffffff%d |cffff0000--|r",
 			["combureport2"] = "|cffff0000 -- Prec. Combustion : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Cibles : |cffffffff%d |cffff0000--|r",
+			["pyroenableon"] = "|cff00ffffPyroblast tracker activé|r",
+			["pyroenableoff"] = "|cff00ffffPyroblast tracker désactivé|r",
+			["lbenableon"] = "|cff00ffffBomb tracker activé|r",
+			["lbenableoff"] = "|cff00ffffBomb tracker désactivé|r",
 			}
 			
 -------------------------------
@@ -110,6 +114,8 @@ combuoptioninfotableFR = {
     ["CombuThresholdSoundButton"] = "Active l'alerte sonore lorsque le seuil d'Enflammer est atteint.",
 	["Combuedgecolornormal"] = "Pour choisir la couleur de la bordure par défaut hors Combustion et impact.",
     ["CombuTickPredictButton"] = "Remplace l'affichage de la valeur d'Enflammer dans la zone de status par les dégats de vos ticks de Combustion ainsi que le nombre de ces ticks dépendant de votre hate.",
+	["CombuPyroEnableButton"] = "Active ou désactive le suivi de Chaleur Continue dans la fenetre principale.",
+	["CombuLBEnableButton"] = "Active ou désactive le suivi des bombes dans la fenetre principale.",
 	}
 
 -------------------------------
@@ -165,6 +171,8 @@ CombuOptLocFR = {
     ["CombuPyromaniacButton"] = "Alerte Pyromane",
 	["Combubgcolorwarning"] = "Couleur du fond (Alerte)",
 	["CombuHotStreakButton"] = "Alerte pour Rechauffement",
+	["CombuPyroEnableButton"] = "Active le suivi de Chaleur Continue",
+	["CombuLBEnableButton"] = "Active le suivi des bombes",
 	}
 
 -------------------------------

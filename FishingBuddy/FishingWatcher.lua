@@ -68,6 +68,13 @@ local WatcherOptions = {
 		["m"] = 1,
 		["default"] = 0,
 		["deps"] = { ["WatchFishies"] = "d" } },
+	["WatchPagleFish"] = {
+		["text"] = FBConstants.CONFIG_FISHWATCHPAGLE_ONOFF,
+		["tooltip"] = FBConstants.CONFIG_FISHWATCHPAGLE_INFO,
+		["v"] = 1,
+		["m"] = 1,
+		["default"] = 1,
+		["deps"] = { ["WatchFishies"] = "d" } },
 };
 
 -- handle special frame actions
@@ -464,6 +471,31 @@ WatchEvents[FBConstants.FISHING_DISABLED_EVT] = function(started)
 	FishingBuddy.SetSetting("CaughtSoFar", FL:GetCaughtSoFar());
 end
 
+-- Handle display of caught Pagle fish
+local function DisplayPagleFish()
+	local line = nil;
+	for id,info in pairs(FishingBuddy.PagleFish) do
+		local haveone = (GetItemCount(id) > 0);
+		if ( haveone or IsQuestFlaggedCompleted(info.quest) ) then
+			local _, _, _, _, _, name, _ = FishingBuddy.GetFishieRaw(id);
+			if ( haveone ) then
+				name = Crayon:Yellow(name);
+			else
+				name = Crayon:Green(name);
+			end
+			if (line) then
+				line = line..", "..name
+			else
+				line = name;
+			end
+		end
+	end
+	if (not line) then
+		line = Crayon:Yellow(NONE);
+	end
+	return QUEST_COMPLETE..": "..line;
+end
+
 -- Handle display elapsed time in some reasonable fashion
 local function DisplayedTime(elapsed)
 	t = elapsed;
@@ -552,6 +584,9 @@ function UpdateTotalsLine(index)
 			if ( GSB("WatchCurrentZone") ) then
 				index = index + 1;
 			end
+			if ( GSB("WatchPagleFish") ) then
+				index = index + 1;
+			end
 		end
 		SetEntry(index, line);
 	end
@@ -615,6 +650,7 @@ WatchEvents[FBConstants.OPT_UPDATE_EVT] = function(changed)
 end
 
 local function WatchUpdate()
+	local GSB = FishingBuddy.GetSettingBool;
 	local reset = FishingBuddy.GetSetting("ResetWatcher");
 	if ( not reset or reset < 1 ) then
 		ResetWatcherFrame(false);
@@ -655,15 +691,20 @@ local function WatchUpdate()
 	
 	local index = 1;
 	fishingWatchMaxWidth = 0;
-	if (FishingBuddy.GetSettingBool("WatchElapsedTime")) then
+	if (GSB("WatchElapsedTime")) then
 		UpdateTimerLine();
 		index = index + 1;
 	end
 	
-	local skill, mods, skillmax = FL:GetCurrentSkill();
-	local zoneskill, _ = FL:GetFishingSkillLine(false, true);
-	if ( FishingBuddy.GetSettingBool("WatchCurrentZone") ) then
+	if ( GSB("WatchCurrentZone") ) then
+		local skill, mods, skillmax = FL:GetCurrentSkill();
+		local zoneskill, _ = FL:GetFishingSkillLine(false, true);
 		SetEntry(index, zoneskill);
+		index = index + 1;
+	end
+
+	if ( GSB("WatchPagleFish") ) then
+		SetEntry(index, DisplayPagleFish());
 		index = index + 1;
 	end
 
@@ -819,3 +860,15 @@ FishingBuddy.WatchFrame.OnClick = function(self)
 		ToggleDropDownMenu(1, nil, menu, "FishingWatchTab", 10, 10);
 	end
 end
+
+FishingBuddy.Commands[FBConstants.CURRENT] = {};
+FishingBuddy.Commands[FBConstants.CURRENT].help = FBConstants.CURRENT_HELP;
+FishingBuddy.Commands[FBConstants.CURRENT].func =
+	function(what)
+		if ( what and what == FBConstants.RESET) then
+			totalCurrent = 0;
+			fishdata = {};
+			FishingBuddy.WatchUpdate();
+			return true;
+		end
+	end;

@@ -1,0 +1,14 @@
+tag v4.0.0-beta42
+2d70ae06e5952a9668f01e912512c8d9df7bb461
+Shefki <shefki@shefki.org>
+2012-11-30 10:18:00 -0500
+
+Tagging as 4.0.0-beta42
+
+
+--------------------
+
+Shefki:
+	- Fix the "OnEvent" errors related to animations.
+	Blizzard apparently made Animations and AnimationGroups no longer have
+	OnEvent scripts.  So stop trying to clear them.

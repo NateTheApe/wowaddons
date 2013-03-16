@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(741, "DBM-HeartofFear", nil, 330)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8086 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 8413 $"):sub(12, -3))
 mod:SetCreatureID(62397)
 mod:SetModelID(42645)
 mod:SetZone()
@@ -20,6 +20,8 @@ mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
 	"SPELL_DAMAGE",
 	"SPELL_MISSED",
+	"SPELL_PERIODIC_DAMAGE",
+	"SPELL_PERIODIC_MISSED",
 	"RAID_BOSS_EMOTE",
 	"UNIT_DIED",
 	"UNIT_SPELLCAST_SUCCEEDED",
@@ -29,7 +31,7 @@ mod:RegisterEventsInCombat(
 local warnWhirlingBlade					= mod:NewTargetAnnounce(121896, 4)--Target scanning not tested
 local warnRainOfBlades					= mod:NewSpellAnnounce(122406, 4)
 local warnRecklessness					= mod:NewTargetAnnounce(125873, 3)
-local warnImpalingSpear					= mod:NewPreWarnAnnounce(122224, 5, 3)--Pre warn your CC is about to break. Maybe need to localize it later to better explain what option is for.
+local warnImpalingSpear					= mod:NewPreWarnAnnounce(122224, 10, 3)--Pre warn your CC is about to break. Maybe need to localize it later to better explain what option is for.
 local warnAmberPrison					= mod:NewTargetAnnounce(121881, 3)
 local warnCorrosiveResin				= mod:NewTargetAnnounce(122064, 3)
 local warnMending						= mod:NewCastAnnounce(122193, 4)
@@ -40,7 +42,7 @@ local warnWindBomb						= mod:NewTargetAnnounce(131830, 4)
 local specWarnWhirlingBlade				= mod:NewSpecialWarningSpell(121896, nil, nil, nil, true)
 local specWarnRainOfBlades				= mod:NewSpecialWarningSpell(122406, nil, nil, nil, true)
 local specWarnRecklessness				= mod:NewSpecialWarningTarget(125873)
-local specWarnReinforcements			= mod:NewSpecialWarningSpell("ej6554", mod:IsTank())
+local specWarnReinforcements			= mod:NewSpecialWarningSpell("ej6554", not mod:IsHealer())--Also important to dps. (Espcially CC classes)
 local specWarnAmberPrison				= mod:NewSpecialWarningYou(121881)
 local yellAmberPrison					= mod:NewYell(121881)
 local specWarnAmberPrisonOther			= mod:NewSpecialWarningSpell(121881, false)--Only people who are freeing these need to know this.
@@ -53,23 +55,25 @@ local specWarnKorthikStrike				= mod:NewSpecialWarningYou(123963)
 local specWarnKorthikStrikeOther		= mod:NewSpecialWarningTarget(123963, mod:IsHealer())
 local yellKorthikStrike					= mod:NewYell(123963)
 local specWarnWindBomb					= mod:NewSpecialWarningMove(131830)
+local specWarnWhirlingBladeMove			= mod:NewSpecialWarningMove(121898)
 local yellWindBomb						= mod:NewYell(131830)
 
 --local timerWhirlingBladeCD				= mod:NewCDTimer(30, 121896)--30~60 sec. very large variable. timer useless?
 local timerRainOfBladesCD				= mod:NewCDTimer(48, 122406)--48-64 sec variation now. so much for it being a precise timer.
-local timerRecklessness					= mod:NewBuffActiveTimer(30, 125873)
+local timerRecklessness					= mod:NewBuffActiveTimer(30, 125873)--Heroic recklessness
 local timerReinforcementsCD				= mod:NewNextCountTimer(50, "ej6554")--EJ says it's 45 seconds after adds die but it's actually 50 in logs. EJ is not updated for current tuning.
 local timerImpalingSpear				= mod:NewTargetTimer(50, 122224)--Filtered to only show your own target, may change to a popup option later that lets you pick whether you show ALL of them or your own (all will be spammy)
-local timerAmberPrisonCD				= mod:NewNextTimer(36, 121876)--each add has their own CD. This is on by default since it concerns everyone.
-local timerCorrosiveResinCD				= mod:NewNextTimer(36, 122064)--^^
-local timerMendingCD					= mod:NewNextTimer(36, 122193, nil, false)--To reduce bar spam, only those dealing with this should turn CD bar on, off by default
-local timerQuickeningCD					= mod:NewNextTimer(36, 122149, nil, false)--^^
+local timerAmberPrisonCD				= mod:NewCDTimer(36, 121876, nil, false)--Reduce bar spam like Zarthik / each add has their own CD. This is on by default since it concerns everyone.
+local timerCorrosiveResinCD				= mod:NewCDTimer(36, 122064, nil, false)--^^
+local timerResidue						= mod:NewBuffFadesTimer(120, 122055)
+local timerMendingCD					= mod:NewNextTimer(37, 122193, nil, false)--To reduce bar spam, only those dealing with this should turn CD bar on, off by default / 37~37.5 sec
+local timerQuickeningCD					= mod:NewNextTimer(37.3, 122149, nil, false)--^^37.3~37.6sec.
 local timerKorthikStrikeCD				= mod:NewCDTimer(32, 123963)--^^
 local timerWindBombCD					= mod:NewCDTimer(6, 131830)--^^
 
 local berserkTimer						= mod:NewBerserkTimer(480)
 
-local countdownImpalingSpear			= mod:NewCountdown(49, 122224) -- like Crossed Over, warns 1 sec earlier.
+local countdownImpalingSpear			= mod:NewCountdown(49, 122224, nil, nil, 10) -- like Crossed Over, warns 1 sec earlier.
 
 mod:AddBoolOption("AmberPrisonIcons", true)
 
@@ -107,13 +111,15 @@ function mod:OnCombatStart(delay)
 	table.wipe(windBombTargets)
 	--timerWhirlingBladeCD:Start(35.5-delay)
 	timerRainOfBladesCD:Start(60-delay)
-	berserkTimer:Start(-delay)
+	if not self:IsDifficulty("lfr25") then
+		berserkTimer:Start(-delay)
+	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(122224) and args.sourceName == UnitName("player") then
 		warnImpalingSpear:Cancel()
-		warnImpalingSpear:Schedule(45)
+		warnImpalingSpear:Schedule(40)
 		countdownImpalingSpear:Cancel()
 		countdownImpalingSpear:Start()
 		timerImpalingSpear:Start(args.destName)
@@ -136,12 +142,13 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 	elseif args:IsSpellID(122064) then
 		warnCorrosiveResin:Show(args.destName)
-		if args:IsPlayer() then
+		if args:IsPlayer() and self:AntiSpam(3, 5) then
 			specWarnCorrosiveResin:Show()
 			yellCorrosiveResin:Yell()
 		end
-	elseif args:IsSpellID(122125) and args:IsPlayer() then
-		specWarnCorrosiveResinPool:Show()
+	elseif args:IsSpellID(122055) and args:IsPlayer() then
+		local _, _, _, _, _, duration, expires, _, _ = UnitDebuff("player", args.spellName)
+		timerResidue:Start(expires-GetTime())
 	elseif args:IsSpellID(125873) then
 		addsCount = addsCount + 1
 		warnRecklessness:Show(args.destName)
@@ -173,14 +180,14 @@ function mod:SPELL_CAST_START(args)
 		timerCorrosiveResinCD:Start(36, args.sourceGUID)
 	elseif args:IsSpellID(122193) then
 		warnMending:Show()
+		timerMendingCD:Start(nil, args.sourceGUID)
 		if args.sourceGUID == UnitGUID("target") or args.sourceGUID == UnitGUID("focus") then
 			specWarnMending:Show(args.sourceName)
 		end
-		timerMendingCD:Start(36, args.sourceGUID)
 	elseif args:IsSpellID(122149) then
 		warnQuickening:Show()
 		specWarnQuickening:Show(args.sourceName)
-		timerQuickeningCD:Start(36, args.sourceGUID)
+		timerQuickeningCD:Start(nil, args.sourceGUID)
 	end
 end
 
@@ -193,9 +200,17 @@ function mod:SPELL_DAMAGE(_, _, _, _, destGUID, destName, _, _, spellId)
 			specWarnWindBomb:Show()
 			yellWindBomb:Yell()
 		end
+	elseif spellId == 122125 and destGUID == UnitGUID("player") and self:AntiSpam(3, 4) then
+		specWarnCorrosiveResinPool:Show()
+	elseif spellId == 122064 and destGUID == UnitGUID("player") and self:AntiSpam(3, 5) then
+		specWarnCorrosiveResin:Show()
+	elseif spellId == 121898 and destGUID == UnitGUID("player") and not self:IsDifficulty("lfr25") and self:AntiSpam(3, 6) then
+		specWarnWhirlingBladeMove:Show()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE
+mod.SPELL_PERIODIC_DAMAGE = mod.SPELL_DAMAGE
+mod.SPELL_PERIODIC_MISSED = mod.SPELL_DAMAGE
 
 function mod:RAID_BOSS_EMOTE(msg)
 	if msg == L.Reinforcements or msg:find(L.Reinforcements) then

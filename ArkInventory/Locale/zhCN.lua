@@ -97,6 +97,7 @@ if not L then return end
 	L["STATUS_NAME_MOUNT"] = "坐骑"
 	L["STATUS_NAME_TOKEN"] = "牌子"
 --	L["STATUS_NAME_TACKLE"] = ""
+--	L["STATUS_NAME_COOKING"] = ""
 	
 	
 --	main menu
@@ -284,6 +285,7 @@ if not L then return end
 --	L["CONFIG_CONTROL_NOTIFY_ERASE_TEXT"] = ""
 	L["CONFIG_CONTROL_OVERRIDE"] = "取代系统框架"
 	L["CONFIG_CONTROL_OVERRIDE_TEXT"] = "设定是否取代系统内建背包及银行\n\n停用此项功能的话，你只能在按键设定中设定，才能开启 %1$s"
+--	L["CONFIG_CONTROL_SPECIAL_TEXT"] = ""
 	L["CONFIG_CONTROL_ANCHOR_LOCK_TEXT"] = "锁定 %1$s 窗口到当前移动的位置"
 --	L["CONFIG_CONTROL_REPOSITION_NOW"] = ""
 --	L["CONFIG_CONTROL_REPOSITION_NOW_TEXT"] = ""
@@ -347,6 +349,8 @@ if not L then return end
 	L["CONFIG_SETTINGS_ITEMS_FADE_TEXT"] = "设定是否淡化显示脱机物品"
 	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE"] = "着色无效物品"
 	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE_TEXT"] = "给不能使用的物品蒙上红色"
+--	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW"] = ""
+--	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW_TEXT"] = ""
 	L["CONFIG_SETTINGS_ITEMS_BORDER_SHOW_TEXT"] = "设置物品边框是否显示"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_STYLE_TEXT"] = "设置物品边框的风格"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_RARITY"] = "稀有物品边框着色"
@@ -414,6 +418,8 @@ if not L then return end
 	L["CONFIG_SORTMETHOD_INCLUDE_ITEMAGE_TEXT"] = "排列物品时是否包含物品时间."
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE"] = "商店价格"
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE_TEXT"] = "排列物品时是否参考商店价格（当前堆叠数量价格）."
+--	L["CONFIG_SORTMETHOD_INCLUDE_ID"] = ""
+--	L["CONFIG_SORTMETHOD_INCLUDE_ID_TEXT"] = ""
 	
 	L["CONFIG_SORTMETHOD_DIRECTION_TEXT"] = "设置物品升序、降序排列"
 	L["CONFIG_SORTMETHOD_ORDER"] = "分类排序"

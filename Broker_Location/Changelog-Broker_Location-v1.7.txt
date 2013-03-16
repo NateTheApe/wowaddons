@@ -1,0 +1,12 @@
+tag v1.7
+efee23729111c31347d4d316bb2304640b746d24
+iceeagle <ciprianmihai.coman@gmail.com>
+2012-12-16 09:57:21 +0200
+
+Tag as v1.7
+
+
+--------------------
+
+iceeagle:
+	- update for patch 5.1

@@ -6,7 +6,7 @@ zhCN localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.2
+Project version: 2.4.4
 ************************************************************************
 Original translated by: iCat, Kurax, 冰焱妩魅 @ CWDG, ananhaid
 Currently maintained by:
@@ -187,7 +187,8 @@ L["Bradley Towns"] = "布拉德雷·汤斯"
 L["Braeg Stoutbeard"] = "布莱格·酒须"
 L["Brandig"] = "布兰迪格"
 L["Brawn"] = "布劳恩"
-L["BRD_RANDOM_ROOM"] = "有几率在黑石深渊5个不同位置房间之内获得，随机出现但是有可能都不出现。"
+L["BRD_MAIL"] = "在黑石深渊有4个刷新点：进入制造厂之前，傀儡统帅阿格曼奇的房间，制造厂的长凳上，或在浇铸间之内。"
+L["BRD_SHOULDERS"] = "在黑石深渊有1个稀有刷新点：暗炉锁和竞技场之间，在角落的床上。"
 L["Brek Stonehoof"] = "布瑞克·石蹄"
 L["Brikk Keencraft"] = "布里克·基克拉夫"
 L["Brock Stoneseeker"] = "布洛克·寻石者"

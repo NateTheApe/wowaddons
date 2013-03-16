@@ -2418,7 +2418,7 @@ local moreParams = {
 	SPELL_PERIODIC_ENERGIZE = { "spellId", "spellName", "spellSchool", "amount", "powerType", },
 	SPELL_PERIODIC_HEAL = { "spellId", "spellName", "spellSchool", "amount", "overhealing", "absorbed", "critical", extra = { "info.realAmount = info.amount - info.overhealAmount", } },
 	SPELL_PERIODIC_LEECH = { "spellId", "spellName", "spellSchool", "amount", "powerType", "extraAmount", },
-	SPELL_PERIODIC_MISSED = { "spellId", "spellName", "spellSchool", "missType", "amountMissed", },
+	SPELL_PERIODIC_MISSED = { "spellId", "spellName", "spellSchool", "missType", "isOffhand", "amountMissed", },
 	SPELL_STOLEN = { "spellId", "spellName", "spellSchool", "extraSpellID", "extraSpellName", "extraSchool", "auraType", },
 	SWING_DAMAGE = { "amount", "overkill", "school", "resisted", "blocked", "absorbed", "critical", "glancing", "crushing", },
 	SWING_MISSED = { "missType", "isOffHand",  "amountMissed", },
@@ -2445,23 +2445,23 @@ local legacyNames = {
 }
 
 local function makeParseFunction(event)
-	local code = "function(info, ...) "
-	for _,v in ipairs(moreParams[event]) do
-		code = code .. ("info.%s, "):format(legacyNames[v] or v)
+	local code = "return function(info, ...) "
+	if next(moreParams[event]) then
+		local paramCode = newList()
+		for _,v in ipairs(moreParams[event]) do
+			table.insert(paramCode, ("info.%s"):format(legacyNames[v] or v))
+		end
+		code = code .. table.concat(paramCode, ",") .. " = ...;"
+		del(paramCode)
 	end
-
-	code = code .. "_ = ...;"
 
 	local extras = moreParams[event].extra
 	if extras then
-		for _,v in ipairs(extras) do
-			code = code .. v .. ";"
-		end
+		code = code .. table.concat(extras, ";") .. ";"
 	end
 
 	code = code .. "end"
-	local luaString = "return " .. code
-	local createFunc, err = loadstring(luaString)
+	local createFunc, err = loadstring(code)
 
 	if createFunc then
 		return createFunc()

@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.4) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2012-11-19T01:14:46Z
+    This file was last updated on 2012-12-12T02:56:26Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -49,6 +49,7 @@ T._LoadedFiles["DCR_init.lua"] = false;
 
 local D;
 local function RegisterDecursive_Once() -- {{{
+
     T.Dcr = LibStub("AceAddon-3.0"):NewAddon("Decursive", "AceConsole-3.0", "AceEvent-3.0", "LibShefkiTimer-1.0", "AceHook-3.0");
     D     = T.Dcr;
 
@@ -57,7 +58,7 @@ local function RegisterDecursive_Once() -- {{{
     --@end-debug@]===]
 
     D.name = "Decursive";
-    D.version = "2.7.2.3_beta_3";
+    D.version = "2.7.2.4";
     D.author = "John Wellesz";
 
     D.DcrFullyInitialized = false;
@@ -205,6 +206,18 @@ local function SetRuntimeConstants_Once () -- {{{
 
     DC.IS_STEALTH_BUFF = D:tReverse({DS["Prowl"], DS["Stealth"], DS["Shadowmeld"],  DS["Invisibility"], DS["Lesser Invisibility"], DS["Camouflage"], DS["SHROUD_OF_CONCEALMENT"], DS['Greater Invisibility']});
 
+
+    -- special meta table to handle Druid's Symbiosis
+    local Enhancements_mt = {
+        __index = function (self, key)
+            if key == 'Types' then
+                return DC.SpellsToUse[(GetSpellInfo(DS["SPELL_SYMBIOSIS"]))].Types;
+            else
+                return nil;
+            end
+        end
+    }
+
     -- SPELL TABLE -- must be parsed after spell translations have been loaded {{{
     DC.SpellsToUse = {
         -- Druids
@@ -309,6 +322,22 @@ local function SetRuntimeConstants_Once () -- {{{
                 Types = {DC.MAGIC},
             }
         },
+        [DS["SPELL_SYMBIOSIS"]] = {
+            Types = {}, -- does nothing by default
+            Better = 1,
+            Pet = false,
+
+            EnhancedBy = true,
+            EnhancedByCheck = function ()
+                if (GetSpellInfo(DS["SPELL_SYMBIOSIS"])) ~= DS["SPELL_SYMBIOSIS"] and DC.SpellsToUse[(GetSpellInfo(DS["SPELL_SYMBIOSIS"]))] then
+                    DC.SpellsToUse[DS["SPELL_SYMBIOSIS"]].Enhancements = setmetatable({}, Enhancements_mt);
+                    return true;
+                else
+                    return false;
+                end
+            end,
+            Enhancements = {}
+        },
         -- Warlock
         [DS["SPELL_FEAR"]] = {
             Types = {DC.CHARMED},
@@ -384,9 +413,9 @@ local function InitVariables_Once() -- {{{
     -- A table UnitID=>IsDebuffed (boolean)
     D.UnitDebuffed = {};
 
-    D.Revision = "2f85d02"; -- not used here but some other add-on may request it from outside
-    D.date = "2012-11-19T01:19:56Z";
-    D.version = "2.7.2.3_beta_3";
+    D.Revision = "cb7f4b6"; -- not used here but some other add-on may request it from outside
+    D.date = "2012-12-25T22:37:36Z";
+    D.version = "2.7.2.4";
 
     if D.date ~= "@project".."-date-iso@" then
         -- @project-timestamp@ doesn't work
@@ -455,7 +484,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
 
             if time() - self.db.global.LastExpirationAlert > 48 * 3600 or forceDisplay then
 
-                StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.2.3_beta_3|r\n\n" .. "|cFFFFAA66" .. L["TOC_VERSION_EXPIRED"] .. "|r");
+                T._ShowNotice ("|cff00ff00Decursive version: 2.7.2.4|r\n\n" .. "|cFFFFAA66" .. L["TOC_VERSION_EXPIRED"] .. "|r");
 
                 self.db.global.LastExpirationAlert = time();
             end
@@ -464,7 +493,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
         self.db.global.TocExpiredDetection = false;
     end
 
-    if (("2.7.2.3_beta_3"):lower()):find("beta") or ("2.7.2.3_beta_3"):find("RC") or ("2.7.2.3_beta_3"):find("Candidate") or alpha then
+    if (("2.7.2.4"):lower()):find("beta") or ("2.7.2.4"):find("RC") or ("2.7.2.4"):find("Candidate") or alpha then
 
         D.RunningADevVersion = true;
 
@@ -477,7 +506,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
                 DC.DevVersionExpired = true;
                 -- Display the expiration notice only once evry 48 hours
                 if time() - self.db.global.LastExpirationAlert > 48 * 3600 or forceDisplay then
-                    StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.2.3_beta_3|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_EXPIRED"] .. "|r");
+                    T._ShowNotice ("|cff00ff00Decursive version: 2.7.2.4|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_EXPIRED"] .. "|r");
 
                     self.db.global.LastExpirationAlert = time();
                 end
@@ -488,16 +517,16 @@ function D:VersionWarnings(forceDisplay) -- {{{
         end
 
         -- display a warning if this is a developpment version (avoid insults from people who don't know what they're doing)
-        if self.db.global.NonRelease ~= "2.7.2.3_beta_3" then
-            self.db.global.NonRelease = "2.7.2.3_beta_3";
-            StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.2.3_beta_3|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_ALERT"] .. "|r");
+        if self.db.global.NonRelease ~= "2.7.2.4" then
+            self.db.global.NonRelease = "2.7.2.4";
+            T._ShowNotice ("|cff00ff00Decursive version: 2.7.2.4|r\n\n" .. "|cFFFFAA66" .. L["DEV_VERSION_ALERT"] .. "|r");
         end
     end
 
     --[===[@debug@
     fromCheckOut = true;
     if time() - self.db.global.LastUnpackagedAlert > 24 * 3600  then
-        StaticPopup_Show ("Decursive_Notice_Frame", "|cff00ff00Decursive version: 2.7.2.3_beta_3|r\n\n" .. "|cFFFFAA66" .. 
+        T._ShowNotice ("|cff00ff00Decursive version: 2.7.2.4|r\n\n" .. "|cFFFFAA66" .. 
         [[
         |cFFFF0000You're using an unpackaged version of Decursive.|r
         Decursive is not meant to be used this way.
@@ -535,7 +564,7 @@ function D:VersionWarnings(forceDisplay) -- {{{
         if D.db.global.NewerVersionDetected > D.VersionTimeStamp and D.db.global.NewerVersionName ~= D.version then -- it's still newer than this one
             if time() - D.db.global.NewerVersionAlert > 3600 * 24 * 4 then -- it's been more than 4 days since the new version alert was shown
                 if not D.db.global.NewVersionsBugMeNot then -- the user did not disable new version alerts
-                    StaticPopup_Show ("Decursive_Notice_Frame", "|cff55ff55Decursive version: 2.7.2.3_beta_3|r\n\n" .. "|cFF55FFFF" .. (L["NEW_VERSION_ALERT"]):format(D.db.global.NewerVersionName or "none", date("%Y-%m-%d", D.db.global.NewerVersionDetected)) .. "|r");
+                    T._ShowNotice ("|cff55ff55Decursive version: 2.7.2.4|r\n\n" .. "|cFF55FFFF" .. (L["NEW_VERSION_ALERT"]):format(D.db.global.NewerVersionName or "none", date("%Y-%m-%d", D.db.global.NewerVersionDetected)) .. "|r");
                     D.db.global.NewerVersionAlert = time();
                 end
             end
@@ -610,6 +639,14 @@ function D:OnEnable() -- called after PLAYER_LOGIN -- {{{
     if T._SelfDiagnostic() == 2 then
         return false;
     end
+
+    -- call _HookErrorHandler() a second time because of BugGrabber versions anerior to the
+    -- alpha of 2012-11-23 which fail to make their callback available for
+    -- registration b4 PLAYER_LOGIN...
+    if not T._HookErrorHandler() then
+        T._AddDebugText("BG's callbacks were not available after PLAYER_LOGIN");
+    end
+
     T._CatchAllErrors = "OnEnable"; -- During init we catch all the errors else, if a library fails we won't know it.
     D.debug = D.db.global.debug;
 
@@ -804,7 +841,7 @@ function D:OnDisable() -- When the addon is disabled by Ace -- {{{
     end
 
     D:CancelAllTimedCalls();
-    D:Debug(D:GetTimersNumber());
+    D:Debug(D:GetTimersInfo());
 
     -- the disable warning popup : {{{ -
     StaticPopupDialogs["Decursive_OnDisableWarning"] = {
@@ -1169,6 +1206,7 @@ function D:SetSpellsTranslations(FromDIAG) -- {{{
         ["SPELL_DETOX"]                 = {     115450              }, -- monk
         ["SPELL_DIFFUSEMAGIC"]          = {     122783              }, -- monk
         ["SPELL_COMMAND_DEMON"]         = {     119898              }, -- warlock
+        ["SPELL_SYMBIOSIS"]             = {     110309              }, -- multi class
         ['Greater Invisibility']        = {     110959              },
     };
 
@@ -1285,9 +1323,8 @@ function D:UpdateMacro () -- {{{
 
     local MacroParameters = {
         D.CONF.MACRONAME,
-        1, -- icon index
+        "INV_MISC_QUESTIONMARK", -- icon
         next(Spells) and string.format("/stopcasting\n/cast [@mouseover,nomod,exists] %s;  [@mouseover,exists,mod:ctrl] %s; [@mouseover,exists,mod:shift] %s", unpack(Spells)) or "/script DecursiveRootTable.Dcr:Println('"..L["NOSPELL"].."')",
-        0, -- per account
     };
 
     local catchAllErrorBackup = T._CatchAllErrors;
@@ -1339,7 +1376,7 @@ end -- }}}
 
 
 
-T._LoadedFiles["DCR_init.lua"] = "2.7.2.3_beta_3";
+T._LoadedFiles["DCR_init.lua"] = "2.7.2.4";
 
 -------------------------------------------------------------------------------
 
@@ -1354,34 +1391,34 @@ Simple replacements
 @project-revision@
     Turns into the highest revision of the entire project in integer form. e.g. 1234
     Note: does not work for git
-133e673a712bb642437233eadb89ff778c6980e4
+8fd5b8198e3f688c038103bfb30673408c9aa70c
     Turns into the hash of the file in hex form. e.g. 106c634df4b3dd4691bf24e148a23e9af35165ea
     Note: does not work for svn
-2f85d02ca6524fdd724a00ca26025c7ab103b3fd
+cb7f4b69db548825894015b6413965a5429a745b
     Turns into the hash of the entire project in hex form. e.g. 106c634df4b3dd4691bf24e148a23e9af35165ea
     Note: does not work for svn
-133e673
+8fd5b81
     Turns into the abbreviated hash of the file in hex form. e.g. 106c63 Note: does not work for svn
-2f85d02
+cb7f4b6
     Turns into the abbreviated hash of the entire project in hex form. e.g. 106c63
     Note: does not work for svn
 Archarodim
     Turns into the last author of the file. e.g. ckknight
 Archarodim
     Turns into the last author of the entire project. e.g. ckknight
-2012-11-19T01:14:46Z
+2012-12-12T02:56:26Z
     Turns into the last changed date (by UTC) of the file in ISO 8601. e.g. 2008-05-01T12:34:56Z
-2012-11-19T01:19:56Z
+2012-12-25T22:37:36Z
     Turns into the last changed date (by UTC) of the entire project in ISO 8601. e.g. 2008-05-01T12:34:56Z
-20121119011446
+20121212025626
     Turns into the last changed date (by UTC) of the file in a readable integer fashion. e.g. 20080501123456
-20121119011956
+20121225223736
     Turns into the last changed date (by UTC) of the entire project in a readable integer fashion. e.g. 2008050123456
 @file-timestamp@
     Turns into the last changed date (by UTC) of the file in POSIX timestamp. e.g. 1209663296
 @project-timestamp@
     Turns into the last changed date (by UTC) of the entire project in POSIX timestamp. e.g. 1209663296
-2.7.2.3_beta_3
+2.7.2.4
     Turns into an approximate version of the project. The tag name if on a tag, otherwise it's up to the repo.
     :SVN returns something like "r1234"
     :Git returns something like "v0.1-873fc1"

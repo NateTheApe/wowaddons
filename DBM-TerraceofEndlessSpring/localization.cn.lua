@@ -1,5 +1,5 @@
 ﻿-- Simplified Chinese by Diablohu(diablohudream@gmail.com)
--- Last update: 9/27/2012
+-- Last update: 12/23/2012
 
 if GetLocale() ~= "zhCN" then return end
 local L
@@ -21,7 +21,7 @@ L:SetOptionLocalization({
 L= DBM:GetModLocalization(742)
 
 L:SetMiscLocalization{
-	Victory	= "I thank you, strangers. I have been freed."
+	Victory	= "谢谢你，陌生人。我自由了。"
 }
 
 
@@ -31,7 +31,8 @@ L:SetMiscLocalization{
 L= DBM:GetModLocalization(729)
 
 L:SetWarningLocalization({
-	warnHideOver			= "%s 结束"
+	warnHideOver			= "%s 结束",
+	warnHideProgress		= "隐藏命中：%s，伤害：%s"
 })
 
 L:SetTimerLocalization({
@@ -40,11 +41,16 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	warnHideOver			= "特殊警报：$spell:123244效果结束时",
-	timerSpecialCD			= "计时条：下一次特殊能力"
+	warnHideProgress		= "Debug警报：$spell:123244的过程",
+	timerSpecialCD			= "计时条：下一次特殊能力",
+	SetIconOnGuard			= "为$journal:6224的目标添加团队标记",
+	RangeFrame				= "距离监视（3码）：应对$spell:123121（隐藏阶段时显示所有人，其余时仅显示坦克位置）",
+	GWHealthFrame			= "生命值监视：移除$spell:123461还需要的伤害"
 })
 
+
 L:SetMiscLocalization{
-	Victory	= "I... ah... oh! Did I...? Was I...? It was... so... cloudy."--wtb alternate and less crappy victory event.
+	Victory	= "我……啊……噢！我……？眼睛……好……模糊。"--wtb alternate and less crappy victory event.
 }
 
 
@@ -53,3 +59,6 @@ L:SetMiscLocalization{
 ----------------------
 L= DBM:GetModLocalization(709)
 
+L:SetOptionLocalization({
+	RangeFrame			= "距离监视（2码）：应对$spell:119519"
+})

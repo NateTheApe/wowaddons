@@ -1,6 +1,6 @@
 --[[
 Name: LibBanzai-2.0
-Revision: $Revision: 43 $
+Revision: $Revision: 45 $
 Author(s): Rabbit (rabbit.magtheridon@gmail.com), maia
 Documentation: http://www.wowace.com/index.php/Banzai-2.0_API_Documentation
 SVN: http://svn.wowace.com/wowace/trunk/BanzaiLib/Banzai-2.0
@@ -13,7 +13,7 @@ Dependencies: LibStub
 -------------------------------------------------------------------------------
 
 local MAJOR_VERSION = "LibBanzai-2.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 43 $"):match("(%d+)"))
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 45 $"):match("(%d+)"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
 local lib = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
@@ -29,13 +29,9 @@ local UnitExists = _G.UnitExists
 local UnitName = _G.UnitName
 local UnitCanAttack = _G.UnitCanAttack
 local IsInRaid = _G.IsInRaid
-if not IsInRaid then
-	IsInRaid = function()
-		return GetNumRaidMembers() > 0
-	end
-end
-local GetNumGroupMembers = _G.GetNumGroupMembers or _G.GetNumRaidMembers
-local GetNumSubgroupMembers = _G.GetNumSubgroupMembers or _G.GetNumPartyMembers
+local IsInGroup = _G.IsInGroup
+local GetNumGroupMembers = _G.GetNumGroupMembers
+local GetNumSubgroupMembers = _G.GetNumSubgroupMembers
 local unpack = _G.unpack
 
 -------------------------------------------------------------------------------
@@ -78,10 +74,11 @@ local function actuallyUpdateRoster()
 			addUnit(raidUnits[i])
 			addUnit(raidPetUnits[i])
 		end
-	end
-	for i = 1, GetNumSubgroupMembers() do
-		addUnit(partyUnits[i])
-		addUnit(partyPetUnits[i])
+	elseif IsInGroup() then
+		for i = 1, GetNumSubgroupMembers() do
+			addUnit(partyUnits[i])
+			addUnit(partyPetUnits[i])
+		end
 	end
 	needsUpdate = nil
 end
@@ -161,8 +158,7 @@ local function start()
 	updateRoster()
 	frame:SetScript("OnUpdate", updateBanzai)
 	frame:SetScript("OnEvent", updateRoster)
-	frame:RegisterEvent("RAID_ROSTER_UPDATE")
-	frame:RegisterEvent("PARTY_MEMBERS_CHANGED")
+	frame:RegisterEvent("GROUP_ROSTER_UPDATE")
 	frame:RegisterEvent("UNIT_PET")
 	frame:RegisterEvent("PLAYER_FOCUS_CHANGED")
 	running = true

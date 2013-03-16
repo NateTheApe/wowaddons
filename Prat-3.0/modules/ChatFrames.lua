@@ -186,8 +186,8 @@ L:AddLocale("ruRU",
 	minchatheight_name = "Минимальная высоты",
 	minchatwidth_desc = "Устанавливает минимальную ширину для всех окон чата.",
 	minchatwidth_name = "Минимальная ширина",
-	-- removeclamp_desc = "",
-	-- removeclamp_name = "",
+	removeclamp_desc = "Разрешить перенесение окна чата за пределы экрана", -- Needs review
+	removeclamp_name = "Вплотную к краю экрана", -- Needs review
 }
 
 )

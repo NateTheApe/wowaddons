@@ -17,6 +17,7 @@ local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 local AceDB = LibStub("AceDB-3.0")
 local AceDBOptions = LibStub("AceDBOptions-3.0")
+local Dialog = LibStub("LibDialog-1.0")
 
 --------------------------------------------------------------------------------------------------------
 --                          Broker_DurabilityInfo variables and defaults                              --
@@ -84,6 +85,8 @@ local DATABASE_DEFAULTS = {
 		warnThreshold = 50,
 	},
 }
+
+local repairAllCost, canRepair
 
 --------------------------------------------------------------------------------------------------------
 --                              Broker_DurabilityInfo options panel                                   --
@@ -310,6 +313,8 @@ function addon:OnInitialize()
 		slotNames[index][ID] = GetInventorySlotInfo(item[SLOT].."Slot")
 	end
 
+	self:CreateDialogs()
+
 	self:RegisterEvent("PLAYER_DEAD","ScheduleUpdate")
 	self:RegisterEvent("PLAYER_UNGHOST","ScheduleUpdate")
 	self:RegisterEvent("UPDATE_INVENTORY_DURABILITY","ScheduleUpdate")
@@ -422,11 +427,11 @@ end
 
 function addon:OnMerchantClose()
 	merchantState = NOT_AT_MERCHANT
-	if StaticPopupDialogs["Broker_DurabilityInfo_Confirm"] then
-		StaticPopup_Hide("Broker_DurabilityInfo_Confirm")
+	if Dialog:ActiveDialog("Broker_DurabilityInfo_Confirm") then
+		Dialog:Dismiss("Broker_DurabilityInfo_Confirm")
 	end
-	if StaticPopupDialogs["Broker_DurabilityInfo_Dialog"] then
-		StaticPopup_Hide("Broker_DurabilityInfo_Dialog")
+	if Dialog:ActiveDialog("Broker_DurabilityInfo_Dialog") then
+		Dialog:Dismiss("Broker_DurabilityInfo_Dialog")
 	end
 end
 
@@ -568,86 +573,45 @@ end
 
 -- Do some checks
 function addon:AttemptToRepair()
-	local repairAllCost, canRepair = GetRepairAllCost()
+	repairAllCost, canRepair = GetRepairAllCost()
 	if profileDB.repairType > 0 and repairAllCost > 0 then
 		local standing = UnitReaction("npc", "player")
 		if standing >= profileDB.repairThreshold then
-			self:DoRepair(repairAllCost, canRepair)
+			self:DoRepair()
 		else
-			self:LowRepConfirmation(repairAllCost, canRepair)
+			self:LowRepConfirmation()
 		end
 	end
 end
 
 -- Call repair functions
-function addon:DoRepair(repairAllCost, canRepair)
+function addon:DoRepair()
 	if profileDB.repairType == 2 then
-		self:ShowDialog(repairAllCost, canRepair)
+		self:ShowDialog()
 	elseif profileDB.repairType == 1 then
 		if profileDB.repairFromGuild then
-			self:AutoRepairFromBank(repairAllCost, canRepair)
+			self:AutoRepairFromBank()
 		else
-			self:AutoRepair(repairAllCost, canRepair)
+			self:AutoRepair()
 		end
 	end
 end
 
 -- Low reputation confirmation
-function addon:LowRepConfirmation(repairAllCost, canRepair)
+function addon:LowRepConfirmation()
 	if (profileDB.alwaysAsk) then
 		local standing = UnitReaction("npc", "player")
-		if not StaticPopupDialogs["Broker_DurabilityInfo_Confirm"] then
-			StaticPopupDialogs["Broker_DurabilityInfo_Confirm"] = {
-				button1 = L["Yes"],
-				button2 = L["No"],
-				showAlert = 1,
-				timeout = 0,
-				hideOnEscape = true,
-				OnAccept = function()
-					self:DoRepair(repairAllCost, canRepair)
-				end,
-			}
-		else
-			StaticPopupDialogs["Broker_DurabilityInfo_Confirm"].OnAccept = function()
-				self:DoRepair(repairAllCost, canRepair)
-			end
-		end
-		StaticPopupDialogs["Broker_DurabilityInfo_Confirm"].text = string.format(L["You are only |cFFFFFF00%s|r with this NPC. Auto repair requires %s.\nDo you stil want to repair?"], _G["FACTION_STANDING_LABEL"..standing], _G["FACTION_STANDING_LABEL"..profileDB.repairThreshold])
-		StaticPopup_Show("Broker_DurabilityInfo_Confirm")
+		Dialog:Spawn("Broker_DurabilityInfo_Confirm", standing)
 	end
 end
 
 -- Display popup for repair
-function addon:ShowDialog(repairAllCost, canRepair)
-	if not StaticPopupDialogs["Broker_DurabilityInfo_Dialog"] then
-		StaticPopupDialogs["Broker_DurabilityInfo_Dialog"] = {
-			button1 = L["Myself"],
-			button2 = L["Cancel"],
-			button3 = L["The guild"],
-			showAlert = 1,
-			timeout = 0,
-			hideOnEscape = true,
-			OnAccept = function()
-				self:AutoRepair(repairAllCost, canRepair)
-			end,
-			OnAlt = function()
-				self:AutoRepairFromBank(repairAllCost, canRepair)
-			end,
-		}
-	else
-		StaticPopupDialogs["Broker_DurabilityInfo_Dialog"].OnAccept = function()
-			self:AutoRepair(repairAllCost, canRepair)
-		end
-		StaticPopupDialogs["Broker_DurabilityInfo_Dialog"].OnAlt = function()
-			self:AutoRepairFromBank(repairAllCost, canRepair)
-		end
-	end
-	StaticPopupDialogs["Broker_DurabilityInfo_Dialog"].text = string.format(L["Who's paying for the repairs?\nIt Costs %s"], self:CopperToString(repairAllCost))
-	StaticPopup_Show("Broker_DurabilityInfo_Dialog")
+function addon:ShowDialog()
+	Dialog:Spawn("Broker_DurabilityInfo_Dialog")
 end
 
 -- Auto repair using own money
-function addon:AutoRepair(repairAllCost, canRepair)
+function addon:AutoRepair()
 	if canRepair == 1 then
 		RepairAllItems()
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[DurabilityInfo]|r "..L["Your items have been repaired for"].." "..self:CopperToString(repairAllCost))
@@ -657,7 +621,7 @@ function addon:AutoRepair(repairAllCost, canRepair)
 end
 
 -- Auto repair using guild money
-function addon:AutoRepairFromBank(repairAllCost, canRepair)
+function addon:AutoRepairFromBank()
 	local BankWithdrawMoney = GetGuildBankWithdrawMoney()
 	if canRepair == 1 and CanGuildBankRepair() and BankWithdrawMoney >= repairAllCost then
 		RepairAllItems(1)
@@ -666,7 +630,7 @@ function addon:AutoRepairFromBank(repairAllCost, canRepair)
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[DurabilityInfo]|r "..L["Guild bank does not have enough money."])
 	else
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[DurabilityInfo]|r "..L["Guild bank does not have enough money. Using yours."])
-		self:AutoRepair(repairAllCost, canRepair)
+		self:AutoRepair()
 	end
 end
 
@@ -683,17 +647,74 @@ end
 function addon:WarnToRepair()
 	local totalcost, percent, percentmin  = addon:GetRepairData()
 	if profileDB.warntoRepair and profileDB.warnThreshold >= percentmin*100 then
-		if not StaticPopupDialogs["Broker_DurabilityInfo_Warn"] then
-			StaticPopupDialogs["Broker_DurabilityInfo_Warn"] = {
-				button1 = L["Ok"],
-				showAlert = 1,
-				timeout = 0,
-				hideOnEscape = true,
-			}
-		end
 		local hexColor = Crayon:GetThresholdHexColor(percentmin)
 		local text = Crayon:Colorize(hexColor, string.format("%d", percentmin * 100))
-		StaticPopupDialogs["Broker_DurabilityInfo_Warn"].text = string.format(L["Your most broken item is at %s percent.\nTake the time to repair!"], text)
-		StaticPopup_Show("Broker_DurabilityInfo_Warn")
+		Dialog:Spawn("Broker_DurabilityInfo_Warn", text)
 	end
 end
+
+-- Create static popup dialogs
+function addon:CreateDialogs()
+	Dialog:Register("Broker_DurabilityInfo_Dialog", {
+		text = " ",
+		buttons = {
+			{
+				text = L["Myself"],
+				on_click = function(self, button, down)
+					addon:AutoRepair()
+				end,
+			},
+			{
+				text = L["Cancel"],
+			},
+			{
+				text = L["The guild"],
+				on_click = function(self, button, down)
+					addon:AutoRepairFromBank()
+				end,
+			},
+		},
+		on_show = function(self, data)
+			self.text:SetFormattedText(L["Who's paying for the repairs?\nIt Costs %s"], addon:CopperToString(repairAllCost))
+		end,
+		hide_on_escape = true,
+		show_while_dead = false,
+	})
+
+	Dialog:Register("Broker_DurabilityInfo_Confirm", {
+		text = " ",
+		icon = [[Interface\DialogFrame\UI-Dialog-Icon-AlertNew]],
+		buttons = {
+			{
+				text = L["Yes"],
+				on_click = function(self, button, down)
+					addon:DoRepair()
+				end,
+			},
+			{
+				text = L["No"],
+			},
+		},
+		on_show = function(self, data)
+			self.text:SetFormattedText(L["You are only |cFFFFFF00%s|r with this NPC. Auto repair requires %s.\nDo you stil want to repair?"], _G["FACTION_STANDING_LABEL"..data], _G["FACTION_STANDING_LABEL"..profileDB.repairThreshold])
+		end,
+		hide_on_escape = true,
+		show_while_dead = false,
+	})
+
+	Dialog:Register("Broker_DurabilityInfo_Warn", {
+		text = " ",
+		icon = [[Interface\DialogFrame\UI-Dialog-Icon-AlertNew]],
+		buttons = {
+			{
+				text = L["Ok"],
+			},
+		},
+		on_show = function(self, data)
+			self.text:SetFormattedText(L["Your most broken item is at %s percent.\nTake the time to repair!"], data)
+		end,
+		hide_on_escape = true,
+		show_while_dead = false,
+	})
+end
+

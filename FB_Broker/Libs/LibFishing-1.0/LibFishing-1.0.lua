@@ -7,7 +7,7 @@ Licensed under a Creative Commons "Attribution Non-Commercial Share Alike" Licen
 --]]
 
 local MAJOR_VERSION = "LibFishing-1.0"
-local MINOR_VERSION = 90000 + tonumber(("$Rev: 708 $"):match("%d+"))
+local MINOR_VERSION = 90000 + tonumber(("$Rev: 762 $"):match("%d+"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -143,25 +143,26 @@ local FISHINGLURES = {
 		["d"] = 10,
 	},
 	{	["id"] = 46006,
-		["n"] = "Glow Worm",							  -- 100 for 60 minutes
+		["n"] = "Glow Worm",						-- 100 for 60 minutes
 		["b"] = 100,
 		["s"] = 100,
 		["d"] = 60,
+		["l"] = 1,
 	},
 	{	["id"] = 68049,
-		["n"] = "Heat-Treated Spinning Lure",		  -- 150 for 5 minutes
+		["n"] = "Heat-Treated Spinning Lure",		 -- 150 for 5 minutes
 		["b"] = 150,
 		["s"] = 250,
 		["d"] = 5,
 	},
 	{	["id"] = 67404,
-		["n"] = "Glass Fishing Bobber",				  -- ???
+		["n"] = "Glass Fishing Bobber",				-- ???
 		["b"] = 15,
 		["s"] = 1,
 		["d"] = 10,
 	},
 	{	["id"] = 88710,
-		["n"] = "Nat's Hat",					  -- 75 for 10 mins
+		["n"] = "Nat's Hat",						-- 150 for 10 mins
 		["b"] = 150,
 		["s"] = 100,
 		["d"] = 10,
@@ -197,6 +198,16 @@ function FishLib:IsWorn(itemid)
 	-- return nil
 end
 
+function FishLib:IsItemOneHanded(item)
+	if ( item ) then
+		local _,_,_,_,_,_,_,_,bodyslot,_ = GetItemInfo(item);
+		if ( bodyslot == "INVTYPE_2HWEAPON" or bodyslot == INVTYPE_2HWEAPON ) then
+			return false;
+		end
+	end
+	return true;
+end
+
 local useinventory = {};
 local lureinventory = {};
 function FishLib:UpdateLureInventory()
@@ -204,20 +215,24 @@ function FishLib:UpdateLureInventory()
 
 	useinventory = {};
 	lureinventory = {};
+	local b = 0;
 	for _,lure in ipairs(FISHINGLURES) do
 		local id = lure.id;
 		local count = GetItemCount(id);
 		-- does this lure have to be "worn"
 		if ( count > 0 ) then
-			if ( lure.u ) then
-				tinsert(useinventory, lure);
-			elseif ( lure.s <= rawskill ) then
-				if ( not lure.w or FishLib:IsWorn(id)) then
-					tinsert(lureinventory, lure);
-				end
-			end
 			-- get the name so we can check enchants
 			lure.n,_,_,_,_,_,_,_,_,_ = GetItemInfo(id);
+			if ( lure.b > b or lure.w ) then
+				b = lure.b;
+				if ( lure.u ) then
+					tinsert(useinventory, lure);
+				elseif ( lure.s <= rawskill ) then
+					if ( not lure.w or FishLib:IsWorn(id)) then
+						tinsert(lureinventory, lure);
+					end
+				end
+			end
 		end
 	end
 	return lureinventory, useinventory;
@@ -234,22 +249,6 @@ function FishLib:HasBuff(buffName)
 		 return name ~= nil;
 	end
 	-- return nil
-end
-
-function FishLib:FindNextLure(b, state)
-	local n = table.getn(lureinventory);
-	for s=state+1,n,1 do
-		if ( lureinventory[s] ) then
-			local id = lureinventory[s].id;
-			local startTime, _, _ = GetItemCooldown(id);
-			if ( startTime == 0 ) then
-				if ( not b or lureinventory[s].b > b ) then 
-					return s, lureinventory[s];
-				end
-			end
-		end
-	end
-	-- return nil;
 end
 
 local function UseThisLure(lure, b, enchant, skill, level)
@@ -269,6 +268,22 @@ local function UseThisLure(lure, b, enchant, skill, level)
 	return false, 0;
 end
 
+function FishLib:FindNextLure(b, state)
+    local n = table.getn(lureinventory);
+    for s=state+1,n,1 do
+		if ( lureinventory[s] ) then
+			local id = lureinventory[s].id;
+			local startTime, _, _ = GetItemCooldown(id);
+			if ( startTime == 0 ) then
+				if ( not b or lureinventory[s].b > b ) then 
+					return s, lureinventory[s];
+				end
+			end
+		end
+	end
+	-- return nil;
+end
+
 function FishLib:FindBestLure(b, state, usedrinks)
 	local zone, subzone = self:GetZoneInfo();
 	local level = self:GetFishingLevel(zone, subzone);
@@ -277,8 +292,8 @@ function FishLib:FindBestLure(b, state, usedrinks)
 		local skill = rank + modifier;
 		-- don't need this now, LT has the full values
 		-- level = level + 95;		-- for no lost fish
-		self:UpdateLureInventory();
-		if ( skill < level ) then
+		if ( skill <= level ) then
+			self:UpdateLureInventory();
 			-- if drinking will work, then we're done
 			if ( usedrinks and #useinventory > 0 ) then
 				if ( not LastUsed or not self:HasBuff(LastUsed.n) ) then
@@ -320,9 +335,6 @@ function FishLib:FindBestLure(b, state, usedrinks)
 				return #lureinventory, checklure;
 			end
 		end
-		-- return nil;
-	else
-		return self:FindNextLure(b, state);
 	end
 	-- return nil;
 end
@@ -342,6 +354,8 @@ if ( not fishlibframe) then
 	fishlibframe:RegisterEvent("UNIT_INVENTORY_CHANGED");
 	fishlibframe:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START");
 	fishlibframe:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP");
+	fishlibframe:RegisterEvent("EQUIPMENT_SWAP_FINISHED");
+	fishlibframe:RegisterEvent("ITEM_LOCK_CHANGED");	
 end
 
 fishlibframe.fl = FishLib;
@@ -351,11 +365,13 @@ fishlibframe:SetScript("OnEvent", function(self, event, ...)
 	if ( event == "UPDATE_CHAT_WINDOWS" ) then
 		canCreateFrame = true;
 		self:UnregisterEvent(event);
-	elseif ( event == "SKILL_LINES_CHANGED" or
-		( event == "UNIT_INVENTORY_CHANGED" and arg1 == "player" ) ) then
-		if (self.fl) then
-			self.fl:UpdateLureInventory();
-		end
+	elseif ( event == "UNIT_INVENTORY_CHANGED" and arg1 == "player" ) then
+		self.fl:UpdateLureInventory();
+		-- we can't actually rely on EQUIPMENT_SWAP_FINISHED, it appears
+		self.fl:ForceGearCheck();
+	elseif ( event == "SKILL_LINES_CHANGED" or event == "ITEM_LOCK_CHANGED" or event == "EQUIPMENT_SWAP_FINISHED" ) then
+		-- Did something we're wearing change?
+		self.fl:ForceGearCheck();
 	elseif ( event == "CHAT_MSG_SKILL" ) then
 		self.fl.caughtSoFar = 0;
 	elseif ( event == "LOOT_OPENED" ) then
@@ -364,7 +380,7 @@ fishlibframe:SetScript("OnEvent", function(self, event, ...)
 		end
 	elseif ( event == "UNIT_SPELLCAST_CHANNEL_START" or event == "UNIT_SPELLCAST_CHANNEL_STOP" ) then
 		if (arg1 ~= "player" ) then
-			return;
+			self.fl:UpdateLureInventory();
 		end
 	end
 end);
@@ -598,13 +614,24 @@ function FishLib:AddSchoolName(name)
 	tinsert(self.SCHOOLS, { name = name, kind = SCHOOL_FISH });
 end
 
+function FishLib:GetMainHandItem(id)
+	local itemLink = GetInventoryItemLink("player", mainhand);
+	if ( not id ) then
+		return itemLink;
+	end
+	_, id, _ = self:SplitFishLink(itemLink);
+	return id;
+end
+
 function FishLib:IsFishingPole(itemLink)
 	if (not itemLink) then
 		-- Get the main hand item texture
-		itemLink = GetInventoryItemLink("player", mainhand);
+		itemLink = self:GetMainHandItem();
 	end
 	if ( itemLink ) then
 		local _,_,_,_,itemtype,subtype,_,_,itemTexture,_ = self:GetItemInfo(itemLink);
+		local _, id, _ = self:SplitFishLink(itemLink);
+
 		self:GetPoleType();
 		if ( not fp_itemtype and itemTexture ) then
 			 -- If there is infact an item in the main hand, and it's texture
@@ -612,9 +639,8 @@ function FishLib:IsFishingPole(itemLink)
 			 itemTexture = string.lower(itemTexture);
 			 if ( string.find(itemTexture, "inv_fishingpole") or
 					string.find(itemTexture, "fishing_journeymanfisher") ) then
-				 local _, id, _ = self:SplitFishLink(itemLink);
 				 -- Make sure it's not "Nat Pagle's Fish Terminator"
-				 if ( id ~= 19944) then
+				 if ( id ~= 19944  ) then
 					 fp_itemtype = itemtype;
 					 fp_subtype = subtype;
 					 return true;
@@ -627,16 +653,29 @@ function FishLib:IsFishingPole(itemLink)
 	return false;
 end
 
+FishLib.gearcheck = true;
+FishLib.hasgear = false;
+
+function FishLib:ForceGearCheck()
+	self.gearcheck = true;
+	self.hasgear = false;
+end
+
 function FishLib:IsFishingGear()
-	if (self:IsFishingPole()) then
-		return true;
-	end
-	for i=1,16,1 do
-		if (self:FishingBonusPoints(slotinfo[i].id, 1) > 0) then
-			return true;
+	if ( self.gearcheck ) then
+		if (self:IsFishingPole()) then
+			self.hasgear = true;
 		end
+		for i=1,16,1 do
+			if ( not self.hasgear ) then
+				if (self:FishingBonusPoints(slotinfo[i].id, 1) > 0) then
+					self.hasgear = true;
+				end
+			end
+		end
+		self.gearcheck = false;
 	end
-	-- return nil;
+	return self.hasgear;
 end
 
 function FishLib:IsFishingReady(partial)
@@ -1167,8 +1206,13 @@ function FishLib:InvokeLuring(id)
 		return;
 	end
 	btn:SetAttribute("type", "item");
-	btn:SetAttribute("item", "item:"..id);
-	btn:SetAttribute("target-slot", mainhand);
+	if ( id ) then
+		btn:SetAttribute("item", "item:"..id);
+		btn:SetAttribute("target-slot", mainhand);
+	else
+		btn:SetAttribute("item", nil);
+		btn:SetAttribute("target-slot", nil);
+	end
 	btn:SetAttribute("spell", nil);
 	btn:SetAttribute("action", nil);
 	btn.postclick = nil;
@@ -1256,7 +1300,7 @@ function FishLib:GetPoleBonus()
 		local hmhe,_,_,_,_,_ = GetWeaponEnchantInfo();
 		if ( hmhe ) then
 			-- IsFishingPole has set mainhand for us
-			local itemLink = GetInventoryItemLink("player", mainhand);
+			local itemLink = self:GetMainHandItem();
 			local _, id, _, enchant = self:SplitLink(itemLink);
 			-- get the raw value of the pole without any temp enchants
 			local pole = self:FishingBonusPoints(id);
@@ -1280,7 +1324,7 @@ function FishLib:GetOutfitBonus()
 end
 
 -- return a list of the best items we have for a fishing outfit
-function FishLib:GetFishingOutfitItems(wearing, usepole)
+function FishLib:GetFishingOutfitItems(wearing, nopole)
 	local ibp = function(link) return self:FishingBonusPoints(link); end;
 	-- find fishing gear
 	-- no affinity, check all bags
@@ -1288,17 +1332,18 @@ function FishLib:GetFishingOutfitItems(wearing, usepole)
 	local itemtable = {};
 	for invslot=1,17,1 do
 		local slotid = slotinfo[invslot].id;
-		if ( not nopole or slotid ~= main ) then
+		local ismain = (slotid == mainhand);
+		if ( not nopole or not ismain ) then
 			local slotname = slotinfo[invslot].name;
-			local maxb = nil;
+			local maxb = -1;
 			local link;
 			-- should we include what we're already wearing?
 			if ( wearing ) then
 				link = GetInventoryItemLink("player", slotid);
 				if ( link ) then
 					maxb = self:FishingBonusPoints(link);
-					outfit = outfit or {};
 					if (maxb > 0) then
+						outfit = outfit or {};
 						outfit[invslot] = { link=link, slot=slotid };
 					end
 				end
@@ -1307,7 +1352,6 @@ function FishLib:GetFishingOutfitItems(wearing, usepole)
 			-- this only gets items in bags, hence the check above for slots
 			wipe(itemtable);
 			itemtable = GetInventoryItemsForSlot(slotid, itemtable);
-	
 			for location,id in pairs(itemtable) do
 				local player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(location);
 				if ( bags ) then
@@ -1317,8 +1361,13 @@ function FishLib:GetFishingOutfitItems(wearing, usepole)
 				end
 				if ( link ) then
 					local b = self:FishingBonusPoints(link);
-					if (b > 0) then
-						if ( not maxb or b > maxb ) then
+					local go = false;
+					if ( ismain ) then
+						go = self:IsFishingPole(link);
+					end
+					if (go or (b > 0)) then
+						local usable, _ = IsUsableItem(link);
+						if ( usable and (b > maxb) ) then
 							maxb = b;
 							outfit = outfit or {};
 							outfit[slotid] = { link=link, bag=bag, slot=slot, slotname=slotname };
@@ -1358,25 +1407,30 @@ end
 -- Find out where the player is. Based on code from Astrolabe and wowwiki notes
 function FishLib:GetCurrentPlayerPosition()
 	local x, y = GetPlayerMapPosition("player");
+	local lC, lZ = GetCurrentMapContinent(), GetCurrentMapZone();
 	-- if the current location is 0,0 we need to call SetMapToCurrentZone()
 	if ( x <= 0 and y <= 0 ) then
 		-- find out where we are now
-		local lC, lZ = GetCurrentMapContinent(), GetCurrentMapZone();
 		SetMapToCurrentZone();
 		-- if we haven't changed zones yet, the zoom is incorrect
 		SetMapZoom(GetCurrentMapContinent());
-		x, y = GetPlayerMapPosition("player");
-		if ( x <= 0 and y <= 0 ) then
-			-- we are in an instance or otherwise off the continent map
-			return;
-		end
+
 		local C, Z = GetCurrentMapContinent(), GetCurrentMapZone();
+		x, y = GetPlayerMapPosition("player");
+
+		-- put everything back, if we need to
 		if ( C ~= lC or Z ~= lZ ) then
 			SetMapZoom(lC, lZ); --set map zoom back to what it was before
 		end
-		return C, Z, x, y;
+
+		if ( x <= 0 and y <= 0 ) then
+			-- we are in an instance or otherwise off the continent map
+			return C, Z, 0, 0;
+		else
+			return C, Z, x, y;
+		end
 	end
-	return GetCurrentMapContinent(), GetCurrentMapZone(), x, y;
+	return lC, lZ, x, y;
 end
 
 -- translation support functions

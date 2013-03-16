@@ -143,58 +143,6 @@
 		<HitRectInsets>
 			<AbsInset left="0" right="30" top="0" bottom="45"/>
 		</HitRectInsets>
-		<Layers>
-		<Layer level="BACKGROUND">
-				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-TopLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="2" y="-1"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>		
-				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-TopRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="258" y="-1"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="2" y="-257"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="258" y="-257"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-		    </Layer>
-		</Layers>
 		<Frames>
 			<Frame name="FishingBuddyLocationsMenu" inherits="UIDropDownMenuTemplate">
 				<Scripts>
@@ -209,9 +157,9 @@
 					<AbsDimension x="160" y="21"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOP" relativeTo="FishingLocationsFrame" relativePoint="TOP">
+					<Anchor point="TOP">
 						<Offset>
-							<AbsDimension x="0" y="-48"/>
+							<AbsDimension x="0" y="-24"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -241,9 +189,9 @@
 					<AbsDimension x="54" y="32"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPLEFT">
+					<Anchor point="BOTTOMLEFT" relativeTo="FishingBuddyFrameInset" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="15" y="-71"/>
+							<AbsDimension x="-3" y="-9"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -306,12 +254,12 @@
 
 			<ScrollFrame name="FishingLocsScrollFrame" hidden="false" inherits="FauxScrollFrameTemplate">
 				<Size>
-					<AbsDimension x="230" y="332"/>
+					<AbsDimension x="230" y="351"/>
 				</Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT">
+					<Anchor point="TOPRIGHT" relativeTo="FishingBuddyFrameInset" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="-66" y="-98"/>
+							<AbsDimension x="-26" y="-7"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -370,9 +318,9 @@
 
 			<Button name="FishingLocations1" inherits="FishingLocationButtonTemplate" hidden="true" id="1">
 				<Anchors>
-					<Anchor point="TOPLEFT">
+					<Anchor point="TOPLEFT" relativeTo="FishingBuddyFrameInset" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="25" y="-100"/>
+							<AbsDimension x="8" y="8"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -551,6 +499,15 @@
 			<Button name="FishingLocations21" inherits="FishingLocationButtonTemplate" hidden="true" id="21">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="FishingLocations20" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FishingLocations22" inherits="FishingLocationButtonTemplate" hidden="true" id="22">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="FishingLocations21" relativePoint="BOTTOMLEFT">
 						<Offset>
 							<AbsDimension x="0" y="0"/>
 						</Offset>

@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.4) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-11-13T16:54:48Z
+    This file was last updated on 2012-12-10T01:03:44Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -754,18 +754,17 @@ do -- Communication event handling and broadcasting {{{1
     alpha = true;
     --@end-alpha@]===]
 
+
     local function GetDistributionChanel()
-        local inInstance, InstanceType = IsInInstance();
-
-        --  "PARTY", "RAID", "GUILD", "BATTLEGROUND". As of 2.1, "WHISPER"
-
-        if InstanceType == "pvp" then
-            return "BATTLEGROUND";
+       
+        -- if we are in a battle ground or a LFG/R instance
+        if GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE) > 0 then
+            return "INSTANCE_CHAT";
         end
 
-        if GetNumRaidMembers() ~= 0 then
+        if IsInRaid() then
             return "RAID";
-        elseif GetNumPartyMembers() ~= 0 then
+        elseif GetNumGroupMembers(LE_PARTY_CATEGORY_HOME) > 0 then
             return "PARTY";
         elseif GetGuildInfo("player") then
             return "GUILD";
@@ -1110,6 +1109,6 @@ do
     end
 end
 
-T._LoadedFiles["Dcr_Events.lua"] = "2.7.2.3_beta_3";
+T._LoadedFiles["Dcr_Events.lua"] = "2.7.2.4";
 
 -- The Great Below

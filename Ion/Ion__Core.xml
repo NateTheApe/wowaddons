@@ -350,7 +350,7 @@
 						</Anchor>
 					</Anchors>
 				</Texture>
-				<Texture name="$parentGloss" file="" hidden="false" alphaMode="ADD">
+				<Texture name="$parentGloss" file="Interface\Buttons\UI-PassiveHighlight" hidden="false" alphaMode="ADD">
 					<Size x="63" y="63"/>
 					<Anchors>
 						<Anchor point="CENTER">
@@ -648,7 +648,7 @@
 						</Anchor>
 					</Anchors>
 				</Texture>
-				<Texture name="$parentGloss" file="" hidden="false" alphaMode="ADD">
+				<Texture name="$parentGloss" file="Interface\Buttons\UI-PassiveHighlight" hidden="false" alphaMode="ADD">
 					<Size x="63" y="63"/>
 					<Anchors>
 						<Anchor point="CENTER">
@@ -1258,7 +1258,7 @@
 		<Size x="32" y="32"/>
 		<Layers>
 			<Layer level="OVERLAY">
-				<Texture name="$parentBorder" file="">
+				<Texture name="$parentBorder" file="Interface\Buttons\UI-PassiveHighlight">
 					<Size x="52" y="52"/>
 					<Anchors>
 						<Anchor point="TOPLEFT"/>

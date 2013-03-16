@@ -61,4 +61,5 @@ CombuMBTrackerAutohideListFR = {
 -- table for text within frame, try to stick to the lenght as it could overflow if bigger
 CombuMBTrackerLabelFR = {["flamestrike"] = "Choc de flamme",
 				["blastwave"] = "Vague d'explosion",
+				["nobomb"] = "-- no bomb --",
 				}

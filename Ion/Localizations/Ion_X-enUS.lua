@@ -146,6 +146,9 @@ L.SLASH_CMD44_DESC = "Toggle Blizzard's Action Bar"
 L.SLASH_CMD45 = "VehicleBar"
 L.SLASH_CMD45_DESC = "Toggle Blizzard's Vehicle Bar"
 
+L.SLASH_CMD46 = "Animate"
+L.SLASH_CMD46_DESC = "Toggle Ion's Orb Animation"
+
 L.BARTYPES_USAGE = "Usage: |cffffff00/ion create <type>|r\n"
 L.BARTYPES_TYPES = "     Types -\n"
 L.BARTYPES_LINE = "Creates a bar for %ss"
@@ -169,6 +172,7 @@ L.ALT = "alt" -- keep in lower case
 L.CTRL = "ctrl" -- keep in lower case
 L.SHIFT = "shift" -- keep in lower case
 L.STEALTH = "stealth" -- keep in lower case
+L.PROWL = "prowl" -- keep in lower case
 L.REACTION = "reaction" -- keep in lower case
 L.COMBAT = "combat" -- keep in lower case
 L.GROUP = "group" -- keep in lower case
@@ -198,6 +202,8 @@ L.SHIFT1 = "Shift Down"
 
 L.STEALTH0 = "No Stealth"
 L.STEALTH1 = "Stealth"
+L.PROWL0 = "No Prowl"
+L.PROWL1 = "Prowl"
 L.REACTION0 = "Friendly"
 L.REACTION1 = "Hostile"
 L.COMBAT0 = "No Combat"
@@ -230,6 +236,7 @@ L.WARLOCK_CASTER = "Caster Form"
 L.MINIMAP_TOOLTIP1 = "Left-Click to Configure Bars"
 L.MINIMAP_TOOLTIP2 = "Right-Click to Edit Buttons"
 L.MINIMAP_TOOLTIP3 = "Middle-Click or Alt-Click to Edit Key Bindings"
+L.MINIMAP_TOOLTIP4 = "Shift-Click for Main Menu"
 
 L.KEYBIND_TOOLTIP1 = "\nHit a key to bind it to"
 L.KEYBIND_TOOLTIP2 = "Left-Click to |cfff00000LOCK|r this %s's bindings\n\nRight-Click to make this %s's bindings a |cff00ff00PRIORITY|r bind\n\nHit |cfff00000ESC|r to clear this %s's current binding(s)"
@@ -328,23 +335,23 @@ L.TOOLTIPS_COMBAT = " - Hide in Combat"
 L.PRESET_STATES = "Preset Action States"
 L.CUSTOM_STATES = "Custom Action States"
 
-L.PAGED = "Paged"
-L.STANCE = "Stance"
-L.PET = "Pet"
-L.ALT = "Alt"
-L.CTRL = "Ctrl"
-L.SHIFT = "Shift"
-L.STEALTH = "Stealth"
-L.REACTION = "Reaction"
-L.COMBAT = "Combat"
-L.GROUP = "Group"
-L.FISHING = "Fishing"
-L.VEHICLE = "Vehicle"
-L.POSSESS = "Possess"
-L.OVERRIDE = "Override"
-L.EXTRABAR = "Extra Bar"
-L.CUSTOM = "Custom"
-L.PROWL = "Prowl"
+L.GUI_PAGED = "Paged"
+L.GUI_STANCE = "Stance"
+L.GUI_PET = "Pet"
+L.GUI_ALT = "Alt"
+L.GUI_CTRL = "Ctrl"
+L.GUI_SHIFT = "Shift"
+L.GUI_STEALTH = "Stealth"
+L.GUI_REACTION = "Reaction"
+L.GUI_COMBAT = "Combat"
+L.GUI_GROUP = "Group"
+L.GUI_FISHING = "Fishing"
+L.GUI_VEHICLE = "Vehicle"
+L.GUI_POSSESS = "Possess"
+L.GUI_OVERRIDE = "Override"
+L.GUI_EXTRABAR = "Extra Bar"
+L.GUI_CUSTOM = "Custom"
+L.GUI_PROWL = "Prowl"
 
 L.REMAP = "Primary State to Remap"
 L.REMAPTO = "Remap State To"
@@ -374,6 +381,11 @@ L.AURAIND = "Aura Watch Ind"
 L.POINT = "Point"
 L.XPOS = "X Pos"
 L.YPOS = "Y Pos"
+
+L.BOUND_SPELL_KEYBIND = "Enable Spell Binding Mode"
+L.BOUND_TOGGLE_SPELL_KEYBIND = "Toggle Spell Binding Mode"
+L.BOUND_MACRO_KEYBIND = "Enable Macro Binding Mode"
+L.BOUND_TOGGLE_MACRO_KEYBIND = "Toggle Macro Binding Mode"
 
 L.BETA_WARNING = [[Thank you for installing Ion!!!
 

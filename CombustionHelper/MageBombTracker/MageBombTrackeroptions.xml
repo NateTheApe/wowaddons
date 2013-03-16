@@ -1,6 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 <!--                        Templates                         -->
+
 <FontString name="CombuMBTrackerValueTemplate" virtual="true" font="Fonts\FRIZQT__.TTF" text="" justifyH="CENTER">
     <Anchors>
         <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
@@ -133,7 +134,7 @@
 	</Anchors>
      <Layers>
      	<Layer level="ARTWORK" textureSubLevel="1" >
-     		<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" justifyH="CENTER" justifyV="MIDDLE" >
+     		<FontString name="$parentText" inherits="CombuMBTrackerValueTemplate" justifyH="CENTER" justifyV="MIDDLE" >
                  <Size>
                    <AbsDimension x="125" y="15" />
                 </Size>
@@ -991,6 +992,7 @@
 					   "Default",
 					   "English",
 					   "Francais",
+					   "Chinese Simplified 简体中文",
 						}
 					
 					local function OnClick(self)

@@ -57,3 +57,5 @@ end
 FishingBuddyFrame = LFH:CreateFrameHandler("FishingBuddyFrame",
 			"Interface\\LootFrame\\FishingLoot-Icon", FBConstants.WINDOW_TITLE, "FISHINGBUDDY",
 			OnShow, nil, OnVariablesLoaded);
+FishingBuddyFrame:Show();
+FishingBuddyFrame:Hide();

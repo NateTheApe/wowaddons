@@ -1,5 +1,5 @@
 --
--- $Id: BugGrabber.lua 188 2012-08-28 19:07:09Z nevcairiel $
+-- $Id: BugGrabber.lua 189 2012-11-23 00:10:51Z archarodim $
 --
 -- The BugSack and !BugGrabber team is:
 -- Current Developer: Rabbit
@@ -139,7 +139,7 @@ local function setupCallbacks()
 		setupCallbacks = nil
 	end
 end
-setupCallbacks()
+addon.setupCallbacks = setupCallbacks; -- make it accessible from the outside for add-ons relying on BugGrabber events so they can make BugGrabber.RegisterCallback appear when they need it (CallbackHandler-1.0 is not embedded in BugGrabber)
 
 local function triggerEvent(...)
 	if not callbacks then setupCallbacks() end

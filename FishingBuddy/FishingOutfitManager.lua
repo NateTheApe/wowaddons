@@ -141,19 +141,25 @@ local function SetOutfitManagerDisplay()
 	else
 		OutfitManagerFrame.html:Hide();
 		UIDropDownMenu_Initialize(OutfitManagerFrame.menu, OutfitManagerMenuSetup);
+		local idx = 1;
 		local show = 1;
+		local menuwidth = 0;
 		for name,_ in pairs(OutfitManagers) do
 			if ( name == current_manager ) then
-				break;
+				show = idx;
 			end
-			show = show + 1;
+			OutfitManagerFrame.menu.label:SetText(name);
+			local width = OutfitManagerFrame.menu.label:GetWidth();
+			if (width > menuwidth) then
+				menuwidth = width;
+			end
+			idx = idx + 1;
 		end
-		OutfitManagerFrame.menu.label:SetText(FBConstants.OUTFITS..": ");
-		UIDropDownMenu_SetWidth(OutfitManagerFrame.menu, 210);
+		
+		UIDropDownMenu_SetWidth(OutfitManagerFrame.menu, menuwidth + 32);
 		UIDropDownMenu_SetSelectedValue(OutfitManagerFrame.menu, show);
 		UIDropDownMenu_SetText(OutfitManagerFrame.menu, current_manager);
-		OutfitManagerFrame:SetWidth(OutfitManagerFrame.menu:GetWidth());
-		OutfitManagerFrame:SetHeight(OutfitManagerFrame.menu:GetHeight());
+		OutfitManagerFrame:SetLabel(FBConstants.OUTFITS..": ");
 	end
 end
 
@@ -183,7 +189,9 @@ FishingBuddy.OutfitManager.RegisterManager = function(name, init, choose, switch
 	OutfitManagers[name].Initialize = init;
 	OutfitManagers[name].Choose = choose;
 	OutfitManagers[name].Switch = switch;
-	choose(false);
+	
+	local cm = FishingBuddy.GetSetting("OutfitManager");
+	choose(cm and (cm == name));
 end
 
 local function UpdateManagers()

@@ -49,6 +49,10 @@ CombuLocEN = {["lockon"] = "|cff00ffffCombustionHelper locked|r",
 			["interfaceGraph"] = "Graphical options",
 			["combureport1"] = "|cffff0000 -- Total Combustion : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Targets : |cffffffff%d |cffff0000--|r",
 			["combureport2"] = "|cffff0000 -- Prev. Combustion : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Targets : |cffffffff%d |cffff0000--|r",
+			["pyroenableon"] = "|cff00ffffPyroblast tracker enabled|r",
+			["pyroenableoff"] = "|cff00ffffPyroblast tracker disabled|r",
+			["lbenableon"] = "|cff00ffffBomb tracker enabled|r",
+			["lbenableoff"] = "|cff00ffffBomb tracker disabled|r",
 			}
 			
 -------------------------------
@@ -110,6 +114,8 @@ combuoptioninfotableEN = {
     ["CombuThresholdSoundButton"] = "Enable the audio warning when Ignite threshold is crossed.",
 	["Combuedgecolornormal"] = "Set the color for the border of the frame outside Combustion and Impact times.",
     ["CombuTickPredictButton"] = "Replace the Ignite damage value in the Status zone by the estimated damage for each tick of Combustion and the number of ticks depending from your current haste.",
+	["CombuPyroEnableButton"] = "Enable or disable Pyroblast tracking in the main window.",
+	["CombuLBEnableButton"] = "Enable or disable Bomb tracking in the main window.",
 	}
 
 -------------------------------
@@ -165,6 +171,8 @@ CombuOptLocEN = {
     ["CombuPyromaniacButton"] = "Missing Pyromaniac warning",
 	["Combubgcolorwarning"] = "Background color (Warning)",
 	["CombuHotStreakButton"] = "Heating Up warning",
+	["CombuPyroEnableButton"] = "Enable Pyroblast tracking",
+	["CombuLBEnableButton"] = "Enable Bomb tracking",
 	}
 
 -------------------------------

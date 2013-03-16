@@ -56,6 +56,12 @@ do -- Battle pets
 	local pets, running, sourceFilters, typeFilters, flagFilters, search = {}, false, {}, {}, {[LE_PET_JOURNAL_FLAG_COLLECTED]=1, [LE_PET_JOURNAL_FLAG_FAVORITES]=1, [LE_PET_JOURNAL_FLAG_NOT_COLLECTED]=1}, ""
 	hooksecurefunc(C_PetJournal, "SetSearchFilter", function(filter) search = filter end)
 	hooksecurefunc(C_PetJournal, "ClearSearchFilter", function() if not running then search = "" end end)
+	local function sortlevel(a,b)
+		local _, acn, _, _, _, _, af, an = C_PetJournal.GetPetInfoByPetID(a)
+		local _, bcn, _, _, _, _, bf, bn = C_PetJournal.GetPetInfoByPetID(b)
+		if af ~= bf then return not not af end
+		return (acn or an or "") < (bcn or bn or "")
+	end
 	local function queryAndCount()
 		assert(not running, "Battle pets enumerator is not reentrant")
 		running = true
@@ -82,11 +88,12 @@ do -- Battle pets
 		local isWild, ni = true, 1 -- Because apparently, there are wild pets. Nobody has seen any, though
 		repeat
 			for i=1,C_PetJournal.GetNumPets(isWild) do
-				pets[ni], ni = C_PetJournal.GetPetInfoByIndex(i, isWild), ni + 1
+				ni, pets[ni] = ni + 1, C_PetJournal.GetPetInfoByIndex(i, isWild)
 			end
 			isWild = not isWild
 		until isWild
 		for j=ni,#pets do pets[j] = nil end
+		table.sort(pets, sortlevel)
 		
 		for k, v in pairs(flagFilters) do
 			C_PetJournal.SetFlagFilter(k, v)

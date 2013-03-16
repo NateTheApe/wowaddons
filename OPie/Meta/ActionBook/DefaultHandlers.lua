@@ -232,19 +232,21 @@ do -- battlepet (pet id)
 	local petAction, actionPet = {}, {}
 	local function hint(id)
 		local pid = actionPet[id]
-		local sid, cn, _, _, _, _, n, tex = C_PetJournal.GetPetInfoByPetID(pid)
-		return not not sid, C_PetJournal.GetSummonedPetID() == pid and 1 or 0, tex, cn or n or "", 0, 0, 0
+		local sid, cn, _, _, _, _, _, n, tex = C_PetJournal.GetPetInfoByPetID(pid)
+		return not not sid, C_PetJournal.GetSummonedPetGUID() == pid and 1 or 0, tex, cn or n or "", 0, 0, 0
 	end
 	local function create(pid)
+		if type(pid) == "number" then return create(("0x%016x"):format(pid)) end
 		if not C_PetJournal.GetPetInfoByPetID(pid) then return end
 		if not petAction[pid] then
-			petAction[pid] = AB:create("func", hint, C_PetJournal.SummonPetByID, pid)
+			petAction[pid] = AB:create("func", hint, C_PetJournal.SummonPetByGUID, pid)
 			actionPet[petAction[pid]] = pid
 		end
 		return petAction[pid]
 	end
 	local function describe(pid)
-		local _, cn, lvl, _, _, _, n, tex = C_PetJournal.GetPetInfoByPetID(pid)
+		if type(pid) == "number" then return describe(("0x%016x"):format(pid)) end
+		local _, cn, lvl, _, _, _, _, n, tex = C_PetJournal.GetPetInfoByPetID(pid)
 		if (cn or n) and ((lvl or 0) > 1) then cn = "[" .. lvl .. "] " .. (cn or n) end
 		return "Battle Pet", cn or n or ("#" .. tostring(pid)), tex
 	end
@@ -260,7 +262,7 @@ do -- equipmentset: an equipment set, by name
 	AB:register("equipmentset", function(name)
 		if type(name) ~= "string" or not GetEquipmentSetInfoByName(name) then return end
 		if not setMap[name] then
-			setMap[name] = AB:create("func", hint, EquipmentManager_EquipSet, name)
+			setMap[name] = AB:create("attribute", hint, "type","macro", "macrotext", (SLASH_EQUIP_SET1 or "/equipset") .. " " .. name)
 			setMap[setMap[name]] = name
 		end
 		return setMap[name]

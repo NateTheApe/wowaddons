@@ -48,6 +48,8 @@ IonGDB = {
 	xbarFirstRun = true,
 
 	betaWarning = true,
+
+	animate = true,
 }
 
 IonCDB = {
@@ -121,6 +123,14 @@ ION.STATES = {
 	fishing1 = L.FISHING1,
 	vehicle0 = L.VEHICLE0,
 	vehicle1 = L.VEHICLE1,
+	possess0 = L.POSSESS0,
+	possess1 = L.POSSESS1,
+	override0 = L.OVERRIDE0,
+	override1 = L.OVERRIDE1,
+	extrabar0 = L.EXTRABAR0,
+	extrabar1 = L.EXTRABAR1,
+	prowl0 = L.PROWL0,
+	prowl1 = L.PROWL1,
 	custom0 = L.CUSTOM0,
 
 }
@@ -139,6 +149,10 @@ ION.STATEINDEX = {
 	group = L.GROUP,
 	fishing = L.FISHING,
 	vehicle = L.VEHICLE,
+	possess = L.POSSESS,
+	override = L.OVERRIDE,
+	extrabar = L.EXTRABAR,
+	prowl = L.PROWL,
 	custom = L.CUSTOM,
 
 	[L.PAGED] = "paged",
@@ -153,6 +167,10 @@ ION.STATEINDEX = {
 	[L.GROUP] = "group",
 	[L.FISHING] = "fishing",
 	[L.VEHICLE] = "vehicle",
+	[L.POSSESS] = "possess",
+	[L.OVERRIDE] = "override",
+	[L.EXTRABAR] = "extrabar",
+	[L.PROWL] = "prowl",
 	[L.CUSTOM] = "custom",
 
 }
@@ -190,7 +208,7 @@ end
 local defGDB, GDB, defCDB, CDB, defSPEC, SPEC = CopyTable(IonGDB), CopyTable(IonGDB), CopyTable(IonCDB), CopyTable(IonCDB), CopyTable(IonSpec), CopyTable(IonSpec)
 
 local slashFunctions = {
-	[1] = "",
+	[1] = "ToggleMainMenu",
 	[2] = "CreateNewBar",
 	[3] = "DeleteBar",
 	[4] = "ToggleBars",
@@ -235,6 +253,7 @@ local slashFunctions = {
 	[43] = "PrintBarTypes",
 	[44] = "BlizzBar",
 	[45] = "",
+	[46] = "Animate",
 }
 
 local count = 1
@@ -1036,7 +1055,7 @@ function ION:UpdateStanceStrings()
 
 	    	wipe(ION.StanceIndex)
 
-		local _, name, spellID, catform
+		local _, name, spellID
 
 		local states = "[stance:0] stance0; "
 
@@ -1063,7 +1082,7 @@ function ION:UpdateStanceStrings()
 						ION.StanceIndex[i] = spellID
 
 						if (ION.class == "DRUID" and spellID == 768) then
-							catform = i
+							ION.kitty = i
 						end
 					end
 				end
@@ -1084,9 +1103,6 @@ function ION:UpdateStanceStrings()
 
 				ION.STATES.prowl = L.DRUID_PROWL
 
-				if (catform) then
-					states = "[stance:"..catform..",stealth] prowl; "..states
-				end
 			end
 
 			if (ION.class == "MONK") then
@@ -1316,33 +1332,36 @@ local minimapShapes = {
 
 local function updatePoint(self, elapsed)
 
-	self.elapsed = self.elapsed + elapsed
+	if (GDB.animate) then
 
-	if (self.elapsed > 0.025) then
+		self.elapsed = self.elapsed + elapsed
 
-		self.l = self.l + 0.0625
-		self.r = self.r + 0.0625
+		if (self.elapsed > 0.025) then
 
-		if (self.r > 1) then
-			self.l = 0
-			self.r = 0.0625
-			self.b = self.b + 0.0625
+			self.l = self.l + 0.0625
+			self.r = self.r + 0.0625
+
+			if (self.r > 1) then
+				self.l = 0
+				self.r = 0.0625
+				self.b = self.b + 0.0625
+			end
+
+			if (self.b > 1) then
+				self.l = 0
+				self.r = 0.0625
+				self.b = 0.0625
+			end
+
+			self.t = self.b - (0.0625 * self.tadj)
+
+			if (self.t < 0) then self.t = 0 end
+			if (self.t > 1) then self.t = 1 end
+
+			self.texture:SetTexCoord(self.l, self.r, self.t, self.b)
+
+			self.elapsed = 0
 		end
-
-		if (self.b > 1) then
-			self.l = 0
-			self.r = 0.0625
-			self.b = 0.0625
-		end
-
-		self.t = self.b - (0.0625 * self.tadj)
-
-		if (self.t < 0) then self.t = 0 end
-		if (self.t > 1) then self.t = 1 end
-
-		self.texture:SetTexCoord(self.l, self.r, self.t, self.b)
-
-		self.elapsed = 0
 	end
 end
 
@@ -1485,6 +1504,7 @@ function ION:MinimapButton_OnEnter(minimap)
 	GameTooltip:AddLine(L.MINIMAP_TOOLTIP1, 1, 1, 1)
 	GameTooltip:AddLine(L.MINIMAP_TOOLTIP2, 1, 1, 1)
 	GameTooltip:AddLine(L.MINIMAP_TOOLTIP3, 1, 1, 1)
+	GameTooltip:AddLine(L.MINIMAP_TOOLTIP4, 1, 1, 1)
 
 	GameTooltip:Show()
 end
@@ -1502,6 +1522,8 @@ function ION:MinimapButton_OnClick(minimap, button)
 
 	if (button == "RightButton") then
 		ION:ToggleEditFrames()
+	elseif (IsShiftKeyDown()) then
+		ION:ToggleMainMenu()
 	elseif (IsAltKeyDown() or button == "MiddleButton") then
 		ION:ToggleBindings()
 	else
@@ -1771,6 +1793,16 @@ function ION:BlizzBar()
 
 end
 
+function ION:Animate()
+
+	if (GDB.animate) then
+		GDB.animate = false
+	else
+		GDB.animate = true
+	end
+
+end
+
 function ION:CreateBar(index, class, id)
 
 	local data, show = ION.RegisteredBarData[class]
@@ -2019,6 +2051,7 @@ function ION:ToggleBars(show, hide)
 			collectgarbage()
 		else
 
+			ION:ToggleMainMenu(nil, true)
 			ION:ToggleEditFrames(nil, true)
 
 			ION.BarsShown = true
@@ -2043,6 +2076,20 @@ function ION:ToggleButtonGrid(show, hide)
 	for id,btn in pairs(BTNIndex) do
 		btn[1]:SetGrid(show, hide)
 	end
+end
+
+function ION:ToggleMainMenu(show, hide)
+
+	if (not IsAddOnLoaded("Ion-GUI")) then
+		LoadAddOn("Ion-GUI")
+	end
+
+	if ((IonMainMenu:IsVisible() or hide) and not show) then
+		IonMainMenu:Hide()
+	else
+		IonMainMenu:Show()
+	end
+
 end
 
 function ION:PrintStateList()
@@ -2191,10 +2238,6 @@ local function control_OnEvent(self, event, ...)
 
 		ION.player, ION.class, ION.level, ION.realm = UnitName("player"), select(2, UnitClass("player")), UnitLevel("player"), GetRealmName()
 
-		if (ION.class == "DRUID") then
-			ION.MAS.stealth = { states = "[nostance:3,stealth] stealth1; laststate", rangeStart = 1, rangeStop = 1, order = 7 }
-		end
-
 		for k,v in pairs(opDepList) do
 			if (IsAddOnLoaded(v)) then
 				ION.OpDep = true
@@ -2225,14 +2268,23 @@ local function control_OnEvent(self, event, ...)
 
 		GameMenuFrame:HookScript("OnShow", function(self)
 
-				if (ION.BarsShown or ION.EditFrameShown or ION.BindingMode) then
+				if (IonMainMenu and IonMainMenu:IsShown()) then
+					HideUIPanel(self); ION:ToggleMainMenu(nil, true)
+				end
 
-					HideUIPanel(self)
-					ION:ToggleEditFrames(nil, true)
-					ION:ToggleBindings(nil, true)
-					ION:ToggleBars(nil, true)
+				if (ION.BarsShown) then
+					HideUIPanel(self); ION:ToggleBars(nil, true)
+				end
 
-				end end)
+				if (ION.EditFrameShown) then
+					HideUIPanel(self); ION:ToggleEditFrames(nil, true)
+				end
+
+				if (ION.BindingMode) then
+					HideUIPanel(self); ION:ToggleBindings(nil, true)
+				end
+
+				end)
 
 		StaticPopupDialogs["ION_BETA_WARNING"] = {
 			text = L.BETA_WARNING,

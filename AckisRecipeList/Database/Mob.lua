@@ -2,10 +2,10 @@
 ************************************************************************
 Mob.lua
 ************************************************************************
-File date: 2012-09-10T03:52:39Z
-File hash: 1291879
-Project hash: 5a95034
-Project version: 2.4.2
+File date: 2012-11-18T00:13:30Z
+File hash: efe9be5
+Project hash: 3df9ad7
+Project version: 2.4.4
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -57,7 +57,7 @@ function addon:InitMob()
 	-- Burning Steppes
 	AddMob(7035,	L["Firegut Brute"],			Z.BURNING_STEPPES,		82.5, 48.1)
 	AddMob(7037,	L["Thaurissan Firewalker"],		Z.BURNING_STEPPES,		61.1, 42.0)
-	AddMob(10119,	L["Volchan"],				Z.BURNING_STEPPES,		73.0, 49.3)
+	AddMob(10119,	L["Volchan"],				Z.BURNING_STEPPES,		22.0, 41.0)
 
 	-- Deadwind Pass
 	AddMob(7372,	L["Deadwind Warlock"],			Z.DEADWIND_PASS,		59.8, 74.4)

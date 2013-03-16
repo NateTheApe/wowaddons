@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.38"
-local MINOR_VERSION = ("$Revision: 296 $"):match("%d+") or 1
-local DATE = string.gsub("$Date: 2012-10-02 22:30:02 +0000 (Tue, 02 Oct 2012) $", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
+local MAJOR_VERSION = "2.40"
+local MINOR_VERSION = ("$Revision: 305 $"):match("%d+") or 1
+local DATE = string.gsub("$Date: 2013-01-29 23:17:29 +0000 (Tue, 29 Jan 2013) $", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
 Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 Skillet.title   = "Skillet"

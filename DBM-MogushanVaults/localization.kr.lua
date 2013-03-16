@@ -34,7 +34,9 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	WarnPhase	= "단계 전환 알림 보기",
-	RangeFrame	= "지팡이의 혼 단계에서 거리 프레임 표시 (6m)"
+	RangeFrame	= "지팡이의 혼 단계에서 거리 프레임 표시 (6m)",
+	SetIconOnWS	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(116784),
+	SetIconOnAR	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(116417)
 })
 
 L:SetMiscLocalization({
@@ -65,7 +67,17 @@ L:SetMiscLocalization({
 ----------------------
 L = DBM:GetModLocalization(687)
 
+L:SetWarningLocalization({
+	DarknessSoon		= "%d초 후 암흑의 방패"
+})
+
+L:SetTimerLocalization({
+	timerUSRevive		= "불멸의 어둠 재형성"
+})
+
 L:SetOptionLocalization({
+	DarknessSoon		= "$spell:117697 주문의 사전 초읽기 경고 보기(5초 전부터)",
+	timerUSRevive		= "$spell:117506 재형성까지 남은 시간 바 표시",
 	RangeFrame			= "거리 프레임 표시 (8m)"
 })
 
@@ -76,7 +88,7 @@ L:SetOptionLocalization({
 L = DBM:GetModLocalization(726)
 
 L:SetWarningLocalization({
-	specWarnDespawnFloor		= "6초 후 가운데 바닥 사라짐!"
+	specWarnDespawnFloor		= "6초 후 가운데 바닥 사라짐 - 낙사 주의!"
 })
 
 L:SetTimerLocalization({
@@ -86,7 +98,7 @@ L:SetTimerLocalization({
 L:SetOptionLocalization({
 	specWarnDespawnFloor		= "가운데 바닥이 무너지기 전에 특수 경고 보기",
 	timerDespawnFloor			= "가운데 바닥이 무너지기 전까지 남은 시간 바 표시",
-	SetIconOnDestabilized	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(132226)
+	SetIconOnDestabilized		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(132226)
 })
 
 
@@ -97,7 +109,8 @@ L= DBM:GetModLocalization(677)
 
 L:SetOptionLocalization({
 	InfoFrame		= "$spell:116525 주문의 영향을 받은 플레이어를 정보 프레임에 표시",
-	ArrowOnCombo	= "$journal:5673 도중 정보 프레임 표시\n알림: 방어전담이 보스 앞에 있고 나머지 공격대원이 뒤에 있을때를 기준으로 합니다."
+	CountOutCombo	= "$journal:5673 시전 횟수를 초읽기 소리로 읽기\n알림: 초 읽기 소리가 Corsica (Female)로 설정되어 있을때만 작동합니다.",
+	ArrowOnCombo	= "$journal:5673 도중 DBM 화살표 표시\n알림: 방어전담이 보스 앞에 있고 나머지 공격대원이 뒤에 있을때를 기준으로 합니다."
 })
 
 L:SetMiscLocalization({

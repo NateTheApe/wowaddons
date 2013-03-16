@@ -100,7 +100,13 @@ Suche]=],
 	err_tooshort = "Критерий поиска слишком короток",
 	find_results = "Найти Результаты:",
 	module_desc = "Добавляет возможность поиска чат кадров.", -- Needs review
-	-- module_info = "",
+	module_info = [=[Этот модуль добавляет команды /find и /findall для поиска в истории чата
+
+Использование:
+
+/find <текст>
+
+/findall <текст>]=], -- Needs review
 	module_name = "Поиск",
 }
 

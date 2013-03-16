@@ -8,7 +8,7 @@ local FL = LibStub("LibFishing-1.0");
 -- 5.0.4 has a problem with a global "_" (see some for loops below)
 local _
 
-local NUM_THINGIES_DISPLAYED = 21;
+local NUM_THINGIES_DISPLAYED = 22;
 local FRAME_THINGIEHEIGHT = 16;
 FishingBuddy.Locations.FRAME_THINGIEHEIGHT = FRAME_THINGIEHEIGHT;
 
@@ -290,7 +290,7 @@ local function SetSelectedLocLine(id, line)
 			UpdateLocationScrollPosition();
 		else
 			LocationLineSelected = line;
-			FishingLocationHighlightFrame:SetPoint ( "TOPLEFT" ,	getglobal("FishingLocations"..id):GetName() , "TOPLEFT" , 5 , 0 )
+			FishingLocationHighlightFrame:SetPoint ("TOPLEFT" , getglobal("FishingLocations"..id):GetName() , "TOPLEFT" , 5 , 0 )
 			FishingLocationHighlightFrame:Show()
 		end
 	end
@@ -304,7 +304,7 @@ local function UpdateLocLine(id, line, leveloffset, c, e, text, texture)
 	locButton.id = id;
 	locButton.line = line;
 	if ( id == 1 ) then
-		locButton:SetPoint("TOPLEFT", leveloffset+25, -94);
+		locButton:SetPoint("TOPLEFT", FishingBuddyFrameInset, "TOPLEFT", leveloffset+8, -4);
 	else
 		local t = id - 1;
 		locButton:SetPoint("TOPLEFT", "FishingLocations"..t, "BOTTOMLEFT", leveloffset, 0);

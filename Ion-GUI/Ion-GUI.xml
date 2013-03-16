@@ -290,7 +290,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<HighlightTexture file="Interface\AddOns\Ion\Images\UI-Panel-Button-YellowHighlight" alphaMode="ADD">
 			<TexCoords left="0" right="0.625" top="0" bottom="0.6875"/>
 		</HighlightTexture>
-		<CheckedTexture file="" alphaMode="ADD">
+		<CheckedTexture file="Interface\Buttons\UI-PassiveHighlight" alphaMode="ADD">
 			<TexCoords left="0" right="0.625" top="0" bottom="0.6875"/>
 		</CheckedTexture>
 		<DisabledTexture file="Interface\AddOns\Ion\Images\UI-Panel-Button-Disabled">
@@ -598,6 +598,28 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 	<!-- Frame Templates -->
 
 	<!-- Not Templates -->
+
+	<Frame name="IonMainMenu" enableMouse="true" movable="true" hidden="true" frameStrata="DIALOG" parent="UIParent" clampedToScreen="true">
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+				<Offset x="0" y="75"/>
+			</Anchor>
+		</Anchors>
+		<Frames>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				Ion:MainMenu_OnLoad(self)
+			</OnLoad>
+			<OnDragStart>
+				self:StartMoving()
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing()
+			</OnDragStop>
+		</Scripts>
+	</Frame>
 
 	<Frame name="IonBarEditor" enableMouse="true" movable="true" hidden="true" frameStrata="DIALOG" parent="UIParent" clampedToScreen="true">
 		<Anchors>

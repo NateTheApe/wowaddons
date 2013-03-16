@@ -8,7 +8,7 @@
 ## X-Credits: maia
 ## Version: 2.0
 ## X-AceLibrary-Banzai-2.0: true
-## X-Curse-Packaged-Version: r43
+## X-Curse-Packaged-Version: r45
 ## X-Curse-Project-Name: LibBanzai-2.0
 ## X-Curse-Project-ID: libbanzai-2-0
 ## X-Curse-Repository-ID: wow/libbanzai-2-0/mainline

@@ -34,7 +34,9 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	WarnPhase	= "提示轉換階段",
-	RangeFrame	= "在祕法階段時顯示距離框(6碼)"
+	RangeFrame	= "在祕法階段時顯示距離框(6碼)",
+	SetIconOnWS	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(116784),
+	SetIconOnAR	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(116417)
 })
 
 L:SetMiscLocalization({
@@ -65,7 +67,17 @@ L:SetMiscLocalization({
 ----------------------
 L = DBM:GetModLocalization(687)
 
+L:SetWarningLocalization({
+	DarknessSoon		= "黑暗之盾在%d秒"
+})
+
+L:SetTimerLocalization({
+	timerUSRevive		= "不死黑影重新成形"
+})
+
 L:SetOptionLocalization({
+	DarknessSoon		= "為$spell:117697提示施放前五秒倒數",
+	timerUSRevive		= "為$spell:117506重新成形顯示計時器",
 	RangeFrame			= "顯示距離框(8碼)"
 })
 
@@ -97,6 +109,7 @@ L= DBM:GetModLocalization(677)
 
 L:SetOptionLocalization({
 	InfoFrame		= "為受到$spell:116525的玩家顯示訊息框",
+	CountOutCombo	= "數出$journal:5673連擊數\n註:這目前僅只有女性音效.",
 	ArrowOnCombo	= "為$journal:5673顯示DBM箭頭\n注:這是假設坦克在前方而其他人在後方"
 })
 

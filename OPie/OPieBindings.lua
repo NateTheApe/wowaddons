@@ -191,11 +191,11 @@ function subBindings:set(id, bind)
 	for j=#t,1,-1 do if t[j] == "false" then t[j] = nil else break end end
 	self.count = #t+1
 	local _, old, ring, global, default = OneRingLib:GetOption("SliceBindingString", self.scope)
-	config.pushUndo("SliceBindingString#" .. (self.scope or ""), OneRingLib.SetOption, OneRingLib, "SliceBindingString", self.scope, old)
+	config.pushUndo("SliceBindingString#" .. (self.scope or ""), OneRingLib.SetOption, OneRingLib, "SliceBindingString", old, self.scope)
 	local v = table.concat(t, " ")
 	if self.scope == nil and v == default then v = nil
 	elseif self.scope ~= nil and v == (global or default) then v = nil end
-	OneRingLib:SetOption("SliceBindingString", self.scope, v)
+	OneRingLib:SetOption("SliceBindingString", v, self.scope)
 end
 function subBindings:scopes(info, level, checked)
 	info.arg1, info.arg2, info.text, info.checked = self, nil, L"Defaults for all rings", checked and self.scope == nil

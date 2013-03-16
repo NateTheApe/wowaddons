@@ -6,7 +6,7 @@ enUS localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.2
+Project version: 2.4.4
 ************************************************************************
 Translation credits: http://www.wowace.com/addons/arl/localization/translators/
 
@@ -193,7 +193,8 @@ L["Bradley Towns"] = true
 L["Braeg Stoutbeard"] = true
 L["Brandig"] = true
 L["Brawn"] = true
-L["BRD_RANDOM_ROOM"] = "There is a chance that you will find it in 5 different rooms in blackrock depths, it is a random spawn though, and sometimes it doesn't even spawn at all."
+L["BRD_MAIL"] = "There are four spawn spots in Blackrock Depths: just before entering the Manufactory, in Golem Lord Arglemach's room, in the Manufactory on a bench, or in the Mold Foundry."
+L["BRD_SHOULDERS"] = "There is one rare spawn spot in Blackrock Depths: the room just after the shadowforge lock and just before the arena, in the corner on some bunk beds."
 L["Brek Stonehoof"] = true
 L["Brikk Keencraft"] = true
 L["Brock Stoneseeker"] = true
@@ -360,7 +361,7 @@ L["DISCOVERY_DESC"] = "Recipes obtained through Discovery should be included in 
 L["DISCOVERY_INSC_BOOK"] = "Discovered randomly by reading the Book of Glyph Mastery."
 L["DISCOVERY_INSC_MINOR"] = "Obtained randomly by conducting Minor Inscription Research."
 L["DISCOVERY_INSC_NORTHREND"] = "Obtained randomly by conducting Northrend Inscription Research."
-L["DISCOVERY_INSC_PANDARIA"] = "Obtained randomly by using the Scroll of Wisdom."
+L["DISCOVERY_INSC_PANDARIA"] = "Obtained randomly by creating a Scroll of Wisdom."
 L["DISCOVERY_JC_PANDARIA"] = "Obtained randomly via the daily Facet of Research."
 L["Disembodied Protector"] = true
 L["Disembodied Vindicator"] = true

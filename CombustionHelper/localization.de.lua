@@ -45,12 +45,16 @@ CombuLocDE = {["lockon"] = "|cff00ffffCombustionHelper gesperrt|r",
 ["lbreport"] = "|cffff0000 -- Zu früh gewirkte Lebende Bomben in diesem Kampf : |cffffffff%d |cffff0000--|r",
 ["pyroreport"] = "|cffff0000 -- Kampfeshitze gewirkte in diesem Kampf : |cffffffff%d |cffff0000--|r",
 ["slashcomm"] = "|cff00ffffÖffne CombustionHelper Einstellungs-Menü|r",
-			["comburepthres"] = "|cff00ffffCombustionHelper report threshold set to : %.0f dot damage.|r",
-			["ignadjvalue"] = "|cff00ffffCombustionHelper Ignite adjust set to : %.1f secs.|r",
-			["redzonetimer"] = "|cff00ffffCombustionHelper rote zone timers : %.1f secs.|r",
-			["interfaceGraph"] = "Grafiken options",
-			["combureport1"] = "|cffff0000 -- Total Einäschern : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Ziels : |cffffffff%d |cffff0000--|r",
-			["combureport2"] = "|cffff0000 -- Vor. Einäschern : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Ziels : |cffffffff%d |cffff0000--|r",
+["comburepthres"] = "|cff00ffffCombustionHelper report threshold set to : %.0f dot damage.|r",
+["ignadjvalue"] = "|cff00ffffCombustionHelper Ignite adjust set to : %.1f secs.|r",
+["redzonetimer"] = "|cff00ffffCombustionHelper rote zone timers : %.1f secs.|r",
+["interfaceGraph"] = "Grafiken options",
+["combureport1"] = "|cffff0000 -- Total Einäschern : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Ziels : |cffffffff%d |cffff0000--|r",
+["combureport2"] = "|cffff0000 -- Vor. Einäschern : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Ziels : |cffffffff%d |cffff0000--|r",
+["pyroenableon"] = "| cff00ffffPyroblast tracker enabled | r",
+["pyroenableoff"] = "| cff00ffffPyroblast tracker deaktiviert | r",
+["lbenableon"] = "| cff00ffffBomb tracker enabled | r",
+["lbenableoff"] = "| cff00ffffBomb tracker deaktiviert | r",
 }
 
 -------------------------------
@@ -111,6 +115,8 @@ combuoptioninfotableDE = {
 ["CombuThresholdSoundButton"] = "Aktiviert den Warnton, wenn der Schwellenwert erreicht ist Entz�nden.";
 ["Combubgcolornormal"] = "Stellt die Farbe für der Ränder des Fensters ein, wenn Einäschern und Einschlag nicht verfügbar sind.",
 ["CombuTickPredictButton"] = "Replace the Ignite damage value in the Status zone by the estimated damage for each tick of Combustion and the number of ticks depending from your current haste.",
+["CombuPyroEnableButton"] = "Aktivieren oder Deaktivieren Pyroblast Tracking im Hauptfenster.",
+["CombuLBEnableButton"] = "Aktivieren oder Deaktivieren Bomb Tracking im Hauptfenster.",
 }
 
 -------------------------------
@@ -162,11 +168,12 @@ CombuOptLocDE = {
 ["CombuSoundInfo"] = "Alarmschwelle :",
 ["CombuThresholdSoundButton"] = "Alarm für Schwellwert",
 ["Combuedgecolornormal"] = "Kantenfarbe (normal)",
-    ["CombuTickPredictButton"] = "Combustion Tick damage/nbr prediction",
-    ["CombuPyromaniacButton"] = "Alarm für Pyromane",
+["CombuTickPredictButton"] = "Combustion Tick damage/nbr prediction",
+["CombuPyromaniacButton"] = "Alarm für Pyromane",
 ["Combubgcolorwarning"] = "Hintergrundfarbe (Alarm)",
-	["CombuHotStreakButton"] = "Alarm für Aufwarmen",
-
+["CombuHotStreakButton"] = "Alarm für Aufwarmen",
+["CombuPyroEnableButton"] = "Aktivieren Pyroblast tracking",
+["CombuLBEnableButton"] = "Aktivieren Bomb tracking",
 }
 
 -------------------------------

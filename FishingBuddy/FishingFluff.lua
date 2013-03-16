@@ -87,11 +87,15 @@ local function GetPetsUpdate(self, ...)
 	for index=start,finish do
 		local petID, speciesID, isOwned, customName, level, favorite, isRevoked, name, icon, petType, creatureID, sourceText, description, isWildPet, canBattle = C_PetJournal.GetPetInfoByIndex(index, self.isWild);
 		if ( isOwned) then
+			local addit = not petmap[creatureID];
 			if (customName) then
 				name = customName;
+				addit = true;
 			end
-			tinsert(ourpets, { cID=creatureID, icon=icon, name=name, petID=petID, checked=false });
-			petmap[creatureID] = petID;
+			if (addit) then
+				tinsert(ourpets, { cID=creatureID, icon=icon, name=name, petID=petID, checked=false });
+				petmap[creatureID] = petID;
+			end
 		end
 	end
 	if (finish == numPets) then
@@ -103,6 +107,9 @@ local function GetPetsUpdate(self, ...)
 		end
 	else
 		self.index = finish + 1;
+	end
+	if (FishingBuddy.Debugging) then
+		FishingBuddy_Info["ourpets"] = ourpets;
 	end
 end
 
@@ -143,6 +150,8 @@ local function CheckedOurPets()
 end
 
 local function DoUpdateChosenPets()
+	local settingpets = GetSetting(PETSETTING);
+
 	chosenpets = {};
 	chosenlist = {};
 	numchosen = 0;
@@ -153,7 +162,7 @@ local function DoUpdateChosenPets()
 		if ( settingpets == PET_ALL ) then
 			allpets = true;
 		end
-		
+
 		for idx=1,#ourpets do
 			local cid = ourpets[idx].cID;
 			if ( FISHINGPETS[cid] and settingpets == PET_FISHING ) then
@@ -172,8 +181,6 @@ local function DoUpdateChosenPets()
 end
 
 local function UpdateChosenPets()
-	local settingpets = GetSetting(PETSETTING);
-
 	if (#ourpets == 0) then
 		GetOurPets(DoUpdateChosenPets);
 	else
@@ -209,7 +216,7 @@ FluffEvents[FBConstants.FISHING_ENABLED_EVT] = function()
 		-- we don't do this stuff if we're "no pole equipped" fishing
 		if ( FishingBuddy.GetSetting(PETSETTING) ~= PET_NONE and FishingBuddy.ReadyForFishing() ) then
 			if ( not (IsFlying() or IsMounted()) ) then
-				local nowpet = C_PetJournal.GetSummonedPetID();
+				local nowpet = C_PetJournal.GetSummonedPetGUID();
 				local petid = nowpet;
 				if ( numchosen > 0 ) then
 					local avail = false;
@@ -221,9 +228,9 @@ FluffEvents[FBConstants.FISHING_ENABLED_EVT] = function()
 						end
 					end
 				end
-				if ( petid ~= nowpet and petid > 0) then
+				if ( petid and petid ~= nowpet ) then
 					resetPet = nowpet;
-					C_PetJournal.SummonPetByID(petid);
+					C_PetJournal.SummonPetByGUID(petid);
 				end
 			end
 		end
@@ -240,12 +247,12 @@ local function Untrack(yes)
 end
 
 local function DoPetReset(pet)
-	if ( pet and pet > 0 ) then
-		C_PetJournal.SummonPetByID(pet);
+	if ( pet ) then
+		C_PetJournal.SummonPetByGUID(pet);
 	elseif (FishingBuddy.GetSetting(PETSETTING) ~= PET_NONE) then
-		local nowpet = C_PetJournal.GetSummonedPetID();
-		if ( nowpet and nowpet > 0 ) then
-			C_PetJournal.SummonPetByID(nowpet);
+		local nowpet = C_PetJournal.GetSummonedPetGUID();
+		if ( nowpet ) then
+			C_PetJournal.SummonPetByGUID(nowpet);
 		end
 	end
 end
@@ -450,34 +457,23 @@ local function FishingPetFrame_OnHide(self)
 	end
 end
 
-local FIManager = FishingBuddy.CreateFBDropDownMenu("FIManager", "FBFishingItemMenu");
-
-local FluffInvisible = {
-	-- options not directly manipulatable from the UI
-	["UseTuskarrSpear"] = {
-		["default"] = 0,
-	},
-	["UseAnglersRaft"] = {
-		["default"] = 0,
-	},
-	["UsePandarenCharm"] = {
-		["default"] = 1,
-	},
-};
-
+local GSB = FishingBuddy.GetSettingBool;
 local FishingItems = {};
 FishingItems[85973] = {
 	["enUS"] = "Ancient Pandaren Fishing Charm",
+	["tooltip"] = FBConstants.CONFIG_FISHINGCHARM_INFO,
 	spell = 125167,
 	setting = "UsePandarenCharm",
-	usable = function()
+	usable = function(item)
 			-- only usable in Pandoria
 			local C,_,_,_ = FL:GetCurrentPlayerPosition();
 			return (C == 6);
 		end,
+	["default"] = 1,
 };
 FishingItems[85500] = {
 	["enUS"] = "Angler's Fishing Raft",
+	["tooltip"] = FBConstants.CONFIG_FISHINGRAFT_INFO,
 	spell = 124036,
 	setting = "UseAnglersRaft",
 	usable = function()
@@ -486,61 +482,54 @@ FishingItems[85500] = {
 				not FL:HasBuff(GetSpellInfo(116032)) and
 				not FL:HasBuff(GetSpellInfo(119700)));
 		end,
-	check = function(buff)
-			local name, _, _, _, _, _, et, _, _, _, _ = UnitBuff("player", buff);
+	check = function(buff, info, need)
+			local _, _, _, _, _, _, et, _, _, _, _ = UnitBuff("player", buff);
+			if (GSB(info.option.setting) and need) then
+				return false;
+			end
 			et = (et or 0) - GetTime();
-			if (not name or et <= 60) then
-				return true;
+			if (need or et <= 60) then
+				return true, 85500;
 			end
 			--return nil;
-		end
+		end,
+	["default"] = 1,
+	["option"] = {
+		["setting"] = "RaftMaintainOnly",
+		["text"] = FBConstants.CONFIG_MAINTAINRAFT_ONOFF,
+		["tooltip"] = FBConstants.CONFIG_MAINTAINRAFT_INFO,
+		["default"] = 1,
+	},
 };
 FishingItems[88535] = {
 	["enUS"] = "Sharpened Tuskarr Spear",
-	-- spell = 0,		-- no spell? use item?
+	["tooltip"] = FBConstants.CONFIG_TUSKAARSPEAR_INFO,
+	spell = 128357,
 	setting = "UseTuskarrSpear",
-	usable = function()
-			return false;	-- until we know how to use it correctly
-		end
+	check = function(buff, info, need)
+			if ( need ) then
+				local s,_,_ = GetItemCooldown(88535);
+				if ( s == 0 ) then
+					local pole = FL:IsFishingPole();
+					local main = FL:GetMainHandItem(true);
+					if ( pole ) then
+						info.pole = main;
+						EquipItemByName(88535);
+						return true, 88535;
+					elseif (main) then
+						return (main == 88535), 88535;
+					end
+				end
+			elseif (info.pole) then
+				EquipItemByName(info.pole);
+				info.pole = nil;
+				return true, nil;
+			end
+			-- return false, nil
+		end,
+	["default"] = 0,
 };
 FishingBuddy.FishingItems = FishingItems;
-
-local function AnyFishingItems()
-	for itemid, info in pairs(FishingItems) do
-		if ( GetItemCount(itemid) > 0 ) then
-			return 1;
-		end
-	end
-	-- return nil;
-end
-
-local maxwidth = 0;
-local function FIMenuSetup()
-	maxwidth = 0;
-	for itemid, info in pairs(FishingItems) do
-		if ( GetItemCount(itemid) > 0 ) then
-			local text = GetItemInfo(itemid);
-			FishingBuddy.MakeDropDownEntry(text, info.setting, true);
-			FIManager.fontstring:SetText(info.name);
-			local width = FIManager.fontstring:GetWidth();
-			if ( width > maxwidth ) then
-				maxwidth = width;
-			end
-		end
-	end
-end
-
-local function FIManagerDisplay()
-	FIManager.html:Hide();
-	UIDropDownMenu_Initialize(FIManager.menu, FIMenuSetup);
-	FIManager.menu.label:SetWidth(1);
-	FIManager.menu.label:Hide();
-	UIDropDownMenu_SetWidth(FIManager.menu, maxwidth);
-	UIDropDownMenu_SetSelectedValue(FIManager.menu, show);
-	UIDropDownMenu_SetText(FIManager.menu, USABLE_ITEMS);
-	FIManager:SetWidth(FIManager.menu:GetWidth());
-	FIManager:SetHeight(FIManager.menu:GetHeight());
-end
 
 local FluffOptions = {
 	["FishingFluff"] = {
@@ -580,24 +569,54 @@ local FluffOptions = {
 		["deps"] = { ["FishingFluff"] = "d" },
 		["default"] = 1
 	},
-	["FishingItems"] = {
-		["margin"] = { 12, 4 },
-		["button"] = "FIManager",
-		["setup"] = 
-			function()
-				if (AnyFishingItems()) then
-					FIManagerDisplay();
-				end
-			end,
-		["visible"] = AnyFishingItems,
-	},
 };
+
+local function UpdateItemOptions()
+	for id,info in pairs(FishingItems) do
+		local option = {};
+		
+		option.visible =
+			function(button)
+				if (GetItemCount(id) > 0) then
+					return 1;
+				end
+				return 0;
+			end
+		option.init =
+			function(option, button)
+				local n, _, _, _, _, _, _, _,_, _ = GetItemInfo(id);
+				if (n) then
+					option.text = n;
+				end
+			end
+
+		option.tooltip = info.tooltip;
+		option.setup = info.setup;
+		option.enabled = info.enabled;
+		option.default = info.default;
+		option.v = 1;
+		-- option.deps = { ["FishingFluff"] = "d" };
+		FluffOptions[info.setting] = option;
+
+		if (info.option) then
+			local sub = {};
+			sub.text = info.option.text;
+			sub.tooltip = info.option.tooltip;
+			sub.default = info.option.default;
+			sub.visible = option.visible;
+			sub.v = 1;
+			sub.deps = {};
+			sub.deps[info.setting] = "d";
+			FluffOptions[info.option.setting] = sub;
+		end
+	end
+	
+	FishingBuddy.FluffOptions = FluffOptions;
+end
 
 FluffEvents["VARIABLES_LOADED"] = function(started)
 	local pet = FishingBuddy.GetSetting(PETSETTING);
-	FishingBuddy.OptionsFrame.HandleOptions(FBConstants.CONFIG_FISHINGFLUFF_ONOFF, "Interface\\Icons\\inv_misc_food_164_fish_seadog", FluffOptions);
-	FishingBuddy.OptionsFrame.HandleOptions(nil, nil, FluffInvisible);
-		
+
 	FishingPetFrame:SetScript("OnHide", FishingPetFrame_OnHide);
 	FishingPetFrameButton:SetScript("OnClick", FishingPetsMenu_Toggle);
 	
@@ -624,6 +643,10 @@ FluffEvents["VARIABLES_LOADED"] = function(started)
 	FishingPetsMenuHolder:ClearAllPoints();
 	FishingPetsMenuHolder:SetPoint("TOPLEFT", FishingPetFrameButton, "BOTTOMLEFT", 0, 8);
 	FishingPetsMenuHolder:Hide();
+
+	UpdateItemOptions();
+	FishingBuddy.OptionsFrame.HandleOptions(FBConstants.CONFIG_FISHINGFLUFF_ONOFF, "Interface\\Icons\\inv_misc_food_164_fish_seadog", FluffOptions);
+	-- FishingBuddy.OptionsFrame.HandleOptions(nil, nil, FluffInvisible);
 end
 
 FluffEvents["PET_STABLE_UPDATE"] = function()
@@ -637,16 +660,21 @@ end
 FishingBuddy.RegisterHandlers(FluffEvents);
 
 if ( FishingBuddy.Debugging ) then
+	local function DumpChosen()
+		DoUpdateChosenPets();
+		local Debug = FishingBuddy.Debug;
+		local pets = FishingPetFrame.petnames;
+		local n = FL:tablecount(chosenpets);
+		Debug("chosenpets "..n.." "..#ourpets.." "..#pets);
+		for idx=1,#chosenpets do
+			Debug("petid "..chosenpets[idx])
+		end
+	end
+	
 	FishingBuddy.Commands["pets"] = {};
 	FishingBuddy.Commands["pets"].func =
 		function(what)
-			local Debug = FishingBuddy.Debug;
-			local pets = FishingPetFrame.petnames;
-			local n = FL:tablecount(chosenpets);
-			Debug("chosenpets "..n.." "..#ourpets.." "..#pets);
-			for idx=1,#chosenlist do
-				Debug("petid "..chosenlist[idx])
-			end
+			GetOurPets(DumpChosen);
 			return true;
 		end
 end

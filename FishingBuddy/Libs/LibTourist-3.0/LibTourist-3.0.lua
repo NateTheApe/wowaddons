@@ -1,6 +1,6 @@
 ﻿--[[
 Name: LibTourist-3.0
-Revision: $Rev: 153 $
+Revision: $Rev: 158 $
 Author(s): ckknight (ckknight@gmail.com), Arrowmaster, Odica (maintainer)
 Website: http://ckknight.wowinterface.com/
 Documentation: http://www.wowace.com/addons/libtourist-3-0/
@@ -10,7 +10,7 @@ License: MIT
 ]]
 
 local MAJOR_VERSION = "LibTourist-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 153 $"):match("(%d+)"))
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 158 $"):match("(%d+)"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -107,6 +107,8 @@ local yardHeights = {}
 local yardXOffsets = {}
 local yardYOffsets = {}
 local fishing = {}
+local battlepet_lows = {}
+local battlepet_highs = {}
 local cost = {}
 local textures = {}
 local textures_rev = {}
@@ -139,7 +141,8 @@ local function PLAYER_LEVEL_UP(self, level)
 				end
 			elseif zoneType == "Battleground" and low and high then
 				local playerLevel = playerLevel
-				if playerLevel >= low and (playerLevel == MAX_PLAYER_LEVEL or math.fmod(playerLevel, 10) >= 6) then
+--				if playerLevel >= low and (playerLevel == MAX_PLAYER_LEVEL or math.fmod(playerLevel, 10) >= 6) then
+				if low <= playerLevel and playerLevel <= high then
 					recInstances[zone] = true
 				end
 			elseif zoneType == "Instance" and low and high then
@@ -156,8 +159,26 @@ function Tourist:GetFishingLevel(zone)
 	return fishing[zone]
 end
 
+function Tourist:GetBattlePetLevel(zone)
+	return battlepet_lows[zone], battlepet_highs[zone]
+end
+
+
 function Tourist:GetLevelString(zone)
 	local lo, hi = Tourist:GetLevel(zone)
+	if lo and hi then
+		if lo == hi then
+			return tostring(lo)
+		else
+			return tostring(lo).."-"..tostring(hi)
+		end
+	else
+		return tostring(lo) or tostring(hi) or ""
+	end
+end
+
+function Tourist:GetBattlePetLevelString(zone)
+	local lo, hi = Tourist:GetBattlePetLevel(zone)
 	if lo and hi then
 		if lo == hi then
 			return tostring(lo)
@@ -222,6 +243,12 @@ function Tourist:GetLevel(zone)
 	return lows[zone], highs[zone]
 end
 
+function Tourist:GetBattlePetLevelColor(zone, petLevel)
+	local low, high = self:GetBattlePetLevel(zone)
+	
+	return Tourist:CalculateLevelColor(low, high, petLevel)
+end
+
 
 function Tourist:GetLevelColor(zone)
 	local low, high = self:GetLevel(zone)
@@ -232,51 +259,56 @@ function Tourist:GetLevelColor(zone)
 			return 1, 0, 0
 		end
 	end
-
+	
+	return Tourist:CalculateLevelColor(low, high, playerLevel)
+end
+	
+	
+function Tourist:CalculateLevelColor(low, high, currentLevel)
 	local midBracket = (low + high) / 2
 
 	if low <= 0 and high <= 0 then
 		-- City or level unknown -> White
 		return 1, 1, 1
-	elseif playerLevel == low and playerLevel == high then
+	elseif currentLevel == low and currentLevel == high then
 		-- Exact match, one-level bracket -> Yellow
 		return 1, 1, 0
-	elseif playerLevel <= low - 3 then
+	elseif currentLevel <= low - 3 then
 		-- Player is three or more levels short of Low -> Red
 		return 1, 0, 0
-	elseif playerLevel < low then
+	elseif currentLevel < low then
 		-- Player is two or less levels short of Low -> sliding scale between Red and Orange
 		-- Green component goes from 0 to 0.5
-		local greenComponent = (playerLevel - low + 3) / 6
+		local greenComponent = (currentLevel - low + 3) / 6
 		return 1, greenComponent, 0
-	elseif playerLevel == low then
+	elseif currentLevel == low then
 		-- Player is at low, at least two-level bracket -> Orange
 		return 1, 0.5, 0
-	elseif playerLevel < midBracket then
+	elseif currentLevel < midBracket then
 		-- Player is between low and the middle of the bracket -> sliding scale between Orange and Yellow
 		-- Green component goes from 0.5 to 1
 		local halfBracketSize = (high - low) / 2
-		local posInBracketHalf = playerLevel - low
+		local posInBracketHalf = currentLevel - low
 		local greenComponent = 0.5 + (posInBracketHalf / halfBracketSize) * 0.5
 		return 1, greenComponent, 0
-	elseif playerLevel == midBracket then
+	elseif currentLevel == midBracket then
 		-- Player is at the middle of the bracket -> Yellow
 		return 1, 1, 0
-	elseif playerLevel < high then
+	elseif currentLevel < high then
 		-- Player is between the middle of the bracket and High -> sliding scale between Yellow and Green
 		-- Red component goes from 1 to 0
 		local halfBracketSize = (high - low) / 2
-		local posInBracketHalf = playerLevel - midBracket
+		local posInBracketHalf = currentLevel - midBracket
 		local redComponent = 1 - (posInBracketHalf / halfBracketSize)
 		return redComponent, 1, 0
-	elseif playerLevel == high then
+	elseif currentLevel == high then
 		-- Player is at High, at least two-level bracket -> Green
 		return 0, 1, 0
-	elseif playerLevel < high + 3 then
+	elseif currentLevel < high + 3 then
 		-- Player is up to three levels above High -> sliding scale between Green and Gray
 		-- Red and Blue components go from 0 to 0.5
 		-- Green component goes from 1 to 0.5
-		local pos = (playerLevel - high) / 3
+		local pos = (currentLevel - high) / 3
 		local redAndBlueComponent = pos * 0.5
 		local greenComponent = 1 - redAndBlueComponent
 		return redAndBlueComponent, greenComponent, redAndBlueComponent
@@ -2653,7 +2685,7 @@ do
 
 	zones[BZ["Alterac Valley"]] = {
 		low = 45,
-		high = 85,
+		high = 90,
 		continent = Eastern_Kingdoms,
 		paths = BZ["Hillsbrad Foothills"],
 		groupSize = 40,
@@ -2663,7 +2695,7 @@ do
 
 	zones[BZ["Arathi Basin"]] = {
 		low = 10,
-		high = 85,
+		high = 90,
 		continent = Eastern_Kingdoms,
 		paths = BZ["Arathi Highlands"],
 		groupSize = 15,
@@ -2673,7 +2705,7 @@ do
 
 	zones[BZ["Warsong Gulch"]] = {
 		low = 10,
-		high = 85,
+		high = 90,
 		continent = Kalimdor,
 		paths = isHorde and BZ["Northern Barrens"] or BZ["Ashenvale"],
 		groupSize = 10,
@@ -2692,6 +2724,8 @@ do
 		faction = "Alliance",
 		type = "City",
 		fishing_min = 75,
+		battlepet_low = 1,
+		battlepet_high = 3,
 	}
 
 	zones[BZ["Silvermoon City"]] = {
@@ -2703,6 +2737,8 @@ do
 		},
 		faction = "Horde",
 		type = "City",
+		battlepet_low = 1,
+		battlepet_high = 3,
 	}
 
 	zones[BZ["Stormwind City"]] = {
@@ -2726,6 +2762,8 @@ do
 		faction = "Alliance",
 		type = "City",
 		fishing_min = 75,
+		battlepet_low = 1,
+		battlepet_high = 1,
 	}
 
 	zones[BZ["Undercity"]] = {
@@ -2739,6 +2777,8 @@ do
 		faction = "Horde",
 		type = "City",
 		fishing_min = 75,
+		battlepet_low = 1,
+		battlepet_high = 3,
 	}
 
 	zones[BZ["Dun Morogh"]] = {
@@ -2756,6 +2796,8 @@ do
 		},
 		faction = "Alliance",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Coldridge Valley"]] = {
@@ -2795,6 +2837,8 @@ do
 		},
 		faction = "Alliance",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Northshire"]] = {
@@ -2819,6 +2863,8 @@ do
 		},
 		faction = "Horde",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Sunstrider Isle"]] = {
@@ -2856,6 +2902,8 @@ do
 --		},
 		faction = "Horde",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Deathknell"]] = {
@@ -2885,6 +2933,8 @@ do
 		},
 		faction = "Horde",
 		fishing_min = 75,
+		battlepet_low = 3,
+		battlepet_high = 6,
 	}
 
 	zones[BZ["Loch Modan"]] = {
@@ -2899,6 +2949,8 @@ do
 		},
 		faction = "Alliance",
 		fishing_min = 75,
+		battlepet_low = 3,
+		battlepet_high = 6,
 	}
 
 	zones[BZ["Silverpine Forest"]] = {
@@ -2914,6 +2966,8 @@ do
 		},
 		faction = "Horde",
 		fishing_min = 75,
+		battlepet_low = 3,
+		battlepet_high = 6,
 	}
 
 	zones[BZ["Westfall"]] = {
@@ -2928,6 +2982,8 @@ do
 		},
 		faction = "Alliance",
 		fishing_min = 75,
+		battlepet_low = 3,
+		battlepet_high = 4,
 	}
 
 	zones[BZ["Redridge Mountains"]] = {
@@ -2941,6 +2997,8 @@ do
 			[BZ["Swamp of Sorrows"]] = true,
 		},
 		fishing_min = 75,
+		battlepet_low = 4,
+		battlepet_high = 6,
 	}
 
 	zones[BZ["Duskwood"]] = {
@@ -2955,6 +3013,8 @@ do
 			[BZ["Elwynn Forest"]] = true,
 		},
 		fishing_min = 150,
+		battlepet_low = 5,
+		battlepet_high = 7,
 	}
 
 	zones[BZ["Hillsbrad Foothills"]] = {
@@ -2971,6 +3031,8 @@ do
 		},
 		faction = "Horde",
 		fishing_min = 150,
+		battlepet_low = 6,
+		battlepet_high = 7,
 	}
 
 	zones[BZ["Wetlands"]] = {
@@ -2985,6 +3047,8 @@ do
 			[BZ["Loch Modan"]] = true,
 		},
 		fishing_min = 150,
+		battlepet_low = 6,
+		battlepet_high = 7,
 	}
 
 	zones[BZ["Arathi Highlands"]] = {
@@ -2999,6 +3063,8 @@ do
 			[BZ["The Hinterlands"]] = true,
 		},
 		fishing_min = 150,
+		battlepet_low = 7,
+		battlepet_high = 8,
 	}
 
 	zones[BZ["Stranglethorn Vale"]] = {
@@ -3014,6 +3080,8 @@ do
 			[BOOTYBAY_RATCHET_BOAT] = true,
 		},
 		fishing_min = 150,
+		battlepet_low = 7,
+		battlepet_high = 10,
 	}
 
 	zones[BZ["Northern Stranglethorn"]] = {
@@ -3029,6 +3097,8 @@ do
 			[UNDERCITY_GROMGOL_ZEPPELIN] = true,
 		},
 		fishing_min = 150,
+		battlepet_low = 7,
+		battlepet_high = 9,
 	}
 
 	zones[BZ["The Cape of Stranglethorn"]] = {
@@ -3040,6 +3110,8 @@ do
 			["Northern Stranglethorn"] = true,
 		},
 		fishing_min = 225,
+		battlepet_low = 9,
+		battlepet_high = 10,
 	}
 
 	zones[BZ["Badlands"]] = {
@@ -3053,6 +3125,8 @@ do
 			[BZ["Loch Modan"]] = true,
 		},
 		fishing_min = 300,
+		battlepet_low = 13,
+		battlepet_high = 14,
 	}
 
 	zones[BZ["Swamp of Sorrows"]] = {
@@ -3067,6 +3141,8 @@ do
 			[BZ["Redridge Mountains"]] = true,
 		},
 		fishing_min = 425,
+		battlepet_low = 14,
+		battlepet_high = 15,
 	}
 
 	zones[BZ["The Hinterlands"]] = {
@@ -3079,6 +3155,8 @@ do
 			[BZ["Arathi Highlands"]] = true,
 		},
 		fishing_min = 225,
+		battlepet_low = 11,
+		battlepet_high = 12,
 	}
 
 	zones[BZ["Searing Gorge"]] = {
@@ -3102,6 +3180,8 @@ do
 			[BZ["Blackrock Mountain"]] = true,
 		},
 		fishing_min = 425,
+		battlepet_low = 13,
+		battlepet_high = 14,
 	}
 
 	zones[BZ["Blackrock Mountain"]] = {
@@ -3141,6 +3221,8 @@ do
 			[BZ["Karazhan"]] = true,
 		},
 		fishing_min = 425,
+		battlepet_low = 17,
+		battlepet_high = 18,
 	}
 
 	zones[BZ["Blasted Lands"]] = {
@@ -3151,7 +3233,9 @@ do
 			[BZ["The Dark Portal"]] = true,
 			[BZ["Swamp of Sorrows"]] = true,
 		},
-		fishing_min = 425
+		fishing_min = 425,
+		battlepet_low = 16,
+		battlepet_high = 17,
 	}
 
 	zones[BZ["Burning Steppes"]] = {
@@ -3175,6 +3259,8 @@ do
 			[BZ["Blackrock Mountain"]] = true,
 		},
 		fishing_min = 425,
+		battlepet_low = 15,
+		battlepet_high = 16,
 	}
 
 	zones[BZ["Western Plaguelands"]] = {
@@ -3190,6 +3276,8 @@ do
 			[BZ["Hillsbrad Foothills"]] = true,
 		},
 		fishing_min = 225,
+		battlepet_low = 10,
+		battlepet_high = 11,
 	}
 
 	zones[BZ["Eastern Plaguelands"]] = {
@@ -3204,6 +3292,8 @@ do
 		},
 		type = "PvP Zone",
 		fishing_min = 300,
+		battlepet_low = 12,
+		battlepet_high = 13,
 	}
 
 	zones[BZ["The Deadmines"]] = {
@@ -3480,6 +3570,8 @@ do
 		faction = "Alliance",
 		type = "City",
 		fishing_min = 75,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Moonglade"]] = {
@@ -3491,6 +3583,8 @@ do
 			[BZ["Winterspring"]] = true,
 		},
 		fishing_min = 300,
+		battlepet_low = 15,
+		battlepet_high = 16,
 	}
 
 	zones[BZ["Orgrimmar"]] = {
@@ -3519,6 +3613,8 @@ do
 		faction = "Horde",
 		type = "City",
 		fishing_min = 75,
+		battlepet_low = 1,
+		battlepet_high = 1,
 	}
 
 	zones[BZ["The Exodar"]] = {
@@ -3530,6 +3626,8 @@ do
 		},
 		faction = "Alliance",
 		type = "City",
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Thunder Bluff"]] = {
@@ -3542,6 +3640,8 @@ do
 		faction = "Horde",
 		type = "City",
 		fishing_min = 75,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Azuremyst Isle"]] = {
@@ -3556,6 +3656,8 @@ do
 		},
 		faction = "Alliance",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Ammen Vale"]] = {
@@ -3582,6 +3684,8 @@ do
 		},
 		faction = "Horde",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Valley of Trials"]] = {
@@ -3617,6 +3721,8 @@ do
 		},
 		faction = "Horde",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Camp Narache"]] = {
@@ -3642,6 +3748,8 @@ do
 		},
 		faction = "Alliance",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Shadowglen"]] = {
@@ -3662,6 +3770,8 @@ do
 		paths = BZ["Azuremyst Isle"],
 		faction = "Alliance",
 		fishing_min = 75,
+		battlepet_low = 3,
+		battlepet_high = 6,
 	}
 
 	zones[BZ["Darkshore"]] = {
@@ -3673,6 +3783,8 @@ do
 		},
 		faction = "Alliance",
 		fishing_min = 75,
+		battlepet_low = 3,
+		battlepet_high = 6,
 	}
 
 	zones[BZ["Northern Barrens"]] = {
@@ -3694,6 +3806,8 @@ do
 		},
 		faction = "Horde",
 		fishing_min = 75,
+		battlepet_low = 3,
+		battlepet_high = 4,
 	}
 
 	zones[BZ["Southern Barrens"]] = {
@@ -3712,6 +3826,8 @@ do
 			[BZ["Mulgore"]] = true,
 		},
 		fishing_min = 225,
+		battlepet_low = 9,
+		battlepet_high = 10,
 	}
 
 	zones[BZ["Stonetalon Mountains"]] = {
@@ -3725,6 +3841,8 @@ do
 			[BZ["Ashenvale"]] = true,
 		},
 		fishing_min = 150,
+		battlepet_low = 5,
+		battlepet_high = 7,
 	}
 
 	zones[BZ["Ashenvale"]] = {
@@ -3745,6 +3863,8 @@ do
 			[BZ["Stonetalon Mountains"]] = true,
 		},
 		fishing_min = 150,
+		battlepet_low = 4,
+		battlepet_high = 6,
 	}
 
 	zones[BZ["Thousand Needles"]] = {
@@ -3762,6 +3882,8 @@ do
 			[BZ["Razorfen Downs"]] = true,
 		},
 		fishing_min = 300,
+		battlepet_low = 13,
+		battlepet_high = 14,
 	}
 
 	zones[BZ["Desolace"]] = {
@@ -3775,6 +3897,8 @@ do
 			[BZ["Maraudon"]] = true,
 		},
 		fishing_min = 225,
+		battlepet_low = 7,
+		battlepet_high = 9,
 	}
 
 	zones[BZ["Dustwallow Marsh"]] = {
@@ -3789,6 +3913,8 @@ do
 			[MENETHIL_THERAMORE_BOAT] = true,
 		},
 		fishing_min = 225,
+		battlepet_low = 12,
+		battlepet_high = 13,
 	}
 
 	zones[BZ["Feralas"]] = {
@@ -3809,6 +3935,8 @@ do
 			[BZ["Dire Maul"]] = true,
 		},
 		fishing_min = 225,
+		battlepet_low = 11,
+		battlepet_high = 12,
 	}
 
 	zones[BZ["Tanaris"]] = {
@@ -3837,6 +3965,8 @@ do
 			[BZ["Caverns of Time"]] = true,
 		},
 		fishing_min = 300,
+		battlepet_low = 13,
+		battlepet_high = 14,
 	}
 
 	zones[BZ["Azshara"]] = {
@@ -3847,6 +3977,8 @@ do
 		paths = BZ["Orgrimmar"],
 		fishing_min = 75,
 		faction = "Horde",
+		battlepet_low = 3,
+		battlepet_high = 6,
 	}
 
 	zones[BZ["Felwood"]] = {
@@ -3859,6 +3991,8 @@ do
 			[BZ["Ashenvale"]] = true,
 		},
 		fishing_min = 300,
+		battlepet_low = 14,
+		battlepet_high = 15,
 	}
 
 	zones[BZ["Un'Goro Crater"]] = {
@@ -3870,6 +4004,8 @@ do
 			[BZ["Tanaris"]] = true,
 		},
 		fishing_min = 375,
+		battlepet_low = 15,
+		battlepet_high = 16,
 	}
 
 	zones[BZ["Silithus"]] = {
@@ -3890,6 +4026,8 @@ do
 		},
 		type = "PvP Zone",
 		fishing_min = 425,
+		battlepet_low = 16,
+		battlepet_high = 17,
 	}
 
 	zones[BZ["Winterspring"]] = {
@@ -3902,6 +4040,8 @@ do
 			[BZ["Mount Hyjal"]] = true,
 		},
 		fishing_min = 425,
+		battlepet_low = 17,
+		battlepet_high = 18,
 	}
 
 	zones[BZ["Ragefire Chasm"]] = {
@@ -4140,6 +4280,8 @@ do
 		},
 		faction = "Sanctuary",
 		type = "City",
+		battlepet_low = 17,
+		battlepet_high = 17,
 	}
 
 	zones[BZ["Hellfire Citadel"]] = {
@@ -4185,6 +4327,8 @@ do
 		},
 		type = "PvP Zone",
 		fishing_min = 375,
+		battlepet_low = 17,
+		battlepet_high = 18,
 	}
 
 	zones[BZ["Coilfang Reservoir"]] = {
@@ -4230,6 +4374,8 @@ do
 		},
 		type = "PvP Zone",
 		fishing_min = 400,
+		battlepet_low = 18,
+		battlepet_high = 19,
 	}
 
 	zones[BZ["Ring of Observance"]] = {
@@ -4275,6 +4421,8 @@ do
 		},
 		type = "PvP Zone",
 		fishing_min = 450,
+		battlepet_low = 18,
+		battlepet_high = 19,
 	}
 
 	zones[BZ["Nagrand"]] = {
@@ -4291,6 +4439,8 @@ do
 		},
 		type = "PvP Zone",
 		fishing_min = 475,
+		battlepet_low = 18,
+		battlepet_high = 19,
 	}
 
 	zones[BZ["Blade's Edge Mountains"]] = {
@@ -4307,6 +4457,8 @@ do
 			[BZ["Zangarmarsh"]] = true,
 			[BZ["Gruul's Lair"]] = true,
 		},
+		battlepet_low = 18,
+		battlepet_high = 20,
 	}
 
 	zones[BZ["Tempest Keep"]] = {
@@ -4348,6 +4500,8 @@ do
 			[BZ["Tempest Keep"]] = true,
 		},
 		fishing_min = 475,
+		battlepet_low = 20,
+		battlepet_high = 21,
 	}
 
 	zones[BZ["Shadowmoon Valley"]] = {
@@ -4360,6 +4514,8 @@ do
 			[BZ["Black Temple"]] = true,
 		},
 		fishing_min = 375,
+		battlepet_low = 20,
+		battlepet_high = 21,
 	}
 
 	zones[BZ["Black Temple"]] = {
@@ -4560,7 +4716,7 @@ do
 
 	zones[BZ["Eye of the Storm"]] = {
 		low = 35,
-		high = 85,
+		high = 90,
 		continent = Outland,
 		groupSize = 15,
 		type = "Battleground",
@@ -4603,6 +4759,8 @@ do
 			[BZ["Sunwell Plateau"]] = true,
 		},
 		fishing_min = 450,
+		battlepet_low = 20,
+		battlepet_high = 20,
 	}
 
 	zones[BZ["Magisters' Terrace"]] = {
@@ -4644,6 +4802,8 @@ do
 		texture = "Dalaran",
 		faction = "Sanctuary",
 		fishing_min = 525,
+		battlepet_low = 21,
+		battlepet_high = 21,
 	}
 
 	zones[BZ["Plaguelands: The Scarlet Enclave"]] = {
@@ -4677,6 +4837,8 @@ do
 			[BZ["Coldarra"]] = true,
 		},
 		fishing_min = 475,
+		battlepet_low = 20,
+		battlepet_high = 22,
 	}
 
 	zones[BZ["Coldarra"]] = {
@@ -4714,6 +4876,8 @@ do
 			[BZ["Utgarde Pinnacle"]] = true,
 		},
 		fishing_min = 475,
+		battlepet_low = 20,
+		battlepet_high = 22,
 	}
 
 	zones[BZ["Dragonblight"]] = {
@@ -4740,6 +4904,8 @@ do
 			[BZ["Strand of the Ancients"]] = true,
 		},
 		fishing_min = 475,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Grizzly Hills"]] = {
@@ -4754,6 +4920,8 @@ do
 		},
 		instances = BZ["Drak'Tharon Keep"],
 		fishing_min = 475,
+		battlepet_low = 21,
+		battlepet_high = 22,
 	}
 
 	zones[BZ["Zul'Drak"]] = {
@@ -4772,6 +4940,8 @@ do
 			[BZ["Drak'Tharon Keep"]] = true,
 		},
 		fishing_min = 475,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Sholazar Basin"]] = {
@@ -4780,6 +4950,8 @@ do
 		continent = Northrend,
 		paths = BZ["Borean Tundra"],
 		fishing_min = 525,
+		battlepet_low = 21,
+		battlepet_high = 22,
 	}
 
 	zones[BZ["Crystalsong Forest"]] = {
@@ -4793,6 +4965,8 @@ do
 			[BZ["The Storm Peaks"]] = true,
 		},
 		fishing_min = 500,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["The Storm Peaks"]] = {
@@ -4811,6 +4985,8 @@ do
 			[BZ["Ulduar"]] = true,
 		},
 		fishing_min = 550,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Icecrown"]] = {
@@ -4836,6 +5012,8 @@ do
 			[BZ["Isle of Conquest"]] = true,
 		},
 		fishing_min = 550,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Hrothgar's Landing"]] = {
@@ -4843,7 +5021,9 @@ do
 		high = 80,
 		paths = BZ["Icecrown"],
 		continent = Northrend,
-		fishing_min = 550
+		fishing_min = 550,
+		battlepet_low = 22,
+		battlepet_high = 22,
 	}
 
 	zones[BZ["Wintergrasp"]] = {
@@ -4854,6 +5034,8 @@ do
 		instances = BZ["Vault of Archavon"],
 		type = "PvP Zone",
 		fishing_min = 525,
+		battlepet_low = 22,
+		battlepet_high = 22,
 	}
 
 	-- WOTLK Dungeons
@@ -5115,7 +5297,7 @@ do
 
 	zones[BZ["Strand of the Ancients"]] = {
 		low = 65,
-		high = 85,
+		high = 90,
 		continent = Northrend,
 		groupSize = 15,
 		type = "Battleground",
@@ -5124,7 +5306,7 @@ do
 
 	zones[BZ["Isle of Conquest"]] = {
 		low = 75,
-		high = 85,
+		high = 90,
 		continent = Northrend,
 		groupSize = 40,
 		type = "Battleground",
@@ -5158,6 +5340,8 @@ do
 			[BZ["Firelands"]] = true,
 		},
 		fishing_min = 575,
+		battlepet_low = 22,
+		battlepet_high = 24,
 	}
 
 	zones[BZ["Uldum"]] = {
@@ -5174,6 +5358,8 @@ do
 			[BZ["Throne of the Four Winds"]] = true,
 		},
 		fishing_min = 650,
+		battlepet_low = 23,
+		battlepet_high = 24,
 	}
 
 	zones[BZ["Ahn'Qiraj: The Fallen Kingdom"]] = {
@@ -5188,6 +5374,8 @@ do
 			[BZ["Ruins of Ahn'Qiraj"]] = true,
 		},
 		type = "Complex",
+		battlepet_low = 16,
+		battlepet_high = 17,
 	}
 
 	zones[BZ["Gilneas"]] = {
@@ -5197,6 +5385,8 @@ do
 		paths = {},  -- phased instance
 		faction = "Alliance",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 1,
 	}
 
 	zones[BZ["Gilneas City"]] = {
@@ -5205,6 +5395,8 @@ do
 		continent = Eastern_Kingdoms,
 		paths = {},  -- phased instance
 		faction = "Alliance",
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
 	zones[BZ["Ruins of Gilneas"]] = {
@@ -5242,6 +5434,8 @@ do
 			[TWILIGHTHIGHLANDS_ORGRIMMAR_PORTAL] = true,
 		},
 		fishing_min = 650,
+		battlepet_low = 23,
+		battlepet_high = 24,
 	}
 
 	zones[BZ["Tol Barad"]] = {
@@ -5253,6 +5447,8 @@ do
 		},
 		type = "PvP Zone",
 		fishing_min = 675,
+		battlepet_low = 23,
+		battlepet_high = 24,
 	}
 
 	zones[BZ["Tol Barad Peninsula"]] = {
@@ -5265,6 +5461,8 @@ do
 			[TOLBARAD_STORMWIND_PORTAL] = true,
 		},
 		fishing_min = 675,
+		battlepet_low = 23,
+		battlepet_high = 24,
 	}
 
 
@@ -5276,6 +5474,8 @@ do
 			[BZ["Throne of the Tides"]] = true,
 		},
 		fishing_min = 575,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Kelp'thar Forest"]] = {
@@ -5286,6 +5486,8 @@ do
 			[BZ["Shimmering Expanse"]] = true,
 		},
 		fishing_min = 575,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Shimmering Expanse"]] = {
@@ -5297,6 +5499,8 @@ do
 			[BZ["Abyssal Depths"]] = true,
 		},
 		fishing_min = 575,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Abyssal Depths"]] = {
@@ -5311,6 +5515,8 @@ do
 			[BZ["Throne of the Tides"]] = true,
 		},
 		fishing_min = 575,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 --	! Conflict with continent
@@ -5337,6 +5543,8 @@ do
 			[DEEPHOLM_STORMWIND_PORTAL] = true,
 		},
 		fishing_min = 550,
+		battlepet_low = 22,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Kezan"]] = {
@@ -5345,6 +5553,8 @@ do
 		continent = The_Maelstrom,
 		faction = "Horde",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 1,
 	}
 
 	zones[BZ["The Lost Isles"]] = {
@@ -5353,8 +5563,19 @@ do
 		continent = The_Maelstrom,
 		faction = "Horde",
 		fishing_min = 25,
+		battlepet_low = 1,
+		battlepet_high = 2,
 	}
 
+-- 	Patch 4.2 zone
+
+	zones[BZ["Molten Front"]] = {
+		low = 85,
+		high = 85,
+		continent = Kalimdor,
+		battlepet_low = 24,
+		battlepet_high = 24,
+	}
 
 --	Patch 4.3 zone
 
@@ -5365,6 +5586,8 @@ do
 			[DARKMOON_MULGORE_PORTAL] = true,
 			[DARKMOON_ELWYNNFOREST_PORTAL] = true,
 		},
+--		battlepet_low = 1,  TODO
+--		battlepet_high = 2,
 	}
 
 
@@ -5548,7 +5771,7 @@ do
 
 	zones[BZ["The Battle for Gilneas"]] = {
 		low = 85,
-		high = 85,
+		high = 90,
 		continent = Eastern_Kingdoms,
 		groupSize = 10,
 		type = "Battleground",
@@ -5557,7 +5780,7 @@ do
 
 	zones[BZ["Twin Peaks"]] = {
 		low = 85,
-		high = 85,
+		high = 90,
 		continent = Eastern_Kingdoms,
 		paths = BZ["Twilight Highlands"],
 		groupSize = 10,
@@ -5573,7 +5796,7 @@ do
 		high = 10,
 		continent = Pandaria,
 --		fishing_min = 25,
- 		faction = "Sanctuary",  -- Not contested and not Alliance or Horde -> no PvP -> sanctuary
+ 		faction = "Sanctuary",  -- Not contested and not Alliance nor Horde -> no PvP -> sanctuary
 	}
 
 	zones[BZ["The Jade Forest"]] = {
@@ -5590,6 +5813,8 @@ do
 			[JADEFOREST_STORMWIND_PORTAL] = true,
 		},
 		fishing_min = 650,
+		battlepet_low = 23,
+		battlepet_high = 25,
 	}
 
 	zones[BZ["Valley of the Four Winds"]] = {
@@ -5606,6 +5831,8 @@ do
 			[BZ["The Veiled Stair"]] = true,
 		},
 		fishing_min = 700,
+		battlepet_low = 23,
+		battlepet_high = 25,
 	}
 
 	zones[BZ["Krasarang Wilds"]] = {
@@ -5616,6 +5843,8 @@ do
 			[BZ["Valley of the Four Winds"]] = true,
 		},
 		fishing_min = 700,
+		battlepet_low = 23,
+		battlepet_high = 25,
 	}
 
 	zones[BZ["Kun-Lai Summit"]] = {
@@ -5633,6 +5862,8 @@ do
 			[BZ["The Veiled Stair"]] = true,
 		},
 		fishing_min = 625,
+		battlepet_low = 23,
+		battlepet_high = 25,
 	}
 
 	zones[BZ["Townlong Steppes"]] = {
@@ -5647,11 +5878,13 @@ do
 			[BZ["Dread Wastes"]] = true,
 		},
 		fishing_min = 700,
+		battlepet_low = 24,
+		battlepet_high = 25,
 	}
 
 	zones[BZ["Dread Wastes"]] = {
-		low = 87,
-		high = 88,
+		low = 89,
+		high = 90,
 		continent = Pandaria,
 		instances = {
 			[BZ["Gate of the Setting Sun"]] = true,
@@ -5663,6 +5896,8 @@ do
 			[BZ["Townlong Steppes"]] = true
 		},
 		fishing_min = 625,
+		battlepet_low = 24,
+		battlepet_high = 25,
 	}
 
 	zones[BZ["Vale of Eternal Blossoms"]] = {
@@ -5677,6 +5912,8 @@ do
 			[BZ["Kun-Lai Summit"]] = true,
 		},
 		fishing_min = 825,
+		battlepet_low = 23,
+		battlepet_high = 25,
 	}
 
 	zones[BZ["The Veiled Stair"]] = {
@@ -5692,6 +5929,8 @@ do
 			[BZ["Kun-Lai Summit"]] = true,
 		},
 		fishing_min = 750,
+		battlepet_low = 23,
+		battlepet_high = 25,
 	}
 
 --	Mists of Pandaria (MoP) cities
@@ -5703,6 +5942,8 @@ do
 		},
 		faction = "Alliance",
 		type = "City",
+		battlepet_low = 23,
+		battlepet_high = 23,
 	}
 
 	zones[BZ["Shrine of Two Moons"]] = {
@@ -5712,6 +5953,8 @@ do
 		},
 		faction = "Horde",
 		type = "City",
+		battlepet_low = 23,
+		battlepet_high = 23,
 	}
 	
 --	Mists of Pandaria (MoP) instances
@@ -5723,7 +5966,7 @@ do
 		paths = BZ["The Jade Forest"],
 		groupSize = 5,
 		type = "Instance",
-	--	entrancePortal = { BZ["The Jade Forest"], 47.70, 51.96 },  TODO
+		entrancePortal = { BZ["The Jade Forest"], 56.20, 57.90 },
 	}
 
 	zones[BZ["Stormstout Brewery"]] = {
@@ -5733,7 +5976,7 @@ do
 		paths = BZ["Valley of the Four Winds"],
 		groupSize = 5,
 		type = "Instance",
-	--	entrancePortal = { BZ["Valley of the Four Winds"], 47.70, 51.96 },  TODO
+		entrancePortal = { BZ["Valley of the Four Winds"], 36.10, 69.10 }, 
 	}
 
 	zones[BZ["Shado-pan Monastery"]] = {
@@ -6020,6 +6263,8 @@ do
 		yardXOffsets[k] = v.x_offset
 		yardYOffsets[k] = v.y_offset
 		fishing[k] = v.fishing_min
+		battlepet_lows[k] = v.battlepet_low
+		battlepet_highs[k] = v.battlepet_high
 		textures[k] = v.texture
 		complexOfInstance[k] = v.complex
 		zoneComplexes[k] = v.complexes

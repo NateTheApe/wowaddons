@@ -11,5 +11,6 @@
 	<Include file="Libs\AceLocale-3.0\AceLocale-3.0.xml"/>
 	<Include file="Libs\AceEvent-3.0\AceEvent-3.0.xml"/>
 	<Include file="Libs\AceTimer-3.0\AceTimer-3.0.xml"/>
+	<Include file="Libs\LibDialog-1.0\lib.xml"/>
 	<Script file="Libs\LibCrayon-3.0\LibCrayon-3.0.lua"/>
 </Ui>

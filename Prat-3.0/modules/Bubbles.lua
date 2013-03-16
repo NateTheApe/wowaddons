@@ -155,20 +155,20 @@ Prat:AddModuleToLoad(function()
   )
   L:AddLocale("ruRU",
   {
-	-- color_desc = "",
-	-- color_name = "",
-	-- font_desc = "",
+	color_desc = "Окрашивать границу облачка чата в цвет канала чата.", -- Needs review
+	color_name = "Окрашивать облачка", -- Needs review
+	font_desc = "Использовать тот же шрифт, что и в окне чата", -- Needs review
 	font_name = "Шрифт чата",
 	fontsize_desc = "Размер шрифта чата",
 	fontsize_name = "Размер шрифта",
-	-- format_desc = "",
+	format_desc = "Применить форматирование чата к тексту в облачках чата.", -- Needs review
 	format_name = "Формат Текста",
-	-- icons_desc = "",
+	icons_desc = "Показать иконки рейда в облачках чата.", -- Needs review
 	icons_name = "Показать Рейд иконок", -- Needs review
-	-- module_desc = "",
-	-- module_name = "",
-	-- shorten_desc = "",
-	-- shorten_name = "",
+	module_desc = "Настройки, относящиеся к облачкам чата", -- Needs review
+	module_name = "Облачка", -- Needs review
+	shorten_desc = "Уменьшать облачка чата до одной строки. Наведите курсор на облачко, чтобы открыть текст полностью.", -- Needs review
+	shorten_name = "Уменьшать облачка", -- Needs review
 }
 
   )

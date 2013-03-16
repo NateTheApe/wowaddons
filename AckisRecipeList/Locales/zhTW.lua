@@ -6,7 +6,7 @@ zhTW localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.2
+Project version: 2.4.4
 ************************************************************************
 Original translated by: iCat, apa1102, zhucc
 Currently maintained by:
@@ -187,7 +187,8 @@ L["Bradley Towns"] = "布瑞德利·湯恩斯"
 L["Braeg Stoutbeard"] = "布瑞格·厚鬚"
 L["Brandig"] = "布銳迪格"
 L["Brawn"] = "布勞恩"
-L["BRD_RANDOM_ROOM"] = "有機會在黑石深淵的五個不同的房間中找到隨機刷新的配方，但有時甚至於沒有。"
+L["BRD_MAIL"] = "在黑石深淵有4個刷新點：進入製造廠之前，魔像領主阿格曼奇的房間，製造廠的長凳上，或在澆鑄間之內。"
+L["BRD_SHOULDERS"] = "在黑石深淵有1個稀有刷新點：暗爐鎖和競技場之間，在角落的床上。"
 L["Brek Stonehoof"] = "布瑞克·石蹄"
 L["Brikk Keencraft"] = "布里克·基克拉夫"
 L["Brock Stoneseeker"] = "布洛克·尋石者"

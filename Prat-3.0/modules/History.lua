@@ -189,17 +189,17 @@ Prat:AddModuleToLoad(function()
     {
 	["Chat history options."] = "Настройки истории чата.",
 	["Color GMOTD"] = "Цвет  GMOTD",
-	-- ["Colors the GMOTD label"] = "",
-	-- delaygmotd_desc = "",
+	["Colors the GMOTD label"] = "Цвета названия СДГ", -- Needs review
+	delaygmotd_desc = "Задерживать отображение СДГ вплоть до окончания спама при входе в игру", -- Needs review
 	delaygmotd_name = "задержка GMOTD",
-	-- divider = "",
+	divider = "========== Конец прокрутки ==========", -- Needs review
 	History = "История",
 	["Maximum number of lines of command history to save."] = "Максимальное число строк сохранённых в истории команд.",
 	["Save Command History"] = "Сохранять историю команд",
 	["Saves command history between sessions (for use with alt+up arrow or just the up arrow)"] = "Сохранять историю команд между сеансами (для использования используйте alt+ стрелка вверх или просто стрелку вверх)",
-	-- Scrollback = "",
-	-- scrollbacklen_desc = "",
-	-- scrollbacklen_name = "",
+	Scrollback = "Прокрутка", -- Needs review
+	scrollbacklen_desc = "Количество строк чата, которое надо сохранять в буфере прокрутки.", -- Needs review
+	scrollbacklen_name = "Длина прокрутки", -- Needs review
 	["Scrollback Options"] = "Вернуть опции",
 	["Set Chat Lines"] = "Задать число строк чата",
 	["Set Command History"] = "История команд",

@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.4) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-11-19T01:15:55Z
+    This file was last updated on 2012-12-12T02:47:54Z
 
 --]]
 -------------------------------------------------------------------------------
@@ -549,7 +549,9 @@ end -- }}}
 function LiveList:DisplayTestItem() -- {{{
     if not self.TestItemDisplayed and D.Status.Unit_Array[1] then
         self.TestItemDisplayed = GetTime();
-        D:DummyDebuff(D.Status.Unit_Array[1], "Test item");
+        for i,unit in ipairs(D.Status.Unit_Array) do
+            D:DummyDebuff(unit, "Test item");
+        end
     end
 end -- }}}
 
@@ -583,4 +585,4 @@ function LiveList:Onclick() -- {{{
     D:Println(L["HLP_LL_ONCLICK_TEXT"]);
 end -- }}}
 
-T._LoadedFiles["Dcr_LiveList.lua"] = "2.7.2.3_beta_3";
+T._LoadedFiles["Dcr_LiveList.lua"] = "2.7.2.4";

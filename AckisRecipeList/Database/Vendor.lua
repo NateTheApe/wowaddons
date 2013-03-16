@@ -2,10 +2,10 @@
 ************************************************************************
 Vendor.lua
 ************************************************************************
-File date: 2012-09-26T22:42:33Z
-File hash: 0206677
-Project hash: 5a95034
-Project version: 2.4.2
+File date: 2012-12-10T00:07:33Z
+File hash: 662678b
+Project hash: 3df9ad7
+Project version: 2.4.4
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -183,7 +183,7 @@ function addon:InitVendor()
 	AddVendor(8161,		L["Harggan"],				Z.THE_HINTERLANDS,		13.4,	44.0,	"Alliance")
 	AddVendor(8176,		L["Gharash"],				Z.SWAMP_OF_SORROWS,		47.2,	52.1,	"Horde") -- COMPLETELY UPDATED
 	AddVendor(8177,		L["Rartar"],				Z.SWAMP_OF_SORROWS,		47.2,	57.1,	"Horde") -- COMPLETELY UPDATED
-	AddVendor(8178,		L["Nina Lightbrew"],			Z.BLASTED_LANDS,		66.9,	18.3,	"Alliance")
+	AddVendor(8178,		L["Nina Lightbrew"],			Z.BLASTED_LANDS,		62.4,	16.0,	"Alliance")
 	AddVendor(8307,		L["Tarban Hearthgrain"],		Z.NORTHERN_BARRENS,		55.1,	61.7,	"Horde")  -- UPDATED
 	AddVendor(8363,		L["Shadi Mistrunner"],			Z.THUNDER_BLUFF,		40.6,	64.0,	"Horde") -- COMPLETELY UPDATED
 	AddVendor(8508,		L["Gretta Ganter"],			Z.DUN_MOROGH,			38.6,	42.9,	"Alliance") -- COMPLETELY UPDATED
@@ -440,6 +440,7 @@ function addon:InitVendor()
 	AddVendor(64465,	L["Noodles"],				Z.VALLEY_OF_THE_FOUR_WINDS,	52.4,	51.6,	"Neutral") -- COMPLETELY UPDATED
 	AddVendor(64595,	L["Rushi the Fox"],			Z.TOWNLONG_STEPPES,		48.8,	70.6,	"Neutral")
 	AddVendor(64599,	L["Ambersmith Zikk"],			Z.DREAD_WASTES,			55.0,	35.6,	"Neutral")
+	AddVendor(67976,	L["Tinkmaster Overspark"],		Z.KRASARANG_WILDS,		16.5,	79.3,	"Alliance")
 
 	self.InitVendor = nil
 end

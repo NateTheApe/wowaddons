@@ -10,7 +10,7 @@ local LBTime, IgnTime, PyroTime, CombustionUp, combufadeout, ImpactUp, combuimpa
 local combupyrogain, combupyrorefresh
 local combuignitebank, combuigniteapplied, combuignitevalue, combuignitemunched, combuigndamage, combuignitecount
 local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, combucombustiontimestamp, combucombustiondmg, combucombustionprevdmg, combuticks, combuprevticks, combutickdmg, combutickprevdmg, combuprevtargets, combutargets
-local combupyrodps, combuhastetick, combucurrenthaste, combuexpectedtickdmg, combustiontime, combuglyph
+local combuhastetick, combucurrenthaste, combuexpectedtickdmg, combustiontime, combuglyph
 
 function Combustion_OnLoad(Frame) 
                                                
@@ -18,7 +18,7 @@ function Combustion_OnLoad(Frame)
         
 	Frame:RegisterForDrag("LeftButton")
 	Frame:RegisterEvent("PLAYER_LOGIN")
-	Frame:RegisterEvent("PLAYER_TALENT_UPDATE")
+	Frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	Frame:RegisterEvent("PLAYER_REGEN_DISABLED")
 	Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
  	Frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -30,13 +30,14 @@ function Combustion_OnLoad(Frame)
 	CombuLSM:Register("border","ElvUI Border","Interface\\AddOns\\CombustionHelper\\Images\\ElvUIBorder")
 	CombuLSM:Register("statusbar","CombuBar","Interface\\AddOns\\CombustionHelper\\Images\\combubarblack")
 	CombuLSM:Register("sound","CH Volcano","Interface\\AddOns\\CombustionHelper\\Sound\\Volcano.ogg")
+	CombuLSM:Register("font","CH Chinese","Fonts\\ARKai_C.ttf")
     
     LibTransition:Attach(Frame)
     
     CombuClientVersionCheck()
-    CombuLanguageCheck()
 	CombuTableCopy()
 	CombustionVarReset()
+    CombuLanguageCheck()
         	
 end
                             
@@ -89,6 +90,8 @@ combudefaultsettingstable = {["combulock"] = false,
                             ["combutickpredict"] = true,
                             ["pyromaniac"] = true,
                             ["hotstreak"] = true,
+                            ["LBEnable"] = true,
+                            ["PyroEnable"] = true,
 }
 
 combuhasteplateau = {{0,10},
@@ -154,7 +157,9 @@ function CombuLanguageCheck()
             CombuLBposition = CombuLBpositionFR
             CombuAutohideList = CombuAutohideListFR
             CombuLabel = CombuLabelFR
-                
+
+            CombufontstringGlobal("Friz Quadrata TT")
+            
         elseif combusettingstable["language"] == "Deutsch" or combusettingstable["language"] == "Default" and GetLocale() == "deDE" then
             
             CombuLoc = CombuLocDE
@@ -163,8 +168,10 @@ function CombuLanguageCheck()
             CombuLBposition = CombuLBpositionDE
             CombuAutohideList = CombuAutohideListDE
             CombuLabel = CombuLabelDE
+
+            CombufontstringGlobal("Friz Quadrata TT")
             
-        elseif combusettingstable["language"] == "Chinese" or combusettingstable["language"] == "Default" and GetLocale() == "zhTW" then
+        elseif combusettingstable["language"] == "Chinese Traditional 繁體中文" or combusettingstable["language"] == "Default" and GetLocale() == "zhTW" then
             
             CombuLoc = CombuLocTW
             combuoptioninfotable = combuoptioninfotableTW
@@ -172,6 +179,30 @@ function CombuLanguageCheck()
             CombuLBposition = CombuLBpositionTW
             CombuAutohideList = CombuAutohideListTW
             CombuLabel = CombuLabelTW
+            
+            CombufontstringGlobal("CH Chinese")
+            
+        elseif combusettingstable["language"] == "Chinese Simplified 简体中文" or combusettingstable["language"] == "Default" and GetLocale() == "zhCN" then
+            
+            CombuLoc = CombuLocCN
+            combuoptioninfotable = combuoptioninfotableCN
+            CombuOptLoc = CombuOptLocCN
+            CombuLBposition = CombuLBpositionCN
+            CombuAutohideList = CombuAutohideListCN
+            CombuLabel = CombuLabelCN
+            
+            CombufontstringGlobal("CH Chinese")
+            
+        elseif combusettingstable["language"] == "Korean" or combusettingstable["language"] == "Default" and GetLocale() == "krKR" then
+            
+            CombuLoc = CombuLocKR
+            combuoptioninfotable = combuoptioninfotableKR
+            CombuOptLoc = CombuOptLocKR
+            CombuLBposition = CombuLBpositionKR
+            CombuAutohideList = CombuAutohideListKR
+            CombuLabel = CombuLabelKR
+
+            CombufontstringGlobal("MoK")
 
         else CombuLoc = CombuLocEN
             combuoptioninfotable = combuoptioninfotableEN
@@ -180,14 +211,19 @@ function CombuLanguageCheck()
             CombuAutohideList = CombuAutohideListEN
             CombuLabel = CombuLabelEN
 
+            CombufontstringGlobal("Friz Quadrata TT")
+
         end
+        
     else CombuLoc = CombuLocEN
         combuoptioninfotable = combuoptioninfotableEN
         CombuOptLoc = CombuOptLocEN
         CombuLBposition = CombuLBpositionEN
         CombuAutohideList = CombuAutohideListEN
         CombuLabel = CombuLabelEN
-        
+
+        CombufontstringGlobal("Friz Quadrata TT") 
+         
    end
 
 end
@@ -259,7 +295,6 @@ end
 -------------------------------
 -- helper function for option panel setup
 function CombustionHelperOptions_OnLoad(panel)
-    CombuLanguageCheck()
 	panel.name = "CombustionHelper"
 	InterfaceOptions_AddCategory(panel);
 end
@@ -267,8 +302,7 @@ end
 -------------------------------
 -- helper function for customisation option panel setup
 function CombustionHelperCustomOptions_OnLoad(panel)
-    CombuLanguageCheck()
-	panel.name = CombuLoc["interfaceGraph"]
+	panel.name = "Customisation"
 	panel.parent = "CombustionHelper"
 	InterfaceOptions_AddCategory(panel);
 end
@@ -418,6 +452,33 @@ function Combustionimpact()
 	end
 end
 
+
+-------------------------------
+-- pyro tracker function for option panel
+function CombustionPyroEnable()
+
+	if CombuPyroEnableButton:GetChecked(true) then combusettingstable["PyroEnable"] = true 
+                                               CombuPyroEnableButton:SetChecked(true)
+                                               if (combusettingstable["combuchat"]==true) then ChatFrame1:AddMessage(CombuLoc["pyroenableon"]) end
+	else combusettingstable["PyroEnable"] = false 
+         CombuPyroEnableButton:SetChecked(false)
+         if (combusettingstable["combuchat"]==true) then ChatFrame1:AddMessage(CombuLoc["pyroenableoff"]) end
+	end
+end
+
+-------------------------------
+-- bomb tracker function for option panel
+function CombustionLBEnable()
+
+	if CombuLBEnableButton:GetChecked(true) then combusettingstable["LBEnable"] = true 
+                                               CombuLBEnableButton:SetChecked(true)
+                                               if (combusettingstable["combuchat"]==true) then ChatFrame1:AddMessage(CombuLoc["lbenableon"]) end
+	else combusettingstable["LBEnable"] = false 
+         CombuLBEnableButton:SetChecked(false)
+         if (combusettingstable["combuchat"]==true) then ChatFrame1:AddMessage(CombuLoc["lbenableoff"]) end
+	end
+end
+
 -------------------------------
 -- Scale function for option panel
 function CombustionScale (scale)
@@ -459,6 +520,48 @@ combuwidgetlist = {
 	text = {"LBLabel","IgniteLabel","PyroLabel","LBTextFrameLabel","IgnTextFrameLabel","PyroTextFrameLabel","StatusTextFrameLabel"},
 }
 
+function Combufontstring(frame,font)
+
+--print(_G[frame],CombuLSM:Fetch("font",font))
+	local kids = { _G[frame]:GetChildren() };
+	
+	for _, child in ipairs(kids) do 
+			
+		if _G[child:GetName().."Text"] then 
+		
+			_G[child:GetName().."Text"]:SetFont(CombuLSM:Fetch("font",font),select(2,_G[child:GetName().."Text"]:GetFont()))
+		
+		end 
+		
+	end
+	
+end
+	
+function CombufontstringGlobal(font)
+
+	Combufontstring("CombuOptionsFrame",font)
+	Combufontstring("CombuCustomOptionsFrame",font)
+	
+	if font == "Friz Quadrata TT" then 
+         
+         for i = 1,#combuwidgetlist["text"] do 	
+         
+            if _G[(combuwidgetlist["text"])[i]] then 
+                _G[(combuwidgetlist["text"])[i]]:SetFont(CombuLSM:Fetch("font",combusettingstable["combufontname"]),select(2,_G[(combuwidgetlist["text"])[i]]:GetFont())) 
+            end
+            
+         end
+		    		
+	else  for i = 1,#combuwidgetlist["text"] do 
+		
+		_G[(combuwidgetlist["text"])[i]]:SetFont(CombuLSM:Fetch("font",font),select(2,_G[(combuwidgetlist["text"])[i]]:GetFont())) 
+	
+		end  
+		 
+	end
+	
+end
+	
 function CombuBackdropBuild ()
 
 	if not CombuBackdrop then
@@ -559,6 +662,57 @@ function CombustionFrameresize()
     CombuMBTrackerBorderFrame:SetFrameLevel((CombustionFrame:GetFrameLevel())-1)
          
 	CombuBackdropBuild ()
+    CombustionHideModules()
+    
+end
+
+function CombustionHideModules()
+
+    local combuheight = 0
+
+    if combusettingstable["LBEnable"] == false then
+        
+        LBLabel:Hide()
+        LBButton:Hide()
+        LBbar:Hide()
+        LBTextFrameLabel:Hide()
+        combuheight = combuheight + 9
+        IgniteLabel:ClearAllPoints()
+        IgniteLabel:SetPoint("TOPLEFT",CombustionTextFrame,"TOPLEFT",6,-5)
+    
+    else
+       
+        LBLabel:Show()
+        LBButton:Show()
+        LBbar:Show()
+        LBTextFrameLabel:Show()
+        IgniteLabel:ClearAllPoints()
+        IgniteLabel:SetPoint("TOP",LBLabel,"BOTTOM",0,0)
+        
+    end
+
+    if combusettingstable["PyroEnable"] == false then
+        
+        PyroLabel:Hide()
+        PyroButton:Hide()
+        Pyrobar:Hide()
+        PyroTextFrameLabel:Hide()
+        combuheight = combuheight + 9
+        StatusTextFrameLabel:ClearAllPoints()
+        StatusTextFrameLabel:SetPoint("TOPLEFT",IgniteLabel,"BOTTOMLEFT",0,0)
+    
+    else
+       
+        PyroLabel:Show()
+        PyroButton:Show()
+        Pyrobar:Show()
+        PyroTextFrameLabel:Show()
+        StatusTextFrameLabel:ClearAllPoints()
+        StatusTextFrameLabel:SetPoint("TOPLEFT",PyroLabel,"BOTTOMLEFT",0,0)
+        
+    end
+    
+    CombustionFrame:SetHeight(48 - combuheight)
     
 end
 
@@ -881,8 +1035,8 @@ local function CombustionIgnite(event, spellId, spellSchool, amount, critical, d
 	end
     
     
-    if (combusettingstable["combureport"] == true) and select(14, UnitDebuff("target",GetSpellInfo(12654),nil,"PLAYER")) then 
-        combuigndamage = select(14, UnitDebuff("target",GetSpellInfo(12654),nil,"PLAYER"))
+    if (combusettingstable["combureport"] == true) and select(15, UnitDebuff("target",GetSpellInfo(12654),nil,"PLAYER")) then 
+        combuigndamage = select(15, UnitDebuff("target",GetSpellInfo(12654),nil,"PLAYER"))
         IgniteLabel:SetText(format(CombuLabel["dmgwhite0"], combuigndamage))
     else combuigndamage = 0
     end
@@ -917,25 +1071,16 @@ end
 
 function CombustionPredict()
 
-	if select(1,UnitAura("target",pyro1,nil,"HARMFUL")) then
-		
-		combupyrodps = 112.333 + (0.12 * GetSpellBonusDamage(3))
-	
-	else combupyrodps = 0
-	end
-
 	if combuigndamage > 0 then
 	
-		combuigndps = (combuigndamage/2)
+		combuigndps = combuigndamage / 2
 	
 	else combuigndps = 0
 	
 	end
 	
-	combuexpectedtickdmg = combupyrodps + combuigndps
-	
---	((0.12 * GetSpellBonusDamage(3)) + 112.333 + (combuigndamage/2))
-	
+	combuexpectedtickdmg = combuigndps
+		
     combucurrenthaste = UnitSpellHaste("player") * 128.05701
 	
 	for i = 2,#combuhasteplateau do
@@ -954,7 +1099,6 @@ function CombustionPredict()
     
 	combustiontime = GetTime()
 	
---	print(format("Tick : %.0f x %0.f",combuexpectedtickdmg,combuhastetick))
 	return format("Tick : %.0f x %0.f",combuexpectedtickdmg,combuhastetick)
 		
 end
@@ -1017,15 +1161,15 @@ function Combustion_OnEvent(self, event, ...)
 	    	then CombustionFrame:EnableMouse(false)
         end	
                	
-        CombuLanguageCheck()
 	    CombustionScale (combusettingstable["combuscale"]) -- Scale check on startup
-	    CombustionFrameresize() -- Combustion Frame size check on startup    
+	    CombustionFrameresize() -- Combustion Frame size check on startup 
+        CombuLanguageCheck()
 
     end
 	
 -------------------------------
 --Combustion spell check      
-    if (event == "PLAYER_TALENT_UPDATE") then
+    if (event == "ACTIVE_TALENT_GROUP_CHANGED") then
     	
     	CombuClientVersionCheck()
         CombuGlyphCheck ()

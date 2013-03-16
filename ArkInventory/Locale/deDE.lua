@@ -97,6 +97,7 @@ if not L then return end
 	L["STATUS_NAME_MOUNT"] = "Reittier"
 	L["STATUS_NAME_TOKEN"] = "Abzeichen"
 --	L["STATUS_NAME_TACKLE"] = ""
+--	L["STATUS_NAME_COOKING"] = ""
 	
 	
 --	main menu
@@ -284,6 +285,7 @@ if not L then return end
 --	L["CONFIG_CONTROL_NOTIFY_ERASE_TEXT"] = ""
 	L["CONFIG_CONTROL_OVERRIDE"] = "Blizzard Interface austauschen"
 	L["CONFIG_CONTROL_OVERRIDE_TEXT"] = "Tauscht das original Blizzard %2$s Interface mit dem von %1$s.\n\nIn abgeschaltetem Zustand wird das standard Blizzard %2$s Interface verwendet.\n\nMan kann in abgeschaltetem Zustand trotzdem das %2$s Interface von %1$s verwenden, aber man muss dann daf\195\188r erst Tastenkombinationen einrichten."
+--	L["CONFIG_CONTROL_SPECIAL_TEXT"] = ""
 	L["CONFIG_CONTROL_ANCHOR_LOCK_TEXT"] = "verhindert, dass der %1$s Rahmen verschoben werden kann"
 --	L["CONFIG_CONTROL_REPOSITION_NOW"] = ""
 --	L["CONFIG_CONTROL_REPOSITION_NOW_TEXT"] = ""
@@ -347,6 +349,8 @@ if not L then return end
 	L["CONFIG_SETTINGS_ITEMS_FADE_TEXT"] = "bestimmt, ob nicht verf\195\188gbare Gegenst\195\164nde verblichen dargestellt werden sollen"
 	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE"] = "Benutzbare einf\195\164rben"
 	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE_TEXT"] = "Benutzbare Gegenst\195\164nde rot einf\195\164rben"
+--	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW"] = ""
+--	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW_TEXT"] = ""
 	L["CONFIG_SETTINGS_ITEMS_BORDER_SHOW_TEXT"] = "bestimmt, ob ein Rahmen um die Gegenst\195\164nde angezeigt wird"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_STYLE_TEXT"] = "bestimmt die Rahmenart f\195\188r Gegenst\195\164nde"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_RARITY"] = "Seltenheit bestimmt Rahmenfarbe"
@@ -414,6 +418,8 @@ if not L then return end
 --	L["CONFIG_SORTMETHOD_INCLUDE_ITEMAGE_TEXT"] = ""
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE"] = "Preis beim H\195\164ndler"
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE_TEXT"] = "Der Verkaufspreis (gestapelte Gegenst\195\164nde werden aufsummiert) bestimmt die Sortierreihenfolge."
+--	L["CONFIG_SORTMETHOD_INCLUDE_ID"] = ""
+--	L["CONFIG_SORTMETHOD_INCLUDE_ID_TEXT"] = ""
 	
 	L["CONFIG_SORTMETHOD_DIRECTION_TEXT"] = "Gegenst\195\164nde in aufsteigender oder absteigender Reihenfolge sortieren."
 	L["CONFIG_SORTMETHOD_ORDER"] = "Sortierreihenfolge"

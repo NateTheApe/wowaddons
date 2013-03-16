@@ -30,7 +30,7 @@ local gDef = {
 	snapToPoint = false,
 	point = "BOTTOM",
 	x = 0,
-	y = 146,
+	y = 226,
 }
 
 local GetParentKeys = ION.GetParentKeys

@@ -143,16 +143,20 @@ local function GetCurrentOutfit()
 end
 
 local function GearManagerSwitch(outfitName)
-	if ( FishingBuddy.ReadyForFishing() ) then
+	local GSB = FishingBuddy.GetSettingBool;
+	if ( FL:IsFishingReady(GSB("PartialGear")) ) then
 		local name = FishingBuddy_Info["LastGearSet"];
+FishingBuddy.Debug("Switching to "..FL:printable(name));
 		if ( not name ) then
 			name, _, _ = GetEquipmentSetInfo(1);
 		end
 		EquipmentManager_EquipSet(name);
 		FishingBuddy_Info["LastGearSet"] = nil;
+		return false;
 	else
 		local icon, idxm1 = GetEquipmentSetInfoByName(FBConstants.NAME);
 		if ( icon ) then
+FishingBuddy.Debug("Switching to "..FBConstants.NAME);
 			FishingBuddy_Info["LastGearSet"] = GetCurrentOutfit();
 			EquipmentManager_EquipSet(FBConstants.NAME);
 			return true;

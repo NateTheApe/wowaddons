@@ -526,8 +526,8 @@ Prat:AddModuleToLoad(function()
     CHAT_MSG_OFFICER = true,
     CHAT_MSG_RAID = true,
     CHAT_MSG_RAID_LEADER = true,
-    CHAT_MSG_BATTLEGROUND = true,
-    CHAT_MSG_BATTLEGROUND_LEADER = true,
+    CHAT_MSG_INSTANCE_CHAT = true,
+    CHAT_MSG_INSTANCE_CHAT_LEADER = true,
   }
 
   local eventTypes = {}
@@ -568,8 +568,8 @@ Prat:AddModuleToLoad(function()
         RAID = true,
         RAID_LEADER = true,
         RAID_WARNING = true,
-        BATTLEGROUND = true,
-        BATTLEGROUND_LEADER = true,
+        INSTANCE_CHAT = true,
+        INSTANCE_CHAT_LEADER = true,
         GUILD = true,
         GUILD_OFFICER = true,
         MONSTER_SAY = true,

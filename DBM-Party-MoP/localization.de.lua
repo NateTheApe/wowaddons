@@ -95,6 +95,10 @@ L:SetMiscLocalization({
 -----------------------
 L= DBM:GetModLocalization(685)
 
+L:SetMiscLocalization({
+	Kill		= "So lange die Gewalt in Euren Herzen wohnt... werde ich... zurückkehren...",
+})
+
 -----------------------
 -- Taran Zhu --
 -----------------------
@@ -175,7 +179,7 @@ L= DBM:GetModLocalization(693)
 L= DBM:GetModLocalization(738)
 
 L:SetTimerLocalization({
-	TimerWave	= "Angriffsbefehl an: %s"
+	TimerWave	= "Sendet: %s"
 })
 
 L:SetOptionLocalization({
@@ -233,7 +237,7 @@ L:SetMiscLocalization({
 L= DBM:GetModLocalization(666)
 
 L:SetMiscLocalization({
-	Kill	= "What?!"
+	Kill	= "STERBT, NEKROMANT!"
 })
 
 -----------------------

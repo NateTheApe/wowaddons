@@ -97,6 +97,7 @@ if not L then return end
 --	L["STATUS_NAME_MOUNT"] = ""
 --	L["STATUS_NAME_TOKEN"] = ""
 --	L["STATUS_NAME_TACKLE"] = ""
+--	L["STATUS_NAME_COOKING"] = ""
 	
 	
 --	main menu
@@ -284,6 +285,7 @@ if not L then return end
 --	L["CONFIG_CONTROL_NOTIFY_ERASE_TEXT"] = ""
 --	L["CONFIG_CONTROL_OVERRIDE"] = ""
 	L["CONFIG_CONTROL_OVERRIDE_TEXT"] = "скрыть стандартный интерфейс %2$s чтобы окно %1$s могло обрабатывать его действия.\n\nОтключение этой опции вернёт функционал стандартного %2$s.\n\nВы всё ещё сможете открыть %1$s %2$s когда эта опция выключена, но только используя специально назначенную клавишу"
+--	L["CONFIG_CONTROL_SPECIAL_TEXT"] = ""
 	L["CONFIG_CONTROL_ANCHOR_LOCK_TEXT"] = "фиксирует положение окна %1$s"
 --	L["CONFIG_CONTROL_REPOSITION_NOW"] = ""
 --	L["CONFIG_CONTROL_REPOSITION_NOW_TEXT"] = ""
@@ -347,6 +349,8 @@ if not L then return end
 	L["CONFIG_SETTINGS_ITEMS_FADE_TEXT"] = "затемнять ли недоступные в данный момент ячейки"
 --	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE"] = ""
 --	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE_TEXT"] = ""
+--	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW"] = ""
+--	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW_TEXT"] = ""
 	L["CONFIG_SETTINGS_ITEMS_BORDER_SHOW_TEXT"] = "отображать ли кромку вокруг каждой ячейки"
 --	L["CONFIG_SETTINGS_ITEMS_BORDER_STYLE_TEXT"] = ""
 	L["CONFIG_SETTINGS_ITEMS_BORDER_RARITY"] = "Кромка в цвет качества"
@@ -414,6 +418,8 @@ if not L then return end
 --	L["CONFIG_SORTMETHOD_INCLUDE_ITEMAGE_TEXT"] = ""
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE"] = "цена продажи"
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE_TEXT"] = "использовать ли цену продажи предмета NPC-торговцу при сортировке"
+--	L["CONFIG_SORTMETHOD_INCLUDE_ID"] = ""
+--	L["CONFIG_SORTMETHOD_INCLUDE_ID_TEXT"] = ""
 	
 	L["CONFIG_SORTMETHOD_DIRECTION_TEXT"] = "производить сортировку в порядке увеличения или убывания?"
 	L["CONFIG_SORTMETHOD_ORDER"] = "Порядок сортировки"

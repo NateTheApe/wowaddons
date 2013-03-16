@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(737, "DBM-HeartofFear", nil, 330)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8086 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 8279 $"):sub(12, -3))
 mod:SetCreatureID(62511)
 mod:SetModelID(43126)
 mod:SetZone()
@@ -16,8 +16,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
 	"SPELL_CAST_SUCCESS",
 	"SPELL_DAMAGE",
-	"SPELL_MISSED",
-	"UNIT_POWER"
+	"SPELL_MISSED"
 )
 
 --[[WoL Reg Expression
@@ -26,21 +25,23 @@ mod:RegisterEventsInCombat(
 --]]
 --Boss
 local warnReshapeLifeTutor		= mod:NewAnnounce("warnReshapeLifeTutor", 1, 122784)--Another LFR focused warning really.
-local warnReshapeLife			= mod:NewTargetAnnounce(122784, 4)
+local warnReshapeLife			= mod:NewAnnounce("warnReshapeLife", 4, 122784)
+local warnWillPower				= mod:NewAnnounce("warnWillPower", 3, 63050)
 local warnAmberScalpel			= mod:NewTargetAnnounce(121994, 3)
 local warnParasiticGrowth		= mod:NewTargetAnnounce(121949, 4, nil, mod:IsHealer())
+local warnAmberGlob				= mod:NewTargetAnnounce(125502, 4)--Heroic drycode, might need some tweaks
 --Construct
 local warnAmberExplosion		= mod:NewAnnounce("warnAmberExplosion", 3, 122398, false)--In case you want to get warned for all of them, but could be spammy later fight so off by default. This announce includes source of cast.
-local warnStruggleForControl	= mod:NewTargetAnnounce(122395, 2)--Disabled in phase 3 as at that point it's just a burn.
+local warnStruggleForControl	= mod:NewTargetAnnounce(122395, 2, nil, false)--Disabled in phase 3 as at that point it's just a burn.
 local warnDestabalize			= mod:NewStackAnnounce(123059, 1, nil, false)--This can be super spammy so off by default.
 --Living Amber
 local warnLivingAmber			= mod:NewSpellAnnounce("ej6261", 2, nil, false)--122348 is what you check spawns with. ALso spamming and off by default
 local warnBurningAmber			= mod:NewCountAnnounce("ej6567", 2, nil, false)--Keep track of Burning Amber Puddles. Spammy, but nessesary for heroic for someone managing them.
 --Amber Monstrosity
 local warnAmberCarapace			= mod:NewTargetAnnounce(122540, 4)--Monstrosity Shielding Boss (phase 2 start)
-local warnMassiveStomp			= mod:NewCastAnnounce(122408, 3)
-local warnAmberExplosionSoon	= mod:NewPreWarnAnnounce(122402, 10, 3)
-local warnFling					= mod:NewSpellAnnounce(122413, 3)--think this always does his aggro target but not sure. If it does random targets it will need target scanning.
+local warnMassiveStomp			= mod:NewCastAnnounce(122408, 3, nil, nil, mod:IsHealer() or mod:IsMelee())
+local warnAmberExplosionSoon	= mod:NewSoonAnnounce(122402, 3)
+local warnFling					= mod:NewSpellAnnounce(122413, 3, nil, mod:IsTank())--think this always does his aggro target but not sure. If it does random targets it will need target scanning.
 local warnInterruptsAvailable	= mod:NewAnnounce("warnInterruptsAvailable", 1, 122398)
 
 --Boss
@@ -50,6 +51,7 @@ local specwarnAmberScalpelNear		= mod:NewSpecialWarningClose(121994)
 local specwarnReshape				= mod:NewSpecialWarningYou(122784)
 local specwarnParasiticGrowth		= mod:NewSpecialWarningTarget(121949, mod:IsHealer())
 local specwarnParasiticGrowthYou	= mod:NewSpecialWarningYou(121949) -- This warn will be needed at player is clustered together. Especially on Phase 3.
+local specwarnAmberGlob				= mod:NewSpecialWarningYou(125502)
 --Construct
 local specwarnAmberExplosionYou		= mod:NewSpecialWarning("specwarnAmberExplosionYou")--Only interruptable by the player controling construct casting, so only that person gets warning. non generic used to make this one more specific.
 local specwarnAmberExplosionAM		= mod:NewSpecialWarning("specwarnAmberExplosionAM")--Must be on by default. Amber montrosity's MUST be interrupted on heroic or it's an auto wipe. it hits for over 500k.
@@ -72,24 +74,33 @@ local timerParasiticGrowthCD	= mod:NewCDTimer(35, 121949, nil, mod:IsHealer())--
 local timerParasiticGrowth		= mod:NewTargetTimer(30, 121949, nil, mod:IsHealer())
 --Construct
 local timerAmberExplosionCD		= mod:NewNextSourceTimer(13, 122398)--13 second cd on player controled units, 18 seconds on non player controlled constructs
-local timerDestabalize			= mod:NewTargetTimer(10, 123059)
-local timerStruggleForControl	= mod:NewTargetTimer(5, 122395)
+local timerDestabalize			= mod:NewTargetTimer(15, 123059, nil, false)
+local timerStruggleForControl	= mod:NewTargetTimer(5, 122395, nil, false)
 --Amber Monstrosity
-local timerMassiveStompCD		= mod:NewCDTimer(18, 122408)--18-25 seconds variation
-local timerFlingCD				= mod:NewCDTimer(25, 122413)--25-40sec variation.
+local timerMassiveStompCD		= mod:NewCDTimer(18, 122408, nil, mod:IsHealer() or mod:IsMelee())--18-25 seconds variation
+local timerFlingCD				= mod:NewCDTimer(25, 122413, nil, mod:IsTank())--25-40sec variation.
 local timerAmberExplosionAMCD	= mod:NewTimer(46, "timerAmberExplosionAMCD", 122402)--Special timer just for amber monstrosity. easier to cancel, easier to tell apart. His bar is the MOST important and needs to be seperate from any other bar option.
 
 local countdownAmberExplosion	= mod:NewCountdown(49, 122398)
 
+local berserkTimer				= mod:NewBerserkTimer(600)
+
 mod:AddBoolOption("InfoFrame", true)
+mod:AddBoolOption("FixNameplates", false)--Because having 215937495273598637205175t9 hostile nameplates on screen when you enter a construct is not cool.
 
 local Phase = 1
 local Puddles = 0
 local Constructs = 0
+local constructCount = 0--NOT same as Constructs variable above. this is one is for counting them mainly in phase 1
 local playerIsConstruct = false
 local warnedWill = false
+local willNumber = 100--Last warned player will power number (not same as actual player will power)
 local lastStrike = 0
 local scansDone = 0
+local Totems = nil
+local Guardians = nil
+local Pets = nil
+local TPTPNormal = nil
 local amberExplosion = GetSpellInfo(122402)
 local Monstrosity = EJ_GetSectionInfo(6254)
 local MutatedConstruct = EJ_GetSectionInfo(6249)
@@ -104,6 +115,7 @@ local function buildGuidTable()
 end
 
 function mod:ScalpelTarget()
+	if playerIsConstruct then return end--Don't need this info as a construct
 	scansDone = scansDone + 1
 	local targetname = DBM:GetUnitFullName("boss1targettarget")--Not a mistake, just clever use of available api to get the target of an invisible mob the boss is targeting ;)
 	if UnitExists("boss1targettarget") and not UnitIsUnit("boss1", "boss1targettarget") then
@@ -111,6 +123,7 @@ function mod:ScalpelTarget()
 		if targetname == UnitName("player") then
 			specwarnAmberScalpel:Show()
 			yellAmberScalpel:Yell()
+			timerAmberScalpel:Start()
 		else
 			local uId = DBM:GetRaidUnitId(targetname)
 			if uId then
@@ -132,66 +145,148 @@ function mod:ScalpelTarget()
 	end
 end
 
+local function warnAmberExplosionCast(spellId)
+	if #canInterrupt == 0 then--This will never happen if fired by "InterruptAvailable" sync since it should always be 1 or greater. This is just a fallback if contructs > 0 and we scheduled "warnAmberExplosionCast" there
+		specwarnAmberExplosion:Show(spellId == 122402 and Monstrosity or MutatedConstruct)--No interupts, warn the raid to prep for aoe damage with beware! alert.
+	else--Interrupts available, lets call em out as a great tool to give raid leader split second decisions on who to allocate to the task (so they don't all waste it on same target and not have for next one).
+		warnInterruptsAvailable:Show(spellId == 122402 and Monstrosity or MutatedConstruct, table.concat(canInterrupt, "<, >"))
+	end
+	table.wipe(canInterrupt)
+end
+
 function mod:OnCombatStart(delay)
 	warnedWill = true--avoid wierd bug on pull
+	willNumber = 100
 	buildGuidTable()
 	Phase = 1
 	Puddles = 0
 	Constructs = 0
+	constructCount = 0
 	lastStrike = 0
 	table.wipe(canInterrupt)
 	playerIsConstruct = false
 	timerAmberScalpelCD:Start(9-delay)
 	timerReshapeLifeCD:Start(20-delay)
 	timerParasiticGrowthCD:Start(23.5-delay)
+	if not self:IsDifficulty("lfr25") then
+		berserkTimer:Start(-delay)
+	end
 	if self.Options.InfoFrame then
 		DBM.InfoFrame:SetHeader(L.WillPower)--This is a work in progress
-		DBM.InfoFrame:Show(5, "playerpower", 1, ALTERNATE_POWER_INDEX, nil, nil, true)--At a point i need to add an arg that lets info frame show the 5 LOWEST not the 5 highest, instead of just showing 10
+		DBM.InfoFrame:Show(5, "playerpower", 1, ALTERNATE_POWER_INDEX, nil, nil, true)
+	end
+	if self.Options.FixNameplates then
+		--Blizz settings either return 1 or nil, we pull users original settings first, then change em if appropriate after.
+		Totems = GetCVarBool("nameplateShowEnemyTotems")
+		Guardians = GetCVarBool("nameplateShowEnemyGuardians")
+		Pets = GetCVarBool("nameplateShowEnemyPets")
+		--Now change all settings to make the nameplates while in constructs not terrible.
+		if Totems then
+			SetCVar("nameplateShowEnemyTotems", 0)
+		end
+		if Guardians then
+			SetCVar("nameplateShowEnemyGuardians", 0)
+		end
+		if Pets then
+			SetCVar("nameplateShowEnemyPets", 0)
+		end
+		--Check for threat plates on pull and save users setting.
+		if IsAddOnLoaded("TidyPlates_ThreatPlates") then
+			TPTPNormal = TidyPlatesThreat.db.profile.nameplate.toggle["Normal"]--Returns true or false, use TidyPlatesNormal to save that value on pull
+		end
+
 	end
 end
 
 function mod:OnCombatEnd()
+	self:UnregisterShortTermEvents()
 	if self.Options.InfoFrame then
 		DBM.InfoFrame:Hide()
+	end
+	if self.Options.FixNameplates then
+		--if any of settings were on before pull, we put them back to way they were.
+		if Totems then
+			SetCVar("nameplateShowEnemyTotems", 1)
+		end
+		if Guardians then
+			SetCVar("nameplateShowEnemyGuardians", 1)
+		end
+		if Pets then
+			SetCVar("nameplateShowEnemyPets", 1)
+		end
+		if IsAddOnLoaded("TidyPlates_ThreatPlates") then
+			if TPTPNormal == true and not TidyPlatesThreat.db.profile.nameplate.toggle["Normal"] then--Normal plates were on when we pulled but aren't on now.
+				TidyPlatesThreat.db.profile.nameplate.toggle["Normal"] = true--Turn them back on
+				TidyPlates:ReloadTheme()--Call the Tidy plates update methods
+				TidyPlates:ForceUpdate()
+			end
+		end
 	end
 end 
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(123059) and not args:GetDestCreatureID() == 62691 then--Only track debuffs on boss, constructs, or monstrosity, ignore oozes.
+	if args:IsSpellID(123059) and args:GetDestCreatureID() ~= 62691 then--Only track debuffs on boss, constructs, or monstrosity, ignore oozes.
 		warnDestabalize:Show(args.destName, args.amount or 1)
-		timerDestabalize:Start(args.destName)
+		if self:IsDifficulty("lfr25") then
+			timerDestabalize:Start(60, args.destName)
+		else
+			timerDestabalize:Start(args.destName)
+		end
 	elseif args:IsSpellID(121949) then
 		warnParasiticGrowth:Show(args.destName)
-		specwarnParasiticGrowth:Show(args.destName)
+		if not playerIsConstruct then--Healers do need to know this, but it's still a distraction as a construct for sound, they got the reg warning.
+			specwarnParasiticGrowth:Show(args.destName)
+		end
 		if args:IsPlayer() then
 			specwarnParasiticGrowthYou:Show()
 		end
 		timerParasiticGrowth:Start(args.destName)
 		timerParasiticGrowthCD:Start()
 	elseif args:IsSpellID(122540) then
+		constructCount = 0
 		Phase = 2
 		warnAmberCarapace:Show(args.destName)
-		specwarnAmberMonstrosity:Show()
+		if not playerIsConstruct then
+			specwarnAmberMonstrosity:Show()
+		end
 		timerMassiveStompCD:Start(20)
 		timerFlingCD:Start(33)
-		warnAmberExplosionSoon:Schedule(45.5)
-		timerAmberExplosionAMCD:Start(55.5, amberExplosion, Monstrosity)
-	elseif args:IsSpellID(122395) and Phase < 3 then
+		warnAmberExplosionSoon:Schedule(50.5)
+		timerAmberExplosionAMCD:Start(55.5, amberExplosion)
+	elseif args:IsSpellID(122395) and Phase < 3 and not playerIsConstruct then
 		warnStruggleForControl:Show(args.destName)
 		timerStruggleForControl:Start(args.destName)
 	elseif args:IsSpellID(122784) then
 		Constructs = Constructs + 1
-		warnReshapeLife:Show(args.destName)
+		constructCount = constructCount + 1
+		warnReshapeLife:Show(args.spellName, args.destName, constructCount)
 		if args:IsPlayer() then
+			self:RegisterShortTermEvents(
+				"UNIT_POWER"
+			)
 			playerIsConstruct = true
 			warnedWill = true -- fix bad low will special warning on entering Construct. After entering vehicle, this will be return to false. (on alt.power changes)
 			specwarnReshape:Show()
 			warnReshapeLifeTutor:Show()
+			timerAmberExplosionCD:Start(15, args.destName)--Only player needs to see this, they are only person who can do anything about it.
+			countdownAmberExplosion:Start(15)
+			if self.Options.FixNameplates and IsAddOnLoaded("TidyPlates_ThreatPlates") then
+				if TPTPNormal == true then
+					TidyPlatesThreat.db.profile.nameplate.toggle["Normal"] = false
+					TidyPlates:ReloadTheme()--Call the Tidy plates update methods
+					TidyPlates:ForceUpdate()
+				end
+			end
 		end
 		if Phase < 3 then
 			timerReshapeLifeCD:Start()
 		else
 			timerReshapeLifeCD:Start(15)--More often in phase 3
+		end
+	elseif args:IsSpellID(125502) then
+		warnAmberGlob:Show(args.destName)
+		if args:IsPlayer() then
+			specwarnAmberGlob:Show()
 		end
 	end
 end
@@ -200,22 +295,32 @@ mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 function mod:SPELL_AURA_REMOVED(args)
 	if args:IsSpellID(122754) then
 		timerDestabalize:Cancel(args.destName)
-	elseif args:IsSpellID(122784) then
+	elseif args:IsSpellID(122370) then
 		Constructs = Constructs - 1
 		if args:IsPlayer() then
+			self:UnregisterShortTermEvents()
+			countdownAmberExplosion:Cancel()
 			playerIsConstruct = false
+			if self.Options.FixNameplates and IsAddOnLoaded("TidyPlates_ThreatPlates") then
+				if TPTPNormal == true and not TidyPlatesThreat.db.profile.nameplate.toggle["Normal"] then--Normal plates were on when we pulled but aren't on now.
+					TidyPlatesThreat.db.profile.nameplate.toggle["Normal"] = true--Turn them back on
+					TidyPlates:ReloadTheme()--Call the Tidy plates update methods
+					TidyPlates:ForceUpdate()
+				end
+			end
 		end
-		countdownAmberExplosion:Cancel()
 		timerAmberExplosionCD:Cancel(args.destName)
 	elseif args:IsSpellID(121994) then
 		timerAmberScalpelCD:Start()
 	elseif args:IsSpellID(121949) then
 		timerParasiticGrowth:Cancel(args.destName)
 	elseif args:IsSpellID(122540) then--Phase 3
+		constructCount = 0
 		Phase = 3
 		timerMassiveStompCD:Cancel()
 		timerFlingCD:Cancel()
 		timerAmberExplosionAMCD:Cancel()
+		timerDestabalize:Cancel(Monstrosity)
 		warnAmberExplosionSoon:Cancel()
 		--He does NOT reset reshape live cd here, he finishes out last CD first, THEN starts using new one.
 	end
@@ -225,46 +330,44 @@ function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(122398) then
 		warnAmberExplosion:Show(args.sourceName, args.spellName)
 		if args:GetSrcCreatureID() == 62701 then--Cast by a wild construct not controlled by player
-			if Constructs == 0 then--No constructs, thus no interrupt. Give a beware warning.
-				specwarnAmberExplosion:Show(args.sourceName)
-			end
-			if playerIsConstruct then--Player is construct
-				if GetTime() - lastStrike >= 4 then--Check if Amber Strike will be available before cast ends.
-					specwarnAmberExplosionOther:Show(args.spellName, args.sourceName)
-					if self:LatencyCheck() then--if you're too laggy we don't want you telling us you can interrupt it 2-3 seconds from now. we only care if you can interrupt it NOW
-						self:SendSync("InterruptAvailable", UnitGUID("player")..":122398")
-					end
+			if playerIsConstruct and GetTime() - lastStrike >= 4 then--Player is construct and Amber Strike will be available before cast ends.
+				specwarnAmberExplosionOther:Show(args.spellName, args.sourceName)
+				if self:LatencyCheck() then--if you're too laggy we don't want you telling us you can interrupt it 2-3 seconds from now. we only care if you can interrupt it NOW
+					self:SendSync("InterruptAvailable", UnitGUID("player")..":122398")
 				end
 			end
 			timerAmberExplosionCD:Start(18, args.sourceName, args.sourceGUID)--Longer CD if it's a non player controlled construct. Everyone needs to see this bar because there is no way to interrupt these.
+			self:Unschedule(warnAmberExplosionCast)
+			self:Schedule(0.5, warnAmberExplosionCast, 122398)--Always check available interrupts and special warn if not
 		elseif args.sourceGUID == UnitGUID("player") then--Cast by YOU
 			specwarnAmberExplosionYou:Show(args.spellName)
 			timerAmberExplosionCD:Start(13, args.sourceName)--Only player needs to see this, they are only person who can do anything about it.
 			countdownAmberExplosion:Start(13)
 		end
 	elseif args:IsSpellID(122402) then--Amber Monstrosity
-		warnAmberExplosion:Show(args.sourceName, args.spellName)
-		if Constructs == 0 then--No constructs, thus no interrupt. Give a beware warning.
-			specwarnAmberExplosion:Show(args.sourceName)
-		end
-		if playerIsConstruct then--Player is construct
-			if GetTime() - lastStrike >= 4 then--Check if Amber Strike will be available before cast ends.
-				specwarnAmberExplosionAM:Show(args.spellName, args.sourceName)--On heroic, not interrupting amber montrosity is an auto wipe. this is single handedly the most important special warning of all!!!!!!
-				if self:LatencyCheck() then--if you're too laggy we don't want you telling us you can interrupt it 2-3 seconds from now. we only care if you can interrupt it NOW
-					self:SendSync("InterruptAvailable", UnitGUID("player")..":122402")
-				end
+		if playerIsConstruct and GetTime() - lastStrike >= 4 then--Player is construct and Amber Strike will be available before cast ends.
+			specwarnAmberExplosionAM:Show(args.spellName, args.sourceName)--On heroic, not interrupting amber montrosity is an auto wipe. this is single handedly the most important special warning of all!!!!!!
+			if self:LatencyCheck() then--if you're too laggy we don't want you telling us you can interrupt it 2-3 seconds from now. we only care if you can interrupt it NOW
+				self:SendSync("InterruptAvailable", UnitGUID("player")..":122402")
 			end
 		end
+		warnAmberExplosion:Show(args.sourceName, args.spellName)
 		warnAmberExplosionSoon:Cancel()
-		warnAmberExplosionSoon:Schedule(39)
-		timerAmberExplosionAMCD:Start(46, args.spellName, args.sourceName)
+		warnAmberExplosionSoon:Schedule(41)
+		timerAmberExplosionAMCD:Start(46, args.spellName)
+		self:Unschedule(warnAmberExplosionCast)
+		self:Schedule(0.5, warnAmberExplosionCast, 122402)--Always check available interrupts and special warn if not
 	elseif args:IsSpellID(122408) then
-		warnMassiveStomp:Show()
-		specwarnMassiveStomp:Show()
-		timerMassiveStompCD:Start()
+		if not playerIsConstruct then
+			warnMassiveStomp:Show()--Don't even need normal warning as a construct, it just doesn't matter
+			specwarnMassiveStomp:Show()
+		end
+		timerMassiveStompCD:Start()--Still start timer so you still have it when you leave construct
 	elseif args:IsSpellID(122413) then
-		warnFling:Show()
-		specwarnFling:Show()
+		warnFling:Show()--Tanks and healers still need to know this even as a construct
+		if not playerIsConstruct then
+			specwarnFling:Show()
+		end
 		timerFlingCD:Start()
 	end
 end
@@ -295,35 +398,40 @@ mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
 function mod:UNIT_POWER(uId)
 	if uId ~= "player" then return end
-	if UnitPower(uId, ALTERNATE_POWER_INDEX) < 28 and not warnedWill then
+	local playerWill = UnitPower(uId, ALTERNATE_POWER_INDEX)
+	if playerWill > willNumber then willNumber = playerWill end--Will power has gone up since last warning so reset that warning.
+	if playerWill == 75 and willNumber > 75 then--Doesn't work? A mystery
+		willNumber = 75
+		warnWillPower:Show(willNumber)
+	elseif playerWill == 50 and willNumber > 50 then--Works
+		willNumber = 50
+		warnWillPower:Show(willNumber)
+	elseif playerWill == 25 and willNumber > 25 then--Doesn't work? A mystery
+		willNumber = 25
+		warnWillPower:Show(willNumber)
+	elseif playerWill >= 22 and warnedWill then
+		warnedWill = false
+	elseif playerWill < 18 and not warnedWill then--5 seconds before 0 (after subtracking a budget of 8 for interrupt)
 		warnedWill = true
 		specwarnWillPower:Show()
-	elseif UnitPower(uId, ALTERNATE_POWER_INDEX) >= 32 and warnedWill then
-		warnedWill = false
+	elseif playerWill == 10 and willNumber > 10 then--Works
+		willNumber = 10
+		warnWillPower:Show(willNumber)
+	elseif playerWill == 5 and willNumber > 5 then--Doesn't work? A mystery
+		willNumber = 5
+		warnWillPower:Show(willNumber)
 	end
 end
 
-local function warnAmberExplosionCast(spellId)
-	if #canInterrupt == 0 then--No interupts, warn the raid to prep for aoe damage with beware! alert.
-		specwarnAmberExplosion:Show(spellId == 122402 and Monstrosity or MutatedConstruct)
-	else--Interrupts available, lets call em out as a great tool to give raid leader split second decisions on who to allocate to the task (so they don't all waste it on same target and not have for next one).
---		print("Debug: Interrupts Available")
-		warnInterruptsAvailable:Show(spellId == 122402 and Monstrosity or MutatedConstruct, table.concat(canInterrupt, "<, >"))
-	end
-	table.wipe(canInterrupt)
-end
-
-function mod:OnSync(msg, str, sender)
---	print(msg, str, sender)
+function mod:OnSync(msg, str)
 	if not guidTableBuilt then
 		buildGuidTable()
 		guidTableBuilt = true
 	end
 	local guid, spellId
-	if sender and str then
+	if str then
 		guid, spellId = string.split(":", str)
 		spellId = tonumber(spellId or "")
---		print(guid, spellId)
 	end
 	if msg == "InterruptAvailable" and guids[guid] and spellId then
 		canInterrupt[#canInterrupt + 1] = guids[guid]

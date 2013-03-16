@@ -46,9 +46,13 @@ CombuLocTW = {["lockon"] = "|cff00ffff已鎖定「燃火助手」|r",
 			["comburepthres"] = "|cff00ffff回報閥值已設為：%.0f 週期性傷害。|r",
 			["ignadjvalue"] = "|cff00ffff>點燃預測微調監控時間已設為：%.1f 秒。|r",
 			["redzonetimer"] = "|cff00ffff計時倒數警告閥值已設為：%.1f 秒。|r",
-			["interfaceGraph"] = "外觀設定",
+			["interfaceGraph"] = "Graphical Options",
 			["combureport1"] = "|cffff0000 -- Total Combustion : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Targets : |cffffffff%d |cffff0000--|r",
 			["combureport2"] = "|cffff0000 -- Prev. Combustion : |cffffffff%d |cffff0000- Ticks : |cffffffff%d |cffff0000- Dmg : |cffffffff%d |cffff0000- Targets : |cffffffff%d |cffff0000--|r",
+			["pyroenableon"] = "|cff00ffffPyroblast tracker enabled|r",
+			["pyroenableoff"] = "|cff00ffffPyroblast tracker disabled|r",
+			["lbenableon"] = "|cff00ffffBomb tracker enabled|r",
+			["lbenableoff"] = "|cff00ffffBomb tracker disabled|r",
             }
 			
 -------------------------------
@@ -109,6 +113,8 @@ combuoptioninfotableTW = {
 	["CombuSoundDropDown"] = "請從下拉式選單中選擇倒數計時完畢時的警告音效。",
     ["CombuThresholdSoundButton"] = "啟用警告音效，超過點燃傷害閥值時給予警示。",
     ["CombuTickPredictButton"] = "Replace the Ignite damage value in the Status zone by the estimated damage for each tick of Combustion and the number of ticks depending from your current haste.",
+	["CombuPyroEnableButton"] = "Enable or disable Pyroblast tracking in the main window.",
+	["CombuLBEnableButton"] = "Enable or disable Bomb tracking in the main window.",
 	}
 
 -------------------------------
@@ -163,6 +169,8 @@ CombuOptLocTW = {
     ["CombuPyromaniacButton"] = "Missing Pyromaniac warning",
 	["Combubgcolorwarning"] = "背景色(警告)",
     ["CombuHotStreakButton"] = "热",
+	["CombuPyroEnableButton"] = "Enable Pyroblast tracking",
+	["CombuLBEnableButton"] = "Enable Bomb tracking",
 
 	}
 

@@ -28,6 +28,41 @@ local POLES = {
 	["Nat Pagle's Fish Terminator"] = "19944:0:0:0",
 }
 
+-- handle key menu
+local function SetKeyValue(self, what, value)
+	local show = FBConstants.Keys[value];
+	FishingBuddy.SetSetting(what, value);
+	UIDropDownMenu_SetSelectedValue(self, show);
+	UIDropDownMenu_SetText(self, show);
+end
+
+local function LoadKeyMenu(keymenu, what)
+	local menu = keymenu.menu;
+	local info = {};
+	local menuwidth = 0;
+	local setting = FishingBuddy.GetSetting(what);
+	for value,label in pairs(FBConstants.Keys) do
+		local v = value;
+		local w = what;
+		local m = menu;
+		info.text = label;
+		info.func = function() SetKeyValue(m, w, v); end;
+		if ( setting == value ) then
+			info.checked = true;
+		else
+			info.checked = false;
+		end
+		UIDropDownMenu_AddButton(info);
+		menu.label:SetText(label);
+		local width = menu.label:GetWidth();
+		if (width > menuwidth) then
+			menuwidth = width;
+		end
+	end
+	UIDropDownMenu_SetWidth(menu, menuwidth + 32);
+	keymenu:SetLabel(FBConstants.KEYS_LABEL_TEXT);
+end
+
 local GeneralOptions = {
 	["ShowNewFishies"] = {
 		["text"] = FBConstants.CONFIG_SHOWNEWFISHIES_ONOFF,
@@ -112,13 +147,15 @@ local function IsFishingAceEnabled()
 	return false;
 end
 
+local EasyCastInit;
+
 local CastingOptions = {
 	["EasyCast"] = {
 		["text"] = FBConstants.CONFIG_EASYCAST_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_EASYCAST_INFO,
 		["tooltipd"] = FBConstants.CONFIG_EASYCAST_INFOD,
 		["enabled"] = function() return (not IsFishingAceEnabled()) and 1 or 0 end,
-		["layoutright"] = "EasyCastKeys",
+		["init"] = function(o, b) EasyCastInit(o, b); end,
 		["v"] = 1,
 		["m"] = 1,
 		["default"] = 1 },
@@ -223,14 +260,14 @@ local CastingOptions = {
 	},
 	["EasyCastKeys"] = {
 		["default"] = FBConstants.KEYS_NONE,
-		["button"] = "FishingBuddyOption_EasyCastKeys",
+		["button"] = "FBEasyKeys",
 		["tooltipd"] = FBConstants.CONFIG_EASYCASTKEYS_INFO,
-		["margin"] = { 16, 0 },
 		["deps"] = { ["EasyCast"] = "h" },
+		["init"] = function(o, b) EasyCastInit(o, b); end,
 		["setup"] =
 			function(button)
 				local gs = FishingBuddy.GetSetting;
-				FishingBuddyOption_EasyCastKeys:SetKeyValue("EasyCastKeys", gs("EasyCastKeys"));
+				FBEasyKeys.menu:SetKeyValue("EasyCastKeys", gs("EasyCastKeys"));
 				button.overlay:ClearAllPoints();
 				button.overlay:SetPoint("TOPLEFT", button.label, "TOPLEFT");
 				button.overlay:SetSize(button:GetWidth(), button:GetHeight());
@@ -309,6 +346,16 @@ local VolumeSlider =
 	["rightextra"] = 32,
 	["setting"] = "EnhanceSound_MasterVolume",
 };
+
+EasyCastInit = function(option, button)
+	-- prettify drop down?
+	local check = FBEasyKeys.menu.label:GetWidth() + FBEasyKeys:GetWidth();
+	if (FishingBuddy.FitInOptionFrame(check)) then
+		CastingOptions["EasyCast"].layoutright = "EasyCastKeys";
+	else
+		CastingOptions["EasyCastKeys"].alone = 1;
+	end
+end
 
 -- default FishingBuddy option handlers
 FishingBuddy.BaseGetSetting = function(setting)
@@ -717,31 +764,23 @@ QuestItems[69914] = {
 	["enUS"] = "Giant Catfish",
 	open = true,
 };
-QuestItems[79046] = {
-	["enUS"] = "Sugar Minnow",
-};
-QuestItems[81122] = {
-	["enUS"] = "Wolf Pirahna",
-};
-QuestItems[80830] = {
-	["enUS"] = "Rusty Shipwreck Debris",
-};
-QuestItems[80260] = {
-	["enUS"] = "Dojani Eel",
-};
 FishingBuddy.QuestItems = QuestItems;
 
 -- Nat Pagle fish
 local PagleFish = {};
 PagleFish[86545] = {
 	["enUS"] = "Mimic Octopus",
+	quest = 31446,
 };
 PagleFish[86544] = {
 	["enUS"] = "Spinefish Alpha",
+	quest = 31444,
 };
 PagleFish[86542] = {
 	["enUS"] = "Flying Tiger Gourami",
+	quest = 31443,
 };
+FishingBuddy.PagleFish = PagleFish;
 
 local QuestLures = {};
 QuestLures[58788] = {
@@ -782,8 +821,7 @@ local function SetFishingLevel(skillcheck, zone, subzone, fishid)
 	return skill + mods;
 end
 
-local questIndex = select('#', GetAuctionItemClasses());
-local questType = select(questIndex, GetAuctionItemClasses());
+local questType = select(10, GetAuctionItemClasses());
 local CurLoc = GetLocale();
 local function AddFishie(color, id, name, zone, subzone, texture, quantity, quality, level, it, st, poolhint)
 	local GSB = FishingBuddy.GetSettingBool;
@@ -957,7 +995,11 @@ local function UseFishingItem(itemtable)
 		if ( GetItemCount(itemid) > 0 and (not info.setting or GSB(info.setting)) ) then
 			if ( not info.usable or info.usable(info) ) then
 				local buff = GetSpellInfo(info.spell);
-				if ( (info.check and info.check(buff)) or not FL:HasBuff(buff) ) then
+				local doit = not FL:HasBuff(buff);
+				if ( info.check ) then
+					doit, itemid = info.check(buff, info, doit);
+				end
+				if ( doit ) then
 					FL:InvokeLuring(itemid);
 					return true;
 				end
@@ -1020,8 +1062,6 @@ local function UpdateLure()
 			LastLure.time = nil;
 		end
 
-		-- we can drop through and add our normal lure, because the quest buff is on
-		-- the player, not the pole...
 		local skill, _, _, _ = FL:GetCurrentSkill();
 		
 		if (skill > 0) then
@@ -1067,7 +1107,7 @@ local function UpdateLure()
 					LastLure.time = GetTime() + RELURE_DELAY;
 					DoLure = nil;
 					return true;
-				else
+				elseif ( not LastLure.time ) then
 					LastLure = nil;
 					LastState = 0;
 				end
@@ -1116,7 +1156,10 @@ StatusEvents["UNIT_AURA"] = function(arg1)
 end
 
 local function ReadyForFishing()
-	return FL:IsFishingReady(FishingBuddy.GetSettingBool("PartialGear"));
+	local GSB = FishingBuddy.GetSettingBool;
+	local id = FL:GetMainHandItem(true);
+	-- if we're holding the spear, assume we're fishing
+	return (GSB("UseTuskarrSpear") and (id == 88535)) or FL:IsFishingReady(GSB("PartialGear"));
 end
 FishingBuddy.ReadyForFishing = ReadyForFishing;
 
@@ -1392,16 +1435,6 @@ FishingBuddy.Commands[FBConstants.UPDATEDB].func =
 		return true;
 	end;
 
-FishingBuddy.Commands[FBConstants.CURRENT] = {};
-FishingBuddy.Commands[FBConstants.CURRENT].help = FBConstants.CURRENT_HELP;
-FishingBuddy.Commands[FBConstants.CURRENT].func =
-	function(what)
-		if ( what and what == FBConstants.RESET) then
-			FishingMode();
-			return true;
-		end
-	end;
-
 local function nextarg(msg, pattern)
 	if ( not msg or not pattern ) then
 		return nil, nil;
@@ -1646,10 +1679,21 @@ FishingBuddy.OnEvent = function(self, event, ...)
 		FishingBuddy.Initialize();
 		FishingBuddy.Slider_Create(VolumeSlider);
 		FishingBuddy.OptionsFrame.HandleOptions(GENERAL, nil, GeneralOptions);
+		FishingBuddy.AddSchoolFish();
+
+		local keymenu = FishingBuddy.CreateFBDropDownMenu("FBEasyKeys", "FishingBuddyDropDownMenuTemplate");
+		keymenu.menu.SetKeyValue = SetKeyValue;
+		keymenu.html:Hide();
+		
+		keymenu.menu.label:SetText(FBConstants.CONFIG_EASYCAST_ONOFF);
+		
+		UIDropDownMenu_Initialize(keymenu.menu, function()
+										  LoadKeyMenu(keymenu, "EasyCastKeys");
+									  end);
 		FishingBuddy.OptionsFrame.HandleOptions(name, "Interface\\Icons\\INV_Fishingpole_02", CastingOptions);
 		FishingBuddy.OptionsFrame.HandleOptions(nil, nil, InvisibleOptions);
 		FishingBuddy.OptionsUpdate();
-		FishingBuddy.AddSchoolFish();
+		
 		self:UnregisterEvent("VARIABLES_LOADED");
 		-- tell all the listeners about this one
 		RunHandlers(event, ...);

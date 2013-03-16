@@ -1,4 +1,41 @@
-﻿Version 1.2c
+﻿Version 1.2i
+- Fix for Equipment Manager event misunderstanding
+- Updated Russian translation (thanks Turbid121!)
+
+Version 1.2h
+- Attempt to fix memory leak and framerate losses with partial outfit option
+- Updated German translation (thanks DirtyHarryGermany!)
+- Updated Russian translation (thanks Turbid121 and BloodyFess!)
+- Rewrite window handling to use new Blizz code and graphics
+- Fixes for Curse bugs #139 and #141 from sometime in the past
+
+Version 1.2g
+- FIx a subtle bug in the Pandaren item code that hopefully will make it work for everyone else
+- Updated Spanish (esES) translation (thanks karrash76!)
+- Updated LibTourist to the latest version
+
+Version 1.2f
+- Updated Spanish (esES) translation (thanks karrash76!)
+- Updated German translation (thanks DirtyHarryGermany!)
+- Updated LibTourist to the latest version
+- Make options display better with long names (CurseForge #110)
+
+Version 1.2e
+- Fishing pets work again
+- Add option to display the Nat Pagle quest fish you've caught "today"
+- Updated Russian translation (thanks BloodyFess!)
+- Updated LibTourist library
+
+Version 1.2d
+- Add option to just "maintain" the raft if it's already on, i.e. manual engagement
+- Support the Sharpened Tuskaar Spear (ugly, but it works for now)
+- Fix the minimap icon setting, again
+- Updated LibTourist to the latest version
+- Updated German translation (thanks DirtyHarryGermany!)
+- Fix summon pet errors -- BUT PETS DON"T WORK YET
+- Fix Curse bugs #206, #207, #208
+
+Version 1.2c
 - Updated German translation (thanks DirtyHarryGermany!)
 - Updated Traditional Chinese translation (thanks titanium0107!)
 - Update the raft buff before it expires, if we can (reworking this for the next version)
@@ -18,7 +55,8 @@ Version 1.2a
 - Updated the About box to thank all the translators! (I always do, calling it out :-)
 
 Version 1.2
-- Add "Partial Gear" option for casting. If enabled, wearing any item that has a fishing bonus will let you double click cast.
+- Add "Partial Gear" option for casting. If enabled, wearing any item that has a fishing
+  bonus will let you double click cast.
 - Add support for the Angler's Raft (still figuring out what to do about the spear)
 - Fishing volume slider works now
 - Updated Traditional Chinese (zhTW) translation (thanks titanium0107!)

@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.3_beta_3) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.4) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-11-13T01:32:04Z
+    This file was last updated on 2012-12-12T02:56:26Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -153,7 +153,7 @@ local function ShowToolTip (frame)
 
         tooltip:AddLine("Max Concurrent update events:", D.Status.MaxConcurentUpdateDebuff);
         
-        tooltip:AddLine("Live timers:", D:GetTimersNumber());
+        tooltip:AddLine("Live timers:", ("Dcr: |cf0d09000%d|r, Lib: |cf0d09000%d|r, Yields: |cf0f06000%d|r, Longest batch: |cf0e07000%dms|r, Largest batch: |cf0d07000%d|r, TotalRun: |cf0d07000%u|r"):format(D:GetTimersInfo()));
 
         tooltip:AddLine("Version annouces received:", T.VersionAnnounceReceived);
 
@@ -207,4 +207,4 @@ function D:HideMiniMapIcon()
     icon:Hide();
 end
 
-T._LoadedFiles["Dcr_LDB.lua"] = "2.7.2.3_beta_3";
+T._LoadedFiles["Dcr_LDB.lua"] = "2.7.2.4";

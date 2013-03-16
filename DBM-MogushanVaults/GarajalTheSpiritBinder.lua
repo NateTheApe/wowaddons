@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(682, "DBM-MogushanVaults", nil, 317)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8052 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 8416 $"):sub(12, -3))
 mod:SetCreatureID(60143)
 mod:SetModelID(41256)
 mod:SetZone()
@@ -14,6 +14,7 @@ mod:RegisterCombat("yell", L.Pull)
 
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED",
+	"SPELL_AURA_REFRESH",
 	"SPELL_AURA_REMOVED",
 	"SPELL_CAST_SUCCESS",
 	"UNIT_SPELLCAST_SUCCEEDED"
@@ -28,6 +29,7 @@ local warnVoodooDolls				= mod:NewTargetAnnounce(122151, 3)
 local warnCrossedOver				= mod:NewTargetAnnounce(116161, 3)
 local warnBanishment				= mod:NewTargetAnnounce(116272, 3)
 local warnSuicide					= mod:NewPreWarnAnnounce(116325, 5, 4)--Pre warn 5 seconds before you die so you take whatever action you need to, to prevent. (this is effect that happens after 30 seconds of Soul Sever
+local warnFrenzy					= mod:NewSpellAnnounce(117752, 4)
 
 local specWarnTotem					= mod:NewSpecialWarningSpell(116174, false)
 local specWarnBanishment			= mod:NewSpecialWarningYou(116272)
@@ -39,7 +41,9 @@ local timerTotemCD					= mod:NewNextCountTimer(20, 116174)
 local timerBanishmentCD				= mod:NewCDTimer(65, 116272)
 local timerSoulSever				= mod:NewBuffFadesTimer(30, 116278)--Tank version of spirit realm
 local timerCrossedOver				= mod:NewBuffFadesTimer(30, 116161)--Dps version of spirit realm
+local timerSpiritualInnervation		= mod:NewBuffFadesTimer(30, 117549)
 local timerShadowyAttackCD			= mod:NewCDTimer(8, "ej6698", nil, nil, nil, 117222)
+local timerFrailSoul				= mod:NewBuffFadesTimer(30, 117723)
 
 local berserkTimer					= mod:NewBerserkTimer(360)
 
@@ -132,8 +136,8 @@ function mod:SPELL_AURA_APPLIED(args)--We don't use spell cast success for actua
 		if self:LatencyCheck() then
 			self:SendSync("VoodooTargets", args.destGUID)
 		end
-	elseif args:IsSpellID(116161, 116160) then -- 116161 is normal and heroic, 116160 is lfr.
-		if args:IsPlayer() then
+	elseif args:IsSpellID(116161, 116260) then -- 116161 is normal and heroic, 116260 is lfr.
+		if args:IsPlayer() and self:AntiSpam(2, 3) then
 			warnSuicide:Schedule(25)
 			countdownCrossedOver:Start(29)
 			timerCrossedOver:Start(29)
@@ -149,20 +153,40 @@ function mod:SPELL_AURA_APPLIED(args)--We don't use spell cast success for actua
 			countdownCrossedOver:Start(29)
 			warnSuicide:Schedule(25)
 		end
+	elseif args:IsSpellID(117543) and args:IsPlayer() then -- 117543 is healer spell, 117549 is dps spell
+		timerSpiritualInnervation:Start()
+	elseif args:IsSpellID(117549) and args:IsPlayer() then -- 117543 is healer spell, 117549 is dps spell
+		if self:IsDifficulty("lfr25") then
+			timerSpiritualInnervation:Start(40)
+		else
+			timerSpiritualInnervation:Start()
+		end
+	elseif args:IsSpellID(117723) and args:IsPlayer() then
+		timerFrailSoul:Start()
+	elseif args:IsSpellID(117752) then
+		warnFrenzy:Show()
+		if not self:IsDifficulty("lfr25") then--lfr continuing summon totem below 20%
+			timerTotemCD:Cancel()
+		end
 	end
 end
+mod.SPELL_AURA_REFRESH = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)--We don't use spell cast success for actual debuff on >player< warnings since it has a chance to be resisted.
-	if args:IsSpellID(116161, 116160) and args:IsPlayer() then
+	if args:IsSpellID(116161, 116260) and args:IsPlayer() then
 		warnSuicide:Cancel()
 		countdownCrossedOver:Cancel()
-		timerCrossedOver:Cancel()	
+		timerCrossedOver:Cancel()
 	elseif args:IsSpellID(116278) and args:IsPlayer() then
 		timerSoulSever:Cancel()
 		warnSuicide:Cancel()
 		countdownCrossedOver:Cancel()
 	elseif args:IsSpellID(122151) then
 		self:SendSync("VoodooGoneTargets", args.destGUID)
+	elseif args:IsSpellID(117543, 117549) and args:IsPlayer() then
+		timerSpiritualInnervation:Cancel()
+	elseif args:IsSpellID(117723) and args:IsPlayer() then
+		timerFrailSoul:Cancel()
 	end
 end
 

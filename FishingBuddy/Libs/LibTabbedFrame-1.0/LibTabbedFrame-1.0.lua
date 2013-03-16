@@ -38,7 +38,7 @@ local function FrameTab_Onclick(self)
 end
 
 local function FrameTab_OnShow(self)
-	PanelTemplates_TabResize(self, 0);
+	PanelTemplates_TabResize(self, 0, nil, 36, self:GetParent().maxTabWidth or 88);
 end
 
 function FrameLib:CreateTabFrame(tabtext)
@@ -46,27 +46,28 @@ function FrameLib:CreateTabFrame(tabtext)
 	self.next_frameid = self.next_frameid or 1;
 	local id = self.next_frameid;
 	local framename = string.format(self.name.."Tab%d", id);
-	local tabframe = CreateFrame("Button", framename, self, "LibTabbedFrameTabButtonTemplate");
+	local tabframe = CreateFrame("Button", framename, self, "LibTabbedFrameTabTemplate");
 	self.TabFrames[id] = tabframe;
 
 	tabframe.name = tabtext;
 	tabframe.enabled = true;
 	tabframe.parent = self;
 
-	tabframe:SetFrameLevel(self:GetFrameLevel() + 2);
 	tabframe:SetScript("OnClick", FrameTab_Onclick);
 	tabframe:SetScript("OnShow", FrameTab_OnShow);
 
 	tabframe:SetID(id);
 	tabframe:SetText(tabtext);
 
-	local text = getglobal(framename.."Text");
+	local text = _G[tabframe:GetName().."Text"];
 	text:SetWidth(0);
-	PanelTemplates_TabResize(tabframe, 0);
-
 	PanelTemplates_SetNumTabs(self, self.next_frameid);
 
 	self.next_frameid = self.next_frameid + 1;
+
+	self.maxTabWidth = self:GetWidth() / self.next_frameid;
+	PanelTemplates_TabResize(tabframe, 0, nil, 36, self.maxTabWidth or 88);
+
 
 	return tabframe, id;
 end
@@ -78,7 +79,7 @@ function FrameLib:UpdateTabFrame(tab)
 		if ( self.lastTabFrame ) then
 			tab:SetPoint("LEFT", self.lastTabFrame, "RIGHT", -15, 0);
 		else
-			tab:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 11, 46);
+			tab:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 11, 2);
 		end
 		tab:Show();
 		self.lastTabFrame = tab;
@@ -211,15 +212,13 @@ local function Embed(self, target)
 	
 	tf:SetParent(self);
 	tf:ClearAllPoints();
-	tf:SetPoint("TOPLEFT", self, "TOPLEFT", 16, -76);
-	tf:SetWidth(326);
-	tf:SetHeight(356);
+	tf:SetAllPoints();
 end
 
 local function CreateEmbeddedScrollFrame(self)
 	-- Create the parent frame that will contain the inner scroll child,
 	-- all buttons, and the scroll bar slider.
-	local scrollFrame = CreateFrame("ScrollFrame", nil, af);
+	local scrollFrame = CreateFrame("ScrollFrame", nil, self);
 	
 	-- This is a bare-bones frame is used to encapsulate the contents of
 	-- the scroll frame.  Each scrollframe can have one scroll child.
@@ -316,9 +315,7 @@ local function CreateEmbeddedScrollFrame(self)
 end
 
 function FrameLib:CreateManagedFrame(framename, tabname, tooltip, toggle)
-	local f = CreateFrame("FRAME", framename, self, "LibTabbedFrameSmallHeaderTemplate");
-	f:SetWidth(384);
-	f:SetHeight(512);
+	local f = CreateFrame("FRAME", framename, self);
 	f:SetAllPoints(self);
 	f:SetHitRectInsets(0, 30, 0, 75);
 	if ( tabname ) then
@@ -388,20 +385,29 @@ function HandlerFrame_OnEvent(self, event, ...)
 end
 
 function FrameLib:CreateFrameHandler(frameName, icon, title, toggle, onshow, onhide, onvarload)
-	local frame = CreateFrame("FRAME", frameName, UIParent, "LibTabbedFrameTemplate");
+	local frame = CreateFrame("FRAME", frameName, UIParent, "ButtonFrameTemplate");
 	self:Embed(frame);
 	
+	-- Standard options
+	frame:Hide();
+	frame:SetToplevel(true);
+	frame:EnableMouse(true);
+	frame:SetMovable(true);
+	ButtonFrameTemplate_HideButtonBar(frame);
+	
 	-- Act like Blizzard windows
-	UIPanelWindows[frameName] = { area = "left", pushable = 999 }; 
+	UIPanelWindows[frameName] = { area = "left", pushable = 6 }; 
 	-- Close with escape key
 	tinsert(UISpecialFrames, frameName); 
 
 	getglobal(frameName.."Portrait"):SetTexture(icon);
-	getglobal(frameName.."NameText"):SetText(title);
+	getglobal(frameName.."TitleText"):SetText(title);
 
 	-- set up some frame local values
 	frame.name = frameName;
 	frame.toggle = toggle;
+
+	frame.maxTabWidth = frame:GetWidth() / 3;
 
 	if (onvarload) then
 		frame.onevent = onvarload;

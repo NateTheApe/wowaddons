@@ -210,16 +210,16 @@ L:AddLocale("ruRU",
 {
 	alpha_desc = "Установить прозрачность меню чата, а также стрелок для всех окон чата.",
 	alpha_name = "Прозрачность",
-	-- buttonframe_desc = "",
-	-- buttonframe_name = "",
+	buttonframe_desc = "Включить или выключить меню Окна кнопок.", -- Needs review
+	buttonframe_name = "Показать Окно кнопок", -- Needs review
 	ChannelNames = "Названия каналов",
 	chatmenu_desc = "Вкл/выкл меню чата.",
 	chatmenu_name = "Показать меню чата",
 	["Chat window button options."] = "Опции кнопок чата.",
 	Default = "По умолчанию",
 	["Original Buttons"] = "Обычные кнопки",
-	-- reflow_desc = "",
-	-- reflow_name = "",
+	reflow_desc = "Текст в окне чата должен обтекать кнопки, а не уходить под них.", -- Needs review
+	reflow_name = "Текст обтекает кнопки", -- Needs review
 	reminder_desc = "Показать кнопку прокрутки, когда чат прокручен вверх, то есть последнее сообщение не в нижней части окна чата.", -- Needs review
 	reminder_name = "Показать прокрутку вниз",
 	["Right, Inside Frame"] = "Справа, внутри рамки",

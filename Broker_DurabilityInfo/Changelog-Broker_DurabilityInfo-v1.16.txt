@@ -1,0 +1,12 @@
+tag v1.16
+e0175ec6bfd6c427fb82107d9c9357070238518f
+iceeagle <ciprianmihai.coman@gmail.com>
+2012-12-19 06:26:11 +0200
+
+Tag as v1.16
+
+
+--------------------
+
+iceeagle:
+	- fix no-lib version - ticket 22

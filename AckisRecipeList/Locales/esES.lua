@@ -6,7 +6,7 @@ esES localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.2
+Project version: 2.4.4
 ************************************************************************
 Original translated by: StiviS
 Currently maintained by:
@@ -187,7 +187,8 @@ L["Bradley Towns"] = "Bradley Villas"
 L["Braeg Stoutbeard"] = "Braeg Barbarrobusta"
 L["Brandig"] = true
 L["Brawn"] = "Mole"
-L["BRD_RANDOM_ROOM"] = "Hay una posibilidad de que la encuentres en cinco diferentes habitaciones en Profundidades de Roca Negra, aunque es un spawn aleatorio, y a veces no tiene ni por que aparecer una sola vez."
+L["BRD_MAIL"] = "Cuatro nodos en las Profundidades de Roca Negra: justo antes de entrar en la Fábrica, en la habitación del Golem Lord Arglemach, en la Fábrica en un banco o la Fundición de Molde." -- Needs review
+L["BRD_SHOULDERS"] = "Hay cuatro nodos raros en las Profundidades de Roca Negra: en la habitación justo antes de la esclusa de la forja de las sombras y justo antes de la arena o en la esquina de algunas literas." -- Needs review
 L["Brek Stonehoof"] = "Brek Pezuñapétrea"
 L["Brikk Keencraft"] = "Brikk Finoficio"
 L["Brock Stoneseeker"] = "Brock Buscapiedras"

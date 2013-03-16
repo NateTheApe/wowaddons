@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(318, "DBM-DragonSoul", nil, 187)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 27 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 34 $"):sub(12, -3))
 mod:SetCreatureID(53879)
 mod:SetModelID(35268)
 mod:SetModelSound("sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKEVENT_01.OGG", "sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKSLAY_01.OGG")
@@ -185,12 +185,12 @@ function mod:SPELL_CAST_START(args)
 			if self:IsDifficulty("normal25", "heroic25") then
 				timerGripCD:Start(16, args.sourceGUID)
 				if #corruptionActive < 2 then--because using countdowns with more then 1 will be noisy not informative.
-					countdownGrip:Start(16, args.sourceGUID)
+					countdownGrip:Start(16, nil, args.sourceGUID)
 				end
 			else
 				timerGripCD:Start(nil, args.sourceGUID)
 				if #corruptionActive < 2 then--because using countdowns with more then 1 will be noisy not informative.
-					countdownGrip:Start(32, args.sourceGUID)
+					countdownGrip:Start(32, nil, args.sourceGUID)
 				end
 			end
 		end

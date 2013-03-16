@@ -2,6 +2,8 @@
 
 FishingBuddy.Minimap = {};
 
+local FL = LibStub("LibFishing-1.0");
+
 local icon = LibStub("LibDBIcon-1.0");
 local broker = LibStub:GetLibrary("LibDataBroker-1.1")
 
@@ -35,7 +37,7 @@ local MinimapOptions = {
 
 local function setter(setting, value)
 	if (setting == "MinimapButtonVisible") then
-		FishingBuddy_Player["MinimapData"].hide = (value == 0);
+		FishingBuddy_Player["MinimapData"].hide = (not value or value == 0);
 	else
 		FishingBuddy.BaseSetSetting(setting, value);
 	end
@@ -43,7 +45,11 @@ end
 
 local function getter(setting)
 	if (setting == "MinimapButtonVisible") then
-		return (not FishingBuddy_Player["MinimapData"].hide) and 1 or 0;
+		if (not FishingBuddy_Player["MinimapData"].hide) then
+			return 1;
+		else
+			return 0;
+		end
 	else
 		return FishingBuddy.BaseGetSetting(setting);
 	end

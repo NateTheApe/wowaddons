@@ -157,8 +157,8 @@ L:AddLocale("ruRU",
 	leavejoin_name = "Вход/выход в/из канала",
 	notices_desc = "Отфильтровывать извещения в каналах (такие как смета модератора и т.п.).",
 	notices_name = "Извещения в канале",
-	-- tradespam_desc = "",
-	-- tradespam_name = "",
+	tradespam_desc = "Скрывать повторяющиеся сообщения", -- Needs review
+	tradespam_name = "Скрывать спам", -- Needs review
 }
 
 )

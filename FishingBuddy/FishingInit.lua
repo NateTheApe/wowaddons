@@ -602,42 +602,6 @@ FishingInit.RegisterFunctionTraps = function()
 	FishingBuddy.TrapWorldMouse();
 end
 
--- handle key menu
-local function SetKeyValue(self, what, value)
-	local show = FBConstants.Keys[value];
-	FishingBuddy.SetSetting(what, value);
-	UIDropDownMenu_SetWidth(self, 90);
-	UIDropDownMenu_SetSelectedValue(self, show);
-	UIDropDownMenu_SetText(self, show);
-end
-
-local function LoadKeyMenu(menu, what)
-	local info = {};
-	local setting = FishingBuddy.GetSetting(what);
-	for value,label in pairs(FBConstants.Keys) do
-		local v = value;
-		local w = what;
-		local m = menu;
-		info.text = label;
-		info.func = function() SetKeyValue(m, w, v); end;
-		if ( setting == value ) then
-			info.checked = true;
-		else
-			info.checked = false;
-		end
-		UIDropDownMenu_AddButton(info);
-	end
-end
-
-FishingInit.KeyMenuSetup = function(menu, what)
-	UIDropDownMenu_Initialize(menu,
-									  function()
-										  local w = what;
-										  LoadKeyMenu(menu, w);
-									  end);
-end
-
-
 FishingBuddy.Initialize = function()
 	if ( FishingInit ) then
 		-- Set everything up, then dump the code we don't need anymore
@@ -652,15 +616,6 @@ FishingBuddy.Initialize = function()
 		-- debugging state
 		FishingBuddy.Debugging = FishingBuddy.BaseGetSetting("FishDebug");
 		
-		-- Casting key menu
-		local f = CreateFrame("Frame", "FishingBuddyOption_EasyCastKeys", nil,
-									 "FishingBuddyDropDownMenuTemplate");
-		f.SetKeyValue = SetKeyValue;
-		FishingInit.KeyMenuSetup(f, "EasyCastKeys");
-		
-		local label = getglobal("FishingBuddyOption_EasyCastKeysLabel");
-		label:SetText(FBConstants.KEYS_LABEL_TEXT);
-
 		-- we don't need these functions anymore, gc 'em
 		FishingInit = nil;
 	end

@@ -7,7 +7,7 @@
 ## X-Category: Library
 ## X-AceLibrary-Crayon-2.0: true
 ## X-License: LGPL v2.1
-## X-Curse-Packaged-Version: r48
+## X-Curse-Packaged-Version: r49
 ## X-Curse-Project-Name: LibCrayon-3.0
 ## X-Curse-Project-ID: libcrayon-3-0
 ## X-Curse-Repository-ID: wow/libcrayon-3-0/mainline

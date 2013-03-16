@@ -756,7 +756,7 @@ function sliceDetail.skipSpecs:text(skipSpecs)
 end
 function sliceDetail.skipSpecs:initialize(level)
 	local info, skip = UIDropDownMenu_CreateInfo(), currentRing[currentSliceIndex].skipSpecs or ""
-	info.func, info.isNotRadio, info.minWidth = self.set, true, self:GetWidth()-40
+	info.func, info.isNotRadio, info.minWidth, info.keepShownOnClick = self.set, true, self:GetWidth()-40, true
 	info.text, info.arg1, info.checked = (L"Unspecialized %s characters"):format("|cff" .. PLAYER_CLASS_COLOR_HEX .. PLAYER_CLASS .. "|r"), PLAYER_CLASS_UC, not skip:match(" " .. PLAYER_CLASS_UC .. " ")
 	UIDropDownMenu_AddButton(info)
 	for i=1, GetNumSpecializations() do

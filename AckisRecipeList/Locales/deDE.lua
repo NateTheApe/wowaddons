@@ -6,7 +6,7 @@ deDE localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.2
+Project version: 2.4.4
 ************************************************************************
 Original translated by: Winkiller, Dessa
 Currently maintained by:
@@ -186,7 +186,6 @@ L["Bradley Towns"] = "Bradley Städter"
 L["Braeg Stoutbeard"] = "Braeg Starkbart"
 L["Brandig"] = true
 L["Brawn"] = true
-L["BRD_RANDOM_ROOM"] = "Es gibt eine Chance, dass es in 5 verschiedenen Räumen in den Schwarzfelstiefen gefunden werden kann; jedoch erscheint es zufällig und manchmal gar nicht."
 L["Brek Stonehoof"] = "Brek Steinhuf"
 L["Brikk Keencraft"] = "Brikk Kühnwerk"
 L["Brock Stoneseeker"] = "Brock Steinsucher"

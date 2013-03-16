@@ -97,6 +97,7 @@ if not L then return end
 	L["STATUS_NAME_MOUNT"] = "Mount"
 	L["STATUS_NAME_TOKEN"] = "Tkn"
 	L["STATUS_NAME_TACKLE"] = "Tkl"
+	L["STATUS_NAME_COOKING"] = "Cook"
 	
 	
 --	main menu
@@ -286,6 +287,7 @@ if not L then return end
 	L["CONFIG_CONTROL_NOTIFY_ERASE_TEXT"] = "generate a notification when erasing %s data"
 	L["CONFIG_CONTROL_OVERRIDE"] = "Override"
 	L["CONFIG_CONTROL_OVERRIDE_TEXT"] = "override the original Blizzard %2$s so that %1$s controls it instead.\n\ndisabling this option will return the standard Blizzard %2$s functionality.\n\nyou will still be able to open the %1$s %2$s when this is disabled but you will need to configure and use a keybinding instead." -- %1$s = program, %2$s = location
+	L["CONFIG_CONTROL_SPECIAL_TEXT"] = "whether to treat the %2$s window as special or not.\n\nspecial windows are closed when the ESCAPE key is pressed.\n\nyou will need to reload the UI for this setting to take effect." -- %1$s = program, %2$s = location
 	L["CONFIG_CONTROL_ANCHOR_LOCK_TEXT"] = "lock the %1$s window so it can't be moved" -- %1$s = location name
 	L["CONFIG_CONTROL_REPOSITION_NOW"] = "Reposition Now"
 	L["CONFIG_CONTROL_REPOSITION_NOW_TEXT"] = "Repositions the %1$s window back onto the screen now" -- %1$s = location name
@@ -349,6 +351,8 @@ if not L then return end
 	L["CONFIG_SETTINGS_ITEMS_FADE_TEXT"] = "fade offline items"
 	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE"] = "Tint Unusable"
 	L["CONFIG_SETTINGS_ITEMS_TINT_USABLE_TEXT"] = "tint unusable items red"
+	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW"] = "Item Level"
+	L["CONFIG_SETTINGS_ITEMS_ITEMLEVEL_SHOW_TEXT"] = "show item level for equippable items"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_SHOW_TEXT"] = "show borders around items or not"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_STYLE_TEXT"] = "set the border style for items"
 	L["CONFIG_SETTINGS_ITEMS_BORDER_RARITY"] = "Rarity coloured border"
@@ -416,6 +420,8 @@ if not L then return end
 	L["CONFIG_SORTMETHOD_INCLUDE_ITEMAGE_TEXT"] = "include item age when sorting."
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE"] = "vendor price"
 	L["CONFIG_SORTMETHOD_INCLUDE_VENDORPRICE_TEXT"] = "include vendor price (per current stack size) when sorting."
+	L["CONFIG_SORTMETHOD_INCLUDE_ID"] = "internal id"
+	L["CONFIG_SORTMETHOD_INCLUDE_ID_TEXT"] = "include internal id (class:id:soulbound) when sorting."
 	
 	L["CONFIG_SORTMETHOD_DIRECTION_TEXT"] = "select what direction you want your items sorted in"
 	L["CONFIG_SORTMETHOD_ORDER"] = "Sort Order"
