@@ -4,9 +4,6 @@
 local _, me = ...                                 --Includes all functions and variables
 local my = UnitName("player")--player name
 
---Include Libs
-me.dropdown = LibStub('LibDewdrop-3.0')			--Dropdownmenu
-
 
 
 function me.dropdown:ShowMenu(level, value, owner)
@@ -27,10 +24,7 @@ function me.dropdown:ShowMenu(level, value, owner)
 					end
 					if (name~=subname) then me.dropdown:AddSpell("  |T"..icon..":16:16:0:0|t "..subname, subname, nil, true) end
 					-- Quicktradeskills
-					local id = me:GetSpellID(subname)
-					if (me:tcount(me.quicktradeskills)>0 and me.quicktradeskills[id]) then
-						me.dropdown:AddArrow("  |T"..icon..":16:16:0:0|t |cffff0000"..subname.."|r",id)
-					end
+					if (me:scanBagForQuickTradeSkillItems(subname, true)) then me.dropdown:AddArrow("  |T"..icon..":16:16:0:0|t |cffff0000"..subname.."|r",subname) end
 				end
 			end
 		end
@@ -53,7 +47,7 @@ function me.dropdown:ShowMenu(level, value, owner)
 			--Disable trainer frame
 			info.func = function(var)
 				me.save[my].config.trainerdisabled = var
-				me:Error(me.L["relog"])
+				print("|cffffd100Broker_ProfessionsMenu:|r","|cffff0000"..me.L["relog"].."|r")
 			end
 			me.dropdown:AddToggle(me.L["trainerdisabled"], me.save[my].config.trainerdisabled, info.func)
 			me.dropdown:AddToggle(me.L["bothfactions"], me.save[my].config.bothfactions, function(var) me.save[my].config.bothfactions=var end)
@@ -90,9 +84,10 @@ function me.dropdown:ShowMenu(level, value, owner)
 			end
 		-- Quicktradeskills
 		else
-			if me.quicktradeskills[value] then
+			local quick = me:scanBagForQuickTradeSkillItems(value)
+			if (quick) then
 				local nomats=true
-				for _,v in me:pairsByKeys(me.quicktradeskills[value]()) do
+				for _,v in me:pairsByKeys(quick) do
 					nomats=nil
 					me.dropdown:AddLine('text',v.name,'icon',v.icon,'func',v.func,'secure',v.action,'tooltipFunc',function(self) v.tooltip(self) end)
 				end
@@ -121,8 +116,8 @@ function me.dropdown:ShowMenu(level, value, owner)
 							me.save[my].quicklauncher[id] = true
 							if (not me.quicklauncher[id]) then me.quicklauncher[id]=me:newlauncher(name,icon) end
 						else
-							me.save[my].quicklauncher[id]=nil;
-							me:Error(me.L["relog"])
+							me.save[my].quicklauncher[id]=nil
+							print("|cffffd100Broker_ProfessionsMenu:|r","|cffff0000"..me.L["relog"].."|r")
 						end
 					end
 					me.dropdown:AddToggle("|T"..icon..":16:16:0:0|t "..name, me.save[my].quicklauncher[id], func)
@@ -157,7 +152,9 @@ function me.dropdown:ShowMenu(level, value, owner)
 					end
 				end
 				info.tooltipFunc = function()
-					local skill,maxskill = strmatch(v,"|Htrade:%d+:(%d+):(%d+):")
+					local skill,maxskill = strmatch(v,"|Htrade:%x+:%d+:(%d+):(%d+):")
+					if (skill == nil) then skill = "?" end
+					if (maxskill == nil) then maxskill = "?" end
 					local frame = GameTooltip:GetOwner()
 					GameTooltip:SetOwner(frame, "ANCHOR_NONE")
 					GameTooltip:SetPoint(me:GetTipAnchor2(frame))

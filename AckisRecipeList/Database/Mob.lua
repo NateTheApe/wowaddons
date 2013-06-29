@@ -2,10 +2,10 @@
 ************************************************************************
 Mob.lua
 ************************************************************************
-File date: 2012-11-18T00:13:30Z
-File hash: efe9be5
-Project hash: 3df9ad7
-Project version: 2.4.4
+File date: 2013-03-03T23:11:34Z
+File hash: 4c8bad9
+Project hash: 3fa6ce4
+Project version: 2.4.8
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -253,6 +253,7 @@ function addon:InitMob()
 	AddMob(9736,	BN.QUARTERMASTER_ZIGRIS,		Z.BLACKROCK_SPIRE,		0, 0)
 	AddMob(10264,	BN.SOLAKAR_FLAMEWREATH,			Z.BLACKROCK_SPIRE,		0, 0)
 	AddMob(10317,	L["Blackhand Elite"],			Z.BLACKROCK_SPIRE,		0, 0)
+	AddMob(10318,	L["Blackhand Assassin"],		Z.BLACKROCK_SPIRE,		0, 0)
 	AddMob(10363,	BN.GENERAL_DRAKKISATH,			Z.BLACKROCK_SPIRE,		0, 0)
 	AddMob(10899,	BB["Goraluk Anvilcrack"],		Z.BLACKROCK_SPIRE,		0, 0)
 
@@ -268,6 +269,9 @@ function addon:InitMob()
 
 	-- Halls of Lightning
 	AddMob(28923,	BN.LOKEN,				Z.HALLS_OF_LIGHTNING,		0, 0)
+
+	-- Isle of Thunder
+	AddMob(69461,	L["Itoka"],				Z.ISLE_OF_THUNDER,		0, 0)
 
 	-- Karazhan
 	AddMob(16406,	L["Phantom Attendant"],			Z.KARAZHAN,			0, 0)
@@ -321,7 +325,7 @@ function addon:InitMob()
 	AddMob(10426,	L["Risen Inquisitor"],			Z.STRATHOLME,			0, 0)
 	AddMob(10813,	BN.BALNAZZAR,				Z.STRATHOLME,			0, 0)
 	AddMob(10438,	BN.MALEKI_THE_PALLID,			Z.STRATHOLME,			0, 0)
-	AddMob(10997,	BB["Cannon Master Willey"],		Z.STRATHOLME,			0, 0)
+	AddMob(10997,	BB["Willey Hopebreaker"],		Z.STRATHOLME,			0, 0)
 
 	-- Temple of Ahn'Qiraj
 	AddMob(15263,	BB["The Prophet Skeram"],		Z.AHNQIRAJ_THE_FALLEN_KINGDOM,	0, 0)

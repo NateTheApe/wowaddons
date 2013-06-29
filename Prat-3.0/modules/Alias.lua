@@ -355,7 +355,7 @@ L:AddLocale("ruRU",
 	["There is no alias current defined for \"%s\""] = "Нет псевдонимов для \"%s\"",
 	["total aliases: %d"] = "всего псевдонимов: %d",
 	["tried to show value for alias \"%s\" but undefined in module.Aliases!"] = "\"%s\" не определено в модуле \"Псевдонимы\" при попытке показать значение!",
-	unalias = "удалить псевдоним", -- Needs review
+	unalias = "удалить псевдоним",
 	verbose = "подробно",
 	["warnUser() called with nil argument!"] = "Функция warnUser() вызвана с нулевым аргументом!",
 	["warnUser() called with zero length string!"] = "Функция warnUser() вызвана со строкой нулевой длины!",

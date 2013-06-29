@@ -6,7 +6,7 @@ frFR localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.4
+Project version: 2.4.8
 ************************************************************************
 Original translated by: Pettigrow
 Currently maintained by:
@@ -153,6 +153,7 @@ L["Bernadette Dexter"] = true
 L["Bethany Cromwell"] = true
 L["Binding"] = "Lien"
 L["Binkie Brightgear"] = "Binkie Brillerouage"
+L["Blackhand Assassin"] = "Assassin main-noire" -- Needs review
 L["Blackhand Elite"] = "Elite Main-noire"
 L["BLACK_MARKET_AUCTION_HOUSE"] = "Vendu uniquement par Madame Goya à l'hôtel des ventes au marché noir. Aucune garantie de vente à un moment donné."
 L["Blacksmith Calypso"] = "Forgeron Calypso"
@@ -297,6 +298,7 @@ L["Danielle Zipstitch"] = "Danielle Vivaiguille"
 L["Dank Drizzlecut"] = "Dank Coupebruine"
 L["Dannelor"] = true
 L["Danwe"] = true
+L["Darian Singh"] = true -- Needs review
 L["Darin Goodstitch"] = "Darin Beaupiqué"
 L["Dark Conclave Shadowmancer"] = "Ténébromancien du sombre Conclave"
 L["Darkmoon Faire"] = "Foire de Sombrelune"
@@ -349,12 +351,16 @@ L["DISCOVERY_ALCH_NORTHREND_XMUTE"] = "Découvert en faisant des transmutations 
 L["DISCOVERY_ALCH_PANDARIA"] = "Découvert aléatoirement en fabriquant n'importe quelle recette de Mists of Pandaria."
 L["DISCOVERY_ALCH_POTION"] = "Découvert en fabriquant des potions à partir d'ingrédients de Burning Crusade ou plus."
 L["DISCOVERY_ALCH_PROT"] = "Découvert en fabriquant des potions de protection majeures à partir d'ingrédients de Burning Crusade ou plus."
+L["DISCOVERY_BS_PANDARIA"] = "Découvert en fabriquant des Lingots de foudracier." -- Needs review
+L["DISCOVERY_BS_WEAP_PANDARIA"] = "Découvert en fabriquant des armes de Pandarie ayant un nom similaire." -- Needs review
 L["DISCOVERY_DESC"] = "Intègre ou non les recettes obtenues par découverte dans l'analyse."
 L["DISCOVERY_INSC_BOOK"] = "Découvert aléatoirement en lisant un Livre de la maîtrise des glyphes."
 L["DISCOVERY_INSC_MINOR"] = "Obtenu aléatoirement en effectuant des Recherches en calligraphie mineures."
 L["DISCOVERY_INSC_NORTHREND"] = "Obtenu aléatoirement en effectuant des Recherches en calligraphie en Norfendre."
 L["DISCOVERY_INSC_PANDARIA"] = "Obtenue aléatoirement en utilisant le Parchemin de Sagesse"
 L["DISCOVERY_JC_PANDARIA"] = "Obtenu aléatoirement des Facettes de recherche journalières."
+L["DISCOVERY_LW_PANDARIA"] = "Obtenu aléatoirement grâce à Splendeur du cuir et Splendeur des écailles." -- Needs review
+L["DISCOVERY_TAILOR_PANDARIA"] = "Obtenu aléatoirement en utilisant le temps de recharge quotidien de Soie impériale." -- Needs review
 L["Disembodied Protector"] = "Protecteur désincarné"
 L["Disembodied Vindicator"] = "Redresseur de torts désincarné"
 L["DISPLAY_EXCLUSION_DESC"] = "Affiche les recettes qui sont dans la liste des exclus."
@@ -636,6 +642,7 @@ L["Ironwool Mammoth"] = "Mammouth laine-de-fer"
 L["Isabel Jones"] = true
 L["Item"] = "Objet"
 L["Item Enhancement"] = "Amélioration d'objet"
+L["Itoka"] = true -- Needs review
 L["\"Jack\" Pisarek Slamfix"] = "« Jack » Pisarek Clakfistole"
 L["Jack Trapper"] = "Jack Trappeur"
 L["Jadefire Rogue"] = "Voleur Jadefeu"
@@ -741,6 +748,7 @@ L["Larana Drome"] = true
 L["Lardan"] = true
 L["Lavinia Crowe"] = true
 L["Layna Karner"] = true
+L["LEARNT_BY_ACCEPTING_QUEST"] = "Cette recette est apprise quand vous acceptez la quête." -- Needs review
 L["Leather"] = "Cuir"
 L["LEATHER_DESC"] = "Intègre ou non les recettes permettant de fabriquer des objets en cuir dans l'analyse."
 L["Lebowski"] = true
@@ -829,6 +837,7 @@ L["Mining"] = "Minage"
 L["Miralisse"] = true
 L["Mirla Silverblaze"] = "Mirla Brasargent"
 L["Misensi"] = true
+L["Mishka"] = true -- Needs review
 L["Mishta"] = true
 L["MissingFromDB"] = [=[: n'est pas présent dans la base de données. 
 Veuillez en informer l'auteur de cet addon.]=]
@@ -842,7 +851,7 @@ L["Modoru"] = true
 L["Molt Thorn"] = "Rougeronce"
 L["Moonrage Tailor"] = "Tailleur Ragelune"
 L["Moordo"] = true
-L["MOP_RAIDS_RANDOM"] = "Drop aléatoire des monstres en mode héroique du Coeur de la Peur, de la Terrasse Printanière, et des Caveaux Mogu'shan."
+L["MOP_RAIDS_RANDOM"] = "Butin aléatoire des monstres en mode héroïque du Coeur de la Peur, de la Terrasse Printanière, et des Caveaux Mogu'shan." -- Needs review
 L["Morgan Day"] = true
 L["Mossflayer Shadowhunter"] = "Chasseur des ténèbres Ecorchemousse"
 L["Mrs. Gant"] = "Mme Gant"
@@ -1093,6 +1102,7 @@ L["Shield"] = "Bouclier"
 L["SHIFT_CLICK"] = "Shift-Clic pour créer un lien vers l'objet de la recette."
 L["Show Known"] = "Connu"
 L["Sid Limbardi"] = true
+L["Silkmaster Tsai"] = "Maître de la soie Tsai" -- Needs review
 L["Silverbrook Defender"] = "Défenseur de Ruissargent"
 L["Silverbrook Hunter"] = "Chasseur de Ruissargent"
 L["Silverbrook Trapper"] = "Trappeur de Ruissargent"
@@ -1109,6 +1119,7 @@ L["Skreah"] = true
 L["Slagg"] = true
 L["Small Font"] = "Petite police"
 L["SMALL_FONT_DESC"] = "Utilise ou non une police plus petite pour les entrées de la liste des recettes."
+L["Smeltmaster Ashpaw"] = "Maître fondeur Cendre Patte" -- Needs review
 L["Smiles O'Byron"] = "Risette O'Byron"
 L["Smith Argus"] = "Argus le forgeron"
 L["Smudge Thunderwood"] = "Smudge Tonnebois"

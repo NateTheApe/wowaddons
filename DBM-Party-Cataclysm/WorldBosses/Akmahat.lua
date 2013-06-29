@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Akmahat", "DBM-Party-Cataclysm", 15)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 48 $"):sub(12, -3))
 mod:SetCreatureID(50063)
 mod:SetModelID(34573)
 mod:SetZone(748, 720)--Uldum (both versions of it)
@@ -84,26 +84,26 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(93561) then
+	if args.spellId == 93561 then
 		warnMantle:Show()
 		specWarnMantle:Show()
 		timerMantleCD:Start()
-	elseif args:IsSpellID(94946) then
+	elseif args.spellId == 94946 then
 		warnFuryofSands:Show()
 		specWarnFuryofSands:Show()
 		timerFuryofSandsCD:Start()
-	elseif args:IsSpellID(94968) then
+	elseif args.spellId == 94968 then
 		warnShockwave:Show()
 		timerShockwaveCD:Start()
 	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(93561) then
+	if args.spellId == 93561 then
 		local shieldname = GetSpellInfo(93561)
 		showShieldHealthBar(self, args.destGUID, shieldname, 500000)
 		self:Schedule(60, hideShieldHealthBar)
-	elseif args:IsSpellID(93578) then
+	elseif args.spellId == 93578 then
 		sandsTargets[#sandsTargets + 1] = args.destName
 		sandsDebuffs = sandsDebuffs + 1
 		timerSandsofTime:Start()
@@ -114,10 +114,10 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(93561) then
+	if args.spellId == 93561 then
 		self:Unschedule(hideShieldHealthBar)
 		hideShieldHealthBar()
-	elseif args:IsSpellID(93578) then
+	elseif args.spellId == 93578 then
 		sandsDebuffs = sandsDebuffs - 1
 		if sandsDebuffs == 0 then
 			timerSandsofTime:Cancel()

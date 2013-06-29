@@ -1,7 +1,7 @@
 ﻿local mod	= DBM:NewMod(186, "DBM-Party-Cataclysm", 10, 77)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 61 $"):sub(12, -3))
 mod:SetCreatureID(23574)
 mod:SetModelID(21630)
 mod:SetZone()
@@ -34,11 +34,11 @@ local eagleGUID = nil
 
 mod:RegisterOnUpdateHandler(function(self)
 	if self.Options.SetIconOnEagle and eagleGUID then
-		for i = 0, DBM:GetGroupMembers() do
-			local uId = (i == 0 and "target") or "party"..i.."target"
-			local guid = UnitGUID(uId)
+		for uId in DBM:GetGroupMembers() do
+			local unitid = uId.."target"
+			local guid = UnitGUID(unitid)
 			if guid == eagleGUID then
-				SetRaidTarget(uId, 8)
+				SetRaidTarget(unitid, 8)
 				eagleGUID = nil
 			end
 		end
@@ -62,7 +62,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(97318) then
+	if args.spellId == 97318 then
 		if args:IsDestTypePlayer() then
 			warnPlucked:Show(args.destName)	
 		else
@@ -72,7 +72,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(43648) then
+	if args.spellId == 43648 then
 		warnStorm:Show(args.destName)
 		specWarnStorm:Show()
 		timerStorm:Start()
@@ -80,7 +80,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		timerStormCD:Start()
 		if self.Options.RangeFrame then
 			DBM.RangeCheck:Hide()
-			mod:Schedule(10, function()
+			self:Schedule(10, function()
 				DBM.RangeCheck:Show(6)
 			end)
 		end

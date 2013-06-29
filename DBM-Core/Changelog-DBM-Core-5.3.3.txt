@@ -1,0 +1,103 @@
+tag 5.3.3
+854a56b23a8df089a0a937c6d8581bb3b83c4714
+subversion <svn@deadlybossmods.com>
+2013-06-12 20:50:19 +0200
+
+Tagging as 5.3.3
+
+
+--------------------
+
+subversion:
+	- increment version number to 5.3.3
+root:
+	- add SiegeOfOrgrimmar to .pkgmeta
+	- tandanu via svn r9810: prevent error when trying to load mods for instances do not exist yet
+	- tandanu via svn r9809: add a temporary name for the SoA mod; note to localizers: do not bother translating this, it will be removed and replaced with the ID as soon as 5.4 is live
+	- tandanu via svn r9808: Core: * make sure that all scheduled methods are called properly (just in case if someone ever decides to use self there...)
+	Megaera: typo
+	- Omega via svn r9807: Fix some bad merging
+	- Omega via svn r9806: Fixes
+	- Omega via svn r9805: Fix scenario mods. it looks like they were 100% broken with new load code. Seems working now, but it does mean having two load methods fire in all instances, i new adding this load code was premature. oh well
+	- Omega via svn r9804: Fix a nil though
+	- Omega via svn r9803: Readd scenario check. i should be more thorough in reviewing code changes. scenario mods would have been broken completely by this after first scenario. the code only started combat on load, once loaded, it never checked scenario mods and never started combat
+	- Omega via svn r9802: Updates to last
+	- Omega via svn r9801: More TOM_RUS load changes. This can actually be used to fix onyxia mod since it works when ZONE_CHANGED_NEW_AREA doesn't fire. Add loadzone info for Siege of Orgrimmar
+	- nbluewiz via svn r9800: # koKR update.
+	- Omega via svn r9799: it's seige, not fall
+	- Omega via svn r9798: Add Orgrimmar raid since EJ info is data mined now and all bosses are known. Fix flex difficulty detection.
+	- Omega via svn r9797: update kolt sounds with new recordings that should be a little easier to hear hopefully
+	- Omega via svn r9796: ##Add option to control the chat frame icons in case it does distort in some fonts it can be turned off by specific users instead of just globally forced on or off for everyone. this option should be default to on and disabled for those that it causes problems for since it should work fine for most.
+	- Omega via svn r9795: ru update Small tortos update
+	- Omega via svn r9794: Make summon ball lightning count in timers warnings and special warnings (this will have a side effect of resetting special warning sound on summon ball lightning though, sorry about that)
+	- Omega via svn r9793: Fix bug in 9792
+	- ultrashining via svn r9792: zhTW update
+	- Omega via svn r9791: Is the texture stripping still needed? if it stays in, the ji-kun arrows don't show in chat frame, on middle of screen :\ I did some initial testing and saw no anomalies in it on my client, but i use english font with standard 1.0 UI scale, so. i'm curious of others feedback on this
+	- Omega via svn r9790: Jikun mod confirmed working, however, i didn't like the message text, so lets make it even fancier. use arrows instead of upper/lower :D Only cavet is that arrows only show in enter message, they do not show in the chat addmsg itself.
+	- Omega via svn r9789: add colors to text
+	- Omega via svn r9788: #Ji-kun update Hopefully, without completely breaking ji-kun mod. arrows that now point to correct nest based on what you choose in UI Special warning for flock will now check arrow setting and if one is set, only warn on those specific flocks instead of all of them, else it still warns on all. General messages specifically saying which nest is the upper and the lower.
+	- Omega via svn r9787: validate revision against a second person as well, like version check does.
+	- Omega via svn r9786: try to throttle fog messages by ignoring blizzards duplicate emotes that fire sometimes. remove load delay from zone change handler, doesn't seem required anymore. hasn't been for long time.
+	- tandanu via svn r9785: fix WSG initialization
+subversion:
+	- tandanu via svn r9784: this is a dummy commit to test if the new svn server works properly
+	- Omega via svn r9783: Add in basic Flex stat support. Obviously incomplete until 5.4 ptr but just to get some placeholder code in. Improve pull timer by using newannounce instead of addmsg so it actually displays in center of screen and plays sound like people are used to old raid warnings doing.
+	- ebmor via svn r9782: JiKun: set 10N/10H flockC=15 back to "Upper" ("Lower" looked like a mistype); infinite LFR minutes
+	- Omega via svn r9781: remove old comment, me and tandanu got that refactored and not duplicate anymore
+	- nbluewiz via svn r9780: # koKR update.
+	- Omega via svn r9779: Big update of nest data
+	- ebmor via svn r9778: DBM:RoleCheck: print the localized name (e.g. enGB-"Damage", deDE-"Schaden") instead of the internal name (e.g. "DAMAGER")
+	- ebmor via svn r9777: deDE update
+	- Omega via svn r9776: hopefully fix dark parasite bugs on 25 man
+	- Omega via svn r9775: fix dbm pull scheduling
+	- Omega via svn r9774: re-add raid boss whisper. UNIT_AURA waste of cpu, current method has slower player warning. so we'll use RAID_BOSS_WHISPER for player warning and less cpu method for the slightly slower "other" warning.
+	- Omega via svn r9773: comment out pull now til i have time to fix it
+	- Omega via svn r9772: color code nests
+	- tandanu via svn r9771: brawlers mod now has a callback mechanism for fight start/end (the fight end thing might fire more than once due to multiple detection methods)
+	- Omega via svn r9770: refactor and move stuff back to rares2 mod. then tandnau can add a sync listener for match end to reset the variable
+	- Omega via svn r9769: and fix another horridon bug
+	- Omega via svn r9768: ##remove the PT chat messages, make them local message instead with an option to disable ##Remove *** filter. no boss mods have done this for several versions now.
+	- Omega via svn r9767: clear up debug now that that should be fixed
+	- Omega via svn r9766: this should fix torrent of ice i believe. not sure how i missed this problem
+	- Omega via svn r9765: god damnit. why is it so hard to write a mod without fucking it up for 5 hours.
+	- Omega via svn r9764: fix more fail. i can't think of any cleaner way to do this, unless i want to copy and paste all of the match begin and end code from brawlers mod into ro-shambo, this is only way to ensure it works for more than one pull.
+	- Omega via svn r9763: that doesn't work, gonna have to do it this way
+	- Omega via svn r9762: This should help make ro-shambo easier
+	- Omega via svn r9761: fix bug with boom booms special warnings going off for everyone instead of just fighter
+	- Omega via svn r9760: add more torrent of ice debug
+	- Omega via svn r9759: not enough time to run away there for some melee, so move warning to a pre warning on 4th fast strike, add run away sound too as it's honestly just too hard to even notice a special warning on a fight that fast pace
+	- Omega via svn r9758: Add blind hero to brawlers
+	- Omega via svn r9757: also, remove some comments, improve debug more (ignore in scenarios too)
+	- Omega via svn r9756: fix battle of high seas bugs
+	- Omega via svn r9755: also filter world boss start combat prints.
+	- Omega via svn r9754: add a print to megaera torrent name, see what the mismatch is.
+	- Omega via svn r9753: refine debug so that we now only print bad pulls. IsEncounterInProgress returned true in EVERY valid pull i tested in kara, SSC, and even in throne of thunder LFR. now lets just keep an eye out for bad pulls, pulls where IsEncounterInProgress is false and figure out where they came from (if it can even happen at all cause remember we are already ignoring bad syncs, at this point the debug only remains to test remote chance there still may be a dbm debug behind the mispulls)
+	- Omega via svn r9752: Seems like this will work block pull syncs if IsEncounterInProgress() isn't true and we are in a LFR group. Bye bye spoofed combat syncs. Going to leave the bug for a bit to see if the bad pulls happen now that this sync block is in.
+	- Omega via svn r9751: fix combat debug, pulls should work again. Also interesting to note is that IsEncounterInProgress is true in old raids too, it's true on ANY raid boss, this could prove very useful in pull sync filtering.
+	- Omega via svn r9750: no idea why this is erroring but lets see if this works
+	- Omega via svn r9749: There is no crashing thunder in phase 3 lei shen, so lets unregister all those damage events, cause there is a TON of damage events in phase 3 and we're wasting cpu looking for events that won't be there.
+	- Omega via svn r9748: Add feed pool warning for TOM_RUS it's off by default and doesn't register events unless turned on, since i consider it a low priority warning and most would want it turned off since these pools are soaked on purpose by many strats
+	- Omega via svn r9747: also try to fix http://elitistjerks.com/f104/t132737-new_lua_error_new_dbm_release/
+	- Omega via svn r9746: make sure we don't error out on scenario start combat (where triggerEvent would be nil)
+	- Omega via svn r9745: Update istanking prototype and switch megaera over to it.
+	- Omega via svn r9744: Re-disable the megaera back head timers. The only way they'd be accurate is to hard code the actual timing for every possible head kill order and that's simply not something i can convince 24 other people to help me do. There are several dozen possible kill orders and every one of them would have different timers. Try to fix findtorrent() aborting early and not returning a target
+	- Omega via svn r9743: improve combat debug, add some notes, investigating a possible fix for looking for raid at least (which is pretty much where 100% of problem is anyways)
+	- ebmor via svn r9742: deDE update
+	- Omega via svn r9741: at start combat debug. seeing way too many bogus pulls lately, ironicly, only in LFR. it's probably some mod or macro or something or another someone thinks is cute to use in LFR to break DBM, the debug will bust out those users too since it'll call out sender. however, if there is a bug, debug will hopefully find this too
+	- Omega via svn r9740: Add warning/special warning for gorefiends grasp on lei shen
+	- Omega via svn r9739: fix static shock bug
+	- nbluewiz via svn r9738: # koKR update.
+	- Omega via svn r9737: ru update
+	- Omega via svn r9736: some alpha version checking fixes
+	- tandanu via svn r9735: While I agree that this "omfg, your version is seriously outdated and will probably break in combat because it wasn't even made for this patch" is potentially a good idea:
+	There is no way* to actually verify if the synced information is true (other that it came from two sources, like we do for the normal update notification); two trolls could simply send a high revision number and disable DBM of everyone in the raid...
+	
+	The version update notification is now forced (even if disabled) if you revision is seriously out of date and might cause problems.
+	
+	* actually, the server could sign the revision number which would increase the size of our version syncs by 1024 bits (256 byte, doesn't even fit in a single addon message...), also we'd need an implementation of RSA in pure Lua, so this isn't really feasible.
+	- ultrashining via svn r9734: zhTW update
+	- Omega via svn r9733: even more changes. disable dbm and print a warning if mod is more than 400 revisions out of date. VERY old boss mods can lead to errors, performance drop if not updated to latest api changes, or at the very least, grievous misinformation that can wipe raids do to your boss mod timers/information being so grossly out of date. Grossly out of date mods must be updated.
+	- Omega via svn r9732: add warning for out of date alpha versions (with threshold being about 20 revisions)
+	- nbluewiz via svn r9731: # GUI : Fix over scroll.
+	- nbluewiz via svn r9730: # koKR update.
+	- tandanu via svn r9729: increment alpha version to 5.3.3

@@ -8,6 +8,7 @@ local delay, counter = 1,0
 local dataobj, tooltip, db
 local color = true
 local path = "Interface\\AddOns\\Broker_MicroMenu\\media\\"
+local _
 
 local function Debug(...)
 	--[===[@debug@
@@ -63,8 +64,6 @@ function cellPrototype:SetupCell(tooltip, value, justification, font, iconCoords
 	tex:SetHeight(16)
 	
 	if guild then
-		--Debug("SetSmallGuildTabardTextures")
-		--SetSmallGuildTabardTextures("player", tex, tabard.background);
 		_G.SetSmallGuildTabardTextures("player", tex,tex);
 	elseif unitID then 
 		_G.SetPortraitTexture(tex, unitID)
@@ -115,36 +114,42 @@ function dataobj:UpdateText()
 			dataobj.icon = path.."red.tga"
 		end
 	end
-	local text = ""
-	if db.showWorldLatency then
-		text = string.format("%s%i|r %s ", colorWorld, latencyWorld, L["ms"])
-	end
-	if db.showHomeLatency then
-		text = string.format("%s%s%i|r %s ", text, colorHome, latencyHome, L["ms"])
-	end
-	if db.showFPS then
-		if db.fpsFirst then
-			dataobj.text = string.format("%s%i|r %s %s", fpsColor, fps , L["fps"], text)
-		else
-			dataobj.text = string.format("%s%s%i|r fps", text, fpsColor, fps )
-		end
-	else 
+	
+	if db.customTextSetting then
+		local lw_string = colorWorld..latencyWorld.."|r"
+		local lh_string = colorHome..latencyHome.."|r"
+		local fps_string = fpsColor..fps.."|r"
+		local text = string.gsub(string.gsub(string.gsub(db.textOutput, "{fps}", (fps_string or "fps")), "{lw}", (lw_string or "lw")), "{lh}", (lh_string or "lh"))
 		dataobj.text = text
+	else
+		local text = ""
+		if db.showWorldLatency then
+			text = string.format("%s%i|r %s ", colorWorld, latencyWorld, L["ms"])
+		end
+		if db.showHomeLatency then
+			text = string.format("%s%s%i|r %s ", text, colorHome, latencyHome, L["ms"])
+		end
+		if db.showFPS then
+			if db.fpsFirst then
+				dataobj.text = string.format("%s%i|r %s %s", fpsColor, fps , L["fps"], text)
+			else
+				dataobj.text = string.format("%s%s%i|r fps", text, fpsColor, fps )
+			end
+		else 
+			dataobj.text = text
+		end
 	end
 end
 
 local function MouseHandler(event, func, button, ...)
-	--Debug("MouseHandler",event, func, button)
 	local name = func
-	if button == "RightButton" then
-		--InviteUnit(name)
+	
+	if _G.type(func) == "function" then
+		func(event, func,button, ...)
 	else
-		if _G.type(func) == "function" then
-			func(event, func,button, ...)
-		else
-			func:GetScript("OnClick")(func,button, ...)
-		end
+		func:GetScript("OnClick")(func,button, ...)
 	end
+	
 	LibQTip:Release(tooltip)
 	tooltip = nil
 end
@@ -166,12 +171,15 @@ function dataobj:OnEnter()
 	local y, x = tooltip:AddLine()
 	tooltip:SetCell(y, 1, path.."spells.tga", myProvider)
 	--tooltip:SetCell(y, 2, "Spellbook & Abilities |cffffd200(P)|r")
-	tooltip:SetCell(y, 2, _G.SPELLBOOK_ABILITIES_BUTTON.."|cffffd200 (".._G.GetBindingKey("TOGGLESPELLBOOK")..")")
-	--tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, SpellbookMicroButton)
+	local key = _G.GetBindingKey("TOGGLESPELLBOOK")
+	if key then
+		tooltip:SetCell(y, 2, _G.SPELLBOOK_ABILITIES_BUTTON.."|cffffd200 ("..key..")")
+	else
+		tooltip:SetCell(y, 2, _G.SPELLBOOK_ABILITIES_BUTTON)
+	end
 	tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, function(self, func, button, ...) 
 		
 		if _G.InCombatLockdown() then
-			local key = _G.GetBindingKey("TOGGLESPELLBOOK")
 			if key then
 				_G.DEFAULT_CHAT_FRAME:AddMessage("Cant' open the Spellbook during combat. Use your hot key: "..key)
 			else
@@ -197,7 +205,7 @@ function dataobj:OnEnter()
 	--tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, TalentMicroButton)
 	tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, function(self, func, button, ...) 
 		if _G.InCombatLockdown() then
-			local key = _G.GetBindingKey("TOGGLETALENTS")
+			key = _G.GetBindingKey("TOGGLETALENTS")
 			if key then
 				_G.DEFAULT_CHAT_FRAME:AddMessage("Cant' open the Talents during combat. Use your hot key: "..key)
 			else
@@ -236,12 +244,8 @@ function dataobj:OnEnter()
 	tooltip:SetCell(y, 2, _G.PVPMicroButton.tooltipText)
 	--tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, function() ToggleFrame(PVPParentFrame) end)
 	tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, function() 
-		--_, _, _, tocversion = GetBuildInfo()
-		--if tocversion == "30350" then
-		if _G.PVPParentFrame then
-			_G.ToggleFrame(_G.PVPParentFrame)
-		else
-			_G.ToggleFrame(_G.PVPFrame) 
+		if _G.TogglePVPUI then
+			_G.TogglePVPUI()
 		end
 	end)
 	

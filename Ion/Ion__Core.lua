@@ -2345,7 +2345,8 @@ local function control_OnEvent(self, event, ...)
 
 	elseif (event == "ACTIVE_TALENT_GROUP_CHANGED" or
 		  event == "LEARNED_SPELL_IN_TAB" or
-		  event == "CHARACTER_POINTS_CHANGED") then
+		  event == "CHARACTER_POINTS_CHANGED" or
+          event == "SPELLS_CHANGED") then
 
 		updater.elapsed = 0
 		updater:Show()
@@ -2377,7 +2378,7 @@ frame:RegisterEvent("PLAYER_LEAVING_WORLD")
 frame:RegisterEvent("PLAYER_REGEN_DISABLED")
 frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-frame:RegisterEvent("SKILL_LINES_CHANGED")
+frame:RegisterEvent("SPELLS_CHANGED")
 frame:RegisterEvent("CHARACTER_POINTS_CHANGED")
 frame:RegisterEvent("LEARNED_SPELL_IN_TAB")
 frame:RegisterEvent("CURSOR_UPDATE")

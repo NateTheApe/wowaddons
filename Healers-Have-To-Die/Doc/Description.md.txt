@@ -3,6 +3,8 @@ Healers Have To Die
 *Spot those bloody healers instantly and help them accomplish their destiny!
 (PVP and PVE)*
 
+**NOTE: Type /HHTDG to open the configuration panel.**
+*HHTD's options are not directly available in the "Interface" panel due to ongoing tainting issues Blizzard is not willing to fix.*
 
 HHTD adds a **red cross** over *enemy* healer's name plates. *You can't miss them!*
  (see the [screen-shot][redcross]).
@@ -19,6 +21,33 @@ someone else during the last 60 seconds (*can be configured*).
 HHTD is PVP and PVE compatible.
 
 Remember to check out available options (/HHTDG)
+
+Compatibility
+-------------
+
+HHTD is only compatible with nameplate add-ons which have been coded
+responsibly and do not modify internal parts of Blizzard nameplates (a very
+selfish behaviour as it prevents any other add-on from re-using them).
+
+HHTD will detect these incompatibilities and report to you so that you can ask
+the culprit add-on authors to fix their code and make it compatible with ALL
+nameplate add-ons.
+
+**Guidelines for other add-on authors:**
+
+- **Do not call :Hide() or :Show() on nameplates' base frame.** This breaks
+  nameplate tracking for other add-ons by unduly firing OnHide/OnShow hooks...
+
+  Instead, make its sub-frames invisible by changing their size and/or setting them to
+  the _empty_ (not _nil_) texture. (check out how TidyPlates does)
+
+- **Do not call :SetParent() on nameplates' subframes**, this would prevent other
+  add-ons from finding and hooking nameplate elements.
+
+- **Do not use SetScript() EVER.** You don't need it. :SetScript() shall only
+  be used on frames  YOU create. You can simply replace all your SetScript()
+  calls by HookScript().
+
 
 Special commands
 ----------------

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Huhuran", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 311 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 452 $"):sub(12, -3))
 mod:SetCreatureID(15509)
 mod:SetModelID(15739)
 mod:RegisterCombat("combat")
@@ -10,7 +10,7 @@ mod:RegisterEvents(
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_APPLIED_DOSE",
 	"SPELL_AURA_REMOVED",
-	"UNIT_HEALTH"
+	"UNIT_HEALTH target focus mouseover"
 )
 
 local warnSting			= mod:NewTargetAnnounce(26180, 2)
@@ -38,11 +38,11 @@ local function warnStingTargets()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(26180) then
+	if args.spellId == 26180 then
 		StingTargets[#StingTargets + 1] = args.destName
 		self:Unschedule(warnStingTargets)
 		self:Schedule(0.3, warnStingTargets)
-	elseif args:IsSpellID(26050) then
+	elseif args.spellId == 26050 then
 		warnAcid:Show(args.spellName, args.destName, args.amount or 1)
 		timerAcid:Start(args.destName)
 		if args:IsPlayer() and (args.amount or 1) >= 10 then
@@ -54,7 +54,7 @@ end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(26180) then
+	if args.spellId == 26180 then
 		timerSting:Cancel()
 	end
 end
@@ -65,4 +65,3 @@ function mod:UNIT_HEALTH(uId)
 		prewarn_berserk = true
 	end
 end
-		

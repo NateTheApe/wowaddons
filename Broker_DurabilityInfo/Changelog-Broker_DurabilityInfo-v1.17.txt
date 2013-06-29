@@ -1,0 +1,12 @@
+tag v1.17
+287c75221d85c8a750bb12ee038c4973b72c5e56
+iceeagle <ciprianmihai.coman@gmail.com>
+2013-03-11 13:22:48 +0200
+
+Tag as v1.17
+
+
+--------------------
+
+iceeagle:
+	- toc update for patch 5.2

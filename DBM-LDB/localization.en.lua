@@ -3,6 +3,8 @@ DBM_LDB_TOOLTIP_HELP2	= "Right-click to open config menu"
 
 DBM_LDB_LOAD_MODS		= "Load boss mods"
 
+DBM_LDB_CAT_MOP			= "Mists of Pandaria"
+DBM_LDB_CAT_CATA		= "Cataclysm"
 DBM_LDB_CAT_WOTLK		= "Wrath of the Lich King"
 DBM_LDB_CAT_BC			= "The Burning Crusade"
 DBM_LDB_CAT_CLASSIC 	= "WoW Classic Bosses"

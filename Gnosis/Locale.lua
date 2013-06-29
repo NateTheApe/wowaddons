@@ -249,7 +249,7 @@ Gnosis.L["OptHideMirrorCB"] = "Blizzards Spiegelleiste verstecken"
 Gnosis.L["OptHideNonPlayerTicks"] = "Verstecke Ticks auf nicht-Spieler Zauberleisten"
 Gnosis.L["OptHidePetCB"] = "Verstecke die Begleiter/Fahrzeug Zauberleiste von Blizzard"
 Gnosis.L["OptHidepushbackTime"] = "Verstecke Zauberverzögerung"
-Gnosis.L["OptImportBar"] = "Import bar(s) (reloads interface)" -- Requires localization
+Gnosis.L["OptImportBar"] = "Import bar(s)" -- Requires localization
 Gnosis.L["OptLoadOptionsButtonDesc"] = "Das Optionsmenü wurde noch nicht generiert, um Gnosis' Speicherauslastung zu minimieren. Nach dem Erstellen kannst du auswählen die Optionen beim Start von WoW automatisch zu generieren."
 Gnosis.L["OptLoadOptionsButtonName"] = "Optionsmenü erstellen..."
 Gnosis.L["OptLocale"] = "Lokalisierung auswählen"
@@ -364,6 +364,13 @@ Gnosis.L["OptWfCL_Desc"] = "Verzögere Ausgabe/Clip Test in ms um Kampftextverz�
 Gnosis.L["OptWfCL_Name"] = "Warte auf Kampftext [ms]"
 Gnosis.L["OptWidth"] = "Breite"
 Gnosis.L["PasteScript"] = "Füge Skript in die Edit-Box ein" -- Needs review
+Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
+Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
+Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
+Gnosis.L["PremadeTfs1"] = "|cffff0000pushback|r remaining / total, e.g. |cffff0000+1.0|r 1.4 / 3.00" -- Requires localization
+Gnosis.L["PremadeTfs2"] = "|cffff0000pushback|r remaining / total, same as above but without minutes display" -- Requires localization
+Gnosis.L["PremadeTfs3"] = "remaining / total, higher precision, e.g. 1.45 / 3.000" -- Requires localization
+Gnosis.L["SelPremadeStr"] = "Select premade string" -- Requires localization
 Gnosis.L["Strata_BACK"] = "Niedrigste"
 Gnosis.L["Strata_DIALOG"] = "Höchste"
 Gnosis.L["Strata_HIGH"] = "Höchste"
@@ -629,7 +636,7 @@ Gnosis.L["OptHideMirrorCB"] = "隐藏暴雪镜像计时条"
 Gnosis.L["OptHideNonPlayerTicks"] = "在非玩家施法条上隐藏跳数"
 Gnosis.L["OptHidePetCB"] = "隐藏暴雪的宠物/载具施法条"
 Gnosis.L["OptHidepushbackTime"] = "隐藏施法打退时间"
-Gnosis.L["OptImportBar"] = "导入施法条 (重载界面)"
+Gnosis.L["OptImportBar"] = "导入施法条 (重载界面)" -- Needs review
 Gnosis.L["OptLoadOptionsButtonDesc"] = "Option tables have not yet been created to reduce Gnosis' memory footprint. After loading you can select to automatically create options tables the next time you start wow (or reload the ui)." -- Requires localization
 Gnosis.L["OptLoadOptionsButtonName"] = "创建选项..."
 Gnosis.L["OptLocale"] = "选择本地化文件"
@@ -741,6 +748,13 @@ Gnosis.L["OptWfCL_Desc"] = "Delay output/clip test after output/clip test reques
 Gnosis.L["OptWfCL_Name"] = "等待战斗记录 [ms]"
 Gnosis.L["OptWidth"] = "宽"
 Gnosis.L["PasteScript"] = "粘贴代码到编辑框."
+Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
+Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
+Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
+Gnosis.L["PremadeTfs1"] = "|cffff0000pushback|r remaining / total, e.g. |cffff0000+1.0|r 1.4 / 3.00" -- Requires localization
+Gnosis.L["PremadeTfs2"] = "|cffff0000pushback|r remaining / total, same as above but without minutes display" -- Requires localization
+Gnosis.L["PremadeTfs3"] = "remaining / total, higher precision, e.g. 1.45 / 3.000" -- Requires localization
+Gnosis.L["SelPremadeStr"] = "Select premade string" -- Requires localization
 Gnosis.L["Strata_BACK"] = "最低"
 Gnosis.L["Strata_DIALOG"] = "最高"
 Gnosis.L["Strata_HIGH"] = "高"
@@ -1003,7 +1017,7 @@ Gnosis.L["OptHideMirrorCB"] = "隱藏暴雪鏡像計時條"
 Gnosis.L["OptHideNonPlayerTicks"] = "隱藏非玩家施法條的跳數"
 Gnosis.L["OptHidePetCB"] = "隱藏暴雪寵物/載具施法條"
 Gnosis.L["OptHidepushbackTime"] = "隱藏施法打退時間"
-Gnosis.L["OptImportBar"] = "匯入施法條 (重載介面)"
+Gnosis.L["OptImportBar"] = "匯入施法條 (重載介面)" -- Needs review
 Gnosis.L["OptLoadOptionsButtonDesc"] = "Option tables have not yet been created to reduce Gnosis' memory footprint. After loading you can select to automatically create options tables the next time you start wow (or reload the ui)." -- Requires localization
 Gnosis.L["OptLoadOptionsButtonName"] = "創建選項..."
 Gnosis.L["OptLocale"] = "選擇本地化檔案"
@@ -1115,6 +1129,13 @@ Gnosis.L["OptWfCL_Desc"] = "Delay output/clip test after output/clip test reques
 Gnosis.L["OptWfCL_Name"] = "等待戰鬥記錄 [ms]"
 Gnosis.L["OptWidth"] = "寬"
 Gnosis.L["PasteScript"] = "貼上腳本到編輯框"
+Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
+Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
+Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
+Gnosis.L["PremadeTfs1"] = "|cffff0000pushback|r remaining / total, e.g. |cffff0000+1.0|r 1.4 / 3.00" -- Requires localization
+Gnosis.L["PremadeTfs2"] = "|cffff0000pushback|r remaining / total, same as above but without minutes display" -- Requires localization
+Gnosis.L["PremadeTfs3"] = "remaining / total, higher precision, e.g. 1.45 / 3.000" -- Requires localization
+Gnosis.L["SelPremadeStr"] = "Select premade string" -- Requires localization
 Gnosis.L["Strata_BACK"] = "最低"
 Gnosis.L["Strata_DIALOG"] = "最高"
 Gnosis.L["Strata_HIGH"] = "高"
@@ -1168,11 +1189,11 @@ Gnosis.L["IfOpenGUI"] = "설정 GUI 열기"
 Gnosis.L["Import"] = "가져오기"
 Gnosis.L["MsgBlizCBIsDis"] = "블리자드 시전바는 이미 다른 애드온에 의해 숨겨져 있습니다."
 Gnosis.L["MsgBlizCBRestored"] = "블리자드 시전바가 복구되었습니다(gui 옵션을 보세요)"
-Gnosis.L["MsgDis"] = "(비활성화)"
+Gnosis.L["MsgDis"] = "(비활성)"
 Gnosis.L["MsgDisBlizCB"] = "블리자드 시전바 비활성화(gui 옵션을 보세요)"
 Gnosis.L["MsgDisMirrCB"] = "기본 미러 시전바 비활성화(gui 옵션을 보세요)"
 Gnosis.L["MsgDisPetCB"] = "블리자드의 소환수/차량 시전바 비활성화(gui 옵션을 보세요)"
-Gnosis.L["MsgEn"] = "(활성화)"
+Gnosis.L["MsgEn"] = "(활성)"
 Gnosis.L["MsgLoaded"] = "불러들임"
 Gnosis.L["MsgMirrCBIsDis"] = "기본 미러 시전바는 이미 다른 애드온에 의해 숨겨져 있습니다."
 Gnosis.L["MsgMirrCBRestored"] = "기본 미러 시전바 복구(gui 옵션을 보세요)"
@@ -1180,7 +1201,7 @@ Gnosis.L["MsgPetCBIsDis"] = "블리자드 소환수/차량 시전바는 이미 �
 Gnosis.L["MsgPetCBRestored"] = "블리자드 소환수/차량 시전바 복구(gui 옵션을 보세요)"
 Gnosis.L["No"] = "아니오"
 Gnosis.L["NoImport"] = "가져오지 않기"
-Gnosis.L["OptAddonDisabled_Name"] = "애드온 비활성화, 현재 설정 탭에서 활성화 할 수 있습니다."
+Gnosis.L["OptAddonDisabled_Name"] = "애드온 비활성, 현재 설정 탭에서 활성화 할 수 있습니다."
 Gnosis.L["OptAddonEnable_Desc"] = "Gnosis 전환"
 Gnosis.L["OptAddonEnable_Name"] = "애드온 활성"
 Gnosis.L["OptBarXYcoordDesc"] = "x,y-좌표"
@@ -1209,7 +1230,7 @@ Gnosis.L["OptCBBorderColInt"] = "테두리 색상(차단 불가능한)"
 Gnosis.L["OptCBBorderSize"] = "테두리 크기"
 Gnosis.L["OptCBBorderTex_D"] = "고정된 크기의 테두리 텍스쳐를 추가합니다. 아이콘을 고정하지 않거나 기본 테두리 크기를 0으로 줄이기 위해 추가적인 테두리 텍스쳐를 사용할 수 있습니다. 이 테두리 텍스쳐는 아이콘 테두리에 영향을 주지 않습니다."
 Gnosis.L["OptCBBorderTex_N"] = "추가적인 테두리 텍스쳐"
-Gnosis.L["OptCBBWListedSpells"] = "주문의 차단/허용 목록화" -- Needs review
+Gnosis.L["OptCBBWListedSpells"] = "차단/허용 주문 또는 타이머 설정"
 Gnosis.L["OptCBCBBgCol"] = "시전바 배경 색상"
 Gnosis.L["OptCBCBColFail"] = "시전바 색상(실패)"
 Gnosis.L["OptCBCBColInt"] = "시전바 색상(차단된)"
@@ -1218,7 +1239,7 @@ Gnosis.L["OptCBCBNIColor"] = "시전바 색상 (차단 불가능 한)"
 Gnosis.L["OptCBCBShColor"] = "문자 그림자 색상"
 Gnosis.L["OptCBCBSucColor"] = "시전 성공 (시전바 색상)"
 Gnosis.L["OptCBCenterCB"] = "시전바 중앙으로"
-Gnosis.L["OptCBChannelsAsNormal"] = "Treat channels as normal spells" -- Requires localization
+Gnosis.L["OptCBChannelsAsNormal"] = "채널링 주문을 일반 주문처럼 보이기"
 Gnosis.L["OptCBCombatSelAlways"] = "전투 중 혹은 전투 중이 아닐 때"
 Gnosis.L["OptCBCombatSelInC"] = "전투 중일 때"
 Gnosis.L["OptCBCombatSelOoC"] = "전투 중이 아닐 때"
@@ -1258,7 +1279,7 @@ Gnosis.L["OptCBNewCB_D"] = "새 시전바를 생성하기에, 유효한 이름�
 Gnosis.L["OptCBNewCB_N"] = "새 시전바"
 Gnosis.L["OptCBNewCBName_D"] = "새 시전바를 생성하기 전에 이름을 입력합니다."
 Gnosis.L["OptCBNewListElem_D"] = [=[시전바:
-차단혹은 허용목록에 추가할 주문이름 입력.
+차단 혹은 허용목록에 추가할 주문이름 입력.
 
 다중-주문 타이머:
 모든 입력 기본 형식: cmds:spell
@@ -1269,38 +1290,20 @@ buff, debuff, dot, hot, aura, help, harm, mine
 쿨다운 명령어들:
 cd (주문 쿨다운), itemcd (아이템 쿨다운)
 runecd (죽기 룬 1..6)
+innercd/proc [norefresh] (내부 쿨다운, 발동 지속시간/쿨다운)
 
 지속시간:
 totemdur (주술사 토템 1..4)
-enchmh 또는 enchoh:무기 마법 부여나 독
+enchmh 또는 enchoh:무기 마법부여나 독
 (mh=주 무기, oh=보조 무기)
 
 주문시전 (시전바 미대체):
 cast:all 또는 cast:주문이름
 
 자원들:
-resource:health, power 또는 altpower, heal, threat
+resource:health, power, combopoints, altpower, heal, threat, soulshards, eclipse, holypower, chi, shadoworbs, burningembers, demonicfury
 
-추가적인 명령어들:
-unit=UnitId (이름 사용가능)
-nfs="바의 이름 형식 무시"
-lag, casttime, recast=도트 틱 시간
-staticdur=바에 초 단위로 표시될 최소 시간
-nodur (중첩 오라 표시)
-not (쿨다운이 아닐 경우/쿨다운 일 경우 오라/쿨다운 표시)
-hidespark (시전바 불빛 숨기기)
-sort 주문 정렬 방법 minrem, maxrem, mindur, maxdur
-sbcol="r,g,b,alpha" (상태바 색상 오버라이드)
-spec=특성 순서 번호 (1/2)
-
-예제:
-sort:minrem
-sort,spec=2:maxrem
-cd,sbcol="1.0,0,0":분산
-cd,nfs="!!! name !!!":분산
-buff,mine,lag,unit=Helge:소생
-aura,mine,harmful,unit=target:어둠의 권능: 고통
-dot,mine,recast=3,staticdur=25:흡혈의 손길]=] -- Needs review
+자세한 정보는 curse/wowinterface 의 Gnosis' 페이지에 있습니다.]=]
 Gnosis.L["OptCBNewListElem_N"] = "추가할 주문 이름 입력"
 Gnosis.L["OptCBOrient"] = "방향"
 Gnosis.L["OptCBRelSel"] = " 의 시전 보이기 : "
@@ -1376,7 +1379,7 @@ Gnosis.L["OptCTO_SCT"] = "Scrolling Combat Text(SCT)"
 Gnosis.L["OptEn"] = "활성"
 Gnosis.L["OptEnAutoCreateOptons"] = "시작 시 자동으로 옵션 테이블 만들기"
 Gnosis.L["OptEnClipTest"] = "시전 끊김 테스트 활성"
-Gnosis.L["OptExportAllBars"] = "Export all bars" -- Requires localization
+Gnosis.L["OptExportAllBars"] = "모든 바 내보내기"
 Gnosis.L["OptFirstStartFrame"] = "첫번째 시작 틀 열기"
 Gnosis.L["OptFirstTickInst"] = "시전과 동시에 첫 틱"
 Gnosis.L["OptFontEnShOffset"] = "특정 그림자 오프셋 사용"
@@ -1393,7 +1396,7 @@ Gnosis.L["OptHideMirrorCB"] = "블리자드의 미러 시전바 숨기기"
 Gnosis.L["OptHideNonPlayerTicks"] = "비 플레이어 시전바의 틱 숨기기"
 Gnosis.L["OptHidePetCB"] = "블리자드의 소환수/차량 시전바 숨기기"
 Gnosis.L["OptHidepushbackTime"] = "시전 밀림 시간 숨기기"
-Gnosis.L["OptImportBar"] = "바 가져오기 (인터페이스 리로드)"
+Gnosis.L["OptImportBar"] = "바 가져오기 (인터페이스 리로드)" -- Needs review
 Gnosis.L["OptLoadOptionsButtonDesc"] = "Gnosis의 메모리 사용량을 줄이기 위해 옵션 테이블을 미리 만들지 않습니다. 로딩 후 자동으로 클라이언트 실행 시 옵션 테이블을 만드는 옵션을 선택할 수 있습니다 (또는 UI 리로드)."
 Gnosis.L["OptLoadOptionsButtonName"] = "옵션 만들기..."
 Gnosis.L["OptLocale"] = "언어 지역 선택"
@@ -1509,6 +1512,13 @@ Gnosis.L["OptWfCL_Desc"] = "전투 로그 지연을 고려해 주어진 시간�
 Gnosis.L["OptWfCL_Name"] = "전투 기록을 위한 대기[ms]"
 Gnosis.L["OptWidth"] = "너비"
 Gnosis.L["PasteScript"] = "입력창에 스크립트 붙여넣기."
+Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
+Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
+Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
+Gnosis.L["PremadeTfs1"] = "|cffff0000pushback|r remaining / total, e.g. |cffff0000+1.0|r 1.4 / 3.00" -- Requires localization
+Gnosis.L["PremadeTfs2"] = "|cffff0000pushback|r remaining / total, same as above but without minutes display" -- Requires localization
+Gnosis.L["PremadeTfs3"] = "remaining / total, higher precision, e.g. 1.45 / 3.000" -- Requires localization
+Gnosis.L["SelPremadeStr"] = "Select premade string" -- Requires localization
 Gnosis.L["Strata_BACK"] = "가장 낮음"
 Gnosis.L["Strata_DIALOG"] = "가장 높음"
 Gnosis.L["Strata_HIGH"] = "높음"
@@ -1882,6 +1892,13 @@ Gnosis.L["OptWfCL_Desc"] = "Задержка вывода/теста обрыв�
 Gnosis.L["OptWfCL_Name"] = "Ожидание журнала боя [мс]"
 Gnosis.L["OptWidth"] = "Ширина"
 Gnosis.L["PasteScript"] = "Вставьте скрипт в окно редактирования" -- Needs review
+Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
+Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
+Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
+Gnosis.L["PremadeTfs1"] = "|cffff0000pushback|r remaining / total, e.g. |cffff0000+1.0|r 1.4 / 3.00" -- Requires localization
+Gnosis.L["PremadeTfs2"] = "|cffff0000pushback|r remaining / total, same as above but without minutes display" -- Requires localization
+Gnosis.L["PremadeTfs3"] = "remaining / total, higher precision, e.g. 1.45 / 3.000" -- Requires localization
+Gnosis.L["SelPremadeStr"] = "Select premade string" -- Requires localization
 Gnosis.L["Strata_BACK"] = "Нижний"
 Gnosis.L["Strata_DIALOG"] = "Наивысший"
 Gnosis.L["Strata_HIGH"] = "Высокий"
@@ -1916,7 +1933,7 @@ Gnosis.L["BT_MSTimer"] = "Multi-Spell Timer" -- Requires localization
 Gnosis.L["CBSetFocus"] = "Focus"
 Gnosis.L["CBSetGCD"] = "GCD" -- Requires localization
 Gnosis.L["CBSetMirror"] = "Miroir"
-Gnosis.L["CBSetPet"] = "PetVehicle" -- Requires localization
+Gnosis.L["CBSetPet"] = "FamilierVehicule" -- Needs review
 Gnosis.L["CBSetPlayer"] = "Joueur"
 Gnosis.L["CBSetSwing"] = "Swing" -- Requires localization
 Gnosis.L["CBSetTarget"] = "Cible"
@@ -1936,34 +1953,34 @@ One or more stored configurations have been found. You can setup Gnosis by loadi
 Gnosis.L["IfNoCBs"] = "No castbars found" -- Requires localization
 Gnosis.L["IfOpenGUI"] = "Open config GUI" -- Requires localization
 Gnosis.L["Import"] = "Import" -- Requires localization
-Gnosis.L["MsgBlizCBIsDis"] = "Barre de cast blizzard est déjà caché par un autre addon"
-Gnosis.L["MsgBlizCBRestored"] = "blizzard castbar restored (see gui options)" -- Requires localization
-Gnosis.L["MsgDis"] = "(disabled)" -- Requires localization
-Gnosis.L["MsgDisBlizCB"] = "disabled blizzard castbar (see gui options)" -- Requires localization
-Gnosis.L["MsgDisMirrCB"] = "disabled default mirror castbar (see gui options)" -- Requires localization
+Gnosis.L["MsgBlizCBIsDis"] = "La barre de cast Blizzard est déjà cachée par un autre addon" -- Needs review
+Gnosis.L["MsgBlizCBRestored"] = "Barre de cast de Blizzard rétablie (voir options interface)" -- Needs review
+Gnosis.L["MsgDis"] = "(désactivé)" -- Needs review
+Gnosis.L["MsgDisBlizCB"] = "Barre de cast de Blizzard désactivée (voir options interface)" -- Needs review
+Gnosis.L["MsgDisMirrCB"] = "Barre miroir par défaut désactivée (voir options interface)" -- Needs review
 Gnosis.L["MsgDisPetCB"] = "disabled blizzard pet/vehicle castbar (see gui options)" -- Requires localization
-Gnosis.L["MsgEn"] = "(enabled)" -- Requires localization
-Gnosis.L["MsgLoaded"] = "loaded" -- Requires localization
-Gnosis.L["MsgMirrCBIsDis"] = "default mirror castbar already hidden by another addon" -- Requires localization
-Gnosis.L["MsgMirrCBRestored"] = "default mirror castbar restored (see gui options)" -- Requires localization
+Gnosis.L["MsgEn"] = "(activé)" -- Needs review
+Gnosis.L["MsgLoaded"] = "chargé" -- Needs review
+Gnosis.L["MsgMirrCBIsDis"] = "La barre miroir par défaut est déjà masquée par un autre addon" -- Needs review
+Gnosis.L["MsgMirrCBRestored"] = "Barre miroir par défaut rétablie (voir options interface)" -- Needs review
 Gnosis.L["MsgPetCBIsDis"] = "blizzard pet/vehicle castbar already hidden by another addon" -- Requires localization
 Gnosis.L["MsgPetCBRestored"] = "blizzard pet/vehicle castbar restored (see gui options)" -- Requires localization
 Gnosis.L["No"] = "No" -- Requires localization
 Gnosis.L["NoImport"] = "Don't import" -- Requires localization
-Gnosis.L["OptAddonDisabled_Name"] = "Addon disabled, enable to access current config tab." -- Requires localization
-Gnosis.L["OptAddonEnable_Desc"] = "Toggle Gnosis" -- Requires localization
-Gnosis.L["OptAddonEnable_Name"] = "Enable Addon" -- Requires localization
-Gnosis.L["OptBarXYcoordDesc"] = "x,y-coordinate" -- Requires localization
-Gnosis.L["OptBarXYcoordName"] = "Bar position: x, y" -- Requires localization
+Gnosis.L["OptAddonDisabled_Name"] = "Addon désactivé, activez-le pour accéder à l'onglet de configuration" -- Needs review
+Gnosis.L["OptAddonEnable_Desc"] = "Activer Gnosis" -- Needs review
+Gnosis.L["OptAddonEnable_Name"] = "Activer l'addon" -- Needs review
+Gnosis.L["OptBarXYcoordDesc"] = "coordonées X,Y" -- Needs review
+Gnosis.L["OptBarXYcoordName"] = "Position de la barre: X,Y" -- Needs review
 Gnosis.L["OptCBActiveSpec"] = "Enabled for talent spec" -- Requires localization
-Gnosis.L["OptCBAddListElem"] = "Add entry" -- Requires localization
-Gnosis.L["OptCBAdjIcon"] = "Adjust icon position (when unlocked)" -- Requires localization
-Gnosis.L["OptCBAdjLatTextCoord"] = "Adjust latency text position" -- Requires localization
-Gnosis.L["OptCBAdjNamePos"] = "Adjust name position" -- Requires localization
-Gnosis.L["OptCBAlignName"] = "Align castname" -- Requires localization
-Gnosis.L["OptCBAlignTime"] = "Align casttime" -- Requires localization
-Gnosis.L["OptCBAlignTimeCoord"] = "Adjust time position" -- Requires localization
-Gnosis.L["OptCBAlpha"] = "Bar alpha" -- Requires localization
+Gnosis.L["OptCBAddListElem"] = "Ajouter une entrée" -- Needs review
+Gnosis.L["OptCBAdjIcon"] = "Ajuster la position de l'icône (quand déverrouillé)" -- Needs review
+Gnosis.L["OptCBAdjLatTextCoord"] = "Ajuster la position du texte de latence" -- Needs review
+Gnosis.L["OptCBAdjNamePos"] = "Ajuster la position du nom" -- Needs review
+Gnosis.L["OptCBAlignName"] = "Ajuster le nom de l'incantation" -- Needs review
+Gnosis.L["OptCBAlignTime"] = "Ajuster le temps d'incantation" -- Needs review
+Gnosis.L["OptCBAlignTimeCoord"] = "Ajuster la position du temps" -- Needs review
+Gnosis.L["OptCBAlpha"] = "Alpha de la barre" -- Needs review
 Gnosis.L["OptCBAnc"] = "Anchoring" -- Requires localization
 Gnosis.L["OptCBAncBarAncPnt"] = "Gnosis bar anchor point" -- Requires localization
 Gnosis.L["OptCBAncFrameAncPnt"] = "Anchor frame anchor point" -- Requires localization
@@ -1974,12 +1991,12 @@ Gnosis.L["OptCBAncToCursor"] = "Anchor to cursor" -- Requires localization
 Gnosis.L["OptCBAncToFrame"] = "Anchor to frame" -- Requires localization
 Gnosis.L["OptCBAncType"] = "Anchor type" -- Requires localization
 Gnosis.L["OptCBBarType"] = "Bartype" -- Requires localization
-Gnosis.L["OptCBBorderCol"] = "Border color" -- Requires localization
+Gnosis.L["OptCBBorderCol"] = "Couleur de la bordure" -- Needs review
 Gnosis.L["OptCBBorderColInt"] = "Border color (non interruptible)" -- Requires localization
 Gnosis.L["OptCBBorderSize"] = "Border size" -- Requires localization
 Gnosis.L["OptCBBorderTex_D"] = "Additional border texture of fixed size. You might want to unlock the icon and reduce the normal border size to 0 when using additional border textures. This border texture will not affect the icon border." -- Requires localization
 Gnosis.L["OptCBBorderTex_N"] = "Additional border texture" -- Requires localization
-Gnosis.L["OptCBBWListedSpells"] = "Black-/whitelisted spells or timer config" -- Requires localization
+Gnosis.L["OptCBBWListedSpells"] = "Configuration des sorts et timers en liste noire/blanche" -- Needs review
 Gnosis.L["OptCBCBBgCol"] = "Castbar background color" -- Requires localization
 Gnosis.L["OptCBCBColFail"] = "Castbar color (failed)" -- Requires localization
 Gnosis.L["OptCBCBColInt"] = "Castbar color (interrupted)" -- Requires localization
@@ -2147,7 +2164,7 @@ Gnosis.L["OptHideMirrorCB"] = "Hide Blizzard's mirror castbar" -- Requires local
 Gnosis.L["OptHideNonPlayerTicks"] = "Hide ticks on non player castbars" -- Requires localization
 Gnosis.L["OptHidePetCB"] = "Hide Blizzard's pet/vehicle castbar" -- Requires localization
 Gnosis.L["OptHidepushbackTime"] = "Hide pushback time" -- Requires localization
-Gnosis.L["OptImportBar"] = "Import bar(s) (reloads interface)" -- Requires localization
+Gnosis.L["OptImportBar"] = "Import bar(s)" -- Requires localization
 Gnosis.L["OptLoadOptionsButtonDesc"] = "Option tables have not yet been created to reduce Gnosis' memory footprint. After loading you can select to automatically create options tables the next time you start wow (or reload the ui)." -- Requires localization
 Gnosis.L["OptLoadOptionsButtonName"] = "Create options..." -- Requires localization
 Gnosis.L["OptLocale"] = "Select localization" -- Requires localization
@@ -2263,6 +2280,13 @@ Gnosis.L["OptWfCL_Desc"] = "Delay output/clip test after output/clip test reques
 Gnosis.L["OptWfCL_Name"] = "Wait for combat log [ms]" -- Requires localization
 Gnosis.L["OptWidth"] = "Width" -- Requires localization
 Gnosis.L["PasteScript"] = "Paste script into edit box." -- Requires localization
+Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
+Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
+Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
+Gnosis.L["PremadeTfs1"] = "|cffff0000pushback|r remaining / total, e.g. |cffff0000+1.0|r 1.4 / 3.00" -- Requires localization
+Gnosis.L["PremadeTfs2"] = "|cffff0000pushback|r remaining / total, same as above but without minutes display" -- Requires localization
+Gnosis.L["PremadeTfs3"] = "remaining / total, higher precision, e.g. 1.45 / 3.000" -- Requires localization
+Gnosis.L["SelPremadeStr"] = "Select premade string" -- Requires localization
 Gnosis.L["Strata_BACK"] = "Lowest" -- Requires localization
 Gnosis.L["Strata_DIALOG"] = "Highest" -- Requires localization
 Gnosis.L["Strata_HIGH"] = "High" -- Requires localization
@@ -2528,7 +2552,7 @@ Gnosis.L["OptHideMirrorCB"] = "Hide Blizzard's mirror castbar"
 Gnosis.L["OptHideNonPlayerTicks"] = "Hide ticks on non player castbars"
 Gnosis.L["OptHidePetCB"] = "Hide Blizzard's pet/vehicle castbar"
 Gnosis.L["OptHidepushbackTime"] = "Hide pushback time"
-Gnosis.L["OptImportBar"] = "Import bar(s) (reloads interface)"
+Gnosis.L["OptImportBar"] = "Import bar(s)"
 Gnosis.L["OptLoadOptionsButtonDesc"] = "Option tables have not yet been created to reduce Gnosis' memory footprint. After loading you can select to automatically create options tables the next time you start wow (or reload the ui)."
 Gnosis.L["OptLoadOptionsButtonName"] = "Create options..."
 Gnosis.L["OptLocale"] = "Select localization"
@@ -2644,6 +2668,13 @@ Gnosis.L["OptWfCL_Desc"] = "Delay output/clip test after output/clip test reques
 Gnosis.L["OptWfCL_Name"] = "Wait for combat log [ms]"
 Gnosis.L["OptWidth"] = "Width"
 Gnosis.L["PasteScript"] = "Paste script into edit box."
+Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)"
+Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r"
+Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast"
+Gnosis.L["PremadeTfs1"] = "|cffff0000pushback|r remaining / total, e.g. |cffff0000+1.0|r 1.4 / 3.00"
+Gnosis.L["PremadeTfs2"] = "|cffff0000pushback|r remaining / total, same as above but without minutes display"
+Gnosis.L["PremadeTfs3"] = "remaining / total, higher precision, e.g. 1.45 / 3.000"
+Gnosis.L["SelPremadeStr"] = "Select premade string"
 Gnosis.L["Strata_BACK"] = "Lowest"
 Gnosis.L["Strata_DIALOG"] = "Highest"
 Gnosis.L["Strata_HIGH"] = "High"

@@ -16,7 +16,7 @@ L:SetOptionLocalization{
 	TimerAddsSpawn	= "Zeige Zeit bis die ersten Adds erscheinen"
 }
 L:SetMiscLocalization{
-	Phase2Emote	= "Kugel der Herrschaft verliert Energie und schaltet sich ab!",
+	Phase2Emote	= "verliert Energie und schaltet sich ab!",
 	YellPull 	= "Eindringlinge sind in die Brutstätte vorgestoßen! Schlagt Alarm! Beschützt die Eier um jeden Preis!"
 }
 -------------------
@@ -25,7 +25,7 @@ L:SetMiscLocalization{
 L = DBM:GetModLocalization("Vaelastrasz")
 
 L:SetGeneralLocalization{
-	name = "Vaelastrasz der Verdorbene"
+	name				= "Vaelastrasz der Verdorbene"
 }
 
 L:SetTimerLocalization{
@@ -45,7 +45,11 @@ L:SetMiscLocalization{
 L = DBM:GetModLocalization("Broodlord")
 
 L:SetGeneralLocalization{
-	name = "Brutwächter Dreschbringer"
+	name	= "Brutwächter Dreschbringer"
+}
+
+L:SetMiscLocalization{
+	Pull	= "Euresgleichen sollte nicht hier sein! Ich werde Euch vernichten!"
 }
 
 ---------------
@@ -136,8 +140,9 @@ L:SetMiscLocalization{
 	YellPriest	= "Priester! Wenn Ihr weiterhin so heilt, können wir es auch gerne etwas interessanter gestalten!",
 	YellWarrior	= "Krieger, Ich bin mir sicher, dass ihr kräftiger als das zuschlagen könnt!",
 	YellRogue	= "Schurken? Kommt aus den Schatten und zeigt Euch!",
-	YellWarlock	= "Hexenmeister, ihr solltet nicht mit Magie spielen, die ihr nicht versteht. Seht ihr was ich meine?", --needs to be verified (current translation source: rpguides)
+	YellWarlock	= "Hexenmeister, Ihr solltet nicht mit Magie spielen, die Ihr nicht versteht. Seht Ihr was ich meine?",--needs to be verified (wowhead-captured translation)
 	YellHunter	= "Jäger und ihre lästigen Knallbüchsen!",
 	YellMage	= "Auch Magier? Ihr solltet vorsichtiger sein, wenn Ihr mit Magie spielt...",
-	YellDK		= "Todesritter... kommt hierher!"
+	YellDK		= "Todesritter... kommt hierher!",
+	YellMonk	= "Mönche, macht Euch dieses Herumrollen denn nicht schwindlig?"--needs to be verified (wowhead-captured translation)
 }

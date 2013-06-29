@@ -1,0 +1,21 @@
+------------------------------------------------------------------------
+r170 | ywfn | 2013-05-22 07:28:59 +0000 (Wed, 22 May 2013) | 1 line
+Changed paths:
+   A /tags/v1.4.2 (from /trunk:169)
+
+Tagging as v1.4.2
+------------------------------------------------------------------------
+r169 | ywfn | 2013-05-22 07:27:51 +0000 (Wed, 22 May 2013) | 1 line
+Changed paths:
+   M /trunk/Options/Scorchio2_Options.toc
+   M /trunk/Scorchio2.toc
+   M /trunk/Scorchio2_Options/Scorchio2_Options.toc
+
+Update ToC for 5.3
+------------------------------------------------------------------------
+r168 | ywfn | 2013-03-11 22:39:28 +0000 (Mon, 11 Mar 2013) | 1 line
+Changed paths:
+   M /trunk/Scorchio2.lua
+
+Small clean up for Frost Bomb
+------------------------------------------------------------------------

@@ -7,26 +7,6 @@ end
 
 local L = PitBull4.L
 
-local mop_500 = select(4,GetBuildInfo()) >= 50000
-
-local GROUP_UPDATE_EVENT = 'GROUP_ROSTER_UPDATE'
-local IsInRaid = IsInRaid
-local GetNumGroupMembers = GetNumGroupMembers
-if not mop_500 then
-	GROUP_UPDATE_EVENT = 'PARTY_MEMBERS_CHANGED'
-	IsInRaid = function()
-		return GetNumRaidMembers() > 0
-	end
-	GetNumGroupMembers = function()
-		local raid_members = GetNumRaidMembers()
-		if raid_members > 0 then
-			return raid_members
-		else
-			return GetNumPartyMembers()
-		end
-	end
-end
-
 local PitBull4_LuaTexts = PitBull4:NewModule("LuaTexts","AceEvent-3.0","AceHook-3.0")
 
 local texts = {}
@@ -505,10 +485,18 @@ end]],
 		[L["Standard"]] = {
 			events = {['UNIT_FACTION']=true,['UPDATE_FACTION']=true},
 			code = [[
-local name,_,min,max,value = GetWatchedFactionInfo()
+local name, _, min , max, value, id = GetWatchedFactionInfo()
 if IsMouseOver() then
   return name or ConfigMode() 
 else
+  local fs_id, fs_rep, _, _, _, _, _, fs_threshold, next_fs_threshold = GetFriendshipReputation(id)
+  if fs_id then
+    if next_fs_threshold then
+      min, max, value = fs_threshold, next_fs_threshold, fs_rep
+    else
+      min, max, value = 0, 1, 1
+    end
+  end
   local bar_cur,bar_max = value-min,max-min
   return "%d/%d (%s%%)",bar_cur,bar_max,Percent(bar_cur,bar_max)
 end]],
@@ -614,7 +602,7 @@ end
 ]],
 		},
 		[L["Mini"]] = {
-			events = {['UNIT_POWER_FRQUENT']=true,['UNIT_MAXPOWER']=true},
+			events = {['UNIT_POWER_FREQUENT']=true,['UNIT_MAXPOWER']=true},
 			code = [[
 return VeryShort(Power(unit,SPELL_POWER_DEMONIC_FURY))
 ]],
@@ -703,7 +691,7 @@ end
 -- require very little actual processing time.
 local protected_events = {
 	['UNIT_SPELLCAST_SENT'] = true,
-	[GROUP_UPDATE_EVENT] = true,
+	['GROUP_ROSTER_UPDATE'] = true,
 }
 
 -- Provide a way to map changed events so existing LuaTexts configs
@@ -721,10 +709,8 @@ compat_event_map.UNIT_HAPPINESS = 'UNIT_POWER'
 compat_event_map.UNIT_MAXHAPPINESS = 'UNIT_POWER'
 compat_event_map.UNIT_RUNIC_POWER = 'UNIT_POWER'
 compat_event_map.UNIT_MAXRUNIC_POWER = 'UNIT_POWER'
-if mop_500 then
-	compat_event_map.PARTY_MEMBERS_CHANGED = 'GROUP_ROSTER_UPDATE'
-	compat_event_map.RAID_ROSTER_UPDATE = 'GROUP_ROSTER_UPDATE'
-end
+compat_event_map.PARTY_MEMBERS_CHANGED = 'GROUP_ROSTER_UPDATE'
+compat_event_map.RAID_ROSTER_UPDATE = 'GROUP_ROSTER_UPDATE'
 
 local timerframe = CreateFrame("Frame")
 PitBull4_LuaTexts.timerframe = timerframe
@@ -771,13 +757,41 @@ local function fix_unit_healthmax()
 	end
 end
 
+local function fix_rep_std_text()
+	local OLD_CODE = [[
+local name,_,min,max,value = GetWatchedFactionInfo()
+if IsMouseOver() then
+  return name or ConfigMode() 
+else
+  local bar_cur,bar_max = value-min,max-min
+  return "%d/%d (%s%%)",bar_cur,bar_max,Percent(bar_cur,bar_max)
+end]]
+	local sv = PitBull4.db:GetNamespace("LuaTexts").profiles
+	for _,profile in pairs(sv) do
+		local layouts = profile.layouts
+		if layouts then
+			for _,layout in pairs(layouts) do
+				local elements = layout.elements
+				if elements then
+					for _,text in pairs(elements) do
+						if text.code == OLD_CODE then
+							text.code = PROVIDED_CODES[L['Reputation']][L['Standard']].code
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 function PitBull4_LuaTexts:OnEnable()
 	fix_unit_healthmax()
+	fix_rep_std_text()
 
 	-- UNIT_SPELLCAST_SENT has to always be registered so we can capture 
 	-- additional data not always available.
 	self:RegisterEvent("UNIT_SPELLCAST_SENT")
-	self:RegisterEvent(GROUP_UPDATE_EVENT, "GROUP_ROSTER_UPDATE")
+	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 
 	-- Hooks to trap OnEnter/OnLeave for the frames.
 	self:AddFrameScriptHook("OnEnter")

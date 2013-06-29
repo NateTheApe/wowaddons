@@ -43,19 +43,19 @@ Contests[1] = {
 	["yell"] = FBConstants.RIGGLE_BASSBAIT,
 };
 
-Contests[2] = {
-	["day"] = 7,
-	["hour"] = 14,
-	["dur"] = 1,
-	["fishid"] = 50289,
-	["count"] = 1,
-	["continent"] = "Northrend",
-	-- ["zone"] -- any zone in Northrend
-	["kind"] = FL.SCHOOL_FISH,	 -- normal fish pools
-	["setting"] = "DerbyTimer",
-	["name"] = FBConstants.DERBY,
-	["yell"] = FBConstants.ELDER_CLEARWATER,
-};
+-- Contests[2] = {
+-- 	["day"] = 7,
+-- 	["hour"] = 14,
+-- 	["dur"] = 1,
+-- 	["fishid"] = 50289,
+-- 	["count"] = 1,
+-- 	["continent"] = "Northrend",
+-- 	-- ["zone"] -- any zone in Northrend
+-- 	["kind"] = FL.SCHOOL_FISH,	 -- normal fish pools
+-- 	["setting"] = "DerbyTimer",
+-- 	["name"] = FBConstants.DERBY,
+-- 	["yell"] = FBConstants.ELDER_CLEARWATER,
+-- };
 
 local FBGetSettingBool = FishingBuddy.GetSettingBool;
 local function GetSettingBool(setting)

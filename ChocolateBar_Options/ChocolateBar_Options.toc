@@ -1,13 +1,13 @@
-﻿## Interface: 50100
+﻿## Interface: 50300
 ## Title: ChocolateBar [|cffeda55fOptions|r]
 ## Notes: Options module for ChocolateBar.
 ## Author: yess
-## Version: v2.3.3
+## Version: v2.4.1
 ## X-Email: starfire@fantasymail.de
 ## Dependencies: ChocolateBar
 ## LoadOnDemand: 1
 ## OptionalDeps: Ace3, AceGUI-3.0-SharedMediaWidgets,
-## X-Curse-Packaged-Version: v2.3.3
+## X-Curse-Packaged-Version: v2.4.1
 ## X-Curse-Project-Name: ChocolateBar Broker Display
 ## X-Curse-Project-ID: chocolatebar
 ## X-Curse-Repository-ID: wow/chocolatebar/mainline

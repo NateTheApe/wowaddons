@@ -11,7 +11,7 @@ debug = true
 
 local L = AL3:NewLocale(addonName, "enUS", true, debug)
 if L then
-L["8% Spell Damage"] = true
+L["8% Spell Damage"] = "5% Spell Damage"
 L["Hitting It!"] = true
 L["$m Is About To Blow!"] = true
 L["Recast %s on $m!"] = true
@@ -38,7 +38,7 @@ end
 
 local L = AL3:NewLocale(addonName, "deDE")
 if L then
-L["8% Spell Damage"] = "8% Zauberschaden"
+L["8% Spell Damage"] = "5% Zauberschaden" -- Needs review
 L["Hitting It!"] = "wurde getroffen!" -- Needs review
 L["$m Is About To Blow!"] = "$m wird explodieren!" -- Needs review
 L["Recast %s on $m!"] = "Erneuere %s auf $m!"
@@ -65,7 +65,7 @@ end
 
 local L = AL3:NewLocale(addonName, "esES") or AL3:NewLocale(addonName, "esMX")
 if L then
-L["8% Spell Damage"] = "8% extra al daño mágico" -- Needs review
+L["8% Spell Damage"] = "5% extra al daño mágico" -- Needs review
 L["Hitting It!"] = "¡Golpeándolo!" -- Needs review
 L["$m Is About To Blow!"] = "¡$m va a explotar!" -- Needs review
 L["Recast %s on $m!"] = "¡Renueva %s en $m!" -- Needs review
@@ -92,7 +92,7 @@ end
 
 local L = AL3:NewLocale(addonName, "frFR")
 if L then
-L["8% Spell Damage"] = "Bonus de 8% de dommage des sorts" -- Needs review
+L["8% Spell Damage"] = "Bonus de 5% de dommage des sorts" -- Needs review
 L["Hitting It!"] = "Métamorphose cassée par une attaque de mêlée !" -- Needs review
 L["$m Is About To Blow!"] = "$m va exploser !" -- Needs review
 L["Recast %s on $m!"] = "%s à rafraîchir sur $m !" -- Needs review
@@ -119,7 +119,7 @@ end
 
 local L = AL3:NewLocale(addonName, "koKR")
 if L then
-L["8% Spell Damage"] = "8% 주문 공격력" -- Needs review
+L["8% Spell Damage"] = "5% 주문 공격력" -- Needs review
 L["Hitting It!"] = "메즈를 근딜로 때림" -- Needs review
 L["$m Is About To Blow!"] = "$m 의 살폭이 터지려고합니다!" -- Needs review
 L["Recast %s on $m!"] = "$m에 %s 재시전" -- Needs review
@@ -146,7 +146,7 @@ end
 
 local L = AL3:NewLocale(addonName, "ruRU")
 if L then
-L["8% Spell Damage"] = "8% урона от заклинаний" -- Needs review
+L["8% Spell Damage"] = "5% урона от заклинаний" -- Needs review
 L["Hitting It!"] = "Ударив его!" -- Needs review
 L["$m Is About To Blow!"] = "$m сейчас взорвется" -- Needs review
 L["Recast %s on $m!"] = "Наложите заклинание %s на $m заново!" -- Needs review
@@ -173,7 +173,7 @@ end
 
 local L = AL3:NewLocale(addonName, "zhCN")
 if L then
-L["8% Spell Damage"] = "8%法术伤害"
+L["8% Spell Damage"] = "5%法术伤害" -- Needs review
 L["Hitting It!"] = "命中目标！"
 L["$m Is About To Blow!"] = "$m 身上的 活体炸弹 即将爆炸！"
 L["Recast %s on $m!"] = "对 $m 重新施放 %s！"
@@ -188,7 +188,9 @@ L["%s Faded"] = "%s 消失了"
 L["%s Faded on $m"] = "$m 身上的 %s 消失了"
 L["%s: Full Threat Restored"] = "%s：恢复威胁值"
 L["%s is Running Out on $m!"] = "$m 身上的 %s 即将消失！"
--- L["%s Ready"] = ""
+L["%s Ready"] = [=[
+
+%s 就绪]=] -- Needs review
 L["%s: Threat Reduction Fading!"] = "%s：威胁值降低效果即将消失！"
 L["$sx $m"] = "$sx $m"
 L["$sx %s"] = "$sx %s"
@@ -200,7 +202,7 @@ end
 
 local L = AL3:NewLocale(addonName, "zhTW")
 if L then
-L["8% Spell Damage"] = "8% 法術傷害" -- Needs review
+L["8% Spell Damage"] = "5% 法術傷害" -- Needs review
 L["Hitting It!"] = "命中目標!" -- Needs review
 L["$m Is About To Blow!"] = "$m 即將爆破!" -- Needs review
 L["Recast %s on $m!"] = "對 $m 再放 %s !" -- Needs review

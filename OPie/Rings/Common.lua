@@ -22,8 +22,6 @@ do -- OPieTrinkets
 			OPieBundleTrinket1 = AB:get("item", (GetInventorySlotInfo("Trinket1Slot")), false, true),
 		}), name="Trinkets"
 	});
-	ORI:SetDisplayOptions("OPieBundleTrinket0", nil, nil, 0.05, 0.75, 0.95)
-	ORI:SetDisplayOptions("OPieBundleTrinket1", nil, nil, 0.95, 0.75, 0.05)
 end
 do -- OPieTracker
 	local collectionData, map = {}, {}
@@ -60,7 +58,7 @@ do -- OPieTracker
 	EC_Register("PLAYER_ENTERING_WORLD", "OPie.AutoTrackerInit", function() return "remove", preClick(col, nil, col) end)
 end
 do -- OPieAutoQuest
-	local whitelist, questItems, collection, inring, colId, ctok, current, changed = {[37888]=true, [37860]=true, [37859]=true, [37815]=true, [46847]=true, [47030]=true, [39213]=true, [42986]=true, [49278]=true}, {[30148]="72986 72985"}, {}, {}
+	local whitelist, questItems, collection, inring, colId, ctok, current, changed = {[33634]=true, [35797]=true, [37888]=true, [37860]=true, [37859]=true, [37815]=true, [46847]=true, [47030]=true, [39213]=true, [42986]=true, [49278]=true, [86425]={31332, 31333, 31334, 31335, 31336, 31337}, [87214]={31752}, [90006]=true, [86536]=true, [86534]=true, [97268]=true}, {[30148]="72986 72985"}, {}, {}
 	local function scanQuests(i)
 		for i=i or 1,GetNumQuestLogEntries() do
 			local _, _, _, _, isHeader, isCollapsed, isComplete, _, qid = GetQuestLogTitle(i)
@@ -104,7 +102,15 @@ do -- OPieAutoQuest
 			for slot=1,GetContainerNumSlots(bag) do
 				local iid = GetContainerItemID(bag, slot);
 				local isQuest, startQuestId, isQuestActive = GetContainerItemQuestInfo(bag, slot);
-				isQuest = iid and ((isQuest and GetItemSpell(iid)) or whitelist[iid] or (startQuestId and not isQuestActive and not IsQuestFlaggedCompleted(startQuestId)));
+				isQuest = iid and ((isQuest and GetItemSpell(iid)) or (whitelist[iid] == true) or (startQuestId and not isQuestActive and not IsQuestFlaggedCompleted(startQuestId)));
+				if not isQuest and type(whitelist[iid]) == "table" then
+					isQuest = true
+					for _, qid in pairs(whitelist[iid]) do
+						if IsQuestFlaggedCompleted(qid) then
+							isQuest = false
+						end
+					end
+				end
 				if isQuest then
 					local tok = "OPieBundleQuest" .. iid
 					if not inring[tok] then
@@ -136,9 +142,6 @@ do -- OPieAutoQuest
 		
 		if changed or freePos <= oldCount then
 			AB:update(colId, collection)
-			for i=1,freePos-1 do
-				ORI:SetDisplayOptions(collection[i], nil, nil, generateColor(i, freePos-1))
-			end
 		end
 	end
 	colId = AB:create("collection", nil, collection)

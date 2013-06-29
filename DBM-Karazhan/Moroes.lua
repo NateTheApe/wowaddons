@@ -1,16 +1,18 @@
 local mod	= DBM:NewMod("Moroes", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 337 $"):sub(12, -3))
-mod:SetCreatureID(15687)--Moroes
+mod:SetRevision(("$Revision: 474 $"):sub(12, -3))
+mod:SetCreatureID(15687, 19875, 19874, 19872, 17007, 19876, 19873)--Moroes
 mod:SetModelID(16540)
 --19875, 19874, 19872, 17007, 19876, 19873--all the adds, for future use, when pull/kill handling by diff tables work right.
-mod:RegisterCombat("yell", L.DBM_MOROES_YELL_START)
+mod:RegisterCombat("combat")
+--mod:RegisterCombat("yell", L.DBM_MOROES_YELL_START)
 
 mod:RegisterEvents(
 	"SPELL_CAST_START",
 	"SPELL_AURA_APPLIED",
-	"SPELL_AURA_REMOVED"
+	"SPELL_AURA_REMOVED",
+	"UNIT_DIED"
 )
 
 local warningVanishSoon		= mod:NewSoonAnnounce(29448, 2)
@@ -38,33 +40,33 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(29405) then
+	if args.spellId == 29405 then
 		warningManaBurn:Show()
-	elseif args:IsSpellID(35096) then
+	elseif args.spellId == 35096 then
 		warningGreaterHeal:Show()
-	elseif args:IsSpellID(29562) then
+	elseif args.spellId == 29562 then
 		warningHolyLight:Show()
 	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(29448) then
+	if args.spellId == 29448 then
 		warningVanish:Show()
 		lastVanish = GetTime()
-	elseif args:IsSpellID(29425) then
+	elseif args.spellId == 29425 then
 		warningGouge:Show(args.destName)
 		timerGouge:Show(args.destName)
-	elseif args:IsSpellID(34694) then
+	elseif args.spellId == 34694 then
 		warningBlind:Show(args.destName)
 		timerBlind:Show(args.destName)
-	elseif args:IsSpellID(29572) then
+	elseif args.spellId == 29572 then
 		warningMortalStrike:Show(args.destName)
 		timerMortalStrike:Show(args.destName)
-	elseif args:IsSpellID(37023) then--Frenzy, he's no longer going to vanish.
+	elseif args.spellId == 37023 then--Frenzy, he's no longer going to vanish.
 		warningFrenzy:Show()
 		warningVanishSoon:Cancel()
 		timerVanishCD:Cancel()
-	elseif args:IsSpellID(37066) then
+	elseif args.spellId == 37066 then
 		warningGarrote:Show(args.destName)
 		if (GetTime() - lastVanish) < 20 then--firing this event here instead, since he does garrote as soon as he comes out of vanish.
 			timerVanishCD:Start()
@@ -74,7 +76,14 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(34694) then
+	if args.spellId == 34694 then
 		timerBlind:Cancel(args.destName)
+	end
+end
+
+function mod:UNIT_DIED(args)
+	local cid = self:GetCIDFromGUID(args.destGUID)
+	if cid == 15687 then
+		DBM:EndCombat(self)
 	end
 end

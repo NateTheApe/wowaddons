@@ -182,6 +182,39 @@ function Scorchio2:UpgradeDatabase(sv, DBVERSION)
 			end
 		end
 	end
+	if oldVersion < 9 then
+		-- Removed Water Elemental and Frostfire Bolt DoT bars
+		for _,prof in pairs(sv.profiles or {}) do
+			if prof.baroptions then
+				prof.baroptions.m = nil -- Water Elemental
+				prof.baroptions.q = nil -- Frostfire Bolt
+			end
+		end
+	end
+	if oldVersion < 10 then
+		-- Combustion is new. Try to make it default like Pyroblast DoT.
+		for _,prof in pairs(sv.profiles or {}) do
+			if prof.baroptions and prof.baroptions.u then
+				prof.baroptions.z = {} -- Combustion
+				local pyroblast = prof.baroptions.u
+				local combustion = prof.baroptions.z
+				for i,j in pairs(pyroblast) do
+					combustion[i] = j
+				end
+				-- Tracking to its default (on) so the user learns about the new feature.
+				combustion.track = nil
+				combustion.show = nil
+				-- Remove settings that might be odd if copied.
+				combustion.message = nil
+				combustion.warning = nil
+				combustion.bar = nil
+				combustion.fg = nil
+				combustion.bg = nil
+			end
+		end
+	end
+
+
 	if oldVersion < DBVERSION then
 		sv.dbversion = DBVERSION
 	end

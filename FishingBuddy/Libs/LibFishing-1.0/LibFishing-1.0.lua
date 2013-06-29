@@ -7,7 +7,7 @@ Licensed under a Creative Commons "Attribution Non-Commercial Share Alike" Licen
 --]]
 
 local MAJOR_VERSION = "LibFishing-1.0"
-local MINOR_VERSION = 90000 + tonumber(("$Rev: 762 $"):match("%d+"))
+local MINOR_VERSION = 90000 + tonumber(("$Rev: 784 $"):match("%d+"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -1354,7 +1354,7 @@ function FishLib:GetFishingOutfitItems(wearing, nopole)
 			itemtable = GetInventoryItemsForSlot(slotid, itemtable);
 			for location,id in pairs(itemtable) do
 				local player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(location);
-				if ( bags ) then
+				if ( bags and slot and bag ) then
 					link = GetContainerItemLink(bag, slot);
 				else
 					link = nil;

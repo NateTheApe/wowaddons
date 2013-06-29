@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Mimiron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 49 $"):sub(12, -3))
 mod:SetCreatureID(33432)
 mod:SetModelID(28578)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -15,7 +15,7 @@ mod:RegisterEvents(
 	"SPELL_AURA_APPLIED",
 	"CHAT_MSG_MONSTER_YELL",
 	"SPELL_AURA_REMOVED",
-	"UNIT_SPELLCAST_CHANNEL_STOP",
+	"UNIT_SPELLCAST_CHANNEL_STOP target focus",
 	"CHAT_MSG_LOOT",
 	"SPELL_SUMMON"
 )
@@ -117,7 +117,7 @@ function mod:Flames()
 end
 
 function mod:SPELL_SUMMON(args)
-	if args:IsSpellID(63811) then -- Bomb Bot
+	if args.spellId == 63811 then -- Bomb Bot
 		warnBombSpawn:Show()
 	end
 end
@@ -139,7 +139,7 @@ function mod:CHAT_MSG_LOOT(msg)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(63631) then
+	if args.spellId == 63631 then
 		if phase == 1 and self.Options.ShockBlastWarningInP1 or phase == 4 and self.Options.ShockBlastWarningInP4 then
 			warnShockBlast:Show()
 		end
@@ -150,10 +150,10 @@ function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(64529, 62997) then -- plasma blast
 		timerPlasmaBlastCD:Start()
 	end
-	if args:IsSpellID(64570) then
+	if args.spellId == 64570 then
 		timerFlameSuppressant:Start()
 	end
-	if args:IsSpellID(64623) then
+	if args.spellId == 64623 then
 		warnFrostBomb:Show()
 		timerBombExplosion:Start()
 		timerNextFrostBomb:Start()
@@ -186,16 +186,16 @@ local function show_warning_for_spinup()
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(63027) then				-- mines
+	if args.spellId == 63027 then				-- mines
 		timerProximityMines:Start()
-	elseif args:IsSpellID(63414) then			-- Spinning UP (before Dark Glare)
+	elseif args.spellId == 63414 then			-- Spinning UP (before Dark Glare)
 		is_spinningUp = true
 		timerSpinUp:Start()
 		timerDarkGlareCast:Schedule(4)
 		timerNextDarkGlare:Schedule(19)			-- 4 (cast spinup) + 15 sec (cast dark glare)
 		DBM:Schedule(0.15, show_warning_for_spinup)	-- wait 0.15 and then announce it, otherwise it will sometimes fail
 		lastSpinUp = GetTime()
-	elseif args:IsSpellID(65192) then
+	elseif args.spellId == 65192 then
 		timerNextFlameSuppressant:Start()
 	end
 end

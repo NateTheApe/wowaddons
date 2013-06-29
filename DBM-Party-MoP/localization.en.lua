@@ -22,7 +22,7 @@ L:SetWarningLocalization({
 })
 
 L:SetOptionLocalization({
-	SpecWarnIntensity	= DBM_CORE_AUTO_SPEC_WARN_OPTIONS["stack"]:format(6, 113315)
+	SpecWarnIntensity	= DBM_CORE_AUTO_SPEC_WARN_OPTIONS.stack:format(6, 113315)
 })
 
 -----------------------
@@ -59,7 +59,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	SpecWarnFizzyBubbles	= "Show special warning when you are missing $spell:114459 debuff",
-	RangeFrame				= "Show range frame (10) for $spell:106546"
+	RangeFrame				= DBM_CORE_AUTO_RANGE_OPTION_TEXT:format(10, 106546)
 })
 
 -----------------------
@@ -69,6 +69,14 @@ L:SetOptionLocalization({
 -- Gu Cloudstrike --
 -----------------------
 L= DBM:GetModLocalization(673)
+
+L:SetWarningLocalization({
+	warnStaticField	= "%s"
+})
+
+L:SetOptionLocalization({
+	warnStaticField	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(106923)
+})
 
 -----------------------
 -- Snowdrift --
@@ -110,6 +118,7 @@ L:SetOptionLocalization({
 -----------------------
 -- <<<The Gate of the Setting Sun>>> --
 -----------------------
+
 ---------------------
 -- Kiptilak --
 ---------------------

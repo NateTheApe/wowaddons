@@ -903,16 +903,15 @@ function Scorchio2:InitBarOptions(baroptions_args)
 	bar_args.i = MinimalProcBarOption(LC["Arcane Charge"])
 	bar_args.j = ProcBarOption(LC["Brain Freeze"], 0, 15)
 	bar_args.k = ProcBarOption(LC["Fingers of Frost"], 0, 15)
-	bar_args.m = SummonBarOption(LC["Water Elemental"], 0, 30)
 	bar_args.n = SummonBarOption(LC["Mirror Image"], 0, 30)
 	bar_args.p = PassiveDebuffBarOption(LC["8% Spell Damage"])
-	bar_args.q = DebuffBarOption(LC["Frostfire Bolt"], 0, 12)
 	bar_args.t = MinimalDebuffBarOption(LC["Ignite"])
 	bar_args.u = MinimalDebuffBarOption(LC["Pyroblast"])
 	bar_args.v = MinimalProcBarOption(LC["Flamestrike"])
 	bar_args.w = ProcBarOption(LC["Invocation"], 0, 40)
 	bar_args.x = DebuffBarOption(LC["Nether Tempest"], 0, 12)
 	bar_args.y = CooldownBarOption(LC["Frost Bomb"])
+	bar_args.z = MinimalDebuffBarOption(LC["Combustion"])
 
 	bar_args.d.args.telltale = telltale
 end

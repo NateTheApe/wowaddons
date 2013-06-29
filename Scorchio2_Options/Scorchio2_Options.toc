@@ -1,5 +1,5 @@
-﻿## Interface: 50001
-## X-Curse-Packaged-Version: v1.3.6
+﻿## Interface: 50300
+## X-Curse-Packaged-Version: v1.4.2
 ## X-Curse-Project-Name: Scorchio! 2
 ## X-Curse-Project-ID: scorchio2
 ## X-Curse-Repository-ID: wow/scorchio2/mainline
@@ -16,7 +16,7 @@
 ## Notes-ruRU: Загружаемый по требованию аддон для Scorchio2
 ## Notes-esES: Cargado-bajo-Demanda Opciones para Scorchio2
 ## Notes-zhTW: Scorchio2 選項模組
-## Version: v1.3.6
+## Version: v1.4.2
 ## Author: ennui@bloodhoof-eu
 
 ## Dependencies: Scorchio2

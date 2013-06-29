@@ -84,7 +84,7 @@ function initialize(self, level, menuList)
 		if menuList == "load" then
 			for i, v in ipairs(categories) do
 				info = UIDropDownMenu_CreateInfo()
-				info.text = getglobal("DBM_LDB_CAT_"..v) or v
+				info.text = getglobal("DBM_LDB_CAT_"..strupper(v)) or v
 				info.notCheckable = true
 				info.hasArrow = true
 				info.menuList = "load"..v

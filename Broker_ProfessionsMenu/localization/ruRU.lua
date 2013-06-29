@@ -25,6 +25,7 @@ your tradeskills to create favorites.]=] ]==]
 -- L["openLastProfessionWindow"] = "Open last opened profession window"
 -- L["openmenu"] = "Open Menu"
 -- L["otherchar"] = "Other Characters"
+-- L["pandaria_research"] = "Pandaria research"
 -- L["professions"] = "Professions"
 -- L["quicklaunch"] = "Key combinations (Quickaccess)"
 -- L["quicklauncher"] = "Create separate quicklaunchers"
@@ -42,6 +43,6 @@ your tradeskills to create favorites.]=] ]==]
 -- L["tooltips"] = "Tooltips"
 -- L["trainer"] = "Trainer"
 -- L["trainerdisabled"] = "Disable trainer frame"
--- L["transmute"] = "Alchemy: Transmute"
+-- L["transmute"] = "Transmute"
 -- L["visityourtrainer"] = "Visit your |cff00ff00%s|r trainer"
 

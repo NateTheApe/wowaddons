@@ -7,8 +7,11 @@ local L
 L= DBM:GetModLocalization(691)
 
 L:SetOptionLocalization({
-	RangeFrame			= "根據玩家減益顯示動態的距離框以對應$spell:119622",
-	SetIconOnMC			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(119622)
+	RangeFrame			= "根據玩家減益顯示動態的距離框以對應$spell:119622"
+})
+
+L:SetMiscLocalization({
+	Pull				= "沒錯...沒錯!釋放你的怒火!試著擊敗我!"
 })
 
 -----------------------
@@ -16,4 +19,24 @@ L:SetOptionLocalization({
 -----------------------
 L= DBM:GetModLocalization(725)
 
+L:SetMiscLocalization({
+	Pull				= "把他們的屍體帶給我!"
+})
 
+--------------
+-- Oondasta --
+--------------
+L= DBM:GetModLocalization(826)
+
+L:SetOptionLocalization({
+	RangeFrame			= "為$spell:137511顯示距離框架"
+})
+
+L:SetMiscLocalization({
+	Pull				= "你們竟敢打擾我們的準備工作!贊達拉這次不會再被阻止了!"
+})
+
+---------------------------
+-- Nalak, The Storm Lord --
+---------------------------
+L= DBM:GetModLocalization(814)

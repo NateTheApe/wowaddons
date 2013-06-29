@@ -1,0 +1,35 @@
+tag 2.4.8
+56c4370cf1fc6e1a0756b5107770c27237c3cf3a
+James D. Callahan III <jcallahan@curse.com>
+2013-05-21 12:03:35 -0500
+
+
+
+--------------------
+
+Ressy:
+	- Update changelog for 2.4.8, bump TOC
+James D. Callahan III:
+	- Check for nil button.
+	- Minor cleanup to give me an excuse to push and test the new Repo bot.
+Ressy:
+	- Engineering - Scan of Lilliam Sparkspindle
+	- Ticket 1554 - Fireworks Discovery-related
+	- Add Crafted Dreadful Gladiator's Greaves of Alacrity, and fix Filter for Greaves of Meditation.
+	- Ticket 1556 - Desolace Caravan Vendors removed from game
+	- Jewelcrafting update
+	- Ticket 1558 - Golden Carp Consumme fix, plus additional cooking fixes
+James D. Callahan III:
+	- Cleanup.
+John Pasula:
+	- Remove another piece of debug.
+	- Remove a piece of debugging I forgot.
+	- Add line to the recipe tooltips identifying what happens with a single click.
+James D. Callahan III:
+	- Fixed logic for adding reputation vendor waypoints.
+	- Parameter name change
+Ressy:
+	- Add Pandaria to Waypoints to get them working!
+	- Ticket 1553 - Adding locations to Banana Infused Rum & Four Senses Brew for TomTom Integration
+John Pasula:
+	- Add Crafted Dreadful Gladiator's Greaves of Meditation

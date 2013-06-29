@@ -1,8 +1,8 @@
-## Interface: 50100
+## Interface: 50200
 ## Title: LibTabbedFrame-1.0
 ## Notes: Handle Player sized frames with tabs
 ## Author: Sutorix=AT=hotmail.com
-## Version: 0.2
+## Version: 0.2a
 ## X-Category: Libraries
 
 LibFrameHandler.xml

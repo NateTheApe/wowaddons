@@ -1,0 +1,14 @@
+tag v4.0.0-beta45
+5ff3f6280add354a461947411e89f2bb8f396477
+Shefki <shefki@shefki.org>
+2013-05-21 12:35:57 -0700
+
+Tagging as v4.0.0-beta45
+
+
+--------------------
+
+Shefki:
+	- Bump TOC for 5.3
+Benjamin Staneck:
+	- fix typo in the LuaTexts module

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ScourgelordTyrannus", "DBM-Party-WotLK", 15)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 36 $"):sub(12, -3))
 mod:SetCreatureID(36658, 36661)
 mod:SetModelID(30277)
 mod:SetUsedIcons(8)
@@ -42,28 +42,28 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(69167, 69629) then					-- Unholy Power
+	if args.spellId == 69167 then					-- Unholy Power
         warnUnholyPower:Show()
 		timerUnholyPower:Start()
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(69155, 69627) then					-- Forceful Smash
+	if args.spellId == 69155 then					-- Forceful Smash
         warnForcefulSmash:Show()
         timerForcefulSmash:Start()
 	end
 end
 
 function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
-	if (spellId == 69238 or spellId == 69628) and destGUID == UnitGUID("player") and self:AntiSpam() then		-- Icy Blast, MOVE!
+	if spellId == 69238 and destGUID == UnitGUID("player") and self:AntiSpam() then		-- Icy Blast, MOVE!
 		specWarnIcyBlast:Show()
 	end
 end
 mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(69172) then							-- Overlord's Brand
+	if args.spellId == 69172 then							-- Overlord's Brand
 		warnOverlordsBrand:Show(args.destName)
 		timerOverlordsBrand:Start(args.destName)
 		if args:IsPlayer() then
@@ -75,6 +75,7 @@ end
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg == L.HoarfrostTarget or msg:find(L.HoarfrostTarget) then
 		if not target then return end
+		local target = DBM:GetFullNameByShortName(target)
 		warnHoarfrost:Show(target)
 		if target == UnitName("player") then
 			specWarnHoarfrost:Show()

@@ -1,3 +1,19 @@
+Hydrogen-5
+- Spell Count bug fix (i.e. Death Knight's Scent of Blood count update)
+- Spell Charges fix properly implemented
+
+Hydrogen-4
+- Forum version, include most hotfixes appearing on the forum (flyx, Nephyrin, chinoloco,kouik)
+- should now display the appropriate tooltip in all cases.
+- GetSpellCount replaced by GetSpellCharges (roll charges issues)
+- spells with distinct subtypes between specs should be shown as useable in all cases.
+- spell cooldowns should update (trash, symbiosis, disconnect/reconnect after a spec change should not show questionmark anymore)
+- flyout should show the proper spell
+
+
+Hydrogen-3 
+
+
 Hydrogen-2
 -Now scans profession spells
 -Tentatively enabling/disabling of the Blizzard Main Bar should work

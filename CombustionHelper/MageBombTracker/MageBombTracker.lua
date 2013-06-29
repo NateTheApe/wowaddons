@@ -19,7 +19,9 @@ function CombuMBTracker_OnLoad()
 	CombuMBTrackerFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 	CombuMBTrackerFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
  	CombuMBTrackerFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
- 	CombuMBTrackerFrame:RegisterEvent("PLAYER_TALENT_UPDATE")
+ 	CombuMBTrackerFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+  	CombuMBTrackerFrame:RegisterEvent("PLAYER_TALENT_UPDATE")
+	CombuMBTrackerFrame:RegisterEvent("PLAYER_ALIVE")
  
  	CombuMBTrackerLSM.RegisterCallback(MageBombTracker , "LibSharedMedia_Registered", "SharedMedia_Registered") 
 
@@ -901,22 +903,9 @@ function CombuMBTracker_OnEvent(self, event, ...)
 	        CombuMBTrackerFrame:SetFrameLevel(1) -- fix when frame is at FrameLevel 0
 	    end
 	        
--------------------------------
---Frame lock check on startup
-        if (combumbtrackersettingstable["combumbtrackerlock"] == false) 
-	 		then CombuMBTrackerFrame:EnableMouse(true)
-        elseif (combumbtrackersettingstable["combumbtrackerlock"] == true) 
-	    	then CombuMBTrackerFrame:EnableMouse(false)
-        end	
-        
-        CombuMBTrackerLanguageCheck()
 	    CombuMBTrackerScale (combumbtrackersettingstable["combumbtrackerscale"]) -- Scale check on startup
-	    CombuMBTrackerFrameresize() 
 
-    elseif (event == "PLAYER_TALENT_UPDATE") then
-        
-        CombuMBTrackerBombChecker ()
-  	    --CombuMBTrackerFrameresize() 
+        CombuMBTrackerLanguageCheck()
 
 -------------------------------
 --Combat log events checks
@@ -1042,10 +1031,22 @@ function CombuMBTracker_OnEvent(self, event, ...)
             
 -------------------------------------------
 -- talent change             
-    elseif event == "PLAYER_TALENT_UPDATE" then
+    elseif event == "ACTIVE_TALENT_GROUP_CHANGED" or event == "PLAYER_TALENT_UPDATE" then
         
     	CombuMBTrackerBombChecker()
         
+	elseif event == "PLAYER_ALIVE" then
+   
+-------------------------------
+--Frame lock check on startup
+        if (combumbtrackersettingstable["combumbtrackerlock"] == false) 
+	 		then CombuMBTrackerFrame:EnableMouse(true)
+        elseif (combumbtrackersettingstable["combumbtrackerlock"] == true) 
+	    	then CombuMBTrackerFrame:EnableMouse(false)
+        end	
+   
+	    CombuMBTrackerFrameresize() 
+
     end
 
 end

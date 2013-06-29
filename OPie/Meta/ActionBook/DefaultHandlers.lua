@@ -1,4 +1,4 @@
-local AB = assert(OneRingLib.ext.ActionBook:compatible(1,2), "Requires a compatible ActionBook library version")
+local AB = assert(OneRingLib.ext.ActionBook:compatible(1,7), "Requires a compatible ActionBook library version")
 
 local spellFeedback, itemFeedback
 
@@ -37,7 +37,7 @@ do -- spell: player's spellbook, mounts
 	local function hint(aid, target)
 		local n = actionMap[aid]
 		if not n then return end
-		local csid = companionMap[n]
+		local csid, time = companionMap[n], GetTime()
 		if csid then
 			local usable = (not (InCombatLockdown() or IsIndoors())) and not UnitIsDeadOrGhost("player")
 			local cdStart, cdLength, cdEnabled = GetSpellCooldown(csid)
@@ -46,19 +46,23 @@ do -- spell: player's spellbook, mounts
 				companionUpdate()
 				_, cname, _, icon, active = GetCompanionInfo("MOUNT", csidMap[csid])
 			end
-			return usable and cdStart == 0, active and 1 or 0, icon, cname, 0, (cdStart or 0) > 0 and (cdStart+cdLength-GetTime()) or 0, cdLength, GameTooltip.SetSpellByID, csid
+			return usable and cdStart == 0, active and 1 or 0, icon, cname, 0, (cdStart or 0) > 0 and (cdStart+cdLength-time) or 0, cdLength, GameTooltip.SetSpellByID, csid
 		end
 		local inRange, usable, nomana = IsSpellInRange(n, aid == false and target or "target"), IsUsableSpell(n)
 		local usable, cooldown, cdLength, enabled = usable and inRange ~= 0, GetSpellCooldown(n)
+		local cdLeft = (cooldown or 0) > 0 and (enabled ~= 0) and (cooldown + cdLength - time) or 0
+		local count, charges, maxCharges, chargeStart, chargeDuration = GetSpellCount(n), GetSpellCharges(n)
 		local state = ((IsSelectedSpellBookItem(n) or IsCurrentSpell(n) or n == currentShapeshift() or enabled == 0) and 1 or 0) +
-									(IsSpellOverlayed(spellMap[n] or 0) and 2 or 0) + (nomana and 8 or 0) + (inRange and 0 or 16)
-		local cdLeft = (cooldown or 0) > 0 and (enabled ~= 0) and (cooldown + cdLength - GetTime()) or 0
+									(IsSpellOverlayed(spellMap[n] or 0) and 2 or 0) + (nomana and 8 or 0) + (inRange and 0 or 16) + (charges and charges > 0 and 64 or 0)
 		usable = not not (usable and (cooldown == nil or cooldown == 0) or (enabled == 0))
+		if charges and maxCharges and charges < maxCharges and cdLeft == 0 then
+			cdLeft, cdLength = chargeStart-time + chargeDuration, chargeDuration
+		end
 		local sbslot = spellMap[n] and FindSpellBookSlotBySpellID(spellMap[n])
-		return usable, state, GetSpellTexture(n), n, GetSpellCount(n), cdLeft, cdLength, sbslot and SetSpellBookItem or spellMap[n] and GameTooltip.SetSpellByID, sbslot or tonumber((GetSpellLink(n) or ""):match("spell:(%d+)")) or spellMap[n]
+		return usable, state, GetSpellTexture(n), n, count <= 1 and charges or count, cdLeft, cdLength, sbslot and SetSpellBookItem or spellMap[n] and GameTooltip.SetSpellByID, sbslot or tonumber((GetSpellLink(n) or ""):match("spell:(%d+)")) or spellMap[n]
 	end
-	function spellFeedback(sname, target)
-		actionMap[false], spellMap[sname] = sname, spellMap[sname] or tonumber((GetSpellLink(sname) or ""):match("spell:(%d+)"))
+	function spellFeedback(sname, target, spellId)
+		actionMap[false], spellMap[sname] = sname, spellId or spellMap[sname] or tonumber((GetSpellLink(sname) or ""):match("spell:(%d+)"))
 		return hint(false, target)
 	end
 	
@@ -99,8 +103,8 @@ do -- item: an item by ID, inventory slot
 		local iid, cdStart, cdLen, cdEnabled = (link and tonumber(link:match("item:(%d+)"))) or itemIdMap[aid]
 		if iid then cdStart, cdLen, cdEnabled = GetItemCooldown(iid) end
 		local inRange = IsItemInRange(ident, aid == false and target or "target")
-		return (GetItemSpell(ident) == nil) or (IsUsableItem(ident) and inRange ~= 0), (IsCurrentItem(ident) and 1 or 0) + (inRange ~= 0 and 0 or 16),
-			icon or GetItemIcon(ident), name or ident, IsConsumableItem(ident) and GetItemCount(ident, false, true) or 0,
+		return (cdLen or 0) == 0 and ((GetItemSpell(ident) == nil) or (IsUsableItem(ident) and inRange ~= 0)), (IsCurrentItem(ident) and 1 or 0) + (inRange ~= 0 and 0 or 16),
+			icon or GetItemIcon(ident), name or ident, GetItemCount(ident, false, true) or 0,
 			(cdStart or 0) > 0 and (cdStart - GetTime() + cdLen) or 0, cdLen or 0,
 			iid and GameTooltip.SetItemByID, iid
 	end
@@ -124,21 +128,25 @@ do -- item: an item by ID, inventory slot
 	end)
 end
 do -- macro, macrotext: built in macro (by name) or custom macros (by text)
-	local castAlias, comcache = {[SLASH_CAST1]=0,[SLASH_CAST2]=0,[SLASH_CAST3]=0,[SLASH_CAST4]=0,[SLASH_USE1]=0,[SLASH_USE2]=0,[SLASH_STOPMACRO1]=2,[SLASH_STOPMACRO2]=2,[SLASH_CASTSEQUENCE1]=3,[SLASH_CASTSEQUENCE2]=3,[SLASH_CASTRANDOM1]=4,[SLASH_CASTRANDOM2]=4}, {}
-	local function compact(macrotext, cache)
+	local castAlias = {[SLASH_CAST1]=0,[SLASH_CAST2]=0,[SLASH_CAST3]=0,[SLASH_CAST4]=0,[SLASH_USE1]=0,[SLASH_USE2]=0,[SLASH_STOPMACRO1]=2,[SLASH_STOPMACRO2]=2,[SLASH_CASTSEQUENCE1]=3,[SLASH_CASTSEQUENCE2]=3,[SLASH_CASTRANDOM1]=4,[SLASH_CASTRANDOM2]=4}
+	local function compact(cache, macrotext)
 		if type(macrotext) ~= "string" then return "" end
-		macrotext = "\n" .. macrotext
-		local gen = macrotext:match("\n#[Ss][Hh][Oo][Ww]%a*[^%S\n]+([^\n]*%S)") or ""
-		if gen ~= "" then return gen end
-		for name, args in macrotext:gmatch("\n(/%a+)([^\n]*)") do
-			if castAlias[name] or castAlias[name:lower()] then
-				if castAlias[name] == 4 then args = args:match("[^,]+") end
+		local macro = "\n" .. macrotext .. "\n"
+		local show, gen = macro:match("\n#[Ss][Hh][Oo][Ww]%a*[^%S\n]+([^\n]-)%s-\n") or "", ""
+		if show ~= "" then return "\a" .. show end
+		for name, args in macro:gmatch("\n(/%S+)[^%S\n]*([^\n]*)") do
+			local ctype = castAlias[name] or castAlias[name:lower()]
+			if ctype then
+				if ctype < 3 then 
+					args = ("\a" .. args):gsub("([;%]]%s*)", "%1\a")
+				end
 				gen = gen .. args:match("^%s*(.-)%s*$") .. "; "
 			end
 		end
-		if cache then cache[macrotext] = gen end
+		cache[macrotext] = gen
 		return gen
 	end
+	local compactMacros = setmetatable({}, {__index=compact})
 	local fixConditionalModifiers do
 		local cache, map, a,s,c = {}
 		local function fixModifierClause(open, invert, params, close)
@@ -168,7 +176,19 @@ do -- macro, macrotext: built in macro (by name) or custom macros (by text)
 			return cache[ident]
 		end
 	end
-	local function seqhint(target, index, item, spell)
+	local function hint(text, altState, shiftState, ctrlState)
+		if type(text) ~= "string" then return end
+		if text == "" then return true, 0, "Interface/Icons/Temp", "Macro", 0, 0, 0 end
+		if altState ~= nil or shiftState ~= nil or ctrlState ~= nil then
+			text = fixConditionalModifiers(text, altState, shiftState, ctrlState)
+		end
+		local clause, target = SecureCmdOptionParse(text)
+		if not clause or clause == "" then return end
+		local cclause, ccount = clause:gsub("\a", "")
+		local index, item, spell = 0, cclause, cclause
+		if ccount == 0 then
+			index, item, spell = QueryCastSequence(clause)
+		end
 		if item then
 			local iname, ilink = GetItemInfo(SecureCmdItemParse(item))
 			if ilink then
@@ -177,23 +197,11 @@ do -- macro, macrotext: built in macro (by name) or custom macros (by text)
 		end
 		return spellFeedback(spell, target)
 	end
-	local function hint(text, altState, shiftState, ctrlState)
-		if type(text) ~= "string" then return end
-		if altState ~= nil or shiftState ~= nil or ctrlState ~= nil then
-			text = fixConditionalModifiers(text, altState, shiftState, ctrlState)
-		end
-		local clause, target = SecureCmdOptionParse(text)
-		if clause:match(",") then
-			return seqhint(target, QueryCastSequence(clause))
-		else
-			return seqhint(target, 0, clause, clause)
-		end
-	end
 
-	local macroMap, macrotextMap, compactcache = {}, {}, {}
+	local macroMap, macrotextMap = {}, {}
 	local function hintMacro(aid, ...)
 		local name, icon, m = GetMacroInfo(macroMap[aid])
-		m = name and (compactcache[m] or compact(m, compactcache)) or ""
+		m = name and compactMacros[m] or ""
 		if m ~= "" then return hint(m, ...) end
 		return not not name, 0, icon, name, 0, 0, 0
 	end
@@ -215,25 +223,25 @@ do -- macro, macrotext: built in macro (by name) or custom macros (by text)
 		if type(macrotext) ~= "string" then return end
 		if not macrotextMap[macrotext] then
 			local aid = AB:create("attribute", hintMacrotext, "type","macro", "macrotext",macrotext)
-			macrotextMap[aid], macrotextMap[macrotext] = compact(macrotext), aid
+			macrotextMap[aid], macrotextMap[macrotext] = compactMacros[macrotext], aid
 		end
 		return macrotextMap[macrotext]
 	end, function(macrotext)
 		if macrotext == "" then return "Custom Macro", "New Macro", "Interface/Icons/Temp" end
-		local opt, tar = SecureCmdOptionParse(compact(macrotext))
-		local _, _, ico, cap = seqhint(tar, QueryCastSequence(opt))
+		local _, _, ico = hint(compactMacros[macrotext])
 		return "Custom Macro", "", ico
 	end)
-	EC_Register("UPDATE_MACROS", "AB.macro", function()
-		AB:notify("macro")
-	end)
+	EC_Register("UPDATE_MACROS", "AB.macro", function() AB:notify("macro") end)
+	AB:miscaction("macrotext", "")
 end
 do -- battlepet (pet id)
 	local petAction, actionPet = {}, {}
 	local function hint(id)
 		local pid = actionPet[id]
 		local sid, cn, _, _, _, _, _, n, tex = C_PetJournal.GetPetInfoByPetID(pid)
-		return not not sid, C_PetJournal.GetSummonedPetGUID() == pid and 1 or 0, tex, cn or n or "", 0, 0, 0
+		local start, duration, enabled = C_PetJournal.GetPetCooldownByGUID(pid)
+		local cdLeft = (cooldown or 0) > 0 and (enabled ~= 0) and (cooldown + duration - time)
+		return not not sid, C_PetJournal.GetSummonedPetGUID() == pid and 1 or 0, tex, cn or n or "", cdLeft or 0, duration or 0, 0
 	end
 	local function create(pid)
 		if type(pid) == "number" then return create(("0x%016x"):format(pid)) end
@@ -332,4 +340,35 @@ do -- opie.databroker.launcher
 		return nameMap[pname]
 	end
 	AB:register("opie.databroker.launcher", create, describe, {"clickUsingRightButton"})
+end
+do -- extrabutton: extra action bar button 1
+	local slot = GetExtraBarIndex()*12 - 11
+	local function hint()
+		if not HasExtraActionBar() then
+			return false, 0, "Interface/Icons/temp", "", 0, 0, 0
+		end
+		local at, aid = GetActionInfo(slot)
+		local inRange, usable, nomana = IsActionInRange(slot), IsUsableAction(slot)
+		local usable, cooldown, cdLength, enabled = usable and inRange ~= 0, GetActionCooldown(slot)
+		local cdLeft = (cooldown or 0) > 0 and (enabled ~= 0) and (cooldown + cdLength - GetTime()) or 0
+		local count, charges, maxCharges = GetActionCount(slot), GetActionCharges(slot)
+		local state = ((IsCurrentAction(slot) or enabled == 0) and 1 or 0) +
+		              (at == "spell" and IsSpellOverlayed(aid) and 2 or 0) +
+		              (nomana and 8 or 0) + (inRange and 0 or 16) + (charges and charges > 0 and 64 or 0)
+		usable = not not (usable and ((cooldown == nil or cooldown == 0) or (enabled == 0) or (charges > 0)))
+		return usable, state, GetActionTexture(slot), GetActionText(slot) or (at == "spell" and GetSpellInfo(aid)), count <= 1 and charges or count, cdLeft, cdLength, GameTooltip.SetAction, slot
+	end
+	local aid = AB:create("conditional", hint, "[extrabar]", "attribute", "type","action", "action",slot)
+	local aid2 = AB:create("attribute", hint, "type","action", "action",slot)
+	AB:register("extrabutton", function(id, forceShow)
+		return id == 1 and (forceShow and aid2 or aid) or nil
+	end, function(id)
+		local name, tex = "Extra Action Button", "Interface/Icons/Temp"
+		if HasExtraActionBar() then 
+			local at, aid = GetActionInfo(slot)
+			name, tex = GetActionText(slot) or (at == "spell" and GetSpellInfo(aid)) or name, GetActionTexture(slot) or tex
+		end
+		return "Extra Action Button", name, tex
+	end, {"forceShow"})
+	AB:miscaction("extrabutton", 1)
 end

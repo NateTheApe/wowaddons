@@ -1,4 +1,25 @@
-﻿Version 1.2i
+﻿Version 1.2n
+- Fix for CurseForge bug #216, error in option screen with Outfitter selected
+- Latest version of LibTourist
+
+Version 1.2m
+- Update TOC for 5.3
+- Better check for "in combat" and some event management updates
+- Latest version of LibBabble-SubZone
+
+Version 1.2l
+- Update TOC for 5.2
+- Updated LibBabble-SubZone and LibTourist for 5.2
+
+Version 1.2k
+- Updated LibBabble-SubZone, prep for 5.2
+- Remove Kalu'ak Fishing Derby timer, now that it's gone for good (sniff!)
+
+Version 1.2j
+- Updated Spanish translation (thanks Magire!)
+- Updated Brazilian Portuguese translation  (thanks tiagopl!)
+
+Version 1.2i
 - Fix for Equipment Manager event misunderstanding
 - Updated Russian translation (thanks Turbid121!)
 

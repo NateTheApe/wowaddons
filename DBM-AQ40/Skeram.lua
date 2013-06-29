@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Skeram", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 311 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 452 $"):sub(12, -3))
 mod:SetCreatureID(15263)
 mod:SetModelID(15345)
 mod:RegisterCombat("combat")
@@ -10,7 +10,7 @@ mod:RegisterEvents(
 	"SPELL_AURA_APPLIED",
 	"SPELL_CAST_SUCCESS",
 	"SPELL_SUMMON",
-	"UNIT_HEALTH"
+	"UNIT_HEALTH target focus mouseover"
 )
 
 local warnMindControl	= mod:NewTargetAnnounce(785, 3)
@@ -26,7 +26,7 @@ local split1
 local split2
 local split3
 local MCTargets = {}
-local MCIcon 	= 8
+local MCIcon = 8
 
 function mod:OnCombatStart(delay)
 	split1 = false
@@ -44,7 +44,7 @@ local function warnMCTargets()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(785) then
+	if args.spellId == 785 then
 		MCTargets[#MCTargets + 1] = args.destName
 		self:Unschedule(warnMCTargets)
 		if #MCTargets >= 3 then
@@ -66,7 +66,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:SPELL_SUMMON(args)
-	if args:IsSpellID(747) then
+	if args.spellId == 747 then
 		warnSummon:Show()
 	end
 end

@@ -1,4 +1,4 @@
-Decursive 2.7.2.4 (2012-12-25)
+Decursive 2.7.2.9 (2013-05-21)
 ==============================
 
 
@@ -10,6 +10,61 @@ I want to thank him for the great opportunity he gave me to work on Decursive, a
 program still useful to hundreds of thousands of people today.
 
 A thread dedicated to his memory can be found here: [http://us.battle.net/wow/en/forum/topic/6232743291](http://us.battle.net/wow/en/forum/topic/6232743291)
+
+
+Changes from Decursive 2.7.2.8 to Decursive 2.7.2.9 (2013-05-21)
+----------------------------------------------------------------
+
+- Updated TOC for WoW 5.3.
+
+
+Changes from Decursive 2.7.2.7 to Decursive 2.7.2.8 (2013-04-14)
+----------------------------------------------------------------
+
+- Added support for Hands of Sacrifice which can dispel magical effects on
+  party/raid members for retribution Paladins.
+
+- Enhanced the internal mechanism for unit exclusion (this concerns spell only
+  usable on the player or on party/raid members): it now also works for MUFs'
+  buttons assignments.
+
+
+Changes from Decursive 2.7.2.6 to Decursive 2.7.2.7 (2013-03-10)
+----------------------------------------------------------------
+
+- Fix Symbiosis support: Decursive now correctly detects "Cleanse" and "Purge"
+  for Druids and "Cyclone" for Priests.
+
+- Decursive will no longer show its "send this debug report to the author"
+  window if the self diagnostic detects a PBCK issue (missing or outdated
+  library, missing file, incompatible TOC, mixed file versions).
+
+- Emphasized in the corrupted installation pop-up that the WoW client must
+  _NOT_ be running while installing add-ons.
+
+
+Changes from Decursive 2.7.2.5 to Decursive 2.7.2.6 (2013-03-07)
+----------------------------------------------------------------
+
+- Fix the custom spell upgrade system that could error out when logging in on a
+  character for the first few times (the upgrade did go through though).
+
+
+Changes from Decursive 2.7.2.4 to Decursive 2.7.2.5 (2013-03-06)
+----------------------------------------------------------------
+
+
+- Decursive's master spell table is now indexed by spell-IDs instead of
+  localized spell-names this will fix localization related name collision issues.
+  These collision were preventing auto-configuration to work correctly for some
+  locals (such as Russian Paladins).
+
+
+- Fixed a rare 'index is nil' Lua error happening is some race conditions when
+  mouse-hovering the MUFs. The same race conditions could cause the MUFs' handle
+  to be displayed in an unexpected position...
+
+- Switched back to AceTimer-3.0 which is reliable again now.
 
 
 Changes from Decursive 2.7.2.3 to Decursive 2.7.2.4 (2012-12-25)
@@ -275,7 +330,7 @@ Changes from Decursive 2.6.0.1 to Decursive 2.6.1 (2011-03-04)
 
     - The handle will always be placed above the first MUF regardless of your MUF's
       display options (Except when the first MUF is at the top of your screen, in
-      this case it will be place beneath last line's first MUF)
+      this case it will be placed beneath last line's first MUF)
 
     - MUFs' Anchoring is now more logical, MUFs' scale tweaking will seem more
       natural.

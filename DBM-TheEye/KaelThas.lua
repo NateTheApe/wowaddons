@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("KaelThas", "DBM-TheEye")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 419 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 455 $"):sub(12, -3))
 mod:SetCreatureID(19622)
 mod:SetModelID(20023)
 mod:SetZone()
@@ -19,11 +19,11 @@ mod:RegisterEvents(
 	"SPELL_DAMAGE",
 	"SWING_DAMAGE",
 	"RANGE_DAMAGE",
-	"UNIT_TARGET",
+	"UNIT_TARGET_UNFILTERED",
 	"CHAT_MSG_MONSTER_EMOTE",
 	"CHAT_MSG_MONSTER_YELL",
 	"UNIT_DIED",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_SPELLCAST_SUCCEEDED target focus"
 )
 
 local warnGaze			= mod:NewAnnounce("WarnGaze", 4, 39414)
@@ -154,11 +154,11 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(37018) then
+	if args.spellId == 37018 then
 		warnConflagTargets[#warnConflagTargets + 1] = args.destName
 		self:Unschedule(showConflag)
 		self:Schedule(0.3, showConflag)
-	elseif args:IsSpellID(36797) then
+	elseif args.spellId == 36797 then
 		warnMCTargets[#warnMCTargets + 1] = args.destName
 		self:Unschedule(showMC)
 		if self.Options.MCIcon then
@@ -170,18 +170,18 @@ function mod:SPELL_AURA_APPLIED(args)
 		else
 			self:Schedule(0.3, showMC)
 		end
-	elseif args:IsSpellID(37027) then
+	elseif args.spellId == 37027 then
 		warnToy:Show(args.destName)
 		timerToy:Start(args.destName)
 		if args:IsPlayer() then
 			specWarnToy:Show()
 		end
-	elseif args:IsSpellID(36815) and not phase5 then
+	elseif args.spellId == 36815 and not phase5 then
 		shieldDown = false
 		showShieldHealthBar(self, args.destGUID, args.spellName, 80000)
 		specWarnShield:Show()
 		timerShieldCD:Start()
-	elseif args:IsSpellID(35859) and args:IsPlayer() and self:IsInCombat() and (args.amount or 1) >= 2 then
+	elseif args.spellId == 35859 and args:IsPlayer() and self:IsInCombat() and (args.amount or 1) >= 2 then
 		specWarnVapor:Show(args.amount)
 	end
 end
@@ -189,29 +189,29 @@ end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(36815) and not phase5 then
+	if args.spellId == 36815 and not phase5 then
 		shieldDown = true
 		specWarnPyro:Show(args.sourceName)
 		self:Unschedule(hideShieldHealthBar)
 		hideShieldHealthBar()
-	elseif args:IsSpellID(36797) then
+	elseif args.spellId == 36797 then
 		if self.Options.MCIcon then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(37027) then
+	elseif args.spellId == 37027 then
 		timerToy:Cancel(args.destName)
 	end
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(44863) then
+	if args.spellId == 44863 then
 		warnFear:Show()
 		timerFear:Start()
 		timerFearCD:Start()
-	elseif args:IsSpellID(36819) then
+	elseif args.spellId == 36819 then
 		warnPyro:Show()
 		timerPyro:Show()
-	elseif args:IsSpellID(35941) then
+	elseif args.spellId == 35941 then
 		warnGravity:Show()
 		timerGravity:Start()
 		timerGravityCD:Start()
@@ -220,7 +220,7 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(36723) then
+	if args.spellId == 36723 then
 		warnPhoenix:Show()
 		timerPhoenixCD:Start()
 	elseif args:GetDestCreatureID() == 21364 then
@@ -236,7 +236,7 @@ end
 mod.SWING_DAMAGE = mod.SPELL_DAMAGE
 mod.RANGE_DAMAGE = mod.SPELL_DAMAGE
 
-function mod:UNIT_TARGET()
+function mod:UNIT_TARGET_UNFILTERED()
 	if self:GetUnitCreatureId("target") == 21364 then
 		self:EggSpawned()
 	end
@@ -288,6 +288,7 @@ end
 
 function mod:CHAT_MSG_MONSTER_EMOTE(msg, _, _, _, target)
 	if msg == L.EmoteGaze or msg:find(L.EmoteGaze) then
+		local target = DBM:GetFullNameByShortName(target)
 		warnGaze:Show(target)
 		timerNextGaze:Start()
 		if target == UnitName("player") then

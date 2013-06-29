@@ -1,4 +1,4 @@
-local api, MAJ, REV = {}, 1, 6
+local api, MAJ, REV = {}, 1, 7
 
 local function assert(condition, err, ...)
 	return (not condition) and error(tostring(err):format(...), 3) or condition
@@ -17,26 +17,34 @@ function ab:callCustom(unit, button)
 end
 
 local abSec = CreateFrame("FRAME", "ActionBookSecLib", nil, "SecureHandlerBaseTemplate")
-abSec:Execute([[collections, colmetadata, tokens, stackCol, stackIdx, outCount = newtable(), newtable(), newtable(), newtable(), newtable(), newtable()]])
+abSec:Execute([=[-- abSec init
+	collections, tokens, metadata, actConditionals, tokConditionals = newtable(), newtable(), newtable(), newtable(), newtable()
+	colStack, idxStack, outCount = newtable(), newtable(), newtable(), newtable()
+]=])
 local abSecEnv = GetManagedEnvironment(abSec)
 abSec:SetAttribute("collection", [=[-- AB.collection
 	local i, ret, root, col, idx, aid = 1, "", tonumber((...)) or 0
 	wipe(outCount)
-	stackCol[i], stackIdx[i] = root, 1
-	while i > 0 do
-		col, idx = stackCol[i], stackIdx[i]
+	colStack[i], idxStack[i] = root, 1
+	repeat
+		col, idx = colStack[i], idxStack[i]
 		if outCount[col] == nil then outCount[col] = 0 self:CallMethod("notifyCollectionOpen", col) end
-		aid, stackIdx[i] = collections[col][idx], idx + 1
+		aid, idxStack[i] = collections[col][idx], idx + 1
 		if not aid then
 			i = i - 1
 		elseif collections[aid] and not outCount[aid] then
-			i, stackIdx[i], stackCol[i+1], stackIdx[i+1] = i + 1, idx, aid, 1
+			i, idxStack[i], colStack[i+1], idxStack[i+1] = i + 1, idx, aid, 1
 		elseif aid and (outCount[aid] or 1) > 0 then
-			ret = ret .. "\n" .. col .. " " .. (outCount[col] + 1) .. " " .. aid .. " " .. tokens[col][idx]
-			outCount[col] = outCount[col] + 1
+			local show, tok = true, tokens[col][idx]
+			local check1, check2 = actConditionals[aid], tokConditionals[tok]
+			if (check1 == nil or (SecureCmdOptionParse(check1) or "hide") ~= "hide") and
+			   (check2 == nil or (SecureCmdOptionParse(check2) or "hide") ~= "hide") then
+				ret = ret .. "\n" .. col .. " " .. (outCount[col] + 1) .. " " .. aid .. " " .. tok
+				outCount[col] = outCount[col] + 1
+			end
 		end
-	end
-	return ret, colmetadata["openAction-" .. root]
+	until i == 0
+	return ret, metadata["openAction-" .. root]
 ]=])
 function abSec:notifyCollectionOpen(id)
 	api:notify("internal.collection.preopen", id)
@@ -97,24 +105,42 @@ function createHandlers.func(id, cnt, func, ...)
 	abCallFuncs[tostring(id)] = cnt > 1 and {func, cnt+1, ...} or func
 	return true
 end
-function updateHandlers.collection(id, cnt, idList)
+function createHandlers.conditional(id, cnt, condition, atype, ...)
+	if type(atype) ~= "string" then
+		return false, "Conditional action type expected, got %s", type(atype)
+	elseif not createHandlers[atype] then
+		return false, "Conditional action type %q is not creatable", tostring(atype)
+	elseif type(condition) ~= "string" then
+		return false, "Conditional expected, got %s", type(condition)
+	end
+	allocatedActionType[id] = atype
+	DeferExecute(("actConditionals[%d] = %q"):format(id, condition))
+	return createHandlers[atype](id, cnt-2, ...)
+end
+function createHandlers.collection(id, cnt, idList)
 	if not (type(idList) == "table") then
 		return false, "Expected table specifying collection actions, got %q", type(idList)
 	elseif idList.__openAction and not allocatedActions[idList.__openAction] then
 		return false, "Collection __openAction key does not specify a valid action"
 	end
-	local spec, tokens = "", ""
+	local spec, tokens, visibility = "", "", ""
 	for i=1,#idList do
-		if allocatedActions[idList[idList[i]]] == nil then
-			return false, "Collection entry #%d is not an allocated action id", i, tostring(idList[i])
+		local tok = idList[i]
+		local aid, vis = idList[tok], idList['__visibility-' .. tok]
+		if type(tok) ~= "string" then
+			return false, "Collection entry #%d: unsupported token type (%s)", i, type(tok)
+		elseif allocatedActions[aid] == nil then
+			return false, "Collection entry #%d: unallocated action id", i, tostring(idList[i])
+		elseif vis ~= nil and type(vis) ~= "string" then
+			return false, "Collection entry #%d: unsupported visibility conditional type (%s)", i, type(vis)
 		end
-		spec, tokens = spec .. idList[idList[i]] .. ", ", tokens .. ("%q, "):format(idList[i])
+		spec, tokens, visibility = spec .. idList[tok] .. ", ", tokens .. ("%q, "):format(tok), ('%s\ntokConditionals[%q] = ' .. (vis and "%q" or "nil")):format(visibility, tok, vis)
 	end
-	DeferExecute(("local id = %d; collections[id], tokens[id], colmetadata['openAction-' .. id] = newtable(%s nil), newtable(%s nil), %s"):format(id, spec, tokens, type(idList.__openAction) == "number" and idList.__openAction or "nil"))
+	DeferExecute(("local id = %d; collections[id], tokens[id], metadata['openAction-' .. id] = newtable(%s nil), newtable(%s nil), %s %s"):format(id, spec, tokens, type(idList.__openAction) == "number" and idList.__openAction or "nil", visibility))
 	return true
 end
-createHandlers.collection = updateHandlers.collection
-local function collectionInfoFunc() end
+updateHandlers.collection = createHandlers.collection
+local function nullInfoFunc() return false end
 
 function api:get(ident, ...)
 	assert(type(ident) == "string", "Syntax: actionId = AB:get(identifier, ...)")
@@ -160,17 +186,17 @@ function api:register(ident, create, describe, opt)
 	end
 end
 function api:create(atype, infoFunc, ...)
-	assert(type(atype) == "string" and (type(infoFunc) == "function" or (atype == "collection" and infoFunc == nil)), "Syntax: actionId = AB:create(actionType, infoFunc, ...)")
+	assert(type(atype) == "string" and (type(infoFunc) == "function" or infoFunc == nil), "Syntax: actionId = AB:create(actionType, infoFunc, ...)")
 	assert(createHandlers[atype], "Action type %q is not creatable", atype)
 	local id = nextActionId
-	nextActionId = nextActionId + 1
+	allocatedActionType[id], nextActionId = atype, nextActionId + 1
 	assert(createHandlers[atype](id, select("#", ...), ...))
-	allocatedActions[id], allocatedActionType[id] = infoFunc or collectionInfoFunc, atype
+	allocatedActions[id] = infoFunc or nullInfoFunc
 	return id
 end
 function api:update(id, ...)
 	assert(type(id) == "number", "Syntax: AB:update(actionId, ...)")
-	assert(allocatedActionType[id], "Action %d does not exist", id)
+	assert(allocatedActions[id], "Action %d does not exist", id)
 	assert(updateHandlers[allocatedActionType[id]], "Action type %q is not updatable", allocatedActionType[id])
 	assert(updateHandlers[allocatedActionType[id]](id, select("#", ...), ...))
 end

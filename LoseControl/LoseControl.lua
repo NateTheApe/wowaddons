@@ -99,6 +99,7 @@ local spellIds = {
 	[126423] = "CC",		-- Petrifying Gaze (Basilisk)
 	[50519]  = "CC",		-- Sonic Blast (Bat)
 	[56626]  = "CC",		-- Sting (Wasp)
+	[96201]  = "CC",		-- Web Wrap (Shale Spider)
 	[50541]  = "Disarm",		-- Clench (Scorpid)
 	[91644]  = "Disarm",		-- Snatch (Bird of Prey)
 	[90327]  = "Root",		-- Lock Jaw (Dog)
@@ -123,7 +124,6 @@ local spellIds = {
 	[55021]  = "Silence",		-- Silenced - Improved Counterspell
 	[122]    = "Root",		-- Frost Nova
 	[111340] = "Root",		-- Ice Ward
-	--[11113]  = "Snare",		-- Blast Wave - gone?
 	[121288] = "Snare",		-- Chilled (Frost Armor)
 	[120]    = "Snare",		-- Cone of Cold
 	[116]    = "Snare",		-- Frostbolt
@@ -139,12 +139,13 @@ local spellIds = {
 	[126451] = "CC",		-- Clash
 	[122242] = "CC",		-- Clash (not sure which one is right)
 	[119392] = "CC",		-- Charging Ox Wave
-	[117418] = "CC",		-- Fists of Fury
+	[120086] = "CC",		-- Fists of Fury
 	[119381] = "CC",		-- Leg Sweep
 	[115078] = "CC",		-- Paralysis
 	[117368] = "Disarm",		-- Grapple Weapon
-	--[???] = "Disarm",		-- Ring of Peace
-	--[???] = "Silence",		-- Ring of Peace
+	[140023] = "Disarm",		-- Ring of Peace
+	[137461] = "Disarm",		-- Disarmed (Ring of Peace)
+	[137460] = "Silence",		-- Silenced (Ring of Peace)
 	[116709] = "Silence",		-- Spear Hand Strike
 	[116706] = "Root",		-- Disable
 	[113275] = "Root",		-- Entangling Roots (Symbiosis)
@@ -168,6 +169,7 @@ local spellIds = {
 	[20170]  = "Snare",		-- Seal of Justice
 	[642]    = "Immune",		-- Divine Shield
 	[31821]  = "Other",		-- Aura Mastery
+	[1022]   = "Other",		-- Hand of Protection
 	-- Priest
 	[113506] = "CC",		-- Cyclone (Symbiosis)
 	[605]    = "CC",		-- Dominate Mind
@@ -221,6 +223,7 @@ local spellIds = {
 	[118345] = "CC",		-- Pulverize
 	-- Warlock
 	[710]    = "CC",		-- Banish
+	[137143] = "CC",		-- Blood Horror
 	[54786]  = "CC",		-- Demonic Leap (Metamorphosis)
 	[5782]   = "CC",		-- Fear
 	[118699] = "CC",		-- Fear
@@ -251,8 +254,9 @@ local spellIds = {
 	[20511]  = "CC",		-- Intimidating Shout (targeted)
 	[132168] = "CC",		-- Shockwave
 	[107570] = "CC",		-- Storm Bolt
+	[132169] = "CC",		-- Storm Bolt
 	[105771] = "CC",		-- Warbringer
-	[18498]  = "Silence",		-- Silenced - Gag Order
+	[18498]  = "Silence",		-- Silenced - Gag Order (PvE only)
 	[676]    = "Disarm",		-- Disarm
 	[107566] = "Root",		-- Staggering Shout
 	[1715]   = "Snare",		-- Hamstring
@@ -281,7 +285,7 @@ local spellIds = {
 	[13099]  = "Root",		-- Net-o-Matic
 	[1604]   = "Snare",		-- Dazed
 	-- PvE
-	--[123456]  = "PvE",		-- not real, just an example
+	--[123456] = "PvE",		-- This is just an example, not a real spell
 }
 
 if debug then
@@ -345,24 +349,33 @@ local anchors = {
 		party3 = "oUF_LUI_partyUnitButton3",
 		party4 = "oUF_LUI_partyUnitButton4",
 	},
+	SyncFrames = {
+		arena1 = "SyncFrame1Class",
+		arena2 = "SyncFrame2Class",
+		arena3 = "SyncFrame3Class",
+		arena4 = "SyncFrame4Class",
+		arena5 = "SyncFrame5Class",
+	},
 	--SUF = {
 	--	player = SUFUnitplayer.portraitModel.portrait,
 	--	pet    = SUFUnitpet.portraitModel.portrait,
 	--	target = SUFUnittarget.portraitModel.portrait,
 	--	focus  = SUFUnitfocus.portraitModel.portrait,
-		--party1 = SUFUnitparty1.portraitModel.portrait,
-		--party2 = SUFUnitparty2.portraitModel.portrait,
-		--party3 = SUFUnitparty3.portraitModel.portrait,
-		--party4 = SUFUnitparty4.portraitModel.portrait,
+	--	party1 = SUFUnitparty1.portraitModel.portrait,
+	--	party2 = SUFUnitparty2.portraitModel.portrait,
+	--	party3 = SUFUnitparty3.portraitModel.portrait,
+	--	party4 = SUFUnitparty4.portraitModel.portrait,
+	--},
 	-- more to come here?
 }
 
 -------------------------------------------------------------------------------
 -- Default settings
 local DBdefaults = {
-	version = 5.1, -- This is the settings version, not necessarily the same as the LoseControl version
+	version = 5.2, -- This is the settings version, not necessarily the same as the LoseControl version
 	noCooldownCount = false,
 	disablePartyInBG = false,
+	disableArenaInBG = true,
 	priority = {		-- higher numbers have more priority; 0 = disabled
 		PvE		= 90,
 		Immune		= 80,
@@ -377,7 +390,7 @@ local DBdefaults = {
 	frames = {
 		player = {
 			enabled = true,
-			size = 56,
+			size = 36,
 			alpha = 1,
 			anchor = "None",
 		},
@@ -476,6 +489,8 @@ function LoseControl:RegisterUnitEvents(enabled)
 			self:RegisterEvent("PLAYER_TARGET_CHANGED")
 		elseif unitId == "focus" then
 			self:RegisterEvent("PLAYER_FOCUS_CHANGED")
+		elseif unitId == "pet" then
+			self:RegisterUnitEvent("UNIT_PET", "player")
 		end
 	else
 		self:UnregisterEvent("UNIT_AURA")
@@ -483,6 +498,8 @@ function LoseControl:RegisterUnitEvents(enabled)
 			self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 		elseif unitId == "focus" then
 			self:UnregisterEvent("PLAYER_FOCUS_CHANGED")
+		elseif unitId == "pet" then
+			self:UnregisterEvent("UNIT_PET")
 		end
 	end
 end
@@ -492,8 +509,12 @@ function LoseControl:ADDON_LOADED(arg1)
 	if arg1 == addonName then
 		if _G.LoseControlDB and _G.LoseControlDB.version then
 			if _G.LoseControlDB.version < DBdefaults.version then
-				_G.LoseControlDB = CopyTable(DBdefaults)
-				print(L["LoseControl reset."])
+				if _G.LoseControlDB.version == 5.1 then -- upgrade gracefully
+					_G.LoseControlDB.disableArenaInBG = DBdefaults.disableArenaInBG
+				else
+					_G.LoseControlDB = CopyTable(DBdefaults)
+					print(L["LoseControl reset."])
+				end
 			end
 		else -- never installed before
 			_G.LoseControlDB = CopyTable(DBdefaults)
@@ -510,10 +531,15 @@ function LoseControl:PLAYER_ENTERING_WORLD() -- this correctly anchors enemy are
 	local unitId = self.unitId
 	self.frame = LoseControlDB.frames[unitId] -- store a local reference to the frame's settings
 	local frame = self.frame
-
 	local inInstance, instanceType = IsInInstance()
-	self:RegisterUnitEvents( frame.enabled and not (LoseControlDB.disablePartyInBG and string.find(unitId, "party") and inInstance and instanceType == "pvp") )
-
+	self:RegisterUnitEvents(
+		frame.enabled and not (
+			inInstance and instanceType == "pvp" and (
+				( LoseControlDB.disablePartyInBG and string.find(unitId, "party") ) or
+				( LoseControlDB.disableArenaInBG and string.find(unitId, "arena") )
+			)
+		)
+	)
 	self.anchor = _G[anchors[frame.anchor][unitId]] or UIParent
 	self:SetParent(self.anchor:GetParent()) -- or LoseControl) -- If Hide() is called on the parent frame, its children are hidden too. This also sets the frame strata to be the same as the parent's.
 	--self:SetFrameStrata(frame.strata or "LOW")
@@ -630,11 +656,18 @@ function LoseControl:UNIT_AURA(unitId) -- fired when a (de)buff is gained/lost
 end
 
 function LoseControl:PLAYER_FOCUS_CHANGED()
+	--if (debug) then print("PLAYER_FOCUS_CHANGED") end
 	self:UNIT_AURA("focus")
 end
 
 function LoseControl:PLAYER_TARGET_CHANGED()
+	--if (debug) then print("PLAYER_TARGET_CHANGED") end
 	self:UNIT_AURA("target")
+end
+
+function LoseControl:UNIT_PET(unitId)
+	--if (debug) then print("UNIT_PET", unitId) end
+	self:UNIT_AURA("pet")
 end
 
 -- Handle mouse dragging
@@ -923,10 +956,22 @@ for _, v in ipairs({ "player", "pet", "target", "focus", "party", "arena" }) do
 		_G[O..v.."DisableInBGText"]:SetText(L["DisableInBG"])
 		DisableInBG:SetScript("OnClick", function(self)
 			LoseControlDB.disablePartyInBG = self:GetChecked()
-			LCframes.party1:PLAYER_ENTERING_WORLD()
-			LCframes.party2:PLAYER_ENTERING_WORLD()
-			LCframes.party3:PLAYER_ENTERING_WORLD()
-			LCframes.party4:PLAYER_ENTERING_WORLD()
+			if not Unlock:GetChecked() then -- prevents the icon from disappearing if the frame is currently hidden
+				for i = 1, 4 do
+					LCframes[v .. i]:PLAYER_ENTERING_WORLD()
+				end
+			end
+		end)
+	elseif v == "arena" then
+		DisableInBG = CreateFrame("CheckButton", O..v.."DisableInBG", OptionsPanelFrame, "OptionsCheckButtonTemplate")
+		_G[O..v.."DisableInBGText"]:SetText(L["DisableInBG"])
+		DisableInBG:SetScript("OnClick", function(self)
+			LoseControlDB.disableArenaInBG = self:GetChecked()
+			if not Unlock:GetChecked() then -- prevents the icon from disappearing if the frame is currently hidden
+				for i = 1, 5 do
+					LCframes[v .. i]:PLAYER_ENTERING_WORLD()
+				end
+			end
 		end)
 	end
 
@@ -969,6 +1014,7 @@ for _, v in ipairs({ "player", "pet", "target", "focus", "party", "arena" }) do
 			DisableInBG:SetChecked(LoseControlDB.disablePartyInBG)
 			unitId = "party1"
 		elseif unitId == "arena" then
+			DisableInBG:SetChecked(LoseControlDB.disableArenaInBG)
 			unitId = "arena1"
 		end
 		local frame = LoseControlDB.frames[unitId]
@@ -990,6 +1036,7 @@ for _, v in ipairs({ "player", "pet", "target", "focus", "party", "arena" }) do
 			if _G[anchors["Perl"][unitId]] then AddItem(AnchorDropDown, "Perl", "Perl") end
 			if _G[anchors["XPerl"][unitId]] then AddItem(AnchorDropDown, "XPerl", "XPerl") end
 			if _G[anchors["LUI"][unitId]] then AddItem(AnchorDropDown, "LUI", "LUI") end
+			if _G[anchors["SyncFrames"][unitId]] then AddItem(AnchorDropDown, "SyncFrames", "SyncFrames") end
 		end)
 		UIDropDownMenu_SetSelectedValue(AnchorDropDown, frame.anchor)
 	end

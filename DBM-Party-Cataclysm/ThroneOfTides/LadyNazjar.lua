@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(101, "DBM-Party-Cataclysm", 9, 65)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 48 $"):sub(12, -3))
 mod:SetCreatureID(40586)
 mod:SetModelID(34342)
 mod:SetZone()
@@ -47,7 +47,7 @@ local function showSporeWarning()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(80564, 91470) then
+	if args.spellId == 80564 then
 		sporeCount = sporeCount + 1
 		sporeTargets[#sporeTargets + 1] = args.destName
 		self:Unschedule(showSporeWarning)
@@ -56,10 +56,10 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(75690) then
+	if args.spellId == 75690 then
 		timerWaterspout:Cancel()
 		timerShockBlastCD:Start(13)
-	elseif args:IsSpellID(80564, 91470) then
+	elseif args.spellId == 80564 then
 		sporeCount = sporeCount - 1
 		if sporeCount == 0 then
 			timerFungalSpores:Cancel()
@@ -68,15 +68,15 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(75863) then
+	if args.spellId == 75863 then
 		warnWaterspout:Show()
 		timerWaterspout:Start()
 		timerShockBlastCD:Cancel()
-	elseif args:IsSpellID(76008, 91477) then
+	elseif args.spellId == 76008 then
 		warnShockBlast:Show()
 		specWarnShockBlast:Show(args.sourceName)
 		timerShockBlastCD:Start()
-		if mod:IsDifficulty("heroic5") then
+		if self:IsDifficulty("heroic5") then
 			timerShockBlast:Start(2)
 		else
 			timerShockBlast:Start()

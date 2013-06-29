@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("TwinEmpsAQ", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 311 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(15276, 15275)
 mod:SetModelID(15778)
 mod:RegisterCombat("combat")
@@ -34,7 +34,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(26607) and self:IsInCombat() then
+	if args.spellId == 26607 and self:IsInCombat() then
 		warnBlizzard:Show()
 	end
 end
@@ -44,10 +44,10 @@ function mod:SPELL_CAST_SUCCESS(args)
 		warnTeleport:Show()
 		warnTeleportSoon:Schedule(30)
 		timerTeleport:Start()
-	elseif args:IsSpellID(802) then
+	elseif args.spellId == 802 then
 		warnMutateBug:Show()
 		timerMutateBug:Start()
-	elseif args:IsSpellID(804) then
+	elseif args.spellId == 804 then
 		warnExplodeBug:Show()
 		timerExplodeBug:Show()
 		timerExplodeBugNext:Start()

@@ -4,8 +4,8 @@ Reputation.lua
 ************************************************************************
 File date: 2012-09-28T16:01:51Z
 File hash: bf98a49
-Project hash: 3df9ad7
-Project version: 2.4.4
+Project hash: 3fa6ce4
+Project version: 2.4.8
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************

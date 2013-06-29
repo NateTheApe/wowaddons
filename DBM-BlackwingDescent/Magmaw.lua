@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(170, "DBM-BlackwingDescent", nil, 73)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 21 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 58 $"):sub(12, -3))
 mod:SetCreatureID(41570)
 mod:SetModelID(37993)
 mod:SetZone()
@@ -20,7 +20,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_MISSED",
 	"CHAT_MSG_MONSTER_YELL",
 	"RAID_BOSS_EMOTE",
-	"UNIT_HEALTH",
+	"UNIT_HEALTH boss1",
 	"UNIT_DIED"
 )
 
@@ -74,13 +74,13 @@ function mod:OnCombatEnd()
 end 
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(78006) then--More than one spellid?
+	if args.spellId == 78006 then--More than one spellid?
 		warnPillarFlame:Show()
 		specWarnPillar:Show()
 		timerPillarFlame:Start()
-	elseif args:IsSpellID(78403) then
+	elseif args.spellId == 78403 then
 		warnMoltenTantrum:Show()
-	elseif args:IsSpellID(89773, 91912, 94616, 94617) then
+	elseif args.spellId == 89773 then
 		warnMangle:Show(args.destName)
 		timerMangle:Start(args.destName)
 		timerMangleCD:Start()
@@ -88,16 +88,16 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(89773, 91912, 94616, 94617) then
+	if args.spellId == 89773 then
 		timerMangle:Cancel(args.destName)
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(77690, 91919, 91931, 91932) and self:AntiSpam(5, 1) then
+	if args.spellId == 77690 and self:AntiSpam(5, 1) then
 		warnLavaSpew:Show()
 		timerLavaSpew:Start()
-	elseif args:IsSpellID(92177) then
+	elseif args.spellId == 92177 then
 		warnArmageddon:Show()
 		specWarnArmageddon:Show()
 		timerArmageddon:Start()
@@ -106,15 +106,15 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:SPELL_SUMMON(args)
-	if args:IsSpellID(92154, 92190, 92191, 92192) then
+	if args.spellId == 92154 then
 		warnInferno:Show()
 		specWarnInfernoSoon:Schedule(31)
 		timerInferno:Start()
 	end
 end
 
-function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 92128 or spellId == 92196 or spellId == 92197 or spellId == 92198) and destGUID == UnitGUID("player") and self:AntiSpam(4, 2) then
+function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if spellId == 92128 and destGUID == UnitGUID("player") and self:AntiSpam(4, 2) then
 		specWarnIgnition:Show()
 	end
 end

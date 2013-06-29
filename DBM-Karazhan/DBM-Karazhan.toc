@@ -1,4 +1,4 @@
-﻿## Interface: 50100
+﻿## Interface: 50300
 ## X-Min-Interface: 50001
 ## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Karazhan|r
 ## Title-koKR:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0카라잔|r
@@ -6,8 +6,9 @@
 ## RequiredDeps: DBM-Core
 ## SavedVariablesPerCharacter: DBMKarazhan_SavedVars, DBMKarazhan_SavedStats
 ## X-DBM-Mod: 1
+## X-DBM-Mod-Type: RAID
 ## X-DBM-Mod-Category: BC
-## X-DBM-Mod-Has-Heroic-Mode: 0
+## X-DBM-Mod-Has-Single-Format: 1
 ## X-DBM-Mod-Name: Karazhan
 ## X-DBM-Mod-Name-ruRU: Каражан
 ## X-DBM-Mod-Name-zhTW: 卡拉贊
@@ -34,6 +35,7 @@ Curator.lua
 TerestianIllhoof.lua
 ShadeOfAran.lua
 Netherspite.lua
+Chess.lua
 PrinceMalchezaar.lua
 Nightbane.lua
 NamedBeasts.lua

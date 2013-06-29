@@ -1,13 +1,12 @@
 local mod	= DBM:NewMod("TerestianIllhoof", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 399 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 474 $"):sub(12, -3))
 mod:SetCreatureID(15688)
 mod:SetModelID(11343)
 
-mod:RegisterCombat("yell", L.DBM_TI_YELL_PULL)
---mod:RegisterCombat("combat", 15688)
---17229--imp, for future use
+--mod:RegisterCombat("yell", L.DBM_TI_YELL_PULL)
+mod:RegisterCombat("combat", 15688)
 
 mod:RegisterEvents(
 	"SPELL_AURA_APPLIED",
@@ -35,7 +34,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(30115) then
+	if args.spellId == 30115 then
 		DBM.BossHealth:AddBoss(17248, L.DChains)
 		warningSacrifice:Show(args.destName)
 		timerSacrifice:Start(args.destName)
@@ -45,7 +44,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		if args:IsPlayer() then
 			specWarnSacrifice:Show()
 		end
-	elseif args:IsSpellID(30065) then
+	elseif args.spellId == 30065 then
 		warningWeakened:Show(args.destName)
 		timerWeakened:Start()
 		warningImpSoon:Schedule(26)
@@ -53,13 +52,13 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(30115) then
+	if args.spellId == 30115 then
 		timerSacrifice:Cancel(args.destName)
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(30066) then
+	if args.spellId == 30066 then
 		warningImpSoon:Cancel()
 		warningImp:Show()
 		DBM.BossHealth:AddBoss(17229, L.Kilrek)

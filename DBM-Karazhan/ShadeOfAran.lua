@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Aran", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 474 $"):sub(12, -3))
 mod:SetCreatureID(16524)
 mod:SetModelID(16621)
 mod:RegisterCombat("combat")
@@ -59,17 +59,17 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(30004) then
+	if args.spellId == 30004 then
 		warningFlameCast:Show()
 		timerFlameCast:Start()
 		timerSpecial:Start()
-	elseif args:IsSpellID(29973) then
+	elseif args.spellId == 29973 then
 		warningArcaneCast:Show()
 		timerArcaneExplosion:Start()
 		specWarnArcane:Show()
 		soundArcane:Play()
 		timerSpecial:Start()
-	elseif args:IsSpellID(29969) then
+	elseif args.spellId == 29969 then
 		warningBlizzard:Show()
 		timerBlizzadCast:Show()
 		timerBlizzad:Schedule(3.7)--may need tweaking
@@ -78,10 +78,10 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(29991) then
+	if args.spellId == 29991 then
 		warningChains:Show(args.destName)
 		timerChains:Start(args.destName)
-	elseif args:IsSpellID(29946) then
+	elseif args.spellId == 29946 then
 		WreathTargets[#WreathTargets + 1] = args.destName
 		timerFlame:Start()
 		if args:IsPlayer() then
@@ -97,8 +97,10 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(29991) then
+	if args.spellId == 29991 then
 		timerChains:Cancel(args.destName)
+	elseif args.spellId == 29946 and self.Options.WreathIcon then
+		self:SetIcon(args.destName, 0)
 	end
 end
 
@@ -132,8 +134,8 @@ do
 	
 	mod:RegisterOnUpdateHandler(function(self)
 		if self.Options.ElementalIcons and (DBM:GetRaidRank() > 0 and not iconsSet == 4) then
-			for i = 1, DBM:GetGroupMembers() do
-				local uId = "raid"..i.."target"
+			for uId in DBM:GetGroupMembers() do
+				uId = uId .. "target"
 				local guid = UnitGUID(uId)
 				if elementalIcon[guid] then
 					SetRaidTarget(uId, elementalIcon[guid])
@@ -145,7 +147,7 @@ do
 	end, 1)
 end
 
-function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
+function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
 	if spellId == 29951 and destGUID == UnitGUID("player") and self:AntiSpam() then
 		specWarnBlizzard:Show()
 	end

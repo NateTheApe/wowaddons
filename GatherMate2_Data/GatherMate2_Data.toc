@@ -1,4 +1,4 @@
-﻿## Interface: 50100
+## Interface: 50300
 ## Notes: Wowhead Data dump for GatherMate2
 ## Notes-zhTW: Wowhead 資料轉存至採集助手 GatherMate2
 ## Notes-zhCN: Wowhead 资料转存至采集助手 GatherMate2
@@ -10,9 +10,9 @@
 ## X-Email: sal.scotto@gmail.com
 ## Version: 1.0
 ## LoadOnDemand: 1
-## X-Generated-Version: $Revision: 224 $
+## X-Generated-Version: $Revision: 271 $
 ## Dependencies: GatherMate2
-## X-Curse-Packaged-Version: v14.7
+## X-Curse-Packaged-Version: v16.8
 ## X-Curse-Project-Name: GatherMate2_Data
 ## X-Curse-Project-ID: gathermate2_data
 ## X-Curse-Repository-ID: wow/gathermate2_data/mainline

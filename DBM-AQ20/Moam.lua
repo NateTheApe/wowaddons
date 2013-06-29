@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Moam", "DBM-AQ20", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 311 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(15340)
 mod:SetModelID(15392)
 mod:RegisterCombat("combat")
@@ -23,14 +23,14 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(25685) then
+	if args.spellId == 25685 then
 		timerStoneformDur:Start()
 		warnStoneform:Show()
 	end
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(25685) then
+	if args.spellId == 25685 then
 		timerStoneform:Start()
 		warnStoneformSoon:Schedule(80)
 	end

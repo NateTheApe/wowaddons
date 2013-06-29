@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(155, "DBM-ThroneFourWinds", nil, 75)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 65 $"):sub(12, -3))
 mod:SetCreatureID(46753)
 mod:SetModelID(35248)
 mod:SetZone()
@@ -14,7 +14,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED_DOSE",
 	"SPELL_AURA_REMOVED",
 	"SPELL_CAST_START",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_SPELLCAST_SUCCEEDED boss1"
 )
 
 --Classes that can drop stacks of acid rain, but only if they can time AMS/bubble right, they use it wrong and they do no good.
@@ -60,11 +60,6 @@ mod:AddBoolOption("RangeFrame", true)
 
 local phase2Started = false
 local strikeStarted = false
-local squallName = GetSpellInfo(91129)
-local iceName = GetSpellInfo(88239)
-local stormlingName = GetSpellInfo(88272)
-local acidName = GetSpellInfo(88290)
-local cloudsName = GetSpellInfo(89639)
 
 function mod:CloudRepeat()
 	self:UnscheduleMethod("CloudRepeat")
@@ -103,7 +98,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(87904, 101458, 101459, 101460) then
+	if args.spellId == 87904 then
 		warnFeedback:Show(args.destName, args.amount or 1)
 		timerFeedback:Cancel()--prevent multiple timers spawning with diff args.
 		countdownFeedback:Cancel()
@@ -114,11 +109,11 @@ function mod:SPELL_AURA_APPLIED(args)
 			timerFeedback:Start(20, args.amount or 1)
 			countdownFeedback:Start(20)
 		end
-	elseif args:IsSpellID(88301, 93279, 93280, 93281) then--Acid Rain (phase 2 debuff)
+	elseif args.spellId == 88301 then--Acid Rain (phase 2 debuff)
 		if args.amount and args.amount > 1 and args:IsPlayer() then
 			warnAcidRain:Show(args.amount)
 		end
-	elseif args:IsSpellID(89668) then
+	elseif args.spellId == 89668 then
 		warnLightningRod:Show(args.destName)
 		timerLightningRod:Show(args.destName)
 		timerLightningRodCD:Start()
@@ -139,7 +134,7 @@ end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(89668) then
+	if args.spellId == 89668 then
 		timerLightningRod:Cancel(args.destName)
 		if self.Options.LightningRodIcon then
 			self:SetIcon(args.destName, 0)
@@ -153,38 +148,38 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(87770, 93261, 93262, 93263) then--Phase 1 wind burst
+	if args.spellId == 87770 then--Phase 1 wind burst
 		warnWindBurst:Show()
 		specWarnWindBurst:Show()
 		timerWindBurstCD:Start()
 		if self:IsDifficulty("heroic10", "heroic25") then
-			timerWindBurst:Start(4)--4 second cast on heroic according to wowhead.
+			timerWindBurst:Start(4)
 		else
 			timerWindBurst:Start()
 		end
 	end
 end
 
-function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 88858 or spellId == 93286 or spellId == 93287 or spellId == 93288) and self:AntiSpam(5, 1) then--Phase 3 wind burst, does not use cast success
+function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if spellId == 88858 and self:AntiSpam(5, 1) then--Phase 3 wind burst, does not use cast success
 		warnWindBurst:Show()
 		timerWindBurstCD:Start(20)
-	elseif (spellId == 89588 or spellId == 93299 or spellId == 93298 or spellId == 93297) and destGUID == UnitGUID("player") and self:AntiSpam(3, 2) then--Phase 3 Clouds
+	elseif spellId == 89588 and destGUID == UnitGUID("player") and self:AntiSpam(3, 2) then--Phase 3 Clouds
 		specWarnCloud:Show()
 	end
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
-function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 91020 or spellId == 93258 or spellId == 93259 or spellId == 93260) and destGUID == UnitGUID("player") and self:AntiSpam(4, 1) then--Phase 1 Ice Storm
+function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if spellId == 91020 and destGUID == UnitGUID("player") and self:AntiSpam(4, 1) then--Phase 1 Ice Storm
 		specWarnIceStorm:Show()
 	end
 end
 mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellId)
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 --	"<42.5> [CAST_SUCCEEDED] Al'Akir:Possible Target<Erej>:boss1:Squall Line::0:91129", -- [870]
-	if spellName == squallName and self:AntiSpam(2, 3) then -- Squall Line (Tornados)
+	if spellId == 91129 and self:AntiSpam(2, 3) then -- Squall Line (Tornados)
 		warnSquallLine:Show()
 		if not phase2Started then
 			timerSquallLineCD:Start(30)--Seems like a longer CD in phase 1? That or had some electrocute and windburst delays, need more data.
@@ -192,15 +187,15 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellId)
 			timerSquallLineCD:Start()
 		end
 --	"<37.6> [CAST_SUCCEEDED] Al'Akir:Possible Target<Erej>:boss1:Ice Storm::0:88239", -- [462]
-	elseif spellName == iceName and self:AntiSpam(2, 4) then -- Ice Storm (Phase 1)
+	elseif spellId == 88239 and self:AntiSpam(2, 4) then -- Ice Storm (Phase 1)
 		warnIceStorm:Show()
 		timerIceStormCD:Start()
 --	"<94.2> [CAST_SUCCEEDED] Al'Akir:Possible Target<Erej>:boss1:Stormling::0:88272", -- [5155]
-	elseif spellName == stormlingName and self:AntiSpam(2, 4) then -- Summon Stormling (Phase 2 add)
+	elseif spellId == 88272 and self:AntiSpam(2, 4) then -- Summon Stormling (Phase 2 add)
 		warnAdd:Show()
 		timerAddCD:Start()
 --	"<83.2> [CAST_SUCCEEDED] Al'Akir:Possible Target<Erej>:boss1:Acid Rain::0:101452", -- [4307]
-	elseif spellName == acidName and self:AntiSpam(2, 5) then -- Acid Rain
+	elseif spellId == 101452 and self:AntiSpam(2, 5) then -- Acid Rain
 		if self:IsDifficulty("normal10", "normal25") then
 			timerAcidRainStack:Start(20)
 		else
@@ -222,7 +217,7 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName, _, _, spellId)
 		timerAcidRainStack:Cancel()
 		self:UnregisterShortTermEvents()
 --	"<244.5> [CAST_SUCCEEDED] Al'Akir:Possible Target<nil>:boss1:Lightning Clouds::0:93304", -- [19368]
-	elseif spellName == cloudsName and self:AntiSpam(2, 3) then -- Phase 3 Lightning cloud trigger (only cast once)
+	elseif spellId == 93304 and self:AntiSpam(2, 3) then -- Phase 3 Lightning cloud trigger (only cast once)
 		self:CloudRepeat()
 		--Only needed in phase 2
 		self:RegisterShortTermEvents(

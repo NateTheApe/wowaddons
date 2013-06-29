@@ -1,13 +1,14 @@
 local mod	= DBM:NewMod("BrawlRank3", "DBM-Brawlers")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8312 $"):sub(12, -3))
---mod:SetCreatureID(60491)
+mod:SetRevision(("$Revision: 9770 $"):sub(12, -3))
 mod:SetModelID(28649)
 mod:SetZone()
+mod:SetUsedIcons(8)
 
 mod:RegisterEvents(
-	"SPELL_CAST_START"
+	"SPELL_CAST_START",
+	"UNIT_TARGET"
 )
 
 local warnPyroblast				= mod:NewCastAnnounce(33975, 3)--Hits fairly hard, interruptable, not make or break though. So no special warning. If it hits you you won't wipe.
@@ -22,24 +23,34 @@ local timerDevastatingThrustCD	= mod:NewCDTimer(12, 134777)--Need more data to v
 
 mod:RemoveOption("HealthFrame")
 mod:RemoveOption("SpeedKillTimer")
+mod:AddBoolOption("SetIconOnBlat", true)
 
 local brawlersMod = DBM:GetModByName("Brawlers")
+local blatGUID = 0
 
 function mod:SPELL_CAST_START(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if args:IsSpellID(33975) then--Spellid is used by 5 diff mobs in game, but SetZone sould filter the other 4 mobs.
+	if args.spellId == 33975 or args.spellId == 136334 then--Spellid is used by 5 diff mobs in game, but SetZone sould filter the other 4 mobs.
 		warnPyroblast:Show()
-	elseif args:IsSpellID(132666) then
+	elseif args.spellId == 132666 then
 		warnFireWall:Show()
 		timerFirewallCD:Start()--First one is 5 seconds after combat start
 		if brawlersMod:PlayerFighting() then
 			specWarnFireWall:Show()
 		end
-	elseif args:IsSpellID(134777) then
+	elseif args.spellId == 134777 then
 		warnDevastatingThrust:Show()
 		timerDevastatingThrustCD:Start()--First one is 7-8 seconds after combat start
 		if brawlersMod:PlayerFighting() then
 			specWarnDevastatingThrust:Show()
 		end
+	elseif args.spellId == 133302 then--Blat splitting
+		blatGUID = args.sourceGUID
+	end
+end
+
+function mod:UNIT_TARGET()
+	if self.Options.SetIconOnBlat and not DBM.Options.DontSetIcons and UnitGUID("target") == blatGUID then
+		SetRaidTarget("target", 8)
 	end
 end

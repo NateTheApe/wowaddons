@@ -1,14 +1,14 @@
 local mod	= DBM:NewMod("Lanathel", "DBM-Icecrown", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 58 $"):sub(12, -3))
 mod:SetCreatureID(37955)
 mod:SetModelID(31165)
 mod:SetUsedIcons(4, 5, 6, 7, 8)
 
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_REMOVED",
 	"SPELL_CAST_SUCCESS",
@@ -32,6 +32,7 @@ local specWarnBloodBolt				= mod:NewSpecialWarningSpell(71772)
 local specWarnPactDarkfallen		= mod:NewSpecialWarningYou(71340)
 local specWarnEssenceoftheBloodQueen= mod:NewSpecialWarningYou(70867)
 local specWarnBloodthirst			= mod:NewSpecialWarningYou(70877)
+local yellBloodthirst				= mod:NewYell(70877, L.YellFrenzy)
 local specWarnSwarmingShadows		= mod:NewSpecialWarningMove(71266)
 local specWarnMindConrolled			= mod:NewSpecialWarningTarget(70923, mod:IsTank())
 
@@ -88,7 +89,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(71340) then		--Pact of the Darkfallen
+	if args.spellId == 71340 then		--Pact of the Darkfallen
 		pactTargets[#pactTargets + 1] = args.destName
 		if args:IsPlayer() then
 			specWarnPactDarkfallen:Show()
@@ -108,20 +109,18 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.BloodMirrorIcon then
 			self:SetIcon(args.destName, 7)
 		end
-	elseif args:IsSpellID(70877, 71474) then
+	elseif args.spellId == 70877 then
 		warnBloodthirst:Show(args.destName)
 		if args:IsPlayer() then
 			specWarnBloodthirst:Show()
-			if self.Options.YellOnFrenzy then
-				SendChatMessage(L.YellFrenzy, "SAY")
-			end
+			yellBloodthirst:Yell()
 			if self:IsDifficulty("normal10", "heroic10") then
 				timerBloodThirst:Start(15)--15 seconds on 10 man
 			else
 				timerBloodThirst:Start()--10 seconds on 25 man
 			end
 		end
-	elseif args:IsSpellID(70867, 70879, 71473, 71525) or args:IsSpellID(71530, 71531, 71532, 71533) then	--Essence of the Blood Queen
+	elseif args:IsSpellID(70867, 70879) then	--Essence of the Blood Queen
 		warnEssenceoftheBloodQueen:Show(args.destName)
 		if args:IsPlayer() then
 			specWarnEssenceoftheBloodQueen:Show()
@@ -133,17 +132,17 @@ function mod:SPELL_AURA_APPLIED(args)
 				warnBloodthirstSoon:Schedule(55)
 			end
 		end
-	elseif args:IsSpellID(70923) then
+	elseif args.spellId == 70923 then
 		warnMindControlled:Show(args.destName)
 		specWarnMindConrolled:Show(args.destName)
-	elseif args:IsSpellID(71772) then
+	elseif args.spellId == 71772 then
 		specWarnBloodBolt:Show()
 		timerBloodBolt:Start()
 	end
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(71340) then				--Pact of the Darkfallen
+	if args.spellId == 71340 then				--Pact of the Darkfallen
 		if self.Options.SetIconOnDarkFallen then
 			self:SetIcon(args.destName, 0)		--Clear icon once you got to where you are supposed to be
 		end
@@ -151,7 +150,7 @@ function mod:SPELL_AURA_REMOVED(args)
 		if self.Options.BloodMirrorIcon then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(70877, 71474) then
+	elseif args.spellId == 70877 then
 		if args:IsPlayer() then
 			timerBloodThirst:Cancel()
 		end
@@ -159,7 +158,7 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(73070) then				--Incite Terror (fear before air phase)
+	if args.spellId == 73070 then				--Incite Terror (fear before air phase)
 		warnInciteTerror:Show()
 		timerInciteTerror:Start()
 		timerNextSwarmingShadows:Start()--This resets the swarming shadows timer
@@ -172,14 +171,14 @@ function mod:SPELL_CAST_SUCCESS(args)
 	end
 end
 
-function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 71726 or spellId == 71727 or spellId == 71728 or spellId == 71729 or spellId == 70946 or spellId == 71475 or spellId == 71476 or spellId == 71477) and self:GetCIDFromGUID(sourceGUID) == 37955 then	-- Vampric Bite (first bite only, hers)
+function mod:SPELL_DAMAGE(sourceGUID, _, _, _, _, destName, _, _, spellId)
+	if (spellId == 71726 or spellId == 70946) and self:GetCIDFromGUID(sourceGUID) == 37955 then	-- Vampric Bite (first bite only, hers)
 		warnVampricBite:Show(destName)
 	end
 end
 
-function mod:SPELL_PERIODIC_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 71277 or spellId == 72638 or spellId == 72639 or spellId == 72640) and destGUID == UnitGUID("player") and self:AntiSpam() then		--Swarn of Shadows (spell damage, you're standing in it.)
+function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if spellId == 71277 and destGUID == UnitGUID("player") and self:AntiSpam() then		--Swarn of Shadows (spell damage, you're standing in it.)
 		specWarnSwarmingShadows:Show()
 	end
 end
@@ -187,6 +186,7 @@ mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg:match(L.SwarmingShadows) then
+		local target = DBM:GetFullNameByShortName(target)
 		warnSwarmingShadows:Show(target)
 		timerNextSwarmingShadows:Start()
 		if target == UnitName("player") then

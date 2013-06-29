@@ -1,9 +1,8 @@
 local mod	= DBM:NewMod(688, "DBM-Party-MoP", 9, 316)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8292 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 9469 $"):sub(12, -3))
 mod:SetCreatureID(59789)
-mod:SetModelID(27705)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
@@ -25,7 +24,7 @@ local specWarnFallenCrusader	= mod:NewSpecialWarningSwitch("ej5863", not mod:IsH
 local specWarnEmpoweredSpirit	= mod:NewSpecialWarningSwitch("ej5869", not mod:IsHealer())--These need to die before they become zombies. Cannot see a way in combat log to detect target, i'll have to watch for target scanning next time to warn that player to run away from dead crusaders.
 
 local timerEvictSoul			= mod:NewTargetTimer(6, 115297)
-local timerEvictSoulCD			= mod:NewNextTimer(41, 115297)
+local timerEvictSoulCD			= mod:NewCDTimer(41, 115297)
 local timerRaiseCrusadeCD		= mod:NewNextTimer(60, 115139)--Both of these are 40 second cds in challenge modes
 local timerSummonSpiritsCD		= mod:NewNextTimer(60, 115147)--Although correction is only needed in one spot
 
@@ -48,13 +47,13 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(115297) then--Trigger CD off success, since we can resist it. do NOT add ID 115548, it's a similcast to 115297
+	if args.spellId == 115297 then--Trigger CD off success, since we can resist it. do NOT add ID 115548, it's a similcast to 115297
 		timerEvictSoulCD:Start()
-	elseif args:IsSpellID(115147) then--Summon Empowering Spirits
+	elseif args.spellId == 115147 then--Summon Empowering Spirits
 		warnSummonSpirits:Show()
 		specWarnEmpoweredSpirit:Show()
 		timerRaiseCrusadeCD:Start(20)--Raise crusaders always 20 seconds after spirits in all modes
-	elseif args:IsSpellID(115139) then--Raise Fallen Crusade
+	elseif args.spellId == 115139 then--Raise Fallen Crusade
 		warnRaiseCrusade:Show()
 		specWarnFallenCrusader:Show()
 		if self:IsDifficulty("challenge5") then
@@ -66,7 +65,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:SPELL_SUMMON(args)
-	if args:IsSpellID(115250) then--Empower Zombie (used by empowering Spirits on fallen Crusaders to make them hulking hard hitting zombies)
+	if args.spellId == 115250 then--Empower Zombie (used by empowering Spirits on fallen Crusaders to make them hulking hard hitting zombies)
 		warnEmpowerZombie:Show()
 	end
 end

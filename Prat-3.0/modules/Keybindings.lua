@@ -111,7 +111,7 @@ Prat:AddModuleToLoad(function()
 	["Channel %d"] = "Kanal %d",
 	["Copy Selected Chat Frame"] = "Kopiere ausgewählte Chat-Rahmen",
 	["Guild Channel"] = "Gildenkanal",
-	["Instance Channel"] = "Schlachtfeld-Kanal", -- Needs review
+	["Instance Channel"] = "Schlachtfeld-Kanal",
 	["Next Chat Tab"] = "Nächster Chat-Tab",
 	["Officer Channel"] = "Offizierskanal",
 	["Party Channel"] = "Gruppenkanal",
@@ -177,7 +177,7 @@ Prat:AddModuleToLoad(function()
 	["Channel %d"] = "Канал %d",
 	["Copy Selected Chat Frame"] = "Копирование выбранного окна чата",
 	["Guild Channel"] = "Канал Гильдии",
-	["Instance Channel"] = "Канал полей сражений", -- Needs review
+	["Instance Channel"] = "Канал Подземелий",
 	["Next Chat Tab"] = "Следующее окно чата",
 	["Officer Channel"] = "Офицерский Канал",
 	["Party Channel"] = "Канал Группы",

@@ -228,8 +228,8 @@ L:AddLocale("ruRU",
 	["Set Position"] = "Положение",
 	["Sets position of chat menu and arrows for all chat windows."] = "Установить положение стрелок и кнопок чата для всех окон.",
 	["Show Arrows"] = "Показывать стрелки",
-	showbnet_desc = "Показать меню Общение", -- Needs review
-	showbnet_name = "Показать меню Общение", -- Needs review
+	showbnet_desc = "Показать меню Общение",
+	showbnet_name = "Показать меню Общение",
 	["Show Chat%d Arrows"] = "Показывать стрелки %d чата",
 	showmenu_desc = "Отображать меню команд",
 	showmenu_name = "Отображать меню",

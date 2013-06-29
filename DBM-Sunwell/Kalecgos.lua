@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Kal", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 459 $"):sub(12, -3))
 mod:SetCreatureID(24850)
 mod:SetModelID(26628)
 mod:SetZone()
@@ -66,37 +66,43 @@ end
 
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(44987) and args:IsPlayer() and self:IsHealer() then
+	if args.spellId == 44987 and args:IsPlayer() and self:IsHealer() then
 		specWarnWildMagic:Show(L.Heal)
-	elseif args:IsSpellID(45001) and args:IsPlayer() then
+	elseif args.spellId == 45001 and args:IsPlayer() then
 		specWarnWildMagic:Show(L.Haste)
-	elseif args:IsSpellID(45002) and args:IsPlayer() and self:IsMelee() then
+	elseif args.spellId == 45002 and args:IsPlayer() and self:IsMelee() then
 		specWarnWildMagic:Show(L.Hit)
-	elseif args:IsSpellID(45004) and args:IsPlayer() and not self:IsHealer() then
+	elseif args.spellId == 45004 and args:IsPlayer() and not self:IsHealer() then
 		specWarnWildMagic:Show(L.Crit)
-	elseif args:IsSpellID(45006) and args:IsPlayer() and not self:IsHealer() then
+	elseif args.spellId == 45006 and args:IsPlayer() and not self:IsHealer() then
 		specWarnWildMagic:Show(L.Aggro)
-	elseif args:IsSpellID(45010) and args:IsPlayer() then
+	elseif args.spellId == 45010 and args:IsPlayer() then
 		specWarnWildMagic:Show(L.Mana)
-	elseif args:IsSpellID(45018) and self:AntiSpam(2, 1) then
+	elseif args.spellId == 45018 and self:AntiSpam(2, 1) then
 		warnBuffet:Show()
 		timerBuffetCD:Start()
-	elseif args:IsSpellID(45029) then
+	elseif args.spellId == 45029 then
 		warnCorrupt:Show(args.destName)
-	elseif args:IsSpellID(46021) then
+	elseif args.spellId == 46021 then
 		if args:IsPlayer() then
 			timerPorted:Start()
 			timerExhausted:Schedule(60)
 		end
 		if self:AntiSpam(20, 2) then
 			local grp, class
-			for i = 1, DBM:GetGroupMembers() do
-				local name, _, subgroup, _, _, fileName = GetRaidRosterInfo(i)
-				if name == args.destName then
-					grp = subgroup
-					class = fileName
-					break
+			if IsInGroup() then
+				for i = 1, DBM:GetNumGroupMembers() do
+					local name, _, subgroup, _, _, fileName = GetRaidRosterInfo(i)
+					if name == args.destName then
+						grp = subgroup
+						class = fileName
+						break
+					end
 				end
+			else
+				-- solo raid
+				grp = 0
+				class = select(2, UnitClass("player"))
 			end
 			self:AddEntry(("%s (%d)"):format(args.destName, grp or 0), class)
 			warnPortal:Show(portCount, args.destName, grp or 0)
@@ -109,7 +115,7 @@ end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(44799) then
+	if args.spellId == 44799 then
 		warnBreath:Show()
 		timerBreathCD:Start()
 	end
@@ -121,12 +127,16 @@ function mod:UNIT_DIED(args)
 	end
 	if bit.band(args.destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 then
 		local grp
-		for i = 1, DBM:GetGroupMembers() do
-			local name, _, subgroup = GetRaidRosterInfo(i)
-			if name == args.destName then
-				grp = subgroup
-				break
+		if IsInGroup() then
+			for i = 1, DBM:GetNumGroupMembers() do
+				local name, _, subgroup = GetRaidRosterInfo(i)
+				if name == args.destName then
+					grp = subgroup
+					break
+				end
 			end
+		else
+			grp = 0
 		end
 		self:RemoveEntry(("%s (%d)"):format(args.destName, grp or 0))
 	end

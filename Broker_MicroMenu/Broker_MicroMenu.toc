@@ -1,12 +1,12 @@
-## Interface: 50001
+## Interface: 50200
 ## Title: Broker: |cff00ff00MicroMenu|r 
-## Version: v1.3.2
+## Version: v1.3.4
 ## Notes: Shows the mirco menu and game menu in a clickable broker tooltip.
 ## Author: yess
 ## X-eMail: starfire@fantasymail.de
 ## OptionalDeps: LibQTip-1.0
 ## SavedVariables: Broker_MicroMenuDB
-## X-Curse-Packaged-Version: v1.3.2
+## X-Curse-Packaged-Version: v1.3.4
 ## X-Curse-Project-Name: Broker_MicroMenu
 ## X-Curse-Project-ID: broker_micromenue
 ## X-Curse-Repository-ID: wow/broker_micromenue/mainline

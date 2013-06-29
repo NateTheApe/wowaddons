@@ -120,8 +120,8 @@ Prat:AddModuleToLoad(function()
   )
   L:AddLocale("ruRU",
   {
-	allevents_desc = "Обрабатывать Prat'ом все сообщения в чате.", -- Needs review
-	allevents_name = "Обрабатывать все сообщения", -- Needs review
+	allevents_desc = "Обрабатывать Prat'ом все сообщения в чате.",
+	allevents_name = "Обрабатывать все сообщения",
 	["Chat window event name options."] = "Настройки названий событий в окне чата.",
 	EventNames = true,
 	Show = "Отображать",

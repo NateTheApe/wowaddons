@@ -1,128 +1,342 @@
-local L, config = OneRingLib.lang, {buttonTemplate = "UIPanelButtonTemplate"}
-do -- ext.config
-	local function onShowRestore()
-		InterfaceOptionsFrame:SetFrameStrata("HIGH");
-	end
-	local function onShowRefresh(self)
-		InterfaceOptionsFrame:SetFrameStrata("HIGH");
-		self:refresh();
-	end
-	function config.createFrame(name, parent, refreshOnShow)
-		local frame = CreateFrame("Frame", nil, UIParent);
-			frame.name, frame.parent = name, parent; InterfaceOptions_AddCategory(frame); frame:Hide();
-		frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
-			frame.title:SetPoint("TOPLEFT", 16, -16); frame.title:SetText(name);
-		frame.version = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
-			frame.version:SetPoint("TOPRIGHT", -16, -16);
-		frame.desc = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
-			frame.desc:SetPoint("TOPLEFT", frame.title, "BOTTOMLEFT", 0, -8);
-			frame.desc:SetPoint("RIGHT", -32, 0);
-			frame.desc:SetJustifyV("TOP")
-			frame.desc:SetJustifyH("LEFT");
-			frame.desc:SetWordWrap(1);
-		frame:SetScript("OnShow", refreshOnShow and onShowRefresh or onShowRestore);
-		frame:Hide();
-		return frame;
-	end
-	do -- undo
-		local undoStack = {};
-		function config.unwindUndo()
-			local entry;
-			for i=#undoStack,1,-1 do
-				entry, undoStack[i] = undoStack[i];
-				EC_pcall("OPC.Undo", "[" .. entry.key .. "]", entry.func, unpack(entry, 1, entry.n));
+local L, config = OneRingLib.lang, {}
+OneRingLib.ext.config = config
+function config.createFrame(name, parent)
+	local frame = CreateFrame("Frame", nil, UIParent)
+		frame.name, frame.parent = name, parent
+	frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+		frame.title:SetPoint("TOPLEFT", 16, -16)
+		frame.title:SetText(name)
+	frame.version = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		frame.version:SetPoint("TOPRIGHT", -16, -16)
+	frame.desc = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		frame.desc:SetPoint("TOPLEFT", frame.title, "BOTTOMLEFT", 0, -8)
+		frame.desc:SetPoint("RIGHT", -32, 0)
+		frame.desc:SetJustifyV("TOP")
+		frame.desc:SetJustifyH("LEFT")
+		frame.desc:SetWordWrap(1)
+	InterfaceOptions_AddCategory(frame)
+	frame:Hide()
+	return frame
+end
+do -- ext.config.ui
+	local multilineInput do
+		local function onNavigate(self, x,y, w,h)
+			local scroller = self.scroll
+			local occH, occP, y = scroller:GetHeight(), scroller:GetVerticalScroll(), -y
+			if occP > y then
+				occP = y -- too far
+			elseif (occP + occH) < (y+h) then
+				occP = y+h-occH -- not far enough
+			else
+				return
 			end
+			scroller:SetVerticalScroll(occP)
+			local _, mx = scroller.ScrollBar:GetMinMaxValues()
+			scroller.ScrollBar:SetMinMaxValues(0, occP < mx and mx or occP)
+			scroller.ScrollBar:SetValue(occP)
 		end
-		function config.clearUndo()
-			table.wipe(undoStack);
+		local function onClick(self)
+			self.input:SetFocus()
 		end
-		function config.pushUndo(key, func, ...)
-			if key ~= "Profile" then
-				for i=#undoStack,1,-1 do
-					if undoStack[i].key == key then
-						return;
-					elseif undoStack[i].key == "Profile" then
-						break;
-					end
+		function multilineInput(name, parent, width)
+			local scroller = CreateFrame("ScrollFrame", name .. "Scroll", parent, "UIPanelScrollFrameTemplate")
+			local input = CreateFrame("Editbox", name, scroller)
+			input:SetWidth(width)
+			input:SetMultiLine(true)
+			input:SetAutoFocus(false)
+			input:SetTextInsets(2,4,0,2)
+			input:SetFontObject(GameFontHighlight)
+			input:SetScript("OnCursorChanged", onNavigate)
+			scroller:EnableMouse(1)
+			scroller:SetScript("OnMouseDown", onClick)
+			scroller:SetScrollChild(input)
+			input.scroll, scroller.input = scroller, input
+			return input, scroller
+		end
+	end
+	local function lineInput(parent, common, width)
+		local input = CreateFrame("EditBox", nil, parent)
+		input:SetAutoFocus(nil) input:SetSize(width or 150, 20)
+		input:SetFontObject(ChatFontNormal)
+		input:SetScript("OnEscapePressed", input.ClearFocus)
+		local l, m, r = input:CreateTexture(nil, "BACKGROUND"), input:CreateTexture(nil, "BACKGROUND"), input:CreateTexture(nil, "BACKGROUND")
+		l:SetSize(common and 8 or 32, common and 20 or 32) l:SetPoint("LEFT", common and -5 or -10, 0)
+		l:SetTexture(common and "Interface\\Common\\Common-Input-Border" or "Interface\\ChatFrame\\UI-ChatInputBorder-Left2")
+		r:SetSize(common and 8 or 32, common and 20 or 32) r:SetPoint("RIGHT", common and 0 or 10, 0)
+		r:SetTexture(common and "Interface\\Common\\Common-Input-Border" or "Interface\\ChatFrame\\UI-ChatInputBorder-Right2")
+		m:SetHeight(common and 20 or 32) m:SetPoint("LEFT", l, "RIGHT") m:SetPoint("RIGHT", r, "LEFT")
+		m:SetTexture(common and "Interface\\Common\\Common-Input-Border" or "Interface\\ChatFrame\\UI-ChatInputBorder-Mid2")
+		if common then
+			l:SetTexCoord(0,1/16, 0,5/8)
+			r:SetTexCoord(15/16,1, 0,5/8)
+			m:SetTexCoord(1/16,15/16, 0,5/8)
+		else
+			m:SetHorizTile(true)
+		end
+		return input
+	end
+	config.ui = {multilineInput=multilineInput, lineInput=lineInput}
+end
+do -- ext.config.bind
+	local unbindMap, activeCaptureButton = {};
+	local alternateFrame = CreateFrame("Frame", nil, UIParent) do
+		alternateFrame:SetBackdrop({ bgFile="Interface/ChatFrame/ChatFrameBackground", edgeFile="Interface/DialogFrame/UI-DialogBox-Border", tile=true, tileSize=32, edgeSize=32, insets={left=11, right=11, top=12, bottom=10}})
+		alternateFrame:SetWidth(350) alternateFrame:SetHeight(115)
+		alternateFrame:SetBackdropColor(0,0,0, 0.85)
+		alternateFrame:EnableMouse()
+		alternateFrame:SetScript("OnHide", alternateFrame.Hide)
+	 	alternateFrame.caption = alternateFrame:CreateFontString("OVERLAY", nil, "GameFontHighlightSmall")
+		alternateFrame.caption:SetPoint("TOPLEFT", 13, -12)
+		local input, scroll = config.ui.multilineInput("OPC_AlternateBindInput", alternateFrame, 305)
+		alternateFrame.input, alternateFrame.scroll = input, scroll
+		scroll:SetPoint("TOPLEFT", 10, -28)
+		scroll:SetPoint("BOTTOMRIGHT", -33, 10)
+		input:SetMaxBytes(1023)
+		input:SetScript("OnEscapePressed", function() alternateFrame:Hide() end)
+		input:SetScript("OnChar", function(self, c)
+			if c == "\n" then
+				local bind = strtrim((self:GetText():gsub("[\r\n]", "")))
+				if bind ~= "" then
+					alternateFrame.apiFrame.SetBinding(alternateFrame.owner, bind)
 				end
+				alternateFrame:Hide()
 			end
-			table.insert(undoStack, {key=key, func=func, n=select("#", ...), ...});
+		end)
+	end
+	local function MapMouseButton(button)
+		if button == "MiddleButton" then return "BUTTON3" end
+		if type(button) == "string" and (tonumber(button:match("^Button(%d+)"))) or 1 > 3 then
+			return button:upper();
 		end
 	end
-	do -- bind
-		local unbindMap, activeCaptureButton = {};
-		local function MapMouseButton(button)
-			if button == "MiddleButton" then return "BUTTON3" end
-			if type(button) == "string" and (tonumber(button:match("^Button(%d+)"))) or 1 > 3 then
-				return button:upper();
-			end
-		end
-		local function Deactivate(self)
-			self:UnlockHighlight(); self:EnableKeyboard(false);
-			self:SetScript("OnKeyDown", nil); self:SetScript("OnHide", nil);
-			activeCaptureButton = activeCaptureButton ~= self and activeCaptureButton or nil;
-			if unbindMap[self:GetParent()] then unbindMap[self:GetParent()]:Disable(); end
-			return self
-		end
-		local function SetBind(self, bind)
-			if not (bind and (bind:match("^[LR]?ALT$") or bind:match("^[LR]?CTRL$") or bind:match("^[LR]?SHIFT$"))) then
-				Deactivate(self);
-				if bind == "ESCAPE" then return; end
-				local bind, p = bind and ((IsAltKeyDown() and "ALT-" or "") ..  (IsControlKeyDown() and "CTRL-" or "") .. (IsShiftKeyDown() and "SHIFT-" or "") .. bind), self:GetParent();
-				if p and type(p.SetBinding) == "function" then p.SetBinding(self, bind); end
-			end
-		end
-		local function OnClick(self, button)
-			if activeCaptureButton then
-				local deactivated, mappedButton = Deactivate(activeCaptureButton), MapMouseButton(button);
-				if deactivated == self and (mappedButton or button == "RightButton") then SetBind(self, mappedButton); end
-				if deactivated == self then return; end
-			end
-			if IsAltKeyDown() and activeCaptureButton == nil and self:GetParent().OnAltClick then return self:GetParent().OnAltClick(self, button); end
-			activeCaptureButton = self;
-			self:LockHighlight();	self:EnableKeyboard(true);
-			self:SetScript("OnKeyDown", SetBind); self:SetScript("OnHide", Deactivate);
-			if unbindMap[self:GetParent()] then unbindMap[self:GetParent()]:Enable(); end
-		end
-		local function UnbindClick(self)
-			if activeCaptureButton and unbindMap[activeCaptureButton:GetParent()] == self then
-				local p = activeCaptureButton:GetParent();
-				if p and type(p.SetBinding) == "function" then p.SetBinding(activeCaptureButton, false); end
-				Deactivate(activeCaptureButton);
-			end
-		end
-		local function IsCapturingBinding(self)
-			return activeCaptureButton == self;
-		end
-		local function bindNameLookup(capture) return _G["KEY_" .. capture]; end
-		local function bindFormat(bind)
-			return bind and bind ~= "" and bind:gsub("[^%-]+$", bindNameLookup) or L"Not bound";
-		end
-		config.bindingFormat = bindFormat
-		local function SetBindingText(self, bind, pre, post)
-			if type(bind) == "string" and bind:match("%b[]") then
-				return SetBindingText(self, SecureCmdOptionParse(bind), pre, post or " |cff20ff20[+]|r")
-			end
-			return self:SetText((pre or "") .. bindFormat(bind) .. (post or ""))
-		end
-		function config.createBindingButton(name, parent)
-			local btn = CreateFrame("Button", name, parent, config.buttonTemplate);
-			btn:SetSize(120, 22); btn:RegisterForClicks("AnyUp"); btn:SetScript("OnClick", OnClick);
-			btn:SetText(" "); btn:GetFontString():SetMaxLines(1);
-			btn.IsCapturingBinding, btn.SetBindingText = IsCapturingBinding, SetBindingText;
-			return btn, unbindMap[parent];
-		end
-		function config.createUnbindButton(name, parent)
-			local btn = CreateFrame("Button", name, parent, config.buttonTemplate);
-			btn:Disable(); btn:SetSize(120, 22); unbindMap[parent] = btn;
-			btn:SetScript("OnClick", UnbindClick);
-			return btn;
+	local function Deactivate(self)
+		self:UnlockHighlight(); self:EnableKeyboard(false);
+		self:SetScript("OnKeyDown", nil); self:SetScript("OnHide", nil);
+		activeCaptureButton = activeCaptureButton ~= self and activeCaptureButton or nil;
+		if unbindMap[self:GetParent()] then unbindMap[self:GetParent()]:Disable(); end
+		return self
+	end
+	local function SetBind(self, bind)
+		if not (bind and (bind:match("^[LR]?ALT$") or bind:match("^[LR]?CTRL$") or bind:match("^[LR]?SHIFT$"))) then
+			Deactivate(self);
+			if bind == "ESCAPE" then return; end
+			local bind, p = bind and ((IsAltKeyDown() and "ALT-" or "") ..  (IsControlKeyDown() and "CTRL-" or "") .. (IsShiftKeyDown() and "SHIFT-" or "") .. bind), self:GetParent();
+			if p and type(p.SetBinding) == "function" then p.SetBinding(self, bind); end
 		end
 	end
-	OneRingLib.ext.config = config;
+	local function OnClick(self, button)
+		PlaySound("UChatScrollButton")
+		if activeCaptureButton then
+			local deactivated, mappedButton = Deactivate(activeCaptureButton), MapMouseButton(button);
+			if deactivated == self and (mappedButton or button == "RightButton") then SetBind(self, mappedButton); end
+			if deactivated == self then return; end
+		end
+		if IsAltKeyDown() and activeCaptureButton == nil and self:GetParent().OnBindingAltClick then
+			return self:GetParent().OnBindingAltClick(self, button);
+		end
+		activeCaptureButton = self;
+		self:LockHighlight();	self:EnableKeyboard(true);
+		self:SetScript("OnKeyDown", SetBind); self:SetScript("OnHide", Deactivate);
+		if unbindMap[self:GetParent()] then unbindMap[self:GetParent()]:Enable(); end
+	end
+	local function UnbindClick(self)
+		if activeCaptureButton and unbindMap[activeCaptureButton:GetParent()] == self then
+			local p, button = activeCaptureButton:GetParent(), activeCaptureButton;
+			if p and type(p.SetBinding) == "function" then p.SetBinding(activeCaptureButton, false); end
+			PlaySound("UChatScrollButton")
+			Deactivate(button)
+		end
+	end
+	local function IsCapturingBinding(self)
+		return activeCaptureButton == self;
+	end
+	local function bindNameLookup(capture) return _G["KEY_" .. capture]; end
+	local function bindFormat(bind)
+		return bind and bind ~= "" and bind:gsub("[^%-]+$", bindNameLookup) or L"Not bound";
+	end
+	config.bindingFormat = bindFormat
+	local function SetBindingText(self, bind, pre, post)
+		if type(bind) == "string" and bind:match("%b[]") then
+			return SetBindingText(self, SecureCmdOptionParse(bind), pre, post or " |cff20ff20[+]|r")
+		end
+		return self:SetText((pre or "") .. bindFormat(bind) .. (post or ""))
+	end
+	local function ToggleAlternateEditor(self, bind, caption)
+		if alternateFrame:IsShown() and alternateFrame.owner == self then
+			alternateFrame:Hide()
+		else
+			alternateFrame.apiFrame, alternateFrame.owner = self:GetParent(), self
+			alternateFrame.caption:SetText(caption or "")
+			alternateFrame.input:SetText(bind or "")
+			alternateFrame:SetParent(self)
+			alternateFrame:SetFrameLevel(self:GetFrameLevel()+10)
+			if self:GetLeft()+(self:GetWidth()-alternateFrame:GetWidth())/2 < self:GetParent():GetLeft() then
+				alternateFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -8, 4)
+			else
+				alternateFrame:SetPoint("TOP", self, "BOTTOM", 0, 4)
+			end
+			alternateFrame:Show()
+			alternateFrame.input:SetFocus()
+		end
+	end
+	function config.createBindingButton(parent)
+		local btn = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate");
+		btn:SetSize(120, 22); btn:RegisterForClicks("AnyUp"); btn:SetScript("OnClick", OnClick);
+		btn:SetText(" "); btn:GetFontString():SetMaxLines(1);
+		btn.IsCapturingBinding, btn.SetBindingText = IsCapturingBinding, SetBindingText
+		btn.ToggleAlternateEditor = ToggleAlternateEditor
+		return btn, unbindMap[parent];
+	end
+	function config.createUnbindButton(parent)
+		local btn = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate");
+		btn:Disable(); btn:SetSize(120, 22); unbindMap[parent] = btn;
+		btn:SetScript("OnClick", UnbindClick);
+		return btn;
+	end
+end
+do -- ext.config.undo
+	local undoStack, undo = {}, {}
+	config.undo = undo
+	function undo.unwind()
+		local entry
+		for i=#undoStack,1,-1 do
+			entry, undoStack[i] = undoStack[i]
+			EC_pcall("OPC.Undo", entry.key and ("[" .. entry.key .. "]") or "(anon)", entry.func, unpack(entry, 1, entry.n))
+		end
+	end
+	function undo.search(key)
+		for i=#undoStack,1,-1 do
+			if undoStack[i].key == key then
+				return true
+			end
+		end
+	end
+	function undo.push(key, func, ...)
+		undoStack[#undoStack + 1] = {key=key, func=func, n=select("#", ...), ...}
+	end
+	function undo.clear()
+		table.wipe(undoStack)
+	end
+end
+do -- ext.config.overlay
+	local container, watcher, occupant = CreateFrame("FRAME"), CreateFrame("FRAME") do
+		container:EnableMouse() container:EnableKeyboard() container:Hide()
+		container:SetPropagateKeyboardInput(true)
+		container:SetScript("OnKeyDown", function(self, key)
+			if key == "ESCAPE" then self:Hide() end
+			self:SetPropagateKeyboardInput(key ~= "ESCAPE")
+		end)
+		container:SetScript("OnMouseWheel", function() end)
+		container.fader = container:CreateTexture(nil, "BACKGROUND")
+		container.fader:SetTexture(0,0,0) container.fader:SetAlpha(0.40)
+		local corner = container:CreateTexture(nil, "ARTWORK")
+		corner:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Corner")
+		corner:SetSize(30,30) corner:SetPoint("TOPRIGHT", -5, -6)
+		local close = CreateFrame("BUTTON", nil, container, "UIPanelCloseButton")
+		close:SetPoint("TOPRIGHT", 0, -1)
+		close:SetScript("OnClick", function() container:Hide() end)
+		container:SetBackdrop({edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border", edgeSize=32, bgFile="Interface\\FrameGeneral\\UI-Background-Rock", tile=true, tileSize=256, insets={left=10,right=10,top=10,bottom=10}})
+		container:SetBackdropColor(0.3, 0.4, 0.5)
+		watcher:SetScript("OnHide", function() if occupant then container:Hide() PlaySound("igMainMenuClose") occupant=nil end end)
+	end
+	function config.overlay(self, overlayFrame)
+		if occupant and occupant ~= overlayFrame then occupant:Hide() end
+		local cw, ch = overlayFrame:GetSize()
+		local w2, h2 = self:GetSize()
+		local w, h, isRefresh = cw + 8, ch + 8, occupant == overlayFrame
+		w2, h2, occupant = w2 > w and (w-w2)/2 or 0, h2 > h and (h-h2)/2
+		container:SetSize(w, h+20)
+		container:SetHitRectInsets(w2, w2, h2, h2)
+		container:SetParent(self)
+		container:SetPoint("CENTER")
+		container:SetFrameLevel(self:GetFrameLevel()+20)
+		container.fader:ClearAllPoints()
+		container.fader:SetPoint("TOPLEFT", self, "TOPLEFT", 2, -2)
+		container.fader:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
+		container:Show()
+		overlayFrame:ClearAllPoints()
+		overlayFrame:SetParent(container)
+		overlayFrame:SetPoint("CENTER")
+		overlayFrame:Show()
+		watcher:SetParent(overlayFrame)
+		watcher:Show()
+		CloseDropDownMenus()
+		if not isRefresh then PlaySound("igMainMenuOpen") end
+		occupant = overlayFrame
+	end
+	
+	local promptFrame = CreateFrame("FRAME") do
+		promptFrame:SetSize(400, 130)
+		promptFrame.title = promptFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+		promptFrame.prompt = promptFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+		promptFrame.editBox = config.ui.lineInput(promptFrame, 300)
+		promptFrame.accept = CreateFrame("Button", nil, promptFrame, "UIPanelButtonTemplate")
+		promptFrame.cancel = CreateFrame("Button", nil, promptFrame, "UIPanelButtonTemplate")
+		promptFrame.detail = promptFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		promptFrame.title:SetPoint("TOP")
+		promptFrame.prompt:SetPoint("TOP", promptFrame.title, "BOTTOM", 0, -8)
+		promptFrame.prompt:SetPoint("TOPRIGHT", -10, -20)
+		promptFrame.editBox:SetPoint("TOP", promptFrame.prompt, "BOTTOM", 0, -7)
+		promptFrame.detail:SetPoint("TOP", promptFrame.editBox, "BOTTOM", 0, -8)
+		promptFrame.cancel:SetWidth(125)
+		promptFrame.accept:SetWidth(125)
+		promptFrame.prompt:SetWidth(380)
+		promptFrame.detail:SetWidth(380)
+				
+		promptFrame.cancel:SetScript("OnClick", function() promptFrame:Hide() end)
+		promptFrame.editBox:SetScript("OnTextChanged", function(self)
+			promptFrame.accept:SetEnabled(promptFrame.callback == nil or promptFrame.callback(self, self:GetText() or "", false, promptFrame:GetParent():GetParent()))
+		end)
+		promptFrame.accept:SetScript("OnClick", function(self)
+			local callback, text = promptFrame.callback, promptFrame.editBox:GetText() or ""
+			if callback == nil or callback(promptFrame.editBox, text, true, promptFrame:GetParent():GetParent()) then
+				promptFrame:Hide()
+			end
+		end)
+		promptFrame.editBox:SetScript("OnEnterPressed", function(self) promptFrame.accept:Click() end)
+		promptFrame.editBox:SetScript("OnEscapePressed", function(self) promptFrame.cancel:Click() end)
+	end
+	function config.prompt(frame, title, prompt, explainText, acceptText, callback, editBoxWidth, cancelText)
+		promptFrame.callback = callback
+		promptFrame.title:SetText(title or "")
+		promptFrame.prompt:SetText(prompt or "")
+		promptFrame.detail:SetText(explainText or "")
+		promptFrame.editBox:SetText("")
+		promptFrame:SetHeight(70 + (editBoxWidth ~= false and 30 or 0) + ((explainText or "") ~= "" and 20 or 0))
+		config.overlay(frame, promptFrame)
+		if editBoxWidth ~= false then
+			promptFrame.editBox:Show()
+			promptFrame.editBox:SetWidth((editBoxWidth or 0.50) * 380)
+			promptFrame.editBox:SetFocus()
+		else
+			promptFrame.editBox:Hide()
+		end
+		promptFrame.cancel:ClearAllPoints()
+		promptFrame.accept:ClearAllPoints()
+		if acceptText ~= false then
+			promptFrame.accept:SetText(acceptText or ACCEPT)
+			promptFrame.cancel:SetText(cancelText or CANCEL)
+			promptFrame.cancel:SetPoint("BOTTOMLEFT", promptFrame, "BOTTOM", 5, 0)
+			promptFrame.accept:SetPoint("BOTTOMRIGHT", promptFrame, "BOTTOM", -5, 0)
+			promptFrame.accept:Show()
+		else
+			promptFrame.accept:Hide()
+			promptFrame.cancel:SetText(cancelText or OKAY)
+			promptFrame.cancel:SetPoint("BOTTOM", 5, 0)
+		end
+		return promptFrame
+	end
 end
 
-local function LBFDetect() return LibStub and LibStub("Masque", true) and true; end
+function config.undo.saveProfile(noData)
+	local undo, name = config.undo, OneRingLib:GetCurrentProfile()
+	if noData then
+		undo.push("OPieLightProfile#" .. name, OneRingLib.SwitchProfile, OneRingLib, name)
+	elseif not undo.search("OPieProfile#" .. name) then
+		undo.push("OPieProfile#" .. name, OneRingLib.SwitchProfile, OneRingLib, name, (OneRingLib:ExportProfile(name)))
+	end
+end
+
 local OPC_OptionSets = {
 	{ "Behavior",
 		{"bool", "RingAtMouse", caption="Center rings at mouse"},
@@ -132,18 +346,19 @@ local OPC_OptionSets = {
 		{"bool", "ClickPriority", caption="Make rings top-most", depOn="ClickActivation", depValue=true, otherwise=false},
 		{"bool", "NoClose", caption="Leave open after use", depOn="ClickActivation", depValue=true, otherwise=false},
 		{"bool", "UseDefaultBindings", caption="Use default ring bindings"},
-		{"range", "MouseBucket", caption="Scroll wheel sensitivity", 5, 1, 1, stdLabels=true},
-		{"range", "RingScale", caption="Ring Scale", suffix=" |cffffd500(%0.1f)|r", 0.1, 2},
+		{"range", "IndicationOffsetX", -500, 500, 50, caption="Move rings right", suffix=" |cffffd500(%d)|r"},
+		{"range", "IndicationOffsetY", -300, 300, 50, caption="Move rings down", suffix=" |cffffd500(%d)|r"},
+		{"range", "MouseBucket", 5, 1, 1, caption="Scroll wheel sensitivity", stdLabels=true},
+		{"range", "RingScale", 0.1, 2, caption="Ring Scale", suffix=" |cffffd500(%0.1f)|r"},
 	}, { "Appearance",
 		{"bool", "MultiIndication", caption="Per-slice icons"},
-		{"bool", "ShowCenterIcon", caption="Center icon", depOn="MultiIndication", depValue=false, otherwise=false},
 		{"bool", "GhostMIRings", caption="Nested rings", depOn="MultiIndication", depValue=true, otherwise=false},
 		{"bool", "ShowKeys", caption="Per-slice bindings", depOn="SliceBinding", depValue=true, depOn2="MultiIndication", depValue2=true, otherwise=false},
 		{"bool", "ShowCenterCaption", caption="Center caption"},
-		{"bool", "ShowCooldowns", caption="Numeric cooldowns"},
 		{"bool", "UseGameTooltip", caption="Show tooltips"},
+		{"bool", "ShowCooldowns", caption="Show cooldown numbers"},
+		{"bool", "ShowRecharge", caption="Show recharge numbers"},
 		{"bool", "HideStanceBar", caption="Hide stance bar", global=true},
-		{"bool", "UseBF", caption="Use Masque", global=true, req=LBFDetect},
 	}, { "Animation",
 		{"bool", "MIScale", caption="Enlarge selected slice", depOn="MultiIndication", depValue=true, otherwise=false},
 		{"bool", "MISpinOnHide", caption="Outward spiral on hide", depOn="MultiIndication", depValue=true, otherwise=false},
@@ -154,12 +369,13 @@ local OPC_OptionSets = {
 	}
 };
 
-local frame = config.createFrame("OPie", nil, true);
-	frame.version:SetFormattedText("%s (%d.%d)", OneRingLib:GetVersion());
+local frame = config.createFrame("OPie")
+	frame.version:SetFormattedText("%s (%d.%d)", OneRingLib:GetVersion())
 local OPC_Profile = CreateFrame("Frame", "OPC_Profile", frame, "UIDropDownMenuTemplate");
 	OPC_Profile:SetPoint("TOPLEFT", frame.desc, "BOTTOMLEFT", 0, -8); UIDropDownMenu_SetWidth(OPC_Profile, 200);
 local OPC_OptionDomain = CreateFrame("Frame", "OPC_OptionDomain", frame, "UIDropDownMenuTemplate");
-	OPC_OptionDomain:SetPoint("LEFT", OPC_Profile, "RIGHT", 0, 0);	UIDropDownMenu_SetWidth(OPC_OptionDomain, 220);
+	OPC_OptionDomain:SetPoint("LEFT", OPC_Profile, "RIGHT");
+	UIDropDownMenu_SetWidth(OPC_OptionDomain, 250);
 
 local OPC_Widgets, OPC_AlterOption, OPC_BlockInput = {};
 do -- Widget construction
@@ -174,30 +390,31 @@ do -- Widget construction
 		self.text:SetVertexColor(a,a,a);
 	end
 	function build.bool(v, rel, ofsY, halfpoint, rowHeight)
-		local b = CreateFrame("CheckButton", "OPC_Option_" .. v[2], frame, "InterfaceOptionsCheckButtonTemplate");
+		local b = CreateFrame("CheckButton", nil, frame, "InterfaceOptionsCheckButtonTemplate");
 		b:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 		b.id, b.text, b.desc = v[2], b.Text, v;
 		b:SetPoint("TOPLEFT", rel, "BOTTOMLEFT", halfpoint and 300 or 5, ofsY);
-		b:SetScript("OnClick", notifyChange); hooksecurefunc(b, "Enable", OnStateChange); hooksecurefunc(b, "Disable", OnStateChange);
+		b:SetScript("OnClick", notifyChange); hooksecurefunc(b, "SetEnabled", OnStateChange);
 		return b, ofsY - (halfpoint and rowHeight or 0), not halfpoint, halfpoint and 0 or 20;
 	end
 	function build.range(v, rel, ofsY, halfpoint, rowHeight)
 		if halfpoint then ofsY = ofsY - rowHeight; end
 		local b = CreateFrame("Slider", "OPC_Slider_" .. v[2], frame, "OptionsSliderTemplate");
+		b:SetWidth(175)
 		b:SetMinMaxValues(v[3] < v[4] and v[3] or -v[3], v[4] > v[3] and v[4] or -v[4]); b:SetValueStep(v[5] or 0.1); b:SetHitRectInsets(0,0,0,0);
 		b.id, b.text, b.hi, b.lo, b.desc = v[2], _G["OPC_Slider_" .. v[2] .. "Text"], _G["OPC_Slider_" .. v[2] .. "High"], _G["OPC_Slider_" .. v[2] .. "Low"], v;
 		b.hi:ClearAllPoints(); b.hi:SetPoint("LEFT", b, "RIGHT", 2, 1);
 		b.lo:ClearAllPoints(); b.lo:SetPoint("RIGHT", b, "LEFT", -2, 1);
 		b.text:ClearAllPoints(); b.text:SetPoint("TOPLEFT", rel, "BOTTOMLEFT", 33, ofsY-7);
 		if not v.stdLabels then b.lo:SetText(v[3]); b.hi:SetText(v[4]); end
-		b:SetPoint("TOPRIGHT", rel, "BOTTOMRIGHT", -103, ofsY-5);
+		b:SetPoint("TOPRIGHT", rel, "BOTTOMRIGHT", -72, ofsY-5);
 		b:SetScript("OnValueChanged", notifyChange)
 		return b, ofsY - 20, false, 0;
 	end
 
 	local cRel, cY, halfpoint, rowHeight = frame.desc, -35, false;
 	for i, v in ipairs(OPC_OptionSets) do
-		v.label = frame:CreateFontString("OPC_Section" .. i, "OVERLAY", "GameFontNormalLarge");
+		v.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge");
 		v.label:SetPoint("TOP", cRel, "BOTTOM", -50, cY-10); v.label:SetJustifyH("LEFT")
 		v.label:SetPoint("LEFT", frame, "LEFT", 15, 0)
 		cY, halfpoint, rowHeight = cY - 30, false, 0;
@@ -209,15 +426,13 @@ do -- Widget construction
 	end
 end
 
-local OR_DeletedProfiles, OR_CurrentOptionsDomain = {};
+local OR_CurrentOptionsDomain
 
 function OPC_AlterOption(widget, option, newval, ...)
 	if (...) == "RightButton" then newval = nil; end
 	if widget.control[1] == "range" and widget.control[3] > widget.control[4] and type(newval) == "number" then newval = -newval; end
-	local _, setting = OneRingLib:GetOption(option, OR_CurrentOptionsDomain);
+	config.undo.saveProfile()
 	OneRingLib:SetOption(option, newval, OR_CurrentOptionsDomain);
-	local key = ("Option%s:%s"):format(OR_CurrentOptionsDomain and ("." .. OR_CurrentOptionsDomain) or "#G", option);
-	config.pushUndo(key, OneRingLib.SetOption, OneRingLib, option, setting, OR_CurrentOptionsDomain);
 	local setval = OneRingLib:GetOption(option, OR_CurrentOptionsDomain);
 	if widget:IsObjectType("Slider") then
 		widget.text:SetText(L(widget.desc.caption) .. (widget.desc.suffix or ""):format(setval));
@@ -228,7 +443,7 @@ function OPC_AlterOption(widget, option, newval, ...)
 	for i,set in ipairs(OPC_OptionSets) do for j=2,#set do local v = set[j]
 		if v.depOn == option or v.depOn2 == option then
 			local match = OneRingLib:GetOption(v.depOn, OR_CurrentOptionsDomain) == v.depValue and (v.depOn2 == nil or OneRingLib:GetOption(v.depOn2, OR_CurrentOptionsDomain) == v.depValue2);
-			v.widget[match and "Enable" or "Disable"](v.widget);
+			v.widget:SetEnabled(match);
 			if match then
 				v.widget:SetChecked(OneRingLib:GetOption(v[2], OR_CurrentOptionsDomain) or nil);
 			else
@@ -243,7 +458,7 @@ function OPC_OptionDomain:click(ringName)
 end
 function OPC_OptionDomain:initialize()
 	local info = UIDropDownMenu_CreateInfo();
-	info.func, info.arg1, info.text, info.checked = OPC_OptionDomain.click, nil, L"Defaults for all rings", OR_CurrentOptionsDomain == nil and 1 or nil;
+	info.func, info.arg1, info.text, info.checked, info.minWidth = OPC_OptionDomain.click, nil, L"Defaults for all rings", OR_CurrentOptionsDomain == nil and 1 or nil, self:GetWidth()-40;
 	UIDropDownMenu_AddButton(info);
 	for i=1,OneRingLib:GetNumRings() do
 		local name, key, macro, internal = OneRingLib:GetRingInfo(i);
@@ -253,47 +468,48 @@ function OPC_OptionDomain:initialize()
 		end
 	end
 end
-local function OPC_Profile_AddNew(self)
-	local name, frame = self.editBox:GetText():match("^%s*(.-)%s*$"), StaticPopupDialogs["ORC_PNAME"].userData; self.editBox:SetText("");
-	if name == "" or OneRingLib:ProfileExists(kn) then return; end
-	StaticPopup_Hide("ORC_PNAME");
-	OneRingLib:SwitchProfile(name, true);
-	config.pushUndo("ProfileCreate", OneRingLib.DeleteProfile, OneRingLib, name);
-	config.pushUndo("Profile", OneRingLib.SwitchProfile, OneRingLib, (OneRingLib:GetCurrentProfile()));
-	frame.refresh("profile")
+local function OPC_Profile_NewCallback(self, text, apply, frame)
+	local name = text:match("^%s*(.-)%s*$")
+	if name == "" or OneRingLib:ProfileExists(name) then 
+		if apply then self.editBox:SetText("") end
+		return false
+	elseif apply then
+		config.undo.saveProfile(true)
+		OneRingLib:SwitchProfile(name, true)
+		if not config.undo.search("OPieProfile#" .. name) then
+			config.undo.push("OPieProfile#" .. name, OneRingLib.DeleteProfile, OneRingLib, name)
+		end
+		frame.refresh("profile")
+	end
+	return true
 end
 function OPC_Profile:switch(arg1, frame)
-	config.pushUndo("Profile", OneRingLib.SwitchProfile, OneRingLib, (OneRingLib:GetCurrentProfile()));
-	OneRingLib:SwitchProfile(arg1);
-	frame.refresh("profile");
+	config.undo.saveProfile(true)
+	OneRingLib:SwitchProfile(arg1)
+	frame.refresh("profile")
 end
 function OPC_Profile:new(_, frame)
-	StaticPopupDialogs["ORC_PNAME"] = StaticPopupDialogs["ORC_PNAME"] or {button1=TEXT(ACCEPT), button2=TEXT(CANCEL), hasEditBox=1, maxLetters=80, whileDead=1, timeout=0, hideOnEscape=true, OnHide = function(self) self.editBox:SetText(""); end, OnAccept=OPC_Profile_AddNew, EditBoxOnEnterPressed=function(self) OPC_Profile_AddNew(self:GetParent()); end};
-	StaticPopupDialogs["ORC_PNAME"].userData, StaticPopupDialogs["ORC_PNAME"].text = frame, L"New profile name:";
-	StaticPopup_Show("ORC_PNAME");
+	config.prompt(frame, L"Create a New Profile", L"New profile name:", L"Profiles save options and ring bindings.", L"Create Profile", OPC_Profile_NewCallback)
 end
 function OPC_Profile:delete(_, frame)
-	OR_DeletedProfiles[OneRingLib:GetCurrentProfile()] = true;
-	OPC_Profile.switch(self, "default", frame);
+	config.undo.saveProfile()
+	OneRingLib:DeleteProfile(OneRingLib:GetCurrentProfile())
+	frame.refresh("profile")
 end
 function OPC_Profile:initialize()
 	local info = UIDropDownMenu_CreateInfo();
 	info.func, info.arg2 = OPC_Profile.switch, self:GetParent();
 	for ident, isActive in OneRingLib.Profiles do
-		if not OR_DeletedProfiles[ident] then
-			info.text, info.arg1, info.checked = ident, ident, isActive or nil;
-			UIDropDownMenu_AddButton(info);
-		end
+		info.text, info.arg1, info.checked = ident, ident, isActive or nil;
+		UIDropDownMenu_AddButton(info);
 	end
 	info.text, info.disabled, info.checked, info.notCheckable, info.justifyH = "", true, nil, true, "CENTER"; UIDropDownMenu_AddButton(info);
-	info.text, info.disabled, info.minWidth, info.func = L"Create a new profile", false, 200, OPC_Profile.new; UIDropDownMenu_AddButton(info);
-	if OneRingLib:GetCurrentProfile() ~= "default" then
-		info.text, info.func = L"Delete current profile", OPC_Profile.delete; UIDropDownMenu_AddButton(info);
-	end
+	info.text, info.disabled, info.minWidth, info.func = L"Create a new profile", false, self:GetWidth()-40, OPC_Profile.new; UIDropDownMenu_AddButton(info);
+	info.text, info.func = OneRingLib:GetCurrentProfile() ~= "default" and L"Delete current profile" or L"Restore default settings", OPC_Profile.delete; UIDropDownMenu_AddButton(info);
 end
 function frame.refresh()
 	OPC_BlockInput = true;
-	frame.desc:SetText(L"Customize indication options; right click on a checkbox to set to default (or global) value." .. "\n" .. L"OPie profiles allow you to save these settings and bindings on a per-specialization basis.");
+	frame.desc:SetText(L"Customize indication options; right click on a checkbox to set to default (or global) value." .. "\n" .. L"Profiles activate automatically when you switch between your primary and secondary specializations.");
 	for i, v in pairs(OPC_OptionSets) do
 		v.label:SetText(L(v[1]));
 		for j=2,#v do
@@ -318,34 +534,27 @@ function frame.refresh()
 		end
 		if v.depOn then
 			local match = OneRingLib:GetOption(v.depOn, OR_CurrentOptionsDomain) == v.depValue and (v.depOn2 == nil or OneRingLib:GetOption(v.depOn2, OR_CurrentOptionsDomain) == v.depValue2);
-			v.widget[match and "Enable" or "Disable"](v.widget)
+			v.widget:SetEnabled(match);
 			if not match then v.widget:SetChecked(v.otherwise or nil); end
 		end
 		v.widget:SetShown(not v.global or OR_CurrentOptionsDomain == nil)
-		if v.req then
-			local ok, res = pcall(v.req)
-			v.widget:SetShown(ok and res)
-		end
 	end end
 	OPC_BlockInput = false;
 end
 function frame.cancel()
-	table.wipe(OR_DeletedProfiles);
-	config.unwindUndo();
+	config.undo.unwind()
 	OR_CurrentOptionsDomain = nil
 end
 function frame.default()
-	OneRingLib:ResetOptions(true);
-	frame.okay(); -- Unfortunately, there's no going back
+	config.undo.saveProfile()
+	OneRingLib:ResetOptions(true)
+	frame.refresh()
 end
 function frame.okay()
-	config.clearUndo();
-	for k in pairs(OR_DeletedProfiles) do
-		OR_DeletedProfiles[k] = nil;
-		OneRingLib:DeleteProfile(k);
-	end
+	config.undo.clear()
 	OR_CurrentOptionsDomain = nil
 end
+frame:SetScript("OnShow", frame.refresh)
 
 local slashExtensions = {}
 local function addSuffix(func, word, ...)
@@ -362,7 +571,8 @@ SlashCmdList["OPIE"] = function(args, ...)
 	if ext then
 		ext(args, ...)
 	elseif not frame:IsVisible() then
-		InterfaceOptionsFrame_OpenToCategory(frame);
+		InterfaceOptionsFrame_OpenToCategory(frame)
+		InterfaceOptionsFrame_OpenToCategory(frame)
 		if frame.collapsed then
 			for i, button in pairs(InterfaceOptionsFrameAddOns.buttons) do
 				if (type(button) == "table" and button.element == frame) then

@@ -18,7 +18,7 @@ Gnosis.tCastbarEvents = {
 	"UNIT_SPELLCAST_INTERRUPTED",
 	"UNIT_SPELLCAST_FAILED",
 	"UNIT_SPELLCAST_FAILED_QUIET",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_SPELLCAST_SUCCEEDED",
 };
 
 Gnosis.tMiscEvents = {
@@ -38,6 +38,30 @@ Gnosis.tMirrorEvents = {
 	"MIRROR_TIMER_STOP",
 	"PLAYER_UNGHOST",
 	"PLAYER_ALIVE",
+};
+
+Gnosis.tBlizzCastbar = {
+	"UNIT_SPELLCAST_START",
+	"UNIT_SPELLCAST_STOP",
+	"UNIT_SPELLCAST_FAILED",
+	"UNIT_SPELLCAST_INTERRUPTED",
+	"UNIT_SPELLCAST_DELAYED",
+	"UNIT_SPELLCAST_CHANNEL_START",
+	"UNIT_SPELLCAST_CHANNEL_UPDATE",
+	"UNIT_SPELLCAST_CHANNEL_STOP",
+	"UNIT_SPELLCAST_INTERRUPTIBLE",
+	"UNIT_SPELLCAST_NOT_INTERRUPTIBLE",
+	"PLAYER_ENTERING_WORLD",
+};
+
+Gnosis.tBlizzMirrorUiParent = {
+	"MIRROR_TIMER_START",
+};
+
+Gnosis.tBlizzMirror123 = {
+	"MIRROR_TIMER_STOP",
+	"MIRROR_TIMER_PAUSE",
+	"PLAYER_ENTERING_WORLD",
 };
 
 Gnosis.tSwingEvents = {
@@ -86,6 +110,7 @@ Gnosis.colClasses = {
 	DRUID		= "1.00, 0.49, 0.04, 1.00",
 	HUNTER		= "0.67, 0.83, 0.45, 1.00",
 	MAGE		= "0.41, 0.80, 0.94, 1.00",
+	MONK		= "0.33, 0.54, 0.52, 1.00",
 	PALADIN		= "0.96, 0.55, 0.73, 1.00",
 	PRIEST		= "1.00, 1.00, 1.00, 1.00",
 	ROGUE		= "1.00, 0.96, 0.41, 1.00",
@@ -94,12 +119,24 @@ Gnosis.colClasses = {
 	WARRIOR		= "0.78, 0.61, 0.43, 1.00",
 };
 
+Gnosis.tPremadeNfs = {
+	[1] = "namecol<1,0,0>txm< (>misctxm<)>col<pre>txts< (>tscurtxts</>tstottxts<)>",
+	[2] = "namecol<1,0,0>txeff< (>effecttxeff<)>col<pre>",
+	[3] = "col<1,1,0>whocol<pre>: name",
+};
+
+Gnosis.tPremadeTfs = {
+	[1] = "col<1,0,0>p<2s>col<pre> r<1m> / t<2m>",
+	[2] = "col<1,0,0>p<2s>col<pre> r<1> / t<2>",
+	[3] = "r<2m> / t<3m>",
+};
+
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 3.26;
+	self.ver = 4.02;
 	self.optver = 3.25;
-	self.build = "v3.26";
+	self.build = "v4.02";
 	self.addonname = "Gnosis";
 	local strVer = string_format("v%.2f", self.ver);
 	if(self.build == strVer) then
@@ -137,7 +174,10 @@ function Gnosis:StartupVariables()
 	self.petcastbar = {};
 
 	-- events registered to blizzard mirror castbar
-	self.blizzmirrorcastbar = {};
+	self.blizzmirroruiparent = {};
+	self.blizzmirror1 = {};
+	self.blizzmirror2 = {};
+	self.blizzmirror3 = {};
 
 	-- clip test
 	self.curchannel = nil;	-- currently channeling spell
@@ -209,20 +249,20 @@ function Gnosis:StartupVariables()
 		-- bar geometry
 		width = 250,
 		height = 20,
-		border = 1.0,
-		bordericon = 1.0,
+		border = 2.0,
+		bordericon = 2.0,
 		scale = 1.0,
 		scaleicon = 1.0,
 		alpha = 1.0,
-		fadeout = 0.3;
+		fadeout = 0.4;
 		latbarsize = 0.15;
-		latbarfixed = 0.02;
+		latbarfixed = 0.03;
 
 		-- coordinates
 		coord = {
-			castname = { x = 2, y = 0 },
-			casttime = { x = -2, y = 0 },
-			casticon = { x = 0, y = 0 },
+			castname = { x = 9, y = 0 },
+			casttime = { x = -9, y = 0 },
+			casticon = { x = -3, y = 0 },
 			latency = { x = -1, y = 1 },
 			shadow = { x = 3, y = -3 },
 		},
@@ -234,27 +274,27 @@ function Gnosis:StartupVariables()
 		alignlat = "ADAPT",		--
 
 		-- spark modifiers
-		fSparkHeightMulti = 1.0,
-		fSparkWidthMulti = 1.0,
+		fSparkHeightMulti = 1.2,
+		fSparkWidthMulti = 0.8,
 
 		-- default bar colors
-		colBar = { 0.20, 0.30, 0.50, 0.70 },
-		colBarNI = { 0.20, 0.30, 0.50, 0.70 },
-		colBarBg = { 0.10, 0.10, 0.35, 0.40 },
-		colLagBar  = { 0.35, 0.65, 0.90, 0.65 },
-		colBorder = { 0.00, 0.00, 0.00, 0.75 },
-		colBorderNI = { 1.00, 0.80, 0.00, 0.75 },
+		colBar = { 0.15, 0.35, 0.35, 0.70 },
+		colBarNI = { 0.15, 0.35, 0.35, 0.70 },
+		colBarBg = { 0.15, 0.42, 0.42, 0.65 },
+		colLagBar  = { 0.90, 0.85, 0.70, 0.65 },
+		colBorder = { 0.00, 0.00, 0.00, 0.85 },
+		colBorderNI = { 1.00, 0.80, 0.00, 0.85 },
 		colText = { 1.00, 1.00, 1.00, 1.00 },
 		colTextTime = { 1.00, 1.00, 1.00, 1.00 },
 		colTextLag = { 1.00, 0.00, 0.00, 1.00 },
-		colInterrupted = { 0.85, 0.85, 0.65, 0.75 },
+		colInterrupted = { 1.00, 0.80, 0.00, 0.70 },
 		colFailed = { 0.70, 0.30, 0.20, 0.75 },
 		colSpark = { 1.00, 1.00, 1.00, 1.00 },
-		colSuccess = { 0.35, 0.60, 0.15, 0.70 },
+		colSuccess = { 0.15, 0.25, 0.10, 0.70 },
 		colShadow = { 0.00, 0.00, 0.00, 0.70 },
 
 		-- default statusbar texture
-		bartexture = "Waterline",
+		bartexture = "Gnosis_Plain",
 		bordertexture = nil,
 
 		-- bar settings
@@ -268,10 +308,10 @@ function Gnosis:StartupVariables()
 		bExtChannels = true,	-- extend channeled spells
 		bUnlocked = true,		-- unlocked when first created
 		bFillup = false,		-- fill bar up at end of cast
-		bShowShield = true,		-- show shielded icon for non-intteruptible casts
+		bShowShield = false,	-- do not show shielded icon for non-intteruptible casts
 		iconside = "LEFT",		-- where to draw icon
 		fontoutline = "OUTLINE",-- font outline
-		font = "",				-- no default font selection (v2.61)
+		font = "Accidental Presidency",		-- "Accidental Presidency", v4.00
 		fontsize = 0,			-- automatic
 		fontsize_timer = 0,		-- automatic
 		fontsize_lat = 0,		-- automatic
@@ -284,8 +324,8 @@ function Gnosis:StartupVariables()
 		bnwlistnew = "",		-- new entry box
 		bResizeLongName = true,	-- automatic resize of long spell names
 		strata = "MEDIUM",		-- medium frame strata
-		strNameFormat = "namecol<1,0,0>txm< (>misctxm<)>col<pre>txts< (>tscurtxts</>tstottxts<)>",	-- default castname string, rank text in red, tradeskill total cnt
-		strTimeFormat = "col<1,0,0>p<2s>col<pre> r<1m> / t<2m>",	-- default casttime string
+		strNameFormat = Gnosis.tPremadeNfs[1],	-- default nfs
+		strTimeFormat = Gnosis.tPremadeTfs[1],	-- default tfs
 		bShowPlayerLatency = true,	-- do not show text latency information
 		bShowAsMinutes = true,	-- show timer in minutes if longer than 60s
 		bMergeTrade = true,		-- merge tradeskill information
@@ -297,7 +337,7 @@ function Gnosis:StartupVariables()
 		bInvDir = false,		-- invert bar direction
 		bColSuc = false,		-- change castbar color when cast finished successfully
 		bEnShadowOffset = false,-- enable changing of text shadow offset
-		bEnShadowCol = false,	-- change text shadow color
+		bEnShadowCol = true,	-- change text shadow color
 
 		-- anchoring
 		anchortype = 1,			-- no anchor

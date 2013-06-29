@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Steamrigger", "DBM-Party-BC", 6)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 389 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(17796)
 --mod:SetModelID(18638)--Does not work
 
@@ -25,7 +25,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(35107) then
+	if args.spellId == 35107 then
 		WarnNet:Show(args.destName)
 		timerNet:Start(args.destName)
 	end

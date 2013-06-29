@@ -1,4 +1,4 @@
-﻿## Interface: 50100
+﻿## Interface: 50300
 ## X-Min-Interface: 50001
 ## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Sunwell|r
 ## Title-koKR:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0태양샘 고원|r
@@ -7,8 +7,9 @@
 ## RequiredDeps: DBM-Core
 ## SavedVariablesPerCharacter: DBMSunwell_SavedVars, DBMSunwell_SavedStats
 ## X-DBM-Mod: 1
+## X-DBM-Mod-Type: RAID
 ## X-DBM-Mod-Category: BC
-## X-DBM-Mod-Has-Heroic-Mode: 0
+## X-DBM-Mod-Has-Single-Format: 1
 ## X-DBM-Mod-Name: Sunwell Plateau
 ## X-DBM-Mod-Name-ruRU: Плато Солнечного Колодца
 ## X-DBM-Mod-Name-zhCN: 太阳之井高地

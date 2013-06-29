@@ -47,7 +47,7 @@ local options = {
 		{ type = "Check", var = "showGuildRank", label = "Show Player Guild Rank Title", tip = "In addition to the guild name, with this option on, you will also see their guild rank by title" },
 		{ type = "Check", var = "showTargetedBy", label = "Show Who Targets the Unit", tip = "When in a raid or party, the tip will show who from your group is targeting the unit" },
 		{ type = "Check", var = "showPlayerGender", label = "Show Player Gender", tip = "This will show the gender of the player. E.g. \"85 Female Blood Elf Paladin\".", y = 16 },
-		{ type = "DropDown", var = "nameType", label = "Name Type", list = { ["Name only"] = "normal", ["Use player titles"] = "title", ["Copy from original tip"] = "original" } },
+		{ type = "DropDown", var = "nameType", label = "Name Type", list = { ["Name only"] = "normal", ["Use player titles"] = "title", ["Copy from original tip"] = "original", ["Mary Sue Protocol"] = "marysueprot" } },
 		{ type = "DropDown", var = "showRealm", label = "Show Unit Realm", list = { ["Do not show realm"] = "none", ["Show realm"] = "show", ["Show (*) instead"] = "asterisk" } },
 		{ type = "DropDown", var = "showTarget", label = "Show Unit Target", list = { ["Do not show target"] = "none", ["First line"] = "first", ["Second line"] = "second", ["Last line"] = "last" }, y = 16 },
 		{ type = "Text", var = "targetYouText", label = "Targeting You Text" },
@@ -253,6 +253,8 @@ end
 --------------------------------------------------------------------------------------------------------
 
 local f = CreateFrame("Frame",modName.."Options",UIParent);
+
+f.options = options;
 
 f:SetWidth(424);
 f:SetHeight(378);	-- "18" per category entry

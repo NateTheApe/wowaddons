@@ -1,4 +1,4 @@
-﻿-- Last update: 12/24/2012 (24/12/2012 in french format)
+﻿-- Last update: 01/03/2013 (03/01/2013 in french format)
 -- By Edoz (stephanelc35@msn.com)
 
 if GetLocale() ~= "frFR" then return end
@@ -37,9 +37,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	WarnPhase	= "Annoncer la transition de Phase",
-	RangeFrame	= "Afficher le cadre de distance (6m) durant la phase d'arcane",
-	SetIconOnWS	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(116784),
-	SetIconOnAR	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(116417)
+	RangeFrame	= "Afficher le cadre de distance (6m) durant la phase d'arcane"
 })
 
 L:SetMiscLocalization({
@@ -54,11 +52,6 @@ L:SetMiscLocalization({
 -- Gara'jal the Spiritbinder --
 -------------------------------
 L= DBM:GetModLocalization(682)
-
-L:SetOptionLocalization({
-	RangeFrame			= "Afficher le cadre de distance (8m)",
-	SetIconOnVoodoo		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(122151)
-})
 
 L:SetMiscLocalization({
 	Pull		= "L'heure de mourir elle est arrivée maintenant !"
@@ -75,7 +68,8 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	timerUSRevive		= "Ombres éternelles reconstitué"
+	timerUSRevive		= "Ombres éternelles reconstitué",
+	timerRainOfArrowsCD	= "%s"
 })
 
 L:SetOptionLocalization({
@@ -100,8 +94,7 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	specWarnDespawnFloor	= "Alerte spéciale avant que le sol ne disparaisse",
-	timerDespawnFloor		= "Afficher le temps avant que le sol disparaît",
-	SetIconOnDestabilized	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(132222)
+	timerDespawnFloor		= "Afficher le temps avant que le sol disparaît"
 })
 
 

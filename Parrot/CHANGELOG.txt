@@ -1,3 +1,14 @@
+v1.11.3:
+* mark compatible with wow 5.3
+* fix bug in raid-difficulty detection
+
+v1.11.2:
+* mark update for WoW 5.2
+
+v1.11.1:
+* fix configuration-menu not working correctly
+* fix Friendly-check in UnitHealth and UnitPower triggerconditions
+
 v1.11.0:
 * add Monk as valid class
 * add option to enable triggers only for specific specs

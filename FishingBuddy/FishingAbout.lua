@@ -52,6 +52,7 @@ credits[FBConstants.ROLE_TRANSLATE_ESES] = {
 	["Winderfind Drakkari"] = { "v1.0.7a" },
 	["jmaister"] = { "V1.0.9e", },
 	["karrash76"] = { "V1.2f", "V1.2g", },
+	["Magire"] = { "V1.2j", },
 };
 
 credits[FBConstants.ROLE_TRANSLATE_KOKR] = {
@@ -75,6 +76,7 @@ credits[FBConstants.ROLE_TRANSLATE_RURU] = {
 
 credits[FBConstants.ROLE_TRANSLATE_PTBR] = {
 	["nomadbr"] = { "V1.0.7a" },
+	["tiagopl"] = { "V1.2j", },
 };
 
 -- Testers/bug fixers

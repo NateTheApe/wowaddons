@@ -661,6 +661,17 @@ local errata = {
 		["Mudsprocket"] = 336195845553,
 		["BlackhoofVillage"] = 208854360,
 	},
+	["Dustwallow_terrain1"] = {
+		["BRACKENWLLVILLAGE"] = 63490483584,
+		["THERAMOREISLE"] = 240013008177,
+		["ALCAZISLAND"] = 23236649166,
+		["THEWYRMBOG"] = 396587478452,
+		["MUDSPROCKET"] = 336195845553,
+		["BLACKHOOFVILLAGE"] = 208854360,
+		["SHADYRESTINN"] = 202007353661,
+		["DIREHORNPOST"] = 181838066967,
+		["WITCHHILL"] = 449152270,
+	},
 	["Felwood"] = {
 		["BloodvenomFalls"] = 248265245017,
 		["JadefireGlen"] = 492075960549,
@@ -1276,6 +1287,24 @@ local errata = {
 		["DojaniRiver"] = 3759433918,
 		["AnglersOutpost"] = 220688746761,
 	},
+	["Krasarang_terrain1"] = {
+		["ZHUSBASTION"] = 641937714,
+		["FALLSONGRIVER"] = 82907112662,
+		["DOJANIRIVER"] = 3759433918,
+		["RUINSOFDOJAN"] = 47710600396,
+		["THEDEEPWILD"] = 63767474364,
+		["NAYELILAGOON"] = 400865607926,
+		["UNGAINGOO"] = 535069632770,
+		["KRASARANGCOVE"] = 21136446759,
+		["RUINSOFKORJA"] = 94620757203,
+		["LOSTDYNASTY"] = 29608926425,
+		["THESOUTHERNISLES"] = 286689404179,
+		["ANGLERSOUTPOST"] = 215320042843,
+		["THEFORBIDDENJUNGLE"] = 84825911553,
+		["REDWINGREFUGE"] = 67978405076,
+		["TEMPLEOFTHEREDCRANE"] = 231169330395,
+		["CRADLEOFCHIJI"] = 403911731472,
+	},
 	["ValleyoftheFourWinds"] = {
 		["KuzenVillage"] = 79692087495,
 		["CliffsofDispair"] = 434017411582,
@@ -1299,6 +1328,7 @@ local errata = {
 	["TheHiddenPass"] = {
 		["TheHiddenSteps"] = 512607059234,
 		["TheBlackMarket"] = 188294346207,
+		["TheHiddenCliffs"] = 454258982,
 	},
 	["KunLaiSummit"] = {
 		["Mogujia"] = 441792545021,
@@ -1356,6 +1386,8 @@ local errata = {
 		["KYPARIVOR"] = 508754245,
 		["ZANVESS"] = 413560761634,
 	},
+	["IsleoftheThunderKing"] = false,
+	["IsleoftheThunderKingScenario"] = false,
 	['*'] = {},
 }
 errata.Hyjal_terrain1 = errata.Hyjal
@@ -1445,6 +1477,9 @@ function FogClear:OnInitialize()
 	db = self.db.profile
 	self.overlays = self.db.global.errata
 
+	self.overlays["IsleoftheThunderKing"] = false
+	self.overlays["IsleoftheThunderKingScenario"] = false
+
 	self:SetEnabledState(Mapster:GetModuleEnabled(MODNAME))
 	Mapster:RegisterModuleOptions(MODNAME, getOptions, L["FogClear"])
 end
@@ -1472,10 +1507,10 @@ function FogClear:OnEnable()
 		self:SecureHook("BattlefieldMinimap_Update", "UpdateBattlefieldMinimapOverlays")
 
 		wipe(battleMapCache)
-		for i = 1, NUM_BATTLEFIELDMAP_OVERLAYS do
+		for i = 1, BattlefieldMinimap:GetAttribute("NUM_BATTLEFIELDMAP_OVERLAYS") do
 			tinsert(battleMapCache, _G[format("BattlefieldMinimapOverlay%d", i)])
 		end
-		NUM_BATTLEFIELDMAP_OVERLAYS = 0
+		BattlefieldMinimap:SetAttribute("NUM_BATTLEFIELDMAP_OVERLAYS", 0)
 
 		if BattlefieldMinimap:IsShown() then
 			BattlefieldMinimap_Update()
@@ -1502,8 +1537,9 @@ function FogClear:OnDisable()
 	end
 
 	if BattlefieldMinimap then
-		NUM_BATTLEFIELDMAP_OVERLAYS = #battleMapCache
-		for i=1, NUM_BATTLEFIELDMAP_OVERLAYS do
+		local num = #battleMapCache
+		BattlefieldMinimap:SetAttribute("NUM_BATTLEFIELDMAP_OVERLAYS", num)
+		for i=1, num do
 			tex = _G[format("BattlefieldMinimapOverlay%d", i)]
 			tex:SetVertexColor(1,1,1)
 			tex:SetAlpha(1 - BattlefieldMinimapOptions.opacity)
@@ -1531,7 +1567,7 @@ function FogClear:RealHasOverlays()
 	if not mapFileName or not self.overlays then return false end
 
 	local overlayMap = self.overlays[mapFileName]
-	if overlayMap and next(overlayMap) then return true end
+	if overlayMap and next(overlayMap) then return true else return false end
 end
 
 local discoveredOverlays = {}
@@ -1547,6 +1583,9 @@ local function updateOverlayTextures(frame, frameName, textureCache, scale, alph
 
 	local pathPrefix = "Interface\\WorldMap\\"..mapFileName.."\\"
 	local overlayMap = self.overlays[mapFileName]
+	if not overlayMap then
+		overlayMap = {}
+	end
 
 	local numOverlays = self.hooks.GetNumMapOverlays()
 	local pathLen = strlen(pathPrefix) + 1

@@ -151,7 +151,7 @@ L:AddLocale("ruRU",
 	["Sticky Per Chat Frame"] = "Прилипать к окнам чата",
 	["Sticky %s"] = "Прилепить к %s",
 	["Toggle remembering the chat type last used per chat frame."] = "Вкл/Выкл запоминание тип чата при последнем использовании чата.",
-	["Toggles sticky on and off for %s."] = "Вкл/Выкл прилепание для %s.",
+	["Toggles sticky on and off for %s."] = "Вкл/Выкл прилипание для %s.",
 }
 
 )

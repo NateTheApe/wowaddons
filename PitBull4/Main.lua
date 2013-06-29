@@ -1,8 +1,6 @@
 -- Constants ----------------------------------------------------------------
 local L = LibStub("AceLocale-3.0"):GetLocale("PitBull4")
 
-local mop_500 = select(4,GetBuildInfo()) >= 50000
-
 local SINGLETON_CLASSIFICATIONS = {
 	"player",
 	"pet",
@@ -240,7 +238,7 @@ _G.PitBull4 = PitBull4
 local DEBUG = PitBull4.DEBUG
 local expect = PitBull4.expect
 
-PitBull4.version = "v4.0.0-beta42"
+PitBull4.version = "v4.0.0-beta45"
 if PitBull4.version:match("@") then
 	PitBull4.version = "Development"
 end
@@ -1401,12 +1399,7 @@ function PitBull4:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 
-	if not mop_500 then
-		self:RegisterEvent("RAID_ROSTER_UPDATE", "GROUP_ROSTER_UPDATE")
-		self:RegisterEvent("PARTY_MEMBERS_CHANGED", "GROUP_ROSTER_UPDATE")
-	else
-		self:RegisterEvent("GROUP_ROSTER_UPDATE")
-	end
+	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 	
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_LEAVING_WORLD")
@@ -1646,7 +1639,7 @@ StateHeader:WrapScript(StateHeader, "OnAttributeChanged", [[
     end
   end
 ]])
-RegisterStateDriver(StateHeader, "group", (mop_500 and "[petbattle] petbattle; " or "").."[target=raid26, exists] raid40; [target=raid21, exists] raid25; [target=raid16, exists] raid20; [target=raid11, exists] raid15; [target=raid6, exists] raid10; [group:raid] raid; [group:party] party; solo")
+RegisterStateDriver(StateHeader, "group", "[petbattle] petbattle; [target=raid26, exists] raid40; [target=raid21, exists] raid25; [target=raid16, exists] raid20; [target=raid11, exists] raid15; [target=raid6, exists] raid10; [group:raid] raid; [group:party] party; solo")
 
 function PitBull4:AddGroupToStateHeader(header)
 	local header_name = header:GetName()

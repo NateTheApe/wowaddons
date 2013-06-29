@@ -1,15 +1,15 @@
 -- EventLib.lua: Handles event/timer management.
-local ECi_Version = 1.13;
+local ECi_Version = 1.14;
 local ECi_Enabled, EC_Core, Events, ErrorCache, ErrorTraceCache, Timers, TimerCount, TimerNext;
 local errorMessage = "[%s] Encountered |cffff8000|Hectrace:%d|h[Error in %s]|h|r."
 
 local function ECi_Panic(aspect, text, st, source)
  local key = aspect .. "." .. text;
- if not ErrorCache[key] or ErrorCache[key] < 5 then
+ ErrorCache[key] = (ErrorCache[key] or 0) + 1
+ if ErrorCache[key] <= 5 then
   tinsert(ErrorTraceCache, {aspect, text, string.gsub(text .. "\n" .. debugstack(st or 2),"Interface\\AddOns\\","")});
   DEFAULT_CHAT_FRAME:AddMessage(errorMessage:format(source or "EventLib", #ErrorTraceCache, aspect),0.8,0.3,0);
  end
- ErrorCache[key] = (ErrorCache[key] or 0) + 1;
 end
 
 local function ECi_Register(event, handle, handler)
@@ -45,7 +45,7 @@ local function ECi_HandleTimer()
  if time > TimerNext then
   TimerNext = time+60;
   for h, v in pairs(Timers) do
-   local f,i,p = unpack(v);
+   local f,i,p = v[1], v[2], v[3]
    if p < time then
     local ok, r = EC_pcall(nil, "Timer:" .. h, f);
     if ok and r == "remove" then

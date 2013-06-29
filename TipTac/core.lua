@@ -474,7 +474,7 @@ local function ModifyUnitTooltip()
 		u.classEng = classEng;
 		-- name
 		lineOne[#lineOne + 1] = (cfg.colorNameByClass and (TT_ClassColors[classEng] or COL_WHITE) or reaction);
-		lineOne[#lineOne + 1] = (cfg.nameType == "original" and u.originalName) or (cfg.nameType == "title" and UnitPVPName(unit)) or name;
+		lineOne[#lineOne + 1] = (cfg.nameType == "marysueprot" and u.rpName) or (cfg.nameType == "original" and u.originalName) or (cfg.nameType == "title" and UnitPVPName(unit)) or name;
 		if (realm) and (realm ~= "") and (cfg.showRealm ~= "none") then
 			if (cfg.showRealm == "show") then
 				lineOne[#lineOne + 1] = " - ";
@@ -513,7 +513,8 @@ local function ModifyUnitTooltip()
 		else
 			if not (petLevelLineIndex) then
 				for i = 2, gtt:NumLines() do
-					if (_G["GameTooltipTextLeft"..i]:GetText():find(TT_LevelMatchPet)) then
+					local gttLineText = _G["GameTooltipTextLeft"..i]:GetText(); 
+					if (type(gttLineText) == "string") and (gttLineText:find(TT_LevelMatchPet)) then
 						petLevelLineIndex = i;
 						break;
 					end
@@ -683,7 +684,7 @@ end
 -- Format Number Value
 local function FormatValue(val)
 	if (not cfg.barsCondenseValues) or (val < 10000) then
-		return val;
+		return tostring(val);
 	elseif (val < 1000000) then
 		return ("%.1fk"):format(val / 1000);
 	elseif (val < 1000000000) then
@@ -704,7 +705,11 @@ local function FormatBarValues(fs,val,max,type)
 	elseif (type == "full") then
 		fs:SetFormattedText("%s / %s (%.0f%%)",FormatValue(val),FormatValue(max),val / max * 100);
 	elseif (type == "deficit") then
-		fs:SetFormattedText(val == max and "" or "-%d",FormatValue(max - val));
+		if (val ~= max) then
+			fs:SetFormattedText("-%s",FormatValue(max - val));
+		else
+			fs:SetText("");
+		end
 	elseif (type == "percent") then
 		fs:SetFormattedText("%.0f%%",val / max * 100);
 	end
@@ -1237,6 +1242,15 @@ local function ApplyTipTacAppearance(first)
 	-- Store Original Name
 	if (first) and (cfg.nameType == "original") then
 		u.originalName = GameTooltipTextLeft1:GetText();
+	end
+	-- Az: RolePlay Explerimental (Mary Sue Protocol)
+	if (first) and (u.isPlayer) and (cfg.nameType == "marysueprot") and (msp) then
+		local field = "NA";
+		local name = UnitName(u.token);
+		msp.Request(name,field);	-- Az: does this return our request, or only storing it for later use? I'm guessing the info isn't available right away, but only after the person's roleplay addon replies.
+		if (msp.char[name]) and (msp.char[name].field[field] ~= "") then
+			u.rpName = msp.char[name].field[field] or name;
+		end
 	end
 	-- Find NPC Title -- 09.08.22: Should now work with colorblind mode
 	if (first) and (not u.isPlayer) then

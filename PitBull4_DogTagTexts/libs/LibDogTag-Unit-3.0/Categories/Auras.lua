@@ -1,5 +1,5 @@
 local MAJOR_VERSION = "LibDogTag-Unit-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 225 $"):match("%d+")) or 0
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 248 $"):match("%d+")) or 0
 
 if MINOR_VERSION > _G.DogTag_Unit_MINOR_VERSION then
 	_G.DogTag_Unit_MINOR_VERSION = MINOR_VERSION
@@ -311,7 +311,7 @@ DogTag:AddTag("Unit", "AuraDuration", {
 		'aura', 'string', '@req',
 		'unit', 'string;undef', 'player'
 	},
-	events = "Update",
+	events = "Update;Aura#$unit",
 	ret = "number;nil",
 	doc = L["Return the duration until the aura for unit is finished"],
 	example = '[AuraDuration("Renew")] => "10.135123"',

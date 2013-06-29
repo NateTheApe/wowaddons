@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("CThun", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 312 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(15727)
 --mod:SetModelID(15787)--Does not scale correctly.
 mod:RegisterCombat("combat")
@@ -52,10 +52,10 @@ function mod:eyeTentacle()
 end
 
 function mod:SPEL_SUMMON(args)
-	if args:IsSpellID(99999) then	-- add summon Giant Eye ID
+	if args.spellId == 99999 then	-- add summon Giant Eye ID
 		timerGiantClawTentacle:Start(30)
 		timerGiantEyeTentacle:Start(60)
-	elseif args:IsSpellID(99998) then	-- add summon Giant Claw ID
+	elseif args.spellId == 99998 then	-- add summon Giant Claw ID
 		timerGiantEyeTentacle:Start(30)
 		timerGiantClawTentacle:Start(60)
 	end

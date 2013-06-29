@@ -10,18 +10,12 @@ L:SetGeneralLocalization{
 	name = "알라르"
 }
 
-L:SetWarningLocalization{
-}
-
 L:SetTimerLocalization{
-	NextPlatform	= "다음 플랫폼"
+	NextPlatform	= "단상 머무름"
 }
 
 L:SetOptionLocalization{
-	NextPlatform	= "알라르 플랫폼 이동 타이머 보기"
-}
-
-L:SetMiscLocalization{
+	NextPlatform	= "단상 머무름 바 표시(더 빨리 떠날수 는 있으나 더 늦게 떠나진 않습니다.)"
 }
 
 ------------------
@@ -31,20 +25,6 @@ L = DBM:GetModLocalization("VoidReaver")
 
 L:SetGeneralLocalization{
 	name = "공허의 절단기"
-}
-
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
-	YellOnOrb	= "$spell:34172 외치기"
-}
-
-L:SetMiscLocalization{
-	YellOrb	= "나에게 비전 보주!"
 }
 
 --------------------------------
@@ -66,19 +46,18 @@ L:SetWarningLocalization{
 
 L:SetTimerLocalization{
 	TimerSplit		= "다음 분리",
-	TimerAgent		= "요원 등장",
-	TimerPriest		= "사제/솔라리안 등장"
+	TimerAgent		= "다음 요원",
+	TimerPriest		= "다음 사제/솔라리안"
 }
 
 L:SetOptionLocalization{
-	WarnSplit		= "분리 경고 보기",
-	WarnSplitSoon	= "분리 사전 경고 보기(soon)",
-	WarnAgent		= "요원 등장 경고 보기",
-	WarnPriest		= "사제/솔라리안 등장 경고 보기",
-	TimerSplit		= "다음 분리 타이머 보기",
-	TimerAgent		= "요원 등장 타이머 보기",
-	TimerPriest		= "사제/솔라리안 등장 타이머 보기",
-	WrathIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(42783),
+	WarnSplit		= "분리 알림 보기",
+	WarnSplitSoon	= "분리 사전 알림 보기",
+	WarnAgent		= "요원 등장 알림 보기",
+	WarnPriest		= "사제/솔라리안 등장 알림 보기",
+	TimerSplit		= "다음 분리 바 표시",
+	TimerAgent		= "다음 요원 바 표시",
+	TimerPriest		= "다음 사제/솔라리안 바 표시",
 	WrathWhisper	= "$spell:42783 대상에게 귓속말 보내기",
 }
 
@@ -103,29 +82,28 @@ L:SetWarningLocalization{
 	WarnMobDead		= "%s 처치",
 	WarnEgg			= "불사조 알 생성",
 	SpecWarnGaze	= "당신을 추적 - 도망치세요!",
-	SpecWarnEgg		= "불사조 알 생성 - 알 극딜!"
+	SpecWarnEgg		= "불사조 알 생성 - 대상 전환!"
 }
 
 L:SetTimerLocalization{
 	TimerPhase		= "다음 단계",
 	TimerPhase1mob	= "%s",
 	TimerNextGaze	= "추적 대상 전환",
-	TimerRebirth	= "불사조 환생"
+	TimerRebirth	= "불사조 환생 가능"
 }
 
 L:SetOptionLocalization{
-	WarnGaze		= "탈라드레드 추적 대상 경고 보기",
-	WarnMobDead		= "2 단계 무기 처치 경고 보기",
-	WarnEgg			= "불사조 알 생성 경고 보기",
+	WarnGaze		= "탈라드레드 추적 대상 알림 보기",
+	WarnMobDead		= "무기 처치 알림 보기",
+	WarnEgg			= "불사조 알 생성 알림 보기",
 	SpecWarnGaze	= "탈라드레드 추적 대상이 될 경우 특수 경고 보기",
 	SpecWarnEgg		= "불사조 알 생성 특수 경고 보기",
-	TimerPhase		= "단계 전환 타이머 보기",
-	TimerPhase1mob	= "1 단계 조언가 등장 타이머 보기",
-	TimerNextGaze	= "탈라드레드 추적 대상 전환 타이머 보기",
-	TimerRebirth	= "불사조 알이 환생하기 까지 남은 타이머 보기",
-	RangeFrame		= "거리 프레임 보기",
+	TimerPhase		= "단계 전환 바 표시",
+	TimerPhase1mob	= "1단계 조언가 등장 바 표시",
+	TimerNextGaze	= "탈라드레드 추적 대상 전환 바 표시",
+	TimerRebirth	= "불사조 알이 환생까지 남은시간 바 표시",
+	RangeFrame		= "거리 창 보기",
 	GazeWhisper		= "탈라드레드 추적 대상에게 귓속말 보내기",
-	MCIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(36797),
 	GazeIcon		= "탈라드레드 추적 대상에게 전술 목표 아이콘 설정",
 }
 

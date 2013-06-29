@@ -2,10 +2,10 @@
 ************************************************************************
 Alchemy.lua
 ************************************************************************
-File date: 2012-12-19T03:11:59Z
-File hash: 62e1817
-Project hash: 3df9ad7
-Project version: 2.4.4
+File date: 2013-03-03T23:05:21Z
+File hash: ae98b42
+Project hash: 3fa6ce4
+Project version: 2.4.8
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -2782,6 +2782,14 @@ function addon:InitAlchemy()
 	recipe:SetItemFilterType("ALCHEMY_TRANSMUTE")
 	recipe:AddFilters(F.ALLIANCE, F.HORDE)
 	recipe:AddDiscovery("DISCOVERY_ALCH_PANDARIA")
+
+	-- Zen Alchemist Stone -- 136197
+	recipe = AddRecipe(136197, V.MOP, Q.COMMON)
+	recipe:SetSkillLevels(515, 515, 515, 525, 535)
+	recipe:SetCraftedItem(75274, "BIND_ON_PICKUP")
+	recipe:SetItemFilterType("ALCHEMY_TRINKET")
+	recipe:AddFilters(F.ALLIANCE, F.HORDE)
+	recipe:AddTrainer(1386, 2132, 2391, 3009, 3184, 3347, 3603, 4160, 4611, 5177, 5499, 16723, 18802, 19052, 26903, 26951, 26975, 26987, 27023, 27029, 28703, 33588, 33608, 33630, 56777, 65186)
 
 	self.InitAlchemy = nil
 end

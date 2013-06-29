@@ -324,7 +324,7 @@ L:AddLocale("ruRU",
 	["Lock Position"] = "Закрепить пазицию",
 	LOW = "НИЗКИЙ",
 	MEDIUM = "СРЕДНИЙ",
-	OriginalEditbox = "ОригинальнаяСтрокаНаписания", -- Needs review
+	OriginalEditbox = true,
 	Padding = "Выравнивание",
 	["Set Alpha"] = "Установить прозрачность",
 	["Set Position"] = "Установить позицию",

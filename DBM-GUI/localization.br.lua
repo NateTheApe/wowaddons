@@ -31,7 +31,6 @@ L.Button_OK 				= 'OK'
 L.Button_Cancel 			= 'Cancelar'
 L.Button_LoadMod 			= 'Carregar AddOn'
 L.Mod_Enabled				= "Habilitar módulo"
-L.Mod_EnableAnnounce		= "Anunciar para a raide (Requer liderança)"
 L.Reset 					= "Redefinir"
 
 L.Enable  					= "Habilitar"
@@ -46,9 +45,6 @@ L.BossStatistics			= "Estatísticas do Chefe"
 L.Statistic_Kills			= "Vitórias:"
 L.Statistic_Wipes			= "Derrotas:"
 L.Statistic_BestKill		= "Melhor vítória:"
-L.Statistic_Heroic			= "Heróico"
-L.Statistic_10Man			= "Raide 10 jogadores"
-L.Statistic_25Man			= "Raide 25 jogadores"
 
 -- Tab: General Options
 L.General 					= "Opções gerais do DBM"
@@ -161,7 +157,6 @@ L.BarWidth					= "Largura da barra: %d"
 L.Panel_SpamFilter				= "Filtros Global e de Spam"
 L.Area_SpamFilter				= "Opções do filtro Global"
 L.HideBossEmoteFrame			= "Esconder quadro de emoção de chefe de raid" -- not so sure about that translation
-L.SpamBlockRaidWarning			= "Filtrar anúncions de outros boss mods" 
 L.SpamBlockBossWhispers			= "Filtrar sussuros de aviso <DBM> durante a luta."
 L.BlockVersionUpdateNotice		= "Desabilitar pop-up de notificação de atualização."
 L.ShowBigBrotherOnCombatStart	= "Realizar checagem de bônus no início do combate."
@@ -169,7 +164,6 @@ L.BigBrotherAnnounceToRaid		= "Anunciar resultados da checagem para a raide"
 
 L.Area_SpamFilter_Outgoing		= "Opções de Filtro Global"
 L.SpamBlockNoShowAnnounce		= "Não mostrar anúncios ou tocar sons de aviso"
-L.SpamBlockNoSendAnnounce		= "Não enviar anúncios para o chat da raide."
 L.SpamBlockNoSendWhisper		= "Não enviar sussurros para outros jogadores"
 L.SpamBlockNoSetIcon			= "Não colocar ícones nos alvos."
 

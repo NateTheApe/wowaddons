@@ -334,7 +334,7 @@ Prat:AddModuleToLoad(function()
 	["Extra data for WHISPER (target) and CHANNEL (channel name or num)"] = "Добавочные данные для ШЕПОТА (цель) и КАНАЛА (название канала или номер)",
 	["Filter Name"] = "Название фильтра",
 	Forward = "Пересылать",
-	ForwardCustom = "Вперед пользовательских", -- Needs review
+	ForwardCustom = true,
 	ForwardMessage = true,
 	ForwardMessageCustom = "Частный канал",
 	["Forward the message to a chat channel."] = "Пересылать сообщение в канал чата.",

@@ -844,7 +844,7 @@ local function checkTriggerEnabled(v)
 	if v.disabled then
 		return false
 	end
-	local specstring = v.spec[playerClass]
+	local specstring = v.spec and v.spec[playerClass]
 	if not specstring then
 		return false
 	end
@@ -2222,8 +2222,9 @@ function Parrot_Triggers:OnOptionsCreate()
 	end
 
 	local function newSecondaryCondition(info, name)
-		local t = info.arg
-		local opt = triggers_opt.args[tostring(t)].args.secondary
+                local i = getTriggerId(info)
+                local t = info.arg
+                local opt = triggers_opt.args[tostring(i)].args.secondary
 		local localName = Parrot_TriggerConditions:GetSecondaryConditionChoices()[name]
 		if not t.secondaryConditions then
 			t.secondaryConditions = {}

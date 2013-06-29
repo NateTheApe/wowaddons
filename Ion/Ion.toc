@@ -1,8 +1,8 @@
-﻿## Interface: 50100
+﻿## Interface: 50300
 ## Title: Ion
 ## Notes: Ion: Action Bar & Object Mananger
 ## Author: Connor Chenoweth (aka Maul)
-## Version: Hydrogen-3
+## Version: Hydrogen-6
 ## DefaultState: enabled
 ## SavedVariables: IonItemCache
 ## SavedVariablesPerCharacter: IonGDB, IonCDB, IonSpec

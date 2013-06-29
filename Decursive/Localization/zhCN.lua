@@ -1,7 +1,7 @@
 ﻿--[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.4) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -74,7 +74,7 @@ T._LoadedFiles["zhCN.lua"] = false;
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhCN");
 
 if not L then
-    T._LoadedFiles["zhCN.lua"] = "2.7.2.4";
+    T._LoadedFiles["zhCN.lua"] = "2.7.2.9";
     return;
 end;
 
@@ -312,7 +312,11 @@ L["OPT_INPUT_SPELL_BAD_INPUT_ID"] = "法术 ID 不可用！"
 L["OPT_INPUT_SPELL_BAD_INPUT_NOT_SPELL"] = "不能在技能书中找到法术！"
 L["OPTION_MENU"] = "Decursive 选项菜单"
 L["OPT_LIVELIST"] = "实时列表"
-L["OPT_LIVELIST_DESC"] = "实时列表选项" -- Needs review
+L["OPT_LIVELIST_DESC"] = [=[这是显示在Decursive条下面受影响目标的相关设置列表。
+
+要移动这个列表，你需要移动小型Decursive框体。下面有些设置只有在框体显示时可用，你可以通过在聊天窗口里输入 |cff20CC20/DCRSHOW|r 来显示它。
+
+一旦你设定好了实时列表的位置、缩放及透明度，你可以通过输入 |cff20CC20/DCRHIDE|r 来安全地隐藏Decursive框体。]=] -- Needs review
 L["OPT_LLALPHA"] = "实时列表透明度"
 L["OPT_LLALPHA_DESC"] = "改变 Decursive 状态条面和实时列表的透明度（状态条必须可见）"
 L["OPT_LLSCALE"] = "实时列表缩放"
@@ -469,4 +473,4 @@ L["UNSTABLERELEASE"] = "不稳定版本"
 
 
 
-T._LoadedFiles["zhCN.lua"] = "2.7.2.4";
+T._LoadedFiles["zhCN.lua"] = "2.7.2.9";

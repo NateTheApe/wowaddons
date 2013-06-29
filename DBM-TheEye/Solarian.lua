@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Solarian", "DBM-TheEye")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 416 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 474 $"):sub(12, -3))
 mod:SetCreatureID(18805)
 mod:SetModelID(18239)
 mod:SetZone()
@@ -40,7 +40,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(42783) then
+	if args.spellId == 42783 then
 		warnWrath:Show(args.destName)
 		if args:IsPlayer() then
 			specWarnWrath:Show()
@@ -48,7 +48,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.WrathIcon then
 			self:SetIcon(args.destName, 8, 6)
 		end
-		if DBM:GetRaidRank() > 0 and self.Options.WrathWhisper then
+		if DBM:GetRaidRank() > 1 and self.Options.WrathWhisper then
 			self:SendWhisper(L.WrathWhisper, args.destName)
 		end
 	end

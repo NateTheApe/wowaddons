@@ -1,15 +1,16 @@
 local mod	= DBM:NewMod("BrawlRank4", "DBM-Brawlers")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8384 $"):sub(12, -3))
---mod:SetCreatureID(60491)
+mod:SetRevision(("$Revision: 9770 $"):sub(12, -3))
 mod:SetModelID(28115)
 mod:SetZone()
+mod:SetUsedIcons(8)
 
 mod:RegisterEvents(
 	"SPELL_CAST_START",
 	"SPELL_AURA_APPLIED",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_TARGET",
+	"UNIT_SPELLCAST_SUCCEEDED target focus"
 )
 
 local warnCharging				= mod:NewSpellAnnounce(133253, 3)
@@ -22,12 +23,14 @@ local timerSolarBeamCD			= mod:NewCDTimer(18.5, 129888)
 
 mod:RemoveOption("HealthFrame")
 mod:RemoveOption("SpeedKillTimer")
+mod:AddBoolOption("SetIconOnDominika", true)
 
 local brawlersMod = DBM:GetModByName("Brawlers")
+local DominikaGUID = 0
 
 function mod:SPELL_CAST_START(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if args:IsSpellID(134743) then
+	if args.spellId == 134743 then
 		warnEarthSeed:Show()
 		timerEarthSeedCD:Start()
 	end
@@ -35,9 +38,17 @@ end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if not brawlersMod.Options.SpectatorMode and not brawlersMod:PlayerFighting() then return end--Spectator mode is disabled, do nothing.
-	if args:IsSpellID(129888) and self:AntiSpam() then
+	if args.spellId == 129888 and self:AntiSpam() then
 		warnSolarBeam:Show()
 		timerSolarBeamCD:Start()
+	elseif args.spellId == 133129 then
+		DominikaGUID = args.destGUID
+	end
+end
+
+function mod:UNIT_TARGET()
+	if self.Options.SetIconOnDominika and not DBM.Options.DontSetIcons and UnitGUID("target") == DominikaGUID then
+		SetRaidTarget("target", 8)
 	end
 end
 

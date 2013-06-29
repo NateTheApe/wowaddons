@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Amanitar", "DBM-Party-WotLK", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 34 $"):sub(12, -3))
 mod:SetCreatureID(30258)
 mod:SetModelID(28133)
 mod:SetZone()
@@ -16,7 +16,7 @@ local warningMini	= mod:NewSpellAnnounce(57055, 3)
 local timerMiniCD	= mod:NewCDTimer(30, 57055)
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(57055) then
+	if args.spellId == 57055 then
 		warningMini:Show()
 		timerMiniCD:Start()
 	end

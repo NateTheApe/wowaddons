@@ -1,11 +1,12 @@
 local mod	= DBM:NewMod("Oz", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 311 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 470 $"):sub(12, -3))
 mod:SetCreatureID(18168)
 mod:SetModelID(17550)
 mod:RegisterCombat("yell", L.DBM_OZ_YELL_DOROTHEE)
 mod:SetMinCombatTime(25)
+mod:SetWipeTime(30)
 
 mod:RegisterEvents(
 	"SPELL_CAST_START",
@@ -18,10 +19,10 @@ local WarnTinhead	= mod:NewAnnounce("DBM_OZ_WARN_TINHEAD", 2, nil, nil, false)
 local WarnTido		= mod:NewAnnounce("DBM_OZ_WARN_TITO", 2, nil, nil, false)
 local WarnCrone		= mod:NewAnnounce("DBM_OZ_WARN_CRONE", 2, nil, nil, false)
 
-local timerRoar		= mod:NewTimer(14.5, "DBM_OZ_WARN_ROAR", "Interface\\Icons\\Ability_Druid_ChallangingRoar", nil, false)
-local timerStrawman	= mod:NewTimer(24, "DBM_OZ_WARN_STRAWMAN", "Interface\\Icons\\INV_Helmet_34", nil, false)
-local timerTinhead	= mod:NewTimer(33, "DBM_OZ_WARN_TINHEAD", "Interface\\Icons\\INV_Helmet_02", nil, false)
-local timerTito		= mod:NewTimer(47.5, "DBM_OZ_WARN_TITO", "Interface\\Icons\\Ability_Mount_WhiteDireWolf", nil, false)
+local timerRoar		= mod:NewTimer(13, "DBM_OZ_WARN_ROAR", "Interface\\Icons\\Ability_Druid_ChallangingRoar", nil, false)
+local timerStrawman	= mod:NewTimer(22, "DBM_OZ_WARN_STRAWMAN", "Interface\\Icons\\INV_Helmet_34", nil, false)
+local timerTinhead	= mod:NewTimer(30, "DBM_OZ_WARN_TINHEAD", "Interface\\Icons\\INV_Helmet_02", nil, false)
+--local timerTito		= mod:NewTimer(47.5, "DBM_OZ_WARN_TITO", "Interface\\Icons\\Ability_Mount_WhiteDireWolf", nil, false)
 
 mod:AddBoolOption("AnnounceBosses", true, "announce")
 mod:AddBoolOption("ShowBossTimers", true, "timer")
@@ -32,7 +33,7 @@ function mod:OnCombatStart(delay)
 		timerRoar:Start(-delay)
 		timerStrawman:Start(-delay)
 		timerTinhead:Start(-delay)
-		timerTito:Start(-delay)
+--		timerTito:Start(-delay)
 	end
 end
 
@@ -66,7 +67,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(31014) then
+	if args.spellId == 31014 then
 		if self.Options.AnnounceBosses then
 			WarnTido:Schedule(1)
 		end

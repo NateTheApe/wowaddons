@@ -475,7 +475,7 @@ local function RegisterHandlers(handlers)
 		if ( not fake ) then
 			-- register the event, if we haven't already
 			if ( not reg_events[evt] ) then
-				handlerframe:RegisterEvent(evt);
+				FishingBuddy.RegisterEvent(evt, nil, handlerframe);
 			end
 			reg_events[evt] = 1;
 		end
@@ -964,9 +964,13 @@ end
 -- We'll want to use the cheapest ones we can until our fish don't get
 -- away from us
 
+local function CheckCombat()
+	return InCombatLockdown() or UnitAffectingCombat("player") or UnitAffectingCombat("pet")
+end
+
 local function PostCastUpdate()
 	local stop = true;
-	if ( not InCombatLockdown() ) then
+	if ( not CheckCombat() ) then
 		FL:ResetOverride();
 		if ( AddingLure ) then
 			local sp, sub, txt, tex, st, et, trade, int = UnitChannelInfo("player");
@@ -1107,7 +1111,7 @@ local function UpdateLure()
 					LastLure.time = GetTime() + RELURE_DELAY;
 					DoLure = nil;
 					return true;
-				elseif ( not LastLure.time ) then
+				elseif ( LastLure and not LastLure.time ) then
 					LastLure = nil;
 					LastState = 0;
 				end
@@ -1166,7 +1170,7 @@ FishingBuddy.ReadyForFishing = ReadyForFishing;
 local function NormalHijackCheck()
 	local GSB = FishingBuddy.GetSettingBool;
 	if ( not AddingLure and
-		 not InCombatLockdown() and (not IsMounted() or GSB("MountedCast")) and
+		 not CheckCombat() and (not IsMounted() or GSB("MountedCast")) and
 		 not IsFishingAceEnabled() and
 		 GSB("EasyCast") and (CastingKeys() or ReadyForFishing()) ) then
 		return true;
@@ -1360,7 +1364,7 @@ end
 FishingBuddy.FishingMode = FishingMode;
 
 local function AutoPoleCheck(self, ...)
-	if ( not LastCastTime or InCombatLockdown() or ReadyForFishing() ) then
+	if ( not LastCastTime or CheckCombat() or ReadyForFishing() ) then
 		self:Hide();
 		LastCastTime = nil;
 		return;
@@ -1758,9 +1762,17 @@ FishingBuddy.OnLoad = function(self)
 end
 
 -- allow other parts of the code to watch for events when not fishing
-FishingBuddy.RegisterEvent = function(event, handler)
-	FishingBuddyRoot:RegisterEvent(event);
-	AddHandler(event, handler);
+local isunit = "UNIT_";
+FishingBuddy.RegisterEvent = function(event, handler, frame)
+	frame = frame or FishingBuddyRoot;
+	if (string.sub(event, 1, string.len(isunit)) == isunit) then
+		frame:RegisterUnitEvent(event, "player");
+	else
+		frame:RegisterEvent(event);
+	end
+	if (handler) then
+		AddHandler(event, handler);
+	end
 end
 
 FishingBuddy.UnregisterEvent = function(event, handler)

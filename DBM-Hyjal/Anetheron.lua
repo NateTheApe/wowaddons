@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Anetheron", "DBM-Hyjal")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 334 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(17808)
 mod:SetModelID(21069)
 mod:SetZone()
@@ -32,13 +32,13 @@ function mod:InfernoTarget()
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(31299) then
+	if args.spellId == 31299 then
 		self:ScheduleMethod(0.15, "InfernoTarget")
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(31306) then
+	if args.spellId == 31306 then
 		warnSwarm:Show()
 		timerSwarm:Start()
 	end

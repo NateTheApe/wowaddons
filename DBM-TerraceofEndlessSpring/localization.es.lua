@@ -8,8 +8,7 @@ local L
 L= DBM:GetModLocalization(683)
 
 L:SetOptionLocalization({
-	RangeFrame			= "Mostrar distancia (8) para $spell:111850\n(Muestra a todo el mundo si no tienes el debuff, solo a los jugadores con debuff sino)",
-	SetIconOnPrison		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(117436)
+	RangeFrame			= "Mostrar distancia (8) para $spell:111850\n(Muestra a todo el mundo si no tienes el debuff, solo a los jugadores con debuff sino)"
 })
 
 
@@ -39,7 +38,7 @@ L:SetTimerLocalization({
 L:SetOptionLocalization({
 	warnHideOver			= "Mostrar aviso cuando $spell:123244 ha terminado",
 	timerSpecialCD			= "Mostrar tiempo para la siguiente habilidad especial.",
-	SetIconOnGuard			= "Poner iconos en $journal:6224"
+	SetIconOnProtector		= "Poner iconos en $journal:6224"
 })
 
 L:SetMiscLocalization{

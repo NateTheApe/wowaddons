@@ -1,7 +1,7 @@
 local mod = DBM:NewMod("Anzu", "DBM-Party-BC", 9)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 315 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 452 $"):sub(12, -3))
 
 mod:SetCreatureID(23035)
 mod:SetModelID(21492)
@@ -11,7 +11,7 @@ mod:RegisterEvents(
 	"SPELL_CAST_START",
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_REMOVED",
-	"UNIT_HEALTH",
+	"UNIT_HEALTH target focus mouseover" ,
 	"CHAT_MSG_MONSTER_EMOTE"
 )
 
@@ -64,15 +64,15 @@ end
 function mod:UNIT_HEALTH(uId)
 	if not warnedbirds1 and self:GetUnitCreatureId(uId) == 23035 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.70 then
 		warnedbirds1 = true
-		warnBirds:Show()	
+		warnBirds:Show()
 	elseif not warnedbirds2 and self:GetUnitCreatureId(uId) == 23035 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.37 then
 		warnedbirds2 = true
-		warnBirds:Show()	
+		warnBirds:Show()
 	end
 end
 
 function mod:CHAT_MSG_MONSTER_EMOTE(msg, target)
-	if msg == L.BirdStone then		-- Spirits returning to stone.
+	if msg == L.BirdStone or msg:find(L.BirdStone) then		-- Spirits returning to stone.
 		warnStoned:Show(target)
 	end
 end

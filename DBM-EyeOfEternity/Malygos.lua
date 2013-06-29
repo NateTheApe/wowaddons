@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Malygos", "DBM-EyeOfEternity")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 14 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 51 $"):sub(12, -3))
 mod:SetCreatureID(28859)
 mod:SetModelID(26752)
 
@@ -13,7 +13,7 @@ mod:RegisterEvents(
 	"SPELL_CAST_SUCCESS",
 	"CHAT_MSG_MONSTER_YELL",
 	"RAID_BOSS_EMOTE",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_SPELLCAST_SUCCEEDED target focus"
 )
 
 local warnSpark					= mod:NewSpellAnnounce(56140, 2, 59381)
@@ -44,8 +44,11 @@ local guids = {}
 local surgeTargets = {}
 
 local function buildGuidTable()
-	for i = 1, DBM:GetGroupMembers() do
-		guids[UnitGUID("raid"..i.."pet") or "none"] = GetRaidRosterInfo(i)
+	table.wipe(guids)
+	for uId in DBM:GetGroupMembers() do
+		local name, server = UnitName(uId)
+		local fullName = name .. (server and server ~= "" and ("-" .. server) or "")
+		guids[UnitGUID(uId.."pet") or "none"] = fullName
 	end
 end
 
@@ -105,7 +108,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(56505) then--His deep breath
+	if args.spellId == 56505 then--His deep breath
 		warnBreath:Show()
 		specWarnBreath:Show()
 		timerBreath:Start()
@@ -114,7 +117,7 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(56105) then
+	if args.spellId == 56105 then
 		timerVortexCD:Start()
 		warnVortexSoon:Schedule(54)
 		warnVortex:Show()
@@ -122,7 +125,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		if timerSpark:GetTime() < 11 and timerSpark:IsStarted() then
 			timerSpark:Update(18, 30)
 		end
-	elseif args:IsSpellID(57430) then
+	elseif args.spellId == 57430 then
 		self:ScheduleMethod(0.1, "StaticFieldTarget")
 --		warnStaticField:Show()
 		timerStaticFieldCD:Start()
@@ -130,7 +133,10 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg)
-	if msg:sub(0, L.YellPhase2:len()) == L.YellPhase2 then
+	--Secondary pull trigger, so we can detect combat when he's pulled while already in combat (which is about 99% of time)
+	if (msg == L.YellPull or msg:find(L.YellPull)) and not self:IsInCombat() then
+		DBM:StartCombat(self, 0)
+	elseif msg:sub(0, L.YellPhase2:len()) == L.YellPhase2 then
 		self:SendSync("Phase2")
 	elseif msg == L.YellBreath or msg:find(L.YellBreath) then
 		self:SendSync("BreathSoon")

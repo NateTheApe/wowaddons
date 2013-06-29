@@ -1,9 +1,8 @@
 local mod	= DBM:NewMod(713, "DBM-HeartofFear", nil, 330)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8402 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 9469 $"):sub(12, -3))
 mod:SetCreatureID(63191)--Also has CID 62164. He has 2 CIDs for a single target, wtf? It seems 63191 is one players attack though so i'll try just it.
-mod:SetModelID(42368)
 mod:SetZone()
 mod:SetUsedIcons(2)
 
@@ -29,7 +28,8 @@ local warnPheromones			= mod:NewTargetAnnounce(122835, 4)
 local warnFury					= mod:NewStackAnnounce(122754, 3)
 local warnBrokenLeg				= mod:NewStackAnnounce(122786, 2)
 local warnMendLeg				= mod:NewSpellAnnounce(123495, 1)
-local warnCrush					= mod:NewSpellAnnounce(122774, 3)--On normal, only cast if you do fight wrong (be it on accident or actually on purpose. however, on heroic, this might have a CD)
+local warnCrush					= mod:NewAnnounce("warnCrush", 3, 122774)
+local warnPhase2				= mod:NewPhaseAnnounce(2)
 local warnPungency				= mod:NewStackAnnounce(123081, 4)
 
 local specwarnUnder				= mod:NewSpecialWarning("specwarnUnder")
@@ -42,7 +42,7 @@ local specwarnLeg				= mod:NewSpecialWarningSwitch("ej6270", mod:IsMelee())--If 
 local specwarnPheromoneTrail	= mod:NewSpecialWarningMove(123120)--Because this starts doing damage BEFORE the visual is there.
 
 local timerCrush				= mod:NewCastTimer(3.5, 122774)--Was 3 second, hotfix went live after my kill log, don't know what new hotfixed cast time is, 3.5, 4? Needs verification.
-local timerCrushCD				= mod:NewNextTimer(37, 122774)
+local timerCrushCD				= mod:NewNextCountTimer(37, 122774)
 local timerFuriousSwipeCD		= mod:NewCDTimer(8, 122735)
 local timerMendLegCD			= mod:NewCDTimer(30, 123495)
 local timerFury					= mod:NewBuffActiveTimer(30, 122754)
@@ -54,16 +54,18 @@ local berserkTimer				= mod:NewBerserkTimer(420)
 --mod:AddBoolOption("InfoFrame", true)--Not sure how to do yet, i need to see 25 man first to get a real feel for number of people with debuff at once.
 mod:AddBoolOption("PheromonesIcon", true)
 
+local crushWarnText = GetSpellInfo(122774)
+local crushCountWarnText = GetSpellInfo(122774).." (%d)"
 local brokenLegs = 0
+local crushCount = 0
 
 function mod:OnCombatStart(delay)
 	brokenLegs = 0
 	timerFuriousSwipeCD:Start(-delay)--8-11 sec on pull
 	if self:IsDifficulty("heroic10", "heroic25") then
-		timerCrushCD:Start(30.5-delay)
-		countdownCrush:Start(30.5-delay)
-	end
-	if not self:IsDifficulty("lfr25") then
+		crushCount = 0
+		timerCrushCD:Start(25.5-delay, 1)
+		countdownCrush:Start(25.5-delay)
 		berserkTimer:Start(-delay)
 	else
 		berserkTimer:Start(720-delay)
@@ -71,17 +73,17 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(122754) and args:GetDestCreatureID() == 63191 then--It applies to both creatureids, so we antispam it
+	if args.spellId == 122754 and args:GetDestCreatureID() == 63191 then--It applies to both creatureids, so we antispam it
 		warnFury:Show(args.destName, args.amount or 1)
 		if self:IsDifficulty("lfr25") then
 			timerFury:Start(15)
 		else
 			timerFury:Start()
 		end
-	elseif args:IsSpellID(122786) and args:GetDestCreatureID() == 63191 then--This one also hits both the leg and the boss, so filter second one here as well.
+	elseif args.spellId == 122786 and args:GetDestCreatureID() == 63191 then--This one also hits both the leg and the boss, so filter second one here as well.
 		-- this warn seems not works? needs review.
 		warnBrokenLeg:Show(args.destName, args.amount or 1)
-	elseif args:IsSpellID(122835) then
+	elseif args.spellId == 122835 then
 		warnPheromones:Show(args.destName)
 		specwarnPheromonesTarget:Show(args.destName)
 		if args:IsPlayer() then
@@ -104,7 +106,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.PheromonesIcon then
 			self:SetIcon(args.destName, 2)
 		end
-	elseif args:IsSpellID(123081) and not self:IsDifficulty("lfr25") then
+	elseif args.spellId == 123081 and not self:IsDifficulty("lfr25") then
 		if (args.amount or 1) >= 9 and (args.amount or 1) % 3 == 0 then
 			warnPungency:Show(args.destName, args.amount)
 		end
@@ -117,28 +119,28 @@ end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(122786) and args:GetDestCreatureID() == 63191 then
+	if args.spellId == 122786 and args:GetDestCreatureID() == 63191 then
 		brokenLegs = (args.amount or 0)
 		warnBrokenLeg:Show(args.destName, brokenLegs)
-	elseif args:IsSpellID(122835) then
+	elseif args.spellId == 122835 then
 		if self.Options.PheromonesIcon then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(123081) and args:IsPlayer() then
+	elseif args.spellId == 123081 and args:IsPlayer() then
 		timerPungency:Cancel()
 	end
 end
 mod.SPELL_AURA_REMOVED_DOSE = mod.SPELL_AURA_REMOVED
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(122735) then
+	if args.spellId == 122735 then
 		warnFuriousSwipe:Show()
 		timerFuriousSwipeCD:Start()
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(123495) then
+	if args.spellId == 123495 then
 		warnMendLeg:Show()
 		timerMendLegCD:Start()
 		if brokenLegs == 4 then--all his legs were broken when heal was cast, which means dps was on body.
@@ -156,17 +158,23 @@ mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg:find("spell:122774") then
-		if self:AntiSpam(3, 2) then
-			warnCrush:Show()
-			specwarnCrush:Show()
-		end
 		timerCrush:Start()
-		if self:IsDifficulty("heroic10", "heroic25") and not msg:find(L.UnderHim) then--unconfirmed
-			timerCrushCD:Start()--unconfirmed, assumed by video
+		if self:IsDifficulty("heroic10", "heroic25") and not msg:find(L.UnderHim) then
+			crushCount = crushCount + 1
+			warnCrush:Show(crushCountWarnText:format(crushCount))
+			specwarnCrush:Show()
+			timerCrushCD:Start(nil, crushCount+1)
 			countdownCrush:Start()
+		elseif self:AntiSpam(3, 2) then
+			warnCrush:Show(crushWarnText)
+			specwarnCrush:Show()
 		end
 		if msg:find(L.UnderHim) and target == UnitName("player") then
 			specwarnUnder:Show()--it's a bit of a too little too late warning, but hopefully it'll help people in LFR understand it's not place to be and less likely to repeat it, eventually thining out LFR failure rate to this.
 		end
+	elseif msg:find(L.Phase2) then
+		timerCrushCD:Cancel()
+		countdownCrush:Cancel()
+		warnPhase2:Show()
 	end
 end

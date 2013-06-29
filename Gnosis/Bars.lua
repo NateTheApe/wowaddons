@@ -376,6 +376,12 @@ function Gnosis:FindGCDBars(spell, rank, fCurTime)
 		self:SetupGCDbar(cb, spell, rank, fCurTime, false);
 		cb = self:FindCBNext("gcd");
 	end
+	
+	local cb = self:FindCB("gcd2");
+	while(cb) do
+		self:SetupGCDbar(cb, spell, rank, fCurTime, false);
+		cb = self:FindCBNext("gcd2");
+	end
 end
 
 function Gnosis:FindSwingTimers(unit, spell, icon, fCurTime, bType)
@@ -407,6 +413,7 @@ end
 function Gnosis:FontString(bar, height)
 	local fs = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallOutline");
 	fs:SetFont(GameFontNormal:GetFont(), height);
+	
 	return fs;
 end
 
@@ -715,8 +722,8 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	self:GenerateTimeTable(bar, true);
 
 	-- castbar? if not set bnIsCB to true
-	if(tParams.unit == "gcd" or tParams.unit == "sm" or tParams.unit == "sr"
-		or tParams.unit == "smr") then
+	if(tParams.unit == "gcd" or tParams.unit == "gcd2" or
+		tParams.unit == "sm" or tParams.unit == "sr" or tParams.unit == "smr") then
 		bar.bnIsCB = true;
 	else
 		bar.bnIsCB = nil;
@@ -925,6 +932,35 @@ function Gnosis:RemoveAllCastbars()
 	self:CreateCBTables();
 end
 
+function Gnosis:RemoveCastbarDialog(key)
+	Gnosis.dialog:Register("GNOSIS_REMOVEBAR",
+		{
+			text = Gnosis.L["OptCBRemCB"] .. " " .. key,
+			buttons = { 
+				{
+					text = Gnosis.L["Yes"],
+					on_click = function(self)
+						Gnosis:RemoveCastbar(key);
+						InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+					end,
+				},
+				{
+					text = Gnosis.L["No"],
+					on_click = function(self)
+					end,
+				},
+			},
+			hide_on_escape = false,
+			show_while_dead = true,
+			exclusive = true,
+			width = 350,
+			strata = 5,
+		}
+	);
+	
+	Gnosis.dialog:Spawn("GNOSIS_REMOVEBAR");
+end
+
 function Gnosis:RemoveCastbar(key)
 	self:CleanupCastbar(self.castbars[key]);
 	self.castbars[key]:Hide();
@@ -1070,6 +1106,17 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left)
 		return;
 	end
 
+	-- non casttime spell GCD Indicator?
+	if (cfg.unit == "gcd2") then
+		local spellcasttime = select(7, GetSpellInfo(spell));
+		local playerischanneling = UnitChannelInfo("player");
+		--local playeriscasting = UnitCastingInfo("player"); -- tested: casting often starts too late to detect correctly
+		
+		if (playerischanneling or not (spellcasttime and spellcasttime == 0)) then
+			return;
+		end
+	end
+	
 		-- valid group layout?
 	if(not self:CheckGroupLayout(cfg)) then
 		return;
@@ -1283,7 +1330,7 @@ function Gnosis:CreateCastnameFromString(name, rank, cb)
 		str = string_gsub(str, "rank<([^>]+)>", "");
 		str = string_gsub(str, "txr<([^>]+)>", "");
 	end
-
+	
 	if(bOther) then
 		str = string_gsub(str, "misc", cb.stacks and cb.stacks or rank);
 		str = string_gsub(str, "txm<([^>]+)>", "%1");
@@ -1292,6 +1339,15 @@ function Gnosis:CreateCastnameFromString(name, rank, cb)
 		str = string_gsub(str, "txm<([^>]+)>", "");
 	end
 
+	-- effect (effect value of various auras like Shield Barrier, Power Word: Shield, ...)
+	if(cb.effect) then
+		str = string_gsub(str, "effect", cb.effect);
+		str = string_gsub(str, "txeff<([^>]+)>", "%1");
+	else
+		str = string_gsub(str, "effect", "");
+		str = string_gsub(str, "txeff<([^>]+)>", "");
+	end
+	
 	if(cb.bIsTrade) then
 		str = string_gsub(str, "tscur", string_format("%.0f", cb.tscnt));
 		str = string_gsub(str, "tstot", string_format("%.0f", cb.tstot));
@@ -1597,7 +1653,8 @@ function Gnosis:SetupTimerbar(cb, fCurTime, tiinfo)
 	cb.icontex = (not curtimer.hideicon) and icon or nil;
 	cb.stacks = stacks;
 	cb.tiUnit = tiunit;
-	cb.tiUnitName = (cb.tiUnit and curtimer.type == 2) and UnitName(cb.tiUnit);
+	--cb.tiUnitName = (cb.tiUnit and curtimer.type == 2) and UnitName(cb.tiUnit);
+	cb.tiUnitName = UnitName(cb.tiUnit);
 	cb.tiType = curtimer.type;
 
 	cb.channel = bChannel;
@@ -2121,6 +2178,7 @@ function Gnosis:CleanupCastbar(cb, bDoNotSetValue, bDoNotOverwriteNfsTfs)
 
 	cb.icontex = nil;
 	cb.stacks = nil;
+	cb.effect = nil;
 	cb.tiUnit = nil;
 	cb.tiUnitName = nil;
 	cb.tiType = nil;

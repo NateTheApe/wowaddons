@@ -1,0 +1,24 @@
+------------------------------------------------------------------------
+r130 | pathur | 2013-05-27 10:37:29 +0000 (Mon, 27 May 2013) | 1 line
+Changed paths:
+   A /tags/2.7 (from /trunk:129)
+
+Tagged as 2.7 (Please check if this works)
+------------------------------------------------------------------------
+r129 | pathur | 2013-05-27 10:35:53 +0000 (Mon, 27 May 2013) | 1 line
+Changed paths:
+   M /trunk/Broker_ProfessionsMenu.toc
+   M /trunk/core.lua
+   M /trunk/dropdownmenu.lua
+
+Bugfix: Patch 5.3 TradeSkillLink Changes (thanks to pejo666)
+------------------------------------------------------------------------
+r128 | pathur | 2012-11-08 12:41:08 +0000 (Thu, 08 Nov 2012) | 1 line
+Changed paths:
+   M /trunk/Broker_ProfessionsMenu.toc
+   M /trunk/core.lua
+   M /trunk/dropdownmenu.lua
+   D /trunk/quicktradeskills.lua
+
+-- code improvements
+------------------------------------------------------------------------

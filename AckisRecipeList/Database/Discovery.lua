@@ -2,10 +2,10 @@
 ************************************************************************
 Discovery.lua
 ************************************************************************
-File date: 2012-09-22T19:55:35Z
-File hash: 46f65df
-Project hash: 3df9ad7
-Project version: 2.4.4
+File date: 2013-05-04T23:14:19Z
+File hash: 3e2ef57
+Project hash: 3fa6ce4
+Project version: 2.4.8
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -47,9 +47,14 @@ function addon:InitDiscovery()
 	AddDiscovery("DISCOVERY_ALCH_NORTHREND_RESEARCH")
 	AddDiscovery("DISCOVERY_ALCH_NORTHREND_XMUTE")
 	AddDiscovery("ENG_DISC")
+	AddDiscovery("ENG_DISC_FIREWORKS")
 	AddDiscovery("DISCOVERY_ALCH_PANDARIA")
 	AddDiscovery("DISCOVERY_INSC_PANDARIA")
 	AddDiscovery("DISCOVERY_JC_PANDARIA")
+	AddDiscovery("DISCOVERY_LW_PANDARIA")
+	AddDiscovery("DISCOVERY_TAILOR_PANDARIA")
+	AddDiscovery("DISCOVERY_BS_PANDARIA")
+	AddDiscovery("DISCOVERY_BS_WEAP_PANDARIA")
 
 	self.InitDiscovery = nil
 end

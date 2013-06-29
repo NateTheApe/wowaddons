@@ -9,10 +9,6 @@ local L
 -----------------------
 L= DBM:GetModLocalization(672)
 
-L:SetOptionLocalization({
-	SetIconOnAdds	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format("ej5616")
-})
-
 -----------------------
 -- Lorewalker Stonestep --
 -----------------------
@@ -20,10 +16,6 @@ L= DBM:GetModLocalization(664)
 
 L:SetWarningLocalization({
 	SpecWarnIntensity	= "%s在%s有(%d)層"
-})
-
-L:SetOptionLocalization({
-	SpecWarnIntensity	= DBM_CORE_AUTO_SPEC_WARN_OPTIONS["stack"]:format(6, 113315)
 })
 
 -----------------------
@@ -59,8 +51,7 @@ L:SetWarningLocalization({
 })
 
 L:SetOptionLocalization({
-	SpecWarnFizzyBubbles	= "當你缺少$spell:114459時顯示特別警告",
-	RangeFrame				= "為$spell:106546顯示距離框"
+	SpecWarnFizzyBubbles	= "當你缺少$spell:114459時顯示特別警告"
 })
 
 -----------------------
@@ -70,6 +61,10 @@ L:SetOptionLocalization({
 -- Gu Cloudstrike --
 -----------------------
 L= DBM:GetModLocalization(673)
+
+L:SetWarningLocalization({
+	warnStaticField	= "%s"
+})
 
 -----------------------
 -- Snowdrift --
@@ -86,8 +81,7 @@ L:SetOptionLocalization({
 
 L:SetMiscLocalization({
 	NovicesPulled	= "你!在煞沉眠了這麼多年之後，你竟然讓它甦醒了!",
-	NovicesDefeated = "你打贏了我資歷最淺的徒弟。現在你要面對我最資深的兩個徒弟。",
---	Defeat			= "I am bested.  Give me a moment and we will venture forth together to face the Sha."
+	NovicesDefeated = "你打贏了我資歷最淺的徒弟。現在你要面對我最資深的兩個徒弟。"
 })
 
 -----------------------
@@ -115,10 +109,6 @@ L:SetOptionLocalization({
 -- Kiptilak --
 ---------------------
 L= DBM:GetModLocalization(655)
-
-L:SetOptionLocalization({
-	IconOnSabotage	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(107268)
-})
 
 -------------
 -- Gadok --
@@ -237,7 +227,7 @@ L:SetMiscLocalization({
 L= DBM:GetModLocalization(666)
 
 L:SetMiscLocalization({
-	Kill	= "什麼?!"
+	Kill	= "受死吧，死靈法師!"
 })
 
 -----------------------

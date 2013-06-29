@@ -11,14 +11,10 @@ L:SetGeneralLocalization({
 	name = "오멘"
 })
 
------------------------
---  Apothecary Trio  --
------------------------
-L = DBM:GetModLocalization("ApothecaryTrio")
-
-L:SetGeneralLocalization({
-	name = "화학회사 삼인방"
-})
+------------------------------
+--  The Crown Chemical Co.  --
+------------------------------
+L = DBM:GetModLocalization("d288")
 
 L:SetTimerLocalization{
 	HummelActive	= "훔멜 활성화",
@@ -27,21 +23,17 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization({
-	TrioActiveTimer		= "각 보스별 활성화 바 표시"
+	TrioActiveTimer		= "각 우두머리별 활성화 바 표시"
 })
 
 L:SetMiscLocalization({
 	SayCombatStart		= "저들이 내가 누군지와 왜 이 일을 하는지 말해주려고 귀찮게 하든가?"
 })
 
--------------
---  Ahune  --
--------------
-L = DBM:GetModLocalization("Ahune")
-
-L:SetGeneralLocalization({
-	name = "아훈"
-})
+----------------------------
+--  The Frost Lord Ahune  --
+----------------------------
+L = DBM:GetModLocalization("d286")
 
 L:SetWarningLocalization({
 	Submerged		= "아훈 잠수",
@@ -58,7 +50,7 @@ L:SetTimerLocalization{
 L:SetOptionLocalization({
 	Submerged		= "잠수 알림 보기",
 	Emerged			= "등장 알림 보기",
-	specWarnAttack	= "보스 약화시 특수 경보 보기",
+	specWarnAttack	= "아훈 약화시 특수 경고 보기",
 	SubmergTimer	= "잠수 바 표시",
 	EmergeTimer		= "등장 바 표시",
 	TimerCombat		= "전투 시작 바 표시",
@@ -71,11 +63,7 @@ L:SetMiscLocalization({
 --------------------
 -- Coren Direbrew --
 --------------------
-L = DBM:GetModLocalization("CorenDirebrew")
-
-L:SetGeneralLocalization({
-	name = "코렌 다이어브루"
-})
+L = DBM:GetModLocalization("d287")
 
 L:SetWarningLocalization({
 	specWarnBrew			= "흑맥주요정이 맥주를 다시 던지기전에 맥주를 마셔버리세요!",
@@ -92,14 +80,10 @@ L:SetMiscLocalization{
 	YellBarrel				= "저에게 맥주통!"
 }
 
--------------------
--- Headless Horseman --
--------------------
-L = DBM:GetModLocalization("HeadlessHorseman")
-
-L:SetGeneralLocalization({
-	name = "저주받은 기사"
-})
+-----------------------------
+--  The Headless Horseman  --
+-----------------------------
+L = DBM:GetModLocalization("d285")
 
 L:SetWarningLocalization({
 	WarnPhase				= "%d 단계",
@@ -151,17 +135,17 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	warnGameOverQuest	= "게임 종료. 획득 점수 %d 점, 획득 가능한 최대 점수 : %d 점",
-	warnGameOverNoQuest	= "게임 종료. 획득 가능한 최대 점수 : %d 점",
+	warnGameOverQuest	= "게임 종료. 점수 %d 점, 이 게임의 최대 점수 : %d 점",
+	warnGameOverNoQuest	= "게임 종료. 이 게임의 최대 점수 : %d 점",
 	warnGnoll			= "놀 등장",
 	warnHogger			= "들창코 놀 등장",
 	specWarnHogger		= "들창코 놀 등장!"
 })
 
 L:SetOptionLocalization({
-	warnGameOver	= "획득 가능한 최대 점수에 대해 알림",
-	warnGnoll		= "놀 등장 알림",
-	warnHogger		= "들창코 놀 등장 알림",
+	warnGameOver	= "진행 게임의 최대 점수 알림 보기",
+	warnGnoll		= "놀 등장 알림 보기",
+	warnHogger		= "들창코 놀 등장 알림 보기",
 	specWarnHogger	= "들창코 놀 득장 특수 경고 보기"
 })
 

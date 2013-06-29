@@ -8,11 +8,6 @@ local expect = PitBull4.expect
 
 PitBull4.Utils = {}
 
--- 12484 is the version that China got the new format, so doing it this way works
--- for both China and 4.0.x
-
-local new_guid_format = tonumber((select(2,GetBuildInfo()))) >= 12484
-
 do
 	local target_same_mt = { __index=function(self, key)
 		if type(key) ~= "string" then
@@ -66,7 +61,10 @@ do
 		better_unit_ids["raidpet" .. i] = "raidpet" .. i
 		better_unit_ids["raid" .. i .. "pet"] = "raidpet" .. i
 	end
-	for i = 1, MAX_ARENA_TEAM_MEMBERS do
+	-- There's no good constant for this.  We used to use
+	-- MAX_ARENA_TEAM_MEMBERS which doesn't make sense and broke
+	-- when 5.2 moved it into the PVPUI addon.
+	for i = 1, 5 do
 		better_unit_ids["arena" .. i] = "arena" .. i
 		better_unit_ids["arenapet" .. i] = "arenapet" .. i
 		better_unit_ids["arena" .. i .. "pet"] = "arenapet" .. i
@@ -246,11 +244,7 @@ function PitBull4.Utils.GetMobIDFromGuid(guid)
         return nil
     end
    
-		if new_guid_format then
-			return tonumber(guid:sub(-12, -9), 16)
-		else
-	    return tonumber(guid:sub(-10, -7), 16)
-		end
+		return tonumber(guid:sub(-12, -9), 16)
 end
 
 --- Return the unit classification of the given unit.

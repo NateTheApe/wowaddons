@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Illidan", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 416 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 455 $"):sub(12, -3))
 mod:SetCreatureID(22917)
 mod:SetModelID(21135)
 mod:SetUsedIcons(8)
@@ -15,7 +15,7 @@ mod:RegisterEvents(
 	"SPELL_DAMAGE",
 	"SPELL_MISSED",
 	"CHAT_MSG_MONSTER_YELL",
-	"UNIT_HEALTH",
+	"UNIT_HEALTH target focus mouseover",
 	"UNIT_DIED"
 )
 
@@ -108,7 +108,7 @@ function mod:OnCombatEnd()
 end 
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(41917) or args:IsSpellID(41914) then
+	if args.spellId == 41917 or args.spellId == 41914 then
 		warnParasite:Show(args.destName)
 		timerParasite:Start(args.destName)
 		if args:IsPlayer() then
@@ -117,17 +117,17 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.ParasiteIcon then
 			self:SetIcon(args.destName, 8)
 		end
-		if DBM:GetRaidRank() > 0 and self.Options.ParasiteWhisper then
+		if DBM:GetRaidRank() > 1 and self.Options.ParasiteWhisper then
 			self:SendWhisper(L.ParasiteWhisper, args.destName)
 		end
-	elseif args:IsSpellID(40585) then
+	elseif args.spellId == 40585 then
 		warnBarrage:Show(args.destName)
 		timerBarrage:Start(args.destName)
 		timerNextBarrage:Start()
 		if args:IsPlayer() then
 			specWarnBarrage:Show()
 		end
-	elseif args:IsSpellID(40932) then
+	elseif args.spellId == 40932 then
 		flameTargets[#flameTargets + 1] = args.destName
 		if args:IsPlayer() then
 			specWarnFlame:Show()
@@ -135,7 +135,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerFlame:Start(args.destName)
 		self:Unschedule(showFlameTargets)
 		self:Schedule(0.3, showFlameTargets)
-	elseif args:IsSpellID(41083) then
+	elseif args.spellId == 41083 then
 		shadowDemonTargets[#shadowDemonTargets + 1] = args.destName
 		self:Unschedule(showDemonTargets)
 		if #shadowDemonTargets >= 4 then
@@ -143,25 +143,25 @@ function mod:SPELL_AURA_APPLIED(args)
 		else
 			self:Schedule(1, showDemonTargets)
 		end
-	elseif args:IsSpellID(40683) then
+	elseif args.spellId == 40683 then
 		warnEnrage:Show()
 		timerEnrage:Start()
-	elseif args:IsSpellID(40695) then
+	elseif args.spellId == 40695 then
 		warnCaged:Show()
 		timerCaged:Start()
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(39855) then
+	if args.spellId == 39855 and self:AntiSpam(4, 1) then
 		flamesDown = 0
 		warnPhase2:Show()
 		timerNextBarrage:Start(81)
 	end
 end
 
-function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if spellId == 41131 and self:AntiSpam(4) then
+function mod:SPELL_DAMAGE(_, _, _, _, _, _, _, _, spellId)
+	if spellId == 41131 and self:AntiSpam(4, 2) then
 		warnFlameBurst:Show()
 		flameBursts = flameBursts + 1
 		if flameBursts < 3 then

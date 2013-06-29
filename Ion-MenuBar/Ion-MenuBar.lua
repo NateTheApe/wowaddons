@@ -158,7 +158,7 @@ local function updateMicroButtons()
 		ION.LatencyButton_SetNormal(IonLatencyButton)
 	end
 
-	if (IonPVPButton and PVPFrame:IsShown()) then
+	if (IonPVPButton and PVPUIFrame and PVPUIFrame:IsShown()) then
 
 		IonPVPButton:SetButtonState("PUSHED", 1)
 		ION.PVPButton_SetPushed(IonPVPButton)
@@ -559,8 +559,8 @@ function ION.PVPButton_OnMouseDown(self)
 
 	if (self.down) then
 		self.down = nil
-		if (PVPFrame) then
-			ToggleFrame(PVPFrame)
+		if (PVPUIFrame) then
+			ToggleFrame(PVPUIFrame)
 		end
 		return
 	end
@@ -579,8 +579,13 @@ function ION.PVPButton_OnMouseUp(self)
 
 	if (self.down) then
 		self.down = nil
-		if (self:IsMouseOver() and PVPFrame) then
-			ToggleFrame(PVPFrame)
+
+		if (not IsAddOnLoaded("Blizzard_PVPUI")) then
+			LoadAddOn("Blizzard_PVPUI")
+		end
+
+		if (self:IsMouseOver() and PVPUIFrame) then
+			ToggleFrame(PVPUIFrame)
 		else
 			updateMicroButtons()
 		end

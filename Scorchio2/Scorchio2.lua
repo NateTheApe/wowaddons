@@ -32,6 +32,7 @@ local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitAura = UnitAura
 local UnitDebuff = UnitDebuff
+local UnitBuff = UnitBuff
 local UnitName = UnitName
 local UnitIsPlayer = UnitIsPlayer
 local GetTime = GetTime
@@ -53,16 +54,18 @@ local DB
 local Scorchio2
 local playerGUID
 local lastTargetGUID
-local waterElementalGUID
 local impactTimestamp = 0
 local impactLBExpire
+local impactIgniteExpire
+local impactPyroblastExpire
+local impactCombustionExpire
 local combatFlag
 
 Scorchio2 = LibStub("AceAddon-3.0"):NewAddon("Scorchio2", "AceEvent-3.0", "AceConsole-3.0", "AceTimer-3.0", "LibBars-1.0", "LibSink-2.0")
 _G.Scorchio2 = Scorchio2
 local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale("Scorchio2")
 local SM = LibStub("LibSharedMedia-3.0")
-local DBVERSION = 8
+local DBVERSION = 10
 
 -- Constants for mobTable
 local MOBNAME = 1
@@ -88,13 +91,13 @@ L["Arcane Charge"] = GetSpellInfo(36032)
 L["Brain Freeze"] = GetSpellInfo(57761)
 L["Fingers of Frost"] = GetSpellInfo(44544)
 L["Mirror Image"] = GetSpellInfo(55342)
-L["Frostfire Bolt"] = GetSpellInfo(44614)
 L["Ignite"] = GetSpellInfo(12654)
 L["Pyroblast"] = GetSpellInfo(11366)
 L["Flamestrike"] = GetSpellInfo(2120)
 L["Invocation"] = GetSpellInfo(114003)
 L["Nether Tempest"] = GetSpellInfo(114923)
 L["Frost Bomb"] = GetSpellInfo(112948)
+L["Combustion"] = GetSpellInfo(83853)
 
 -- Register some sounds
 SM:Register("sound", "AchievementSound", [[Sound\Spells\AchievmentSound1.wav]])
@@ -139,7 +142,6 @@ local SPELLIDS = {
 	[122] = true, -- Frost Nova
 	[30455] = true, -- Ice Lance
 	[108853] = true, -- Inferno Blast
-	[44614] = true, -- Frostfire Bolt
 	[44457] = true, -- Living Bomb
 	[55342] = true, -- Mirror Image
 	[118] = true, -- Polymorph
@@ -151,8 +153,8 @@ local SPELLIDS = {
 	[61780] = true, -- Polymorph: Turkey
 	[2948] = true, -- Scorch
 	[31589] = true, -- Slow
-	[31687] = true, -- Summon Water Elemental
 	[114923] = true, -- Nether Tempest
+	[11129] = true, -- Combustion
 }
 
 -- Bar settings in the DB are referenced by these 1-letter codes.
@@ -168,11 +170,11 @@ local BAR_ARCANE_CHARGE = "i"
 local BAR_BRAIN_FREEZE = "j"
 local BAR_FINGERS_OF_FROST = "k"
 -- Shadow Mastery, removed
-local BAR_WATER_ELEMENTAL = "m"
+-- Water Elemental, removed
 local BAR_MIRROR_IMAGE = "n"
 -- Torment the Weak, removed
 local BAR_8_PERCENT_SPELL_DAMAGE = "p"
-local BAR_FROSTFIRE_BOLT = "q"
+-- Frostfire Bolt, removed
 -- Impact, removed
 -- Improved Polymorph, removed
 local BAR_IGNITE = "t"
@@ -181,7 +183,11 @@ local BAR_FLAMESTRIKE = "v"
 local BAR_INVOCATION = "w"
 local BAR_NETHER_TEMPEST = "x"
 local BAR_FROST_BOMB = "y"
+local BAR_COMBUSTION = "z"
 
+-- When deleting or inserting anything in this array, you must update a couple UpdateTable() calls
+-- pertaining to Flamestrike and Frost Bomb, since they have no spellID to reference. Appending 
+-- causes no problems.
 local VULNDATA = {
 	{ -- Pyromaniac
 		bar = BAR_PYROMANIC,
@@ -216,7 +222,7 @@ local VULNDATA = {
 		},
 		self = false,
 		durationpve = 50,
-		durationpvp = 10,
+		durationpvp = 8,
 		maxstacks = 1,
 		unique = true,
 		valid = 4294967295,
@@ -226,7 +232,7 @@ local VULNDATA = {
 		spellid = 31589,
 		self = false,
 		durationpve = 15,
-		durationpvp = 10,
+		durationpvp = 8,
 		maxstacks = 1,
 		unique = true,
 		valid = 4294967295,
@@ -267,7 +273,7 @@ local VULNDATA = {
 		self = true,
 		durationpve = 10,
 		durationpvp = 10,
-		maxstacks = 6,
+		maxstacks = 4,
 		unique = true,
 		valid = COMBATLOG_OBJECT_AFFILIATION_MINE,
 	},
@@ -291,16 +297,6 @@ local VULNDATA = {
 		unique = true,
 		valid = COMBATLOG_OBJECT_AFFILIATION_MINE,
 	},
-	{  -- Water Elemental
-		bar = BAR_WATER_ELEMENTAL,
-		-- no spellid; elemental is detected specially through the SPELL_SUMMON event, not through casts
-		self = true,
-		durationpve = 45,
-		durationpvp = 45,
-		maxstacks = 1,
-		unique = true,
-		valid = COMBATLOG_OBJECT_AFFILIATION_MINE,
-	},
 	{  -- Mirror Image
 		bar = BAR_MIRROR_IMAGE,
 		spellid = 55342,
@@ -311,32 +307,12 @@ local VULNDATA = {
 		unique = true,
 		valid = COMBATLOG_OBJECT_AFFILIATION_MINE,
 	},
-	{  -- Ebon Plaguebringer
-		bar = BAR_8_PERCENT_SPELL_DAMAGE,
-		spellid = 65142,
-		self = false,
-		durationpve = 20,
-		durationpvp = 10,
-		maxstacks = 1,
-		unique = false,
-		valid = 4294967295,
-	},
 	{  -- Curse of Elements
 		bar = BAR_8_PERCENT_SPELL_DAMAGE,
 		spellid = 1490,
 		self = false,
 		durationpve = 300,
-		durationpvp = 10,
-		maxstacks = 1,
-		unique = false,
-		valid = 4294967295,
-	},
-	{  -- Earth and Moon
-		bar = BAR_8_PERCENT_SPELL_DAMAGE,
-		spellid = 60433,
-		self = false,
-		durationpve = 12,
-		durationpvp = 10,
+		durationpvp = 120,
 		maxstacks = 1,
 		unique = false,
 		valid = 4294967295,
@@ -346,20 +322,30 @@ local VULNDATA = {
 		spellid = 93068,
 		self = false,
 		durationpve = 15,
-		durationpvp = 10,
+		durationpvp = 15,
 		maxstacks = 1,
 		unique = false,
 		valid = 4294967295,
 	},
-	{ -- Frostfire Bolt
-		bar = BAR_FROSTFIRE_BOLT,
-		spellid = 44614,
+	{  -- Lightning Breath
+		bar = BAR_8_PERCENT_SPELL_DAMAGE,
+		spellid = 24844,
 		self = false,
-		durationpve = 12,
-		durationpvp = 12,
-		maxstacks = 3,
+		durationpve = 45,
+		durationpvp = 45,
+		maxstacks = 1,
 		unique = false,
-		valid = COMBATLOG_OBJECT_AFFILIATION_MINE,
+		valid = 4294967295,
+	},
+	{  -- Fire Breath
+		bar = BAR_8_PERCENT_SPELL_DAMAGE,
+		spellid = 34889,
+		self = false,
+		durationpve = 45,
+		durationpvp = 45,
+		maxstacks = 1,
+		unique = false,
+		valid = 4294967295,
 	},
 	{ -- Ignite
 		bar = BAR_IGNITE,
@@ -375,8 +361,8 @@ local VULNDATA = {
 		bar = BAR_PYROBLAST,
 		spellid = 11366,
 		self = false,
-		durationpve = 12,
-		durationpvp = 12,
+		durationpve = 18,
+		durationpvp = 18,
 		maxstacks = 1,
 		unique = false,
 		valid = COMBATLOG_OBJECT_AFFILIATION_MINE,
@@ -415,7 +401,17 @@ local VULNDATA = {
 		bar = BAR_FROST_BOMB,
 		-- tracking done by time since cast success, not auras
 		self = false,
-		durationpve = 10,
+		durationpve = 10, -- actual duration of bar will depend on haste (dealt with elsewhere)
+		durationpvp = 10, 
+		maxstacks = 1,
+		unique = false,
+		valid = COMBATLOG_OBJECT_AFFILIATION_MINE,
+	},
+	{ -- Combustion
+		bar = BAR_COMBUSTION,
+		spellid = 83853,
+		self = false,
+		durationpve = 10, -- Glyph will double it, that will be automatically detected
 		durationpvp = 10,
 		maxstacks = 1,
 		unique = false,
@@ -772,27 +768,7 @@ local defaults = {
 			},
 			l = { -- Shadow Mastery, removed
 			},
-			m = { -- Water Elemental
-				message = format(L["%s Dead"], L["Water Elemental"]),
-				warning = "Water Elemental Fading!", -- not localizing this because it will be removed soon
-				track = false,
-				show = true,
-				showproc = false,
-				showwarning = true,
-				showexpire = true,
-				warningtime = 10,
-				soundson = true,
-				bar = L["Water Elemental"],
-				warningsound = "Bell",
-				expiredsound = "Info",
-				fg = { 0.2, 1, 1 },
-				bg = { 0.2, 0.2, 0.2 },
-				nontargetanchor = "buffs",
-				targetanchor = "buffs",
-				nontargetalpha = 1.0,
-				targetalpha = 1.0,
-				clearooc = false,
-				icon = "Interface\\Icons\\Spell_Frost_SummonWaterElemental_2"
+			m = { -- Water Elemental, removed
 			},
 			n = { -- Mirror Image
 				message = format(L["%s: Full Threat Restored"], L["Mirror Image"]),
@@ -817,7 +793,7 @@ local defaults = {
 			},
 			o = { -- Torment the Weak, removed
 			},
-			p = { -- 8% Spell Damage
+			p = { -- 5% Spell Damage
 				message = format(L["%s Faded on $m"], L["8% Spell Damage"]),
 				warning = "",
 				track = true,
@@ -838,27 +814,7 @@ local defaults = {
 				clearooc = true,
 				icon = "Interface\\Icons\\INV_Enchant_EssenceMagicLarge"
 			},
-			q = { -- Frostfire Bolt
-				message = format(L["%s Faded on $m"], L["Frostfire Bolt"]),
-				warning = format(L["Recast %s on $m!"], L["Frostfire Bolt"]),
-				track = true,
-				show = true,
-				showproc = false,
-				showwarning = true,
-				showexpire = true,
-				warningtime = 5,
-				soundson = true,
-				bar = L["$sx $m"],
-				warningsound = "Bell",
-				expiredsound = "Info",
-				fg = { 0.2, 0.2, 1 },
-				bg = { 0.2, 0.2, 0.2 },
-				nontargetanchor = "nontargeted",
-				targetanchor = "targeted",
-				nontargetalpha = 1.0,
-				targetalpha = 1.0,
-				clearooc = true,
-				icon = "Interface\\Icons\\Ability_Mage_FrostFireBolt"
+			q = { -- Frostfire Bolt, removed
 			},
 			r = { -- Impact, removed
 			},
@@ -1002,6 +958,29 @@ local defaults = {
 				clearooc = false,
 				icon = "Interface\\Icons\\Spell_Mage_FrostBomb"
 			},
+			z = { -- Combustion
+				message = "",
+				warning = "",
+				track = true,
+				show = true,
+				showproc = false,
+				showwarning = false,
+				showexpire = false,
+				warningtime = 5,
+				soundson = false,
+				bar = "$m",
+				procsound = "None",
+				warningsound = "None",
+				expiredsound = "None",
+				fg = { 1, 0.06666666666666667, 0 },
+				bg = { 0.2, 0.2, 0.2 },
+				nontargetanchor = "none",
+				targetanchor = "targeted",
+				nontargetalpha = 1.0,
+				targetalpha = 1.0,
+				clearooc = true,
+				icon = "Interface\\Icons\\Spell_Fire_SealOfFire"
+			},
 		},
 		sinkoptions = { },
 		debug = {
@@ -1080,13 +1059,13 @@ function Scorchio2:OnInitialize()
 	mobTable = { }
 	Scorchio2.mobTable = mobTable
 	combatFlag = false
-	waterElementalGUID = nil
 end
 
 function Scorchio2:OnEnable()
 	Scorchio2:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	Scorchio2:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "CheckArcaneCharge")
-	Scorchio2:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", "CheckArcaneCharge")
+	Scorchio2:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", "SpecialChecks")
+	Scorchio2:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", "SpecialChecks")
+	Scorchio2:RegisterEvent("UNIT_AURA", "SpecialChecks")
 	Scorchio2:RegisterEvent("PLAYER_ENTERING_WORLD")
 	Scorchio2:RegisterEvent("PLAYER_REGEN_ENABLED")
 	Scorchio2:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -1121,13 +1100,13 @@ end
 
 function Scorchio2:RunTest(anchor)
 	if anchor == "buffs" then
-		Scorchio2:UpdateTable("Test1", "Hot Streak", 6, GetTime(), 1, nil, nil, anchor)
-		Scorchio2:UpdateTable("Test2", "Clearcasting", 8, GetTime(), 1, nil, nil, anchor)
+		Scorchio2:UpdateTable("Test1", "Pyroblast!", VULNERABILITIES[48108], GetTime(), 1, nil, nil, anchor)
+		Scorchio2:UpdateTable("Test2", "Arcane Missiles!", VULNERABILITIES[79683], GetTime(), 1, nil, nil, anchor)
 	else
-		Scorchio2:UpdateTable("Test1", "Test Mob 1", 1, GetTime(), 1, nil, nil, anchor)
-		Scorchio2:UpdateTable("Test2", "Test Mob 2", 3, GetTime(), 1, nil, nil, anchor)
-		Scorchio2:UpdateTable("Test3", "Test Mob 3", 5, GetTime(), 1, nil, nil, anchor)
-		Scorchio2:UpdateTable("Test4", "Test Mob 4", 4, GetTime(), 1, nil, nil, anchor)
+		Scorchio2:UpdateTable("Test1", "Test Mob 1", VULNERABILITIES[132210], GetTime(), 1, nil, nil, anchor)
+		Scorchio2:UpdateTable("Test2", "Test Mob 2", VULNERABILITIES[44457], GetTime(), 1, nil, nil, anchor)
+		Scorchio2:UpdateTable("Test3", "Test Mob 3", VULNERABILITIES[118], GetTime(), 1, nil, nil, anchor)
+		Scorchio2:UpdateTable("Test4", "Test Mob 4", VULNERABILITIES[31589], GetTime(), 1, nil, nil, anchor)
 	end
 end
 
@@ -1212,12 +1191,6 @@ end
 
 -- Event Handling Functions
 
-function Scorchio2:WaterElementalLifeSpan()
-	local playerClass, englishClass = UnitClass("player")
-	if englishClass ~= "MAGE" then return 0 end
-	local _, _, _, _, currRank, _ = GetTalentInfo(3,26)
-	return 45 + (currRank * 5)
-end
 
 function Scorchio2:inCombat()
 	if combatFlag then return true end
@@ -1249,60 +1222,56 @@ function Scorchio2:COMBAT_LOG_EVENT_UNFILTERED(_, _, event, hideCaster, srcGUID,
 			Scorchio2:PLAYER_REGEN_ENABLED()
 		elseif (suffix == "CAST_SUCCESS") then
 			if (spellID == 2136 or spellID == 108853) and mobTable[dstGUID] then
-				-- Fire Blast or Infero Blast.
+				-- Fire Blast or Inferno Blast.
 				impactTimestamp = timeStamp
 				impactLBExpire = mobTable[dstGUID].c and mobTable[dstGUID].c[EXPIRATIONTIME] or nil
+				impactIgniteExpire = mobTable[dstGUID].t and mobTable[dstGUID].t[EXPIRATIONTIME] or nil
+				impactPyroblastExpire = mobTable[dstGUID].u and mobTable[dstGUID].u[EXPIRATIONTIME] or nil
+				impactCombustionExpire = mobTable[dstGUID].z and mobTable[dstGUID].z[EXPIRATIONTIME] or nil
 			end
 		elseif (suffix == "DAMAGE") then
 			if spellID == 2120 and bit_band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) ~= 0 and DB.profile.baroptions.v.track then
 				-- Flamestrike
-				Scorchio2:UpdateTable(srcGUID, srcName, 20, timeStamp, 1, true, 8)
+				Scorchio2:UpdateTable(srcGUID, srcName, 18, timeStamp, 1, true, 8)
 			end
-		end
-
-		if (suffix == "AURA_REMOVED") then
+		elseif (suffix == "AURA_REMOVED") then
 			spellCount = -1
 			local spellID = ...
 			Scorchio2:CheckVuln(spellID, spellCount, timeStamp, dstGUID, dstName, isPlayer, srcFlags, dstFlags, srcGUID)
-		end
-
-		if (suffix == "SUMMON") then
-			if spellID == 31687 and bit_band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) ~= 0 and DB.profile.baroptions.m.track then
-				waterElementalGUID = dstGUID
-				Scorchio2:UpdateTable(waterElementalGUID, dstName, 11, timeStamp, 1, false, Scorchio2:WaterElementalLifeSpan())
-			elseif spellID == 58833 and bit_band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) ~= 0 and DB.profile.baroptions.n.track then
-				Scorchio2:UpdateTable(srcGUID, srcName, 12, timeStamp, 1, true, 30)
+		elseif (suffix == "SUMMON") then
+			if spellID == 58833 and bit_band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) ~= 0 and DB.profile.baroptions.n.track then
+				Scorchio2:UpdateTable(srcGUID, srcName, VULNERABILITIES[55342], timeStamp, 1, true, 30)
 			end
-		end
-
-		if not Scorchio2:inCombat() then return end
-
-		if (suffix == "AURA_APPLIED") then
+		elseif (suffix == "AURA_APPLIED") then
+			-- For the aura checks, we need to check the player himself even if not in combat, for procs.  Using the SPELLIDS table 
+			-- could have worked for the most part, by making CAST_SUCCESS also trigger PLAYER_REGEN_DISABLED, and adding Barrage etc
+			-- to the SPELLIDS list...but it would have never worked for pet Freeze (auras are applied before it casts/hits). So we do this.
+			if (not Scorchio2:inCombat()) and (dstGUID ~= playerGUID) then return end
 			spellCount = 1
 			local spellID = ...
 			Scorchio2:CheckVuln(spellID, spellCount, timeStamp, dstGUID, dstName, isPlayer, srcFlags, dstFlags, srcGUID)
 		elseif (suffix == "AURA_APPLIED_DOSE") then
+			if (not Scorchio2:inCombat()) and (dstGUID ~= playerGUID) then return end
 			local spellID,_,_,_,spellCount = ...
 			Scorchio2:CheckVuln(spellID, spellCount, timeStamp, dstGUID, dstName, isPlayer, srcFlags, dstFlags, srcGUID)
 		elseif (suffix == "AURA_REFRESH") then
+			if (not Scorchio2:inCombat()) and (dstGUID ~= playerGUID) then return end
 			local spellID = ...
 			Scorchio2:CheckVuln(spellID, nil, timeStamp, dstGUID, dstName, isPlayer, srcFlags, dstFlags, srcGUID)
-
 		elseif (suffix == "AURA_REMOVED_DOSE") then
+			if (not Scorchio2:inCombat()) and (dstGUID ~= playerGUID) then return end
 			local spellID,_,_,_,spellCount = ...
 			Scorchio2:CheckVuln(spellID, spellCount, timeStamp, dstGUID, dstName, isPlayer, srcFlags, dstFlags, srcGUID)
 		elseif (suffix == "AURA_BROKEN_SPELL") then
+			if not Scorchio2:inCombat() then return end
 			local _,_,_,_,spellCount = ...
 			Scorchio2:AuraBroken(dstGUID, srcName, spellCount)
 		elseif (suffix == "AURA_BROKEN") then
+			if not Scorchio2:inCombat() then return end
 			Scorchio2:AuraBroken(dstGUID, srcName, L["Hitting It!"])
 		end
 	elseif (prefix == "UNIT") then
-		if dstGUID == waterElementalGUID then
-			Scorchio2:LostVuln(waterElementalGUID, 13)
-			Scorchio2:MobDies(waterElementalGUID, dstName)
-			waterElementalGUID = nil
-		elseif dstName ~= nil and mobTable[dstGUID] ~= nil then
+		if dstName ~= nil and mobTable[dstGUID] ~= nil then
 			Scorchio2:MobDies(dstGUID, dstName)
 		end
 	end
@@ -1314,32 +1283,22 @@ function Scorchio2:SPELL_UPDATE_COOLDOWN()
 	if cdStart > 0 then
 		self:UnregisterEvent("SPELL_UPDATE_COOLDOWN")
 		local now = GetTime()
-		Scorchio2:UpdateTable(playerGUID, "", 23, now, 1, true, cdLength - (now - cdStart))
+		Scorchio2:UpdateTable(playerGUID, "", 21, now, 1, true, cdLength - (now - cdStart))
 	end
 end
 
-function Scorchio2:CheckArcaneCharge(event, unitid, _, _, _, spellID)
-	-- We don't get the aura event when refreshing a 6-stack, so instead we have to check for,
-	-- a) AB cast success, or
-	-- b) AM channel completion
-	-- And when we get those, recheck the Arcane Charge stack.
+function Scorchio2:SpecialChecks(event, unitid, _, _, _, spellID)
 	if unitid == "player" then
-		if event == "UNIT_SPELLCAST_CHANNEL_STOP" and SPELLIDS[spellID] then
+		-- UNIT_AURA trigging ScanAuras() is used to handle several things, such as to capture a 
+		-- refresh of Arcane Charge and some other buff-based procs while they're at max stacks, 
+		-- and also because of Alter Time.
+		if event == "UNIT_AURA" then
+			Scorchio2:ScanAuras("player")
+		elseif event == "UNIT_SPELLCAST_CHANNEL_STOP" and SPELLIDS[spellID] then
 			if not self:inCombat() then
 				self:PLAYER_REGEN_DISABLED()
 			end
-		end
-		if spellID == 30451 or spellID == 5143 then
-			local tab = mobTable[playerGUID]
-			if tab then
-				local tab_i = tab.i
-				if tab_i then
-					if tab_i[STACK] == 6 then
-						Scorchio2:CheckVuln(36032, nil, GetTime(), playerGUID, UnitName("player"), true, 1297, 1297, playerGUID)
-					end
-				end
-			end
-		elseif spellID == 112948 then
+		elseif event == "UNIT_SPELLCAST_SUCCEEDED" and spellID == 112948 then
 			-- This is Frost Bomb. We need to wait for a further event though.
 			self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 		end
@@ -1467,7 +1426,7 @@ function Scorchio2:LostVuln(dstGUID, vulnKey)
 	end
 
 	if Scorchio2:inCombat() or not DB.profile.baroptions[T[vulnKey]].clearooc then
-		if (GetTime() - mobTable[dstGUID][T[vulnKey]][REFRESHTIME] > ( mobTable[dstGUID][T[vulnKey]][DURATION] - 0.25 )) or (dstGUID == waterElementalGUID) then
+		if GetTime() - mobTable[dstGUID][T[vulnKey]][REFRESHTIME] > ( mobTable[dstGUID][T[vulnKey]][DURATION] - 0.25 ) then
 			if DB.profile.baroptions[T[vulnKey]].soundson then
 				PlaySoundFile(SM:Fetch("sound", DB.profile.baroptions[T[vulnKey]].expiredsound), "Master")
 			end
@@ -1496,11 +1455,32 @@ end
 
 function Scorchio2:ScanAuras(unitID)
 	if not UnitExists(unitID) then return end
-	if not Scorchio2:inCombat() then return end
+	-- Don't return if not in combat and the unit is the player, because Alter Time doesn't trigger combat
+	-- and it can change the stacks/duration on Arcane Charge and buff-based procs even while no longer
+	-- in combat.
+	if (unitID ~= "player") and (not Scorchio2:inCombat()) then return end
 	local dstGUID = UnitGUID(unitID)
 	local dstName = UnitName(unitID)
 	local isPlayer = UnitIsPlayer(unitID)
 	if isPlayer == nil then isPlayer = false end
+	
+	-- If the unit is the player, we need to scan him for any updates to buff-based procs because of Alter Time, 
+	-- although this same logic also handles some other previously broken situations (such as refreshing an AM
+	-- 2-stack before using it).  No need to ever check buffs on any other units, though.
+	if (unitID == "player") then
+		for i = 1, 40 do
+			local _, _, icon, count, _, _, expirationTime, unitCaster, _, _, spellID = UnitBuff(unitID, i)
+			if icon == nil then break end
+			local isVuln = VULNERABILITIES[spellID]
+			if isVuln and DB.profile.baroptions[T[isVuln]].track then
+				if (VULNDATA[isVuln].valid == COMBATLOG_OBJECT_AFFILIATION_MINE and unitCaster == "player") or VULNDATA[isVuln].valid ~= COMBATLOG_OBJECT_AFFILIATION_MINE then
+					local now = GetTime()
+					Scorchio2:UpdateTable(dstGUID, dstName, isVuln, now, count, isPlayer, expirationTime - now)
+				end
+			end
+		end
+	end
+	
 	for i = 1, 40 do
 		local _, _, icon, count, _, _, expirationTime, unitCaster, _, _, spellID = UnitDebuff(unitID, i)
 		if icon == nil then break end
@@ -1515,6 +1495,11 @@ function Scorchio2:ScanAuras(unitID)
 end
 
 function Scorchio2:UpdateTable(dstGUID, dstName, vulnKey, timeStamp, spellCount, isPlayer, timeToRun, anchor, alpha)
+	if timeToRun and (timeToRun < 0) then
+		-- This happens with Frost Bomb, since the vuln never gets cleared.
+		return
+	end
+	
 	if mobTable[dstGUID] == nil then
 		mobTable[dstGUID] = { }
 	end
@@ -1546,30 +1531,50 @@ function Scorchio2:UpdateTable(dstGUID, dstName, vulnKey, timeStamp, spellCount,
 	else
 		local warningTime = DB.profile.baroptions[T[vulnKey]].warningtime
 		local icon = DB.profile.baroptions[T[vulnKey]].icon
+		local now = GetTime()
+		local save_expiration_time = false
 		local duration
 		if isPlayer == true then
 			duration = VULNDATA[vulnKey].durationpvp
 		else
 			duration = VULNDATA[vulnKey].durationpve
 		end
+
+		-- Maintain time left on proc for Fingers of Frost / Arcane Missiles which can stack to 2 but don't refresh time when using 1
+		if (VULNDATA[vulnKey].spellid == 79683 or VULNDATA[vulnKey].spellid == 44544) then
+			save_expiration_time = (mobTable[dstGUID][T[vulnKey]][STACK] == spellCount + 1)
+		end
+
 		mobTable[dstGUID][T[vulnKey]][STACK] = spellCount
 		mobTable[dstGUID][T[vulnKey]][REFRESHTIME] = timeStamp
 
 		if timeToRun == nil then
-			local now = GetTime()
 			timeToRun = duration - (now - timeStamp)
 			if (now - impactTimestamp < 1.0) then
-				if vulnKey == 2 and impactLBExpire then
+				if vulnKey == VULNERABILITIES[44457] and impactLBExpire then
 					timeToRun = impactLBExpire - timeStamp
+				end
+				if vulnKey == VULNERABILITIES[12654] and impactIgniteExpire then
+					timeToRun = impactIgniteExpire - timeStamp
+				end
+				if vulnKey == VULNERABILITIES[11366] and impactPyroblastExpire then
+					timeToRun = impactPyroblastExpire - timeStamp
+				end
+				if vulnKey == VULNERABILITIES[83853] and impactCombustionExpire then
+					timeToRun = impactCombustionExpire - timeStamp
 				end
 			end
 		end
 		mobTable[dstGUID][T[vulnKey]][DURATION] = timeToRun
-		mobTable[dstGUID][T[vulnKey]][EXPIRATIONTIME] = timeStamp + timeToRun
+		if save_expiration_time then
+			timeToRun = mobTable[dstGUID][T[vulnKey]][EXPIRATIONTIME] - now
+		else
+			mobTable[dstGUID][T[vulnKey]][EXPIRATIONTIME] = timeStamp + timeToRun
+		end
 		if mobTable[dstGUID][T[vulnKey]][BAR] then
 			local bar = mobTable[dstGUID][T[vulnKey]][BAR]
 			local overrun = bar.value - timeToRun
-			if overrun > 0 and timeToRun > 0 then
+			if overrun > 0 and timeToRun > 0 and not save_expiration_time then
 				bar:SetValue(timeToRun, bar.maxValue - overrun)
 				return
 			end
@@ -1590,7 +1595,6 @@ function Scorchio2:UpdateTable(dstGUID, dstName, vulnKey, timeStamp, spellCount,
 
 			local barText = SubTokens(DB.profile.baroptions[T[vulnKey]].bar, dstName, spellCount)
 
-
 			local newBar = Scorchio2[anchor]:NewTimerBar(tostring(dstGUID .. "_" .. T[vulnKey]), barText, timeToRun, duration, icon, 0)
 			mobTable[dstGUID][T[vulnKey]][BAR] = newBar
 			local newAlpha = newBar:GetAlpha()
@@ -1608,6 +1612,7 @@ function Scorchio2:UpdateTable(dstGUID, dstName, vulnKey, timeStamp, spellCount,
 					newBar:SetAlpha(1)
 				end
 			end
+
 			mobTable[dstGUID][T[vulnKey]][BAR].texture:SetVertexColor(Colours(DB.profile.baroptions[T[vulnKey]].fg, alpha))
 			mobTable[dstGUID][T[vulnKey]][BAR].bgtexture:SetVertexColor(Colours(DB.profile.baroptions[T[vulnKey]].bg, alpha))
 		end
@@ -1621,3 +1626,4 @@ function Scorchio2:UpdateTable(dstGUID, dstName, vulnKey, timeStamp, spellCount,
 		end
 	end
 end
+

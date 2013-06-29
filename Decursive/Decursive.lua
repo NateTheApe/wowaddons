@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.4) add-on for World of Warcraft UI
+    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-11-13T01:32:04Z
+    This file was last updated on 2013-03-17T04:19:07Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -549,17 +549,41 @@ do
 
 
     local D = D;
-    local _ = false;
+    local _;
     local CureOrder;
     local sorting = function (a, b)
 
-        CureOrder = D.classprofile.CureOrder; -- LUA is too simple, lets do the access optimization...
+        CureOrder = D.classprofile.CureOrder;
 
-        local cura = (a.Type and CureOrder[a.Type] and CureOrder[a.Type] > 0) and CureOrder[a.Type] or 1024;
-        local curb = (b.Type and CureOrder[b.Type] and CureOrder[b.Type] > 0) and CureOrder[b.Type] or 1024;
+        -- local cura = (a.Type and CureOrder[a.Type] and CureOrder[a.Type] > 0) and CureOrder[a.Type] or 1024;
+        -- local curb = (b.Type and CureOrder[b.Type] and CureOrder[b.Type] > 0) and CureOrder[b.Type] or 1024;
 
-        return cura < curb;
+        return ((a.Type and CureOrder[a.Type] and CureOrder[a.Type] > 0) and CureOrder[a.Type] or 1024) < ((b.Type and CureOrder[b.Type] and CureOrder[b.Type] > 0) and CureOrder[b.Type] or 1024);
     end
+
+    local NotRaidOrParty = {
+        ["player"]      = true,
+        ["target"]      = true,
+        ["focus"]       = true,
+        ["mouseover"]   = true,
+    };
+    local function UnitFilteringTest(unit, filterValue)
+
+        D:Debug("UnitFilteringTest:", unit, filterValue);
+
+        if not filterValue then
+            return nil;
+        end
+
+        if filterValue==1 and unit ~= 'player' then -- for personal spells
+            return true;
+        elseif filterValue==2 and NotRaidOrParty[unit] then -- for spells that can't be used on oneself
+            return true;
+        end
+
+    end
+
+    D.UnitFilteringTest = UnitFilteringTest; -- I need this function elsewhere
 
     -- This function will return a table containing only the Debuffs we can cure excepts the one we have to ignore
     -- in different conditions.
@@ -601,8 +625,8 @@ do
             continue_ = true;
 
             -- test if we have to ignore this debuf  {{{ --
-            
-            if self.Status.PlayerOnlyTypes[Debuff.Type] and Unit ~= "player" then -- if this type is curable on the player only
+           
+            if UnitFilteringTest(Unit, self.Status.UnitFilteringTypes[Debuff.Type]) then
                 continue_ = false;
             end
             
@@ -831,6 +855,6 @@ end
 
 
 
-T._LoadedFiles["Decursive.lua"] = "2.7.2.4";
+T._LoadedFiles["Decursive.lua"] = "2.7.2.9";
 
 -- Sin

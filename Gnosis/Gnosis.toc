@@ -1,15 +1,15 @@
-## Interface: 50100
-## Title: Gnosis (|cffaaff44Castbars and Timers|r) v3.26
+## Interface: 50300
+## Title: Gnosis (|cffaaff44Castbars and Timers|r) v4.02
 ## Notes: Highly configurable castbar and single timer addon.
 ## Author: elchefe <>
-## Version: v3.26
+## Version: v4.02
 ## SavedVariables: GnosisDB, GnosisConfigs
 ## SavedVariablesPerCharacter: GnosisChar, GnosisCharConfig
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## X-Embeds: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## LoadOnDemand: 0
 ## DefaultState: enabled
-## X-Curse-Packaged-Version: v3.26
+## X-Curse-Packaged-Version: v4.02
 ## X-Curse-Project-Name: Gnosis (Castbars and Timers)
 ## X-Curse-Project-ID: gnosis
 ## X-Curse-Repository-ID: wow/gnosis/mainline
@@ -26,6 +26,9 @@ Libs\AceDB-3.0\AceDB-3.0.xml
 Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\LibSharedMedia-3.0\lib.xml
 Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
+Libs\LibRangeCheck-2.0\LibRangeCheck-2.0.lua
+Libs\LibDialog-1.0\lib.xml
+Libs\LibBetterBlizzOptions-1.0\LibBetterBlizzOptions-1.0\lib.xml
 #@end-no-lib-strip@
 
 # xml

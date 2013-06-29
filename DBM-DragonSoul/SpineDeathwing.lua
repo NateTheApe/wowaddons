@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(318, "DBM-DragonSoul", nil, 187)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 34 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 48 $"):sub(12, -3))
 mod:SetCreatureID(53879)
 mod:SetModelID(35268)
 mod:SetModelSound("sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKEVENT_01.OGG", "sound\\CREATURE\\Deathwing\\VO_DS_DEATHWING_BACKSLAY_01.OGG")
@@ -30,7 +30,7 @@ local warnAbsorbedBlood		= mod:NewStackAnnounce(105248, 2)
 local warnResidue			= mod:NewCountAnnounce("ej4057", 3, nil, false)--This is HIGHLY inaccurate in 5.x, i do not know why right now. I'll actually log fight next week
 local warnGrip				= mod:NewTargetAnnounce(105490, 4)
 local warnNuclearBlast		= mod:NewCastAnnounce(105845, 4)
-local warnSealArmor			= mod:NewCastAnnounce(105847, 4)
+local warnSealArmor			= mod:NewAnnounce("warnSealArmor", 4, 105847)
 local warnAmalgamation		= mod:NewSpellAnnounce("ej4054", 3, 106005)--Amalgamation spawning, give temp icon.
 
 local specWarnRoll			= mod:NewSpecialWarningSpell("ej4050", nil, nil, nil, true)--The actual roll
@@ -55,6 +55,7 @@ mod:AddBoolOption("InfoFrame", true)
 mod:AddBoolOption("SetIconOnGrip", true)
 mod:AddBoolOption("ShowShieldInfo", false)--on 25 man this is quite frankly a spammy nightmare, especially on heroic. off by default since it's really only sensible in 10 man. Besides I may be adding an alternate frame option for "grip damage needed"
 
+local sealArmorText = DBM_CORE_AUTO_ANNOUNCE_TEXTS.cast:format(GetSpellInfo(105847), 23)
 local gripTargets = {}
 local gripIcon = 6
 local corruptionActive = {}
@@ -146,9 +147,9 @@ end
 
 function mod:OnCombatStart(delay)
 	if self:IsDifficulty("lfr25") then
-		warnSealArmor = mod:NewCastAnnounce(105847, 4, 34.5)
+		sealArmorText = DBM_CORE_AUTO_ANNOUNCE_TEXTS.cast:format(GetSpellInfo(105847), 34.5)
 	else
-		warnSealArmor = mod:NewCastAnnounce(105847, 4)
+		sealArmorText = DBM_CORE_AUTO_ANNOUNCE_TEXTS.cast:format(GetSpellInfo(105847), 23)
 	end
 	table.wipe(gripTargets)
 	table.wipe(corruptionActive)
@@ -167,19 +168,19 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(105845) then
+	if args.spellId == 105845 then
 		warnNuclearBlast:Show()
 		specWarnNuclearBlast:Show()
 		soundNuclearBlast:Play()
 	elseif args:IsSpellID(105847, 105848) then--This still has 2 spellids, since it's locational, location based IDs did NOT get crunched.
-		warnSealArmor:Show()
+		warnSealArmor:Show(sealArmorText)
 		specWarnSealArmor:Show()
 		if self:IsDifficulty("lfr25") then
 			timerSealArmor:Start(34.5)
 		else
 			timerSealArmor:Start()
 		end
-	elseif args:IsSpellID(109379) then
+	elseif args.spellId == 109379 then
 		if not corruptionActive[args.sourceGUID] then
 			corruptionActive[args.sourceGUID] = 0
 			if self:IsDifficulty("normal25", "heroic25") then
@@ -205,13 +206,13 @@ end
 
 -- not needed guid check. This is residue creation step.
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(105219) then 
+	if args.spellId == 105219 then 
 		residueNum = residueNum + 1
 		diedOozeGUIDS[args.sourceGUID] = GetTime()
 		self:Unschedule(warningResidue)
 		self:Schedule(1.25, warningResidue)
 		if residueDebug then print("created", residueNum) end
-	elseif args:IsSpellID(105248) and diedOozeGUIDS[args.sourceGUID] then
+	elseif args.spellId == 105248 and diedOozeGUIDS[args.sourceGUID] then
 		residueNum = residueNum - 1
 		diedOozeGUIDS[args.sourceGUID] = nil
 		self:Unschedule(warningResidue)
@@ -236,10 +237,10 @@ end
 mod.SWING_MISSED = mod.SWING_DAMAGE
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(105248) then
+	if args.spellId == 105248 then
 		warnAbsorbedBlood:Cancel()--Just a little anti spam
 		warnAbsorbedBlood:Schedule(1.25, args.destName, 1)
-	elseif args:IsSpellID(105490) then
+	elseif args.spellId == 105490 then
 		gripTargets[#gripTargets + 1] = args.destName
 		timerGripCD:Cancel(args.sourceGUID)
 		countdownGrip:Cancel(args.sourceGUID)
@@ -255,7 +256,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		self:Unschedule(showGripWarning)
 		self:Schedule(0.3, showGripWarning)
-	elseif args:IsSpellID(105479) then
+	elseif args.spellId == 105479 then
 		if self.Options.ShowShieldInfo then
 			setPlasmaTarget(args.destGUID, args.destName)
 		end
@@ -263,7 +264,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end		
 
 function mod:SPELL_AURA_APPLIED_DOSE(args)
-	if args:IsSpellID(105248) then
+	if args.spellId == 105248 then
 		warnAbsorbedBlood:Cancel()--Just a little anti spam
 		if args.amount == 9 then
 			warnAbsorbedBlood:Show(args.destName, 9)
@@ -274,11 +275,11 @@ function mod:SPELL_AURA_APPLIED_DOSE(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(105490) then
+	if args.spellId == 105490 then
 		if self.Options.SetIconOnGrip then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(105479) then
+	elseif args.spellId == 105479 then
 		if self.Options.ShowShieldInfo then
 			clearPlasmaTarget(args.destGUID, args.destName)
 		end

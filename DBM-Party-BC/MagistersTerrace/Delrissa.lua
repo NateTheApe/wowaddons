@@ -1,7 +1,7 @@
 local mod = DBM:NewMod("Delrissa", "DBM-Party-BC", 16)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 403 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 
 mod:SetCreatureID(24560, 24557, 24558, 24554, 24561, 24559, 24555, 24553, 24556)--24560 is main boss.
 mod:SetModelID(22596)
@@ -26,15 +26,15 @@ local warnPolymorph     = mod:NewTargetAnnounce(13323, 4)
 local warnPWShield      = mod:NewTargetAnnounce(44175, 2, nil, false)
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(17843) and self:IsInCombat() then                                -- Delrissa's Flash Heal
+	if args.spellId == 17843 and self:IsInCombat() then                                -- Delrissa's Flash Heal
 		warnFlashHeal:Show()
-	elseif args:IsSpellID(46181, 44256) then                                           -- Apoko's LHW
+	elseif args:IsSpellID(44256, 46181) then                                           -- Apoko's LHW
 		warnLHW:Show()
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(27621) and self:IsInCombat() then                                -- Apoko's Windfury Totem
+	if args.spellId == 27621 and self:IsInCombat() then                                -- Apoko's Windfury Totem
 		warnWindFury:Show()
 	elseif args:IsSpellID(44178, 46195) then                                           -- Yazzai's Blizzard
 		warnBlizzard:Show()
@@ -44,9 +44,9 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(13323) and self:IsInCombat() then                                -- Yazzai's Polymorph
+	if args.spellId == 13323 and self:IsInCombat() then                                -- Yazzai's Polymorph
 		warnPolymorph:Show(args.destName)
-	elseif args:IsSpellID(44141) then                                                  -- Ellrys SoC
+	elseif args.spellId == 44141 then                                                  -- Ellrys SoC
 		warnSoC:Show(args.destName)
 	elseif args:IsSpellID(44175, 44291, 46193) and not args:IsDestTypePlayer() then    -- Delrissa's PWShield
 		warnPWShield:Show(args.destName)

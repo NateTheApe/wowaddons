@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Twins", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 416 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 437 $"):sub(12, -3))
 mod:SetCreatureID(25165, 25166)
 mod:SetModelID(23334)
 mod:SetZone()
@@ -67,14 +67,14 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(45230) and not args:IsDestTypePlayer() then
+	if args.spellId == 45230 and not args:IsDestTypePlayer() then
 		warnPyro:Show()
 		specWarnPyro:Show(args.destName)
-	elseif args:IsSpellID(45347) and args:IsPlayer() then
+	elseif args.spellId == 45347 and args:IsPlayer() then
 		if (args.amount or 1) >= 8 then
 			specWarnDarkTouch:Show(args.amount)
 		end
-	elseif args:IsSpellID(45348) and args:IsPlayer() then
+	elseif args.spellId == 45348 and args:IsPlayer() then
 		if (args.amount or 1) >= 5 then
 			specWarnFlameTouch:Show(args.amount)
 		end
@@ -97,7 +97,7 @@ function mod:SPELL_MISSED(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, 
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(45248) then
+	if args.spellId == 45248 then
 		warnBlade:Show()
 		timerBladeCD:Start()
 	end
@@ -105,6 +105,7 @@ end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg == L.Nova or msg:find(L.Nova) then
+		local target = DBM:GetFullNameByShortName(target)
 		warnNova:Show(target)
 		timerNova:Start()
 		timerNovaCD:Start()
@@ -118,6 +119,7 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 			self:SendWhisper(L.NovaWhisper, target)
 		end
 	elseif msg == L.Conflag or msg:find(L.Conflag) then
+		local target = DBM:GetFullNameByShortName(target)
 		warnConflag:Show(target)
 		timerConflag:Start()
 		timerConflagCD:Start()

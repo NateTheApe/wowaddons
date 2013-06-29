@@ -290,7 +290,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<HighlightTexture file="Interface\AddOns\Ion\Images\UI-Panel-Button-YellowHighlight" alphaMode="ADD">
 			<TexCoords left="0" right="0.625" top="0" bottom="0.6875"/>
 		</HighlightTexture>
-		<CheckedTexture file="Interface\Buttons\UI-PassiveHighlight" alphaMode="ADD">
+		<CheckedTexture file="" alphaMode="ADD">
 			<TexCoords left="0" right="0.625" top="0" bottom="0.6875"/>
 		</CheckedTexture>
 		<DisabledTexture file="Interface\AddOns\Ion\Images\UI-Panel-Button-Disabled">

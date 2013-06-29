@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Fathomlord", "DBM-Serpentshrine")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 397 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 474 $"):sub(12, -3))
 mod:SetCreatureID(21214)
 mod:SetModelID(20662)
 mod:SetZone()
@@ -28,7 +28,7 @@ local specWarnTotem		= mod:NewSpecialWarningSpell(38236)
 
 local berserkTimer		= mod:NewBerserkTimer(600)
 
-mod:AddBoolOption("HealthFrame", true)
+mod:AddBoolOption("HealthFrame", false)
 
 function mod:OnCombatStart(delay)
 	berserkTimer:Start(-delay)
@@ -39,7 +39,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(38330) then
+	if args.spellId == 38330 then
 		warnHeal:Show()
 		if self:GetUnitCreatureId("target") == 21964 then
 			specWarnHeal:Show(args.sourceName)
@@ -48,7 +48,7 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_SUMMON(args)
-	if args:IsSpellID(38236) then
+	if args.spellId == 38236 then
 		warnTotem:Show(args.sourceName)
 	end
 end

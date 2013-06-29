@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Shahraz", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 416 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(22947)
 mod:SetModelID(21252)
 mod:SetZone()
@@ -56,7 +56,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(41001) then
+	if args.spellId == 41001 then
 		warnFATargets[#warnFATargets + 1] = args.destName
 		self:Unschedule(showFATargets)
 		if args:IsPlayer() then
@@ -80,7 +80,7 @@ end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(41001) and self.FAIcons then
+	if args.spellId == 41001 and self.FAIcons then
 		self:SetIcon(args.destName, 0)
 	end
 end

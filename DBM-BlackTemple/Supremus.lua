@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Supremus", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 416 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(22898)
 mod:SetModelID(21145)
 mod:SetZone()
@@ -62,9 +62,9 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(40265) and args:IsPlayer() and self:AntiSpam(4, 1) then
+	if args.spellId == 40265 and args:IsPlayer() and self:AntiSpam(4, 1) then
 		specWarnMolten:Show()
-	elseif args:IsSpellID(42052) and args:IsPlayer() and self:AntiSpam(4, 2) then
+	elseif args.spellId == 42052 and args:IsPlayer() and self:AntiSpam(4, 2) then
 		specWarnVolcano:Show()
 	end
 end

@@ -1,6 +1,6 @@
 ﻿-- (c) 2009-2012, all rights reserved.
--- $Revision: 1043 $
--- $Date: 2012-11-15 21:15:42 +1100 (Thu, 15 Nov 2012) $
+-- $Revision: 1087 $
+-- $Date: 2013-05-22 20:51:33 +1000 (Wed, 22 May 2013) $
 
 
 local _G = _G
@@ -42,11 +42,11 @@ function ArkInventoryRules.OnInitialize( )
 	-- scrap: http://wow.curse.com/downloads/wow-addons/details/scrap.aspx
 	if IsAddOnLoaded( "Scrap" ) then
 		
-		ArkInventory.Output( "enabling Scrap support" )
+		ArkInventory.Output( string.format( "%s: Scrap %s", ArkInventory.Localise["CONFIG_RULES"], ArkInventory.Localise["ENABLED"] ) )
 		
 		if IsAddOnLoaded( "Scrap_Merchant" ) then
 			if Scrap.ToggleJunk then
-				ArkInventory.Output( "enabling Scrap Merchant support" )
+				ArkInventory.Output( string.format( "%s: Scrap Merchant %s", ArkInventory.Localise["CONFIG_RULES"], ArkInventory.Localise["ENABLED"] ) )
 				ArkInventory.MySecureHook( Scrap, "ToggleJunk", ArkInventoryRules.ItemCacheClear )
 			end
 		end
@@ -56,7 +56,7 @@ function ArkInventoryRules.OnInitialize( )
 	-- selljunk: http://wow.curse.com/downloads/wow-addons/details/sell-junk.aspx
 	if IsAddOnLoaded( "SellJunk" ) then
 		if SellJunk.Add and SellJunk.Rem then
-			ArkInventory.Output( "enabling SellJunk support" )
+			ArkInventory.Output( string.format( "%s: SellJunk %s", ArkInventory.Localise["CONFIG_RULES"], ArkInventory.Localise["ENABLED"] ) )
 			ArkInventory.MySecureHook( SellJunk, "Add", ArkInventoryRules.ItemCacheClear )
 			ArkInventory.MySecureHook( SellJunk, "Rem", ArkInventoryRules.ItemCacheClear )
 		end
@@ -65,7 +65,7 @@ function ArkInventoryRules.OnInitialize( )
 	-- reagent restocker: http://wow.curse.com/downloads/wow-addons/details/reagent_restocker.aspx
 	if IsAddOnLoaded( "ReagentRestocker" ) then
 		if ReagentRestocker.addItemToSellingList and ReagentRestocker.deleteItem then
-			ArkInventory.Output( "enabling ReagentRestocker support" )
+			ArkInventory.Output( string.format( "%s: ReagentRestocker %s", ArkInventory.Localise["CONFIG_RULES"], ArkInventory.Localise["ENABLED"] ) )
 			ArkInventory.MySecureHook( ReagentRestocker, "addItemToSellingList", ArkInventoryRules.ItemCacheClear )
 			ArkInventory.MySecureHook( ReagentRestocker, "deleteItem", ArkInventoryRules.ItemCacheClear )
 		end
@@ -114,7 +114,7 @@ function ArkInventoryRules.OutfitterInitialize( ... )
 	
 	if Outfitter:IsInitialized( ) then
 		
-		ArkInventory.Output( "enabling Outfitter support" )
+		ArkInventory.Output( string.format( "%s: Outfitter %s", ArkInventory.Localise["CONFIG_RULES"], ArkInventory.Localise["ENABLED"] ) )
 		
 		Outfitter:RegisterOutfitEvent( "ADD_OUTFIT", ArkInventoryRules.ItemCacheClear )
 		Outfitter:RegisterOutfitEvent( "DELETE_OUTFIT", ArkInventoryRules.ItemCacheClear )
@@ -827,7 +827,7 @@ function ArkInventoryRules.System.outfit_blizzard( ... )
 		
 		for k, location in pairs( set ) do
 			
-			local wearing, bank, bags, slot, bag = EquipmentManager_UnpackLocation( location )
+			local wearing, bank, bags, void, slot, bag = EquipmentManager_UnpackLocation( location )
 			if wearing or bank or bags then
 				
 				local h
@@ -1216,9 +1216,10 @@ function ArkInventoryRules.System.pettype( ... )
 		error( string.format( ArkInventory.Localise["RULE_FAILED_ARGUMENT_NONE_SPECIFIED"], fn ), 0 )
 	end
 	
-	local e = string.lower( select( 8, ArkInventory.ObjectInfo( ArkInventoryRules.Object.h ) ) )
+	local e = select( 8, ArkInventory.ObjectInfo( ArkInventoryRules.Object.h ) )
+	e = string.lower( ArkInventory.PetJournal.PetTypeName( e ) )
 	
-	if e ~= "" then
+	if e then
 		
 		for ax = 1, ac do
 			
@@ -1229,14 +1230,10 @@ function ArkInventoryRules.System.pettype( ... )
 			end
 			
 			if type( arg ) == "number" then
-				arg = _G[string.format( "%s%s", "BATTLE_PET_NAME_", arg )]
+				arg = ArkInventory.PetJournal.PetTypeName( arg )
 				if not arg then
 					error( string.format( ArkInventory.Localise["RULE_FAILED_ARGUMENT_IS_INVALID"], fn, ax, "within acceptable range" ), 0 )
 				end
-			end
-			
-			if type( arg ) ~= "string" then
-				error( string.format( ArkInventory.Localise["RULE_FAILED_ARGUMENT_IS_INVALID"], fn, ax, ArkInventory.Localise["STRING"] ), 0 )
 			end
 			
 			if e == string.lower( string.trim( arg ) ) then

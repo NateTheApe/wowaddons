@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Muru", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 356 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(25741)--25741--Muru
 mod:SetModelID(23404)
 mod:SetZone()
@@ -79,7 +79,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(45996) and args:GetDestCreatureID() == 25741 then
+	if args.spellId == 45996 and args:GetDestCreatureID() == 25741 then
 		warnDarkness:Show()
 		warnDarknessSoon:Schedule(40)
 		timerNextDarkness:Start()
@@ -87,7 +87,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(46177) then
+	if args.spellId == 46177 then
 		timerNextDarkness:Cancel()
 		timerHuman:Cancel()
 		timerVoid:Cancel()
@@ -104,9 +104,9 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:SPELL_SUMMON(args)
-	if args:IsSpellID(46268) then
+	if args.spellId == 46268 then
 		warnFiend:Show()
-	elseif args:IsSpellID(46282) then
+	elseif args.spellId == 46282 then
 		warnBlackHole:Show()
 		timerBlackHoleCD:Start()
 	end

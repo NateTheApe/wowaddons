@@ -1,3 +1,20 @@
+TipTac Changes | 2013 May 22
+----------------------------
+- Changed the TOC version to 50300 for the 5.3 patch.
+- Updated TipTacItemRef addon.
+
+TipTac Changes | 2013 Apr 17
+----------------------------
+- Changed the TOC version to 50200 for the 5.2 patch.
+- Added experimental code to support the "Mary Sue Protocol", used by roleplaying addons. To enable, go options and set the "General -> Name Type" to "Mary Sue Protocol". As this is experimental, it will not work properly or maybe not at all, but I am interested in the initial feedback and help in how to get it working optimally.
+- Added a check for proper data when constructing battle pet tooltips, which could previously cause Lua errors in some cases.
+
+TipTac Changes | 2013 Feb 19
+----------------------------
+- Changed the TOC version to 50100 for the 5.1 patch.
+- Fixed an error for the health/power bar text when set to "Deficit", with the "Condensed Bar Values" option on.
+- The options configurations table is now accessible through Lua via "TipTacOptions.options".
+
 TipTac Changes | 2012 Oct 30
 ----------------------------
 - Added proper support for battle pet tooltips, such as pet type, as well as their actual combat level instead of critter level.

@@ -21,19 +21,20 @@ L:SetMiscLocalization({
 	Overload	= "%s is about to Overload!"
 })
 
-
 ------------
 -- Feng the Accursed --
 ------------
 L= DBM:GetModLocalization(689)
 
 L:SetWarningLocalization({
-	WarnPhase	= "Phase %d"
+	WarnPhase			= "Phase %d",
+	specWarnBarrierNow	= "Use Nullification Barrier NOW!"
 })
 
 L:SetOptionLocalization({
-	WarnPhase	= "Announce Phase transition",
-	RangeFrame	= "Show range frame (6) during arcane phase",
+	WarnPhase			= "Announce Phase transition",
+	specWarnBarrierNow	= "Show special warning when you're supposed to use $spell:115817 (only applies to LFR)",
+	RangeFrame	= DBM_CORE_AUTO_RANGE_OPTION_TEXT_SHORT:format("6") .. " during arcane phase",
 	SetIconOnWS	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(116784),
 	SetIconOnAR	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(116417)
 })
@@ -45,21 +46,18 @@ L:SetMiscLocalization({
 	Shadow		= "Great soul of champions past! Bear to me your shield!"
 })
 
-
 -------------------------------
 -- Gara'jal the Spiritbinder --
 -------------------------------
 L= DBM:GetModLocalization(682)
 
 L:SetOptionLocalization({
-	RangeFrame			= "Show range frame (8)",
 	SetIconOnVoodoo		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(122151)
 })
 
 L:SetMiscLocalization({
 	Pull		= "It be dyin' time, now!"
 })
-
 
 ----------------------
 -- The Spirit Kings --
@@ -71,15 +69,16 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	timerUSRevive		= "Undying Shadow Reform"
+	timerUSRevive		= "Undying Shadow Reform",
+	timerRainOfArrowsCD	= "%s"
 })
 
 L:SetOptionLocalization({
 	DarknessSoon		= "Show pre-warning countdown for $spell:117697 (5s before)",
 	timerUSRevive		= "Show timer for $spell:117506 reform",
-	RangeFrame			= "Show range frame (8)"
+	timerRainOfArrowsCD = DBM_CORE_AUTO_TIMER_OPTIONS.cd:format(118122),
+	RangeFrame			= DBM_CORE_AUTO_RANGE_OPTION_TEXT_SHORT:format("8")
 })
-
 
 ------------
 -- Elegon --
@@ -97,9 +96,9 @@ L:SetTimerLocalization({
 L:SetOptionLocalization({
 	specWarnDespawnFloor	= "Show special warning before floor vanishes",
 	timerDespawnFloor		= "show timer for when floor vanishes",
-	SetIconOnDestabilized	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(132222)
+	SetIconOnDestabilized	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(132222),
+	SetIconOnCreature		= "Set icons on $journal:6193"
 })
-
 
 ------------
 -- Will of the Emperor --
@@ -119,4 +118,3 @@ L:SetMiscLocalization({
 	Courage		= "The Emperor's Courage appears in the alcoves!",--Emote
 	Boss		= "Two titanic constructs appear in the large alcoves!"--Emote
 })
-

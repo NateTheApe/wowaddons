@@ -1,8 +1,8 @@
-## Interface: 50100
+## Interface: 50200
 
 ## Author : Angayelle of Nordrassil
 
-## Title: MageBombTracker 1.0.8
+## Title: MageBombTracker 1.0.12
 
 ## Notes: An addon for tracking Mage bombs
 
@@ -10,7 +10,7 @@
 
 ## SavedVariables: combumbtrackersettingstable
 
-## version: 1.0.8
+## version: 1.0.12
 
 libs\LibStub\LibStub.lua
 

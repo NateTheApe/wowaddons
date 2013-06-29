@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Maiden", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 311 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(16457)
 mod:SetModelID(16198)
 mod:RegisterCombat("combat")
@@ -37,7 +37,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(29511) then
+	if args.spellId == 29511 then
 		warningRepentanceSoon:Cancel()
 		warningRepentance:Show()
 		timerRepentance:Start()
@@ -47,14 +47,14 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(29522) then
+	if args.spellId == 29522 then
 		warningHolyFire:Show(args.destName)
 		timerHolyFire:Start(args.destName)
 	end
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(29522) then
+	if args.spellId == 29522 then
 		timerHolyFire:Cancel(args.destName)
 	end
 end

@@ -1,7 +1,7 @@
 local mod = DBM:NewMod("Soccothrates", "DBM-Party-BC", 15)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 315 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 
 mod:SetCreatureID(20886)
 mod:SetModelID(19977)
@@ -14,7 +14,7 @@ mod:RegisterEvents(
 local warnKnockaway      = mod:NewSpellAnnounce(36512)
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(36512) then
+	if args.spellId == 36512 then
 		warnKnockaway:Show()
 	end
 end

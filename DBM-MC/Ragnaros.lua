@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ragnaros-Classic", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 330 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(11502)
 mod:SetModelID(11121)
 mod:RegisterCombat("combat")
@@ -45,7 +45,7 @@ local function emerged()
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(20566) then
+	if args.spellId == 20566 then
 		warnWrathRag:Show()
 		timerWrathRag:Start()
 	end

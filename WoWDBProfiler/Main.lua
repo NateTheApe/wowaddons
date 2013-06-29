@@ -1,6 +1,5 @@
------------------------------------------------------------------------
--- Upvalued Lua API.
------------------------------------------------------------------------
+-- LUA API ------------------------------------------------------------
+
 local _G = getfenv(0)
 
 local pairs = _G.pairs
@@ -13,13 +12,12 @@ local table = _G.table
 local select = _G.select
 
 
------------------------------------------------------------------------
--- AddOn namespace.
------------------------------------------------------------------------
+-- ADDON NAMESPACE ----------------------------------------------------
+
 local ADDON_NAME, private = ...
 
 local LibStub = _G.LibStub
-local WDP = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceEvent-3.0", "AceTimer-3.0")
+local WDP = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 
 local deformat = LibStub("LibDeformat-3.0")
 local LPJ = LibStub("LibPetJournal-2.0")
@@ -29,17 +27,34 @@ local DatamineTT = _G.CreateFrame("GameTooltip", "WDPDatamineTT", _G.UIParent, "
 DatamineTT:SetOwner(_G.WorldFrame, "ANCHOR_NONE")
 
 
------------------------------------------------------------------------
--- Local constants.
------------------------------------------------------------------------
-local DB_VERSION = 14
+-- CONSTANTS ----------------------------------------------------------
+
+local AF = private.ACTION_TYPE_FLAGS
+local CLIENT_LOCALE = _G.GetLocale()
+local DB_VERSION = 16
 local DEBUGGING = false
 local EVENT_DEBUG = false
+local OBJECT_ID_ANVIL = 192628
+local OBJECT_ID_FORGE = 1685
+local PLAYER_CLASS = _G.select(2, _G.UnitClass("player"))
+local PLAYER_FACTION = _G.UnitFactionGroup("player")
+local PLAYER_GUID = _G.UnitGUID("player")
+local PLAYER_NAME = _G.UnitName("player")
+local PLAYER_RACE = _G.select(2, _G.UnitRace("player"))
 
+local ALLOWED_LOCALES = {
+    enUS = true,
+    enGB = true,
+}
 
 local DATABASE_DEFAULTS = {
     char = {},
     global = {
+        config = {
+            minimap_icon = {
+                hide = true,
+            },
+        },
         items = {},
         npcs = {},
         objects = {},
@@ -48,7 +63,6 @@ local DATABASE_DEFAULTS = {
         zones = {},
     }
 }
-
 
 local EVENT_MAPPING = {
     AUCTION_HOUSE_SHOW = true,
@@ -65,6 +79,7 @@ local EVENT_MAPPING = {
     CURSOR_UPDATE = true,
     FORGE_MASTER_OPENED = true,
     GOSSIP_SHOW = true,
+    GROUP_ROSTER_UPDATE = true,
     GUILDBANKFRAME_OPENED = true,
     ITEM_TEXT_BEGIN = true,
     ITEM_UPGRADE_MASTER_OPENED = true,
@@ -89,6 +104,7 @@ local EVENT_MAPPING = {
     TRAINER_CLOSED = true,
     TRAINER_SHOW = true,
     TRANSMOGRIFY_OPEN = true,
+    UNIT_PET = true,
     UNIT_QUEST_LOG_CHANGED = true,
     UNIT_SPELLCAST_FAILED = "HandleSpellFailure",
     UNIT_SPELLCAST_FAILED_QUIET = "HandleSpellFailure",
@@ -102,36 +118,15 @@ local EVENT_MAPPING = {
 }
 
 
-local OBJECT_ID_ANVIL = 192628
-local OBJECT_ID_FORGE = 1685
+-- VARIABLES ----------------------------------------------------------
 
-
-local AF = private.ACTION_TYPE_FLAGS
-
-
-local PLAYER_CLASS = _G.select(2, _G.UnitClass("player"))
-local PLAYER_FACTION = _G.UnitFactionGroup("player")
-local PLAYER_GUID = _G.UnitGUID("player")
-local PLAYER_NAME = _G.UnitName("player")
-local PLAYER_RACE = _G.select(2, _G.UnitRace("player"))
-
-
-local CLIENT_LOCALE = _G.GetLocale()
-
-
-local ALLOWED_LOCALES = {
-    enUS = true,
-    enGB = true,
-}
-
-
------------------------------------------------------------------------
--- Local variables.
------------------------------------------------------------------------
 local anvil_spell_ids = {}
 local currently_drunk
 local char_db
 local global_db
+local group_member_uids = {}
+local group_owner_guids_to_pet_guids = {}
+local group_pet_guids = {}
 local item_process_timer_handle
 local faction_standings = {}
 local forge_spell_ids = {}
@@ -143,9 +138,7 @@ local current_target_id
 local current_area_id
 local current_loot
 
------------------------------------------------------------------------
 -- Data for our current action. Including possible values as a reference.
------------------------------------------------------------------------
 local current_action = {
     identifier = nil,
     loot_label = nil,
@@ -159,14 +152,14 @@ local current_action = {
     zone_data = nil,
 }
 
------------------------------------------------------------------------
--- Helper Functions.
------------------------------------------------------------------------
-local function Debug(...)
+
+-- HELPERS ------------------------------------------------------------
+
+local function Debug(message, ...)
     if not DEBUGGING then
         return
     end
-    _G.print(...)
+    _G.print(message:format(...))
 end
 
 
@@ -289,26 +282,13 @@ local function ClearKilledBossID()
 end
 
 
-local function IsRaidFinderInstance(instance_type, instance_difficulty)
-    return instance_type == "raid" and instance_difficulty == 2 and _G.IsPartyLFG() and _G.IsInLFGDungeon()
-end
-
-
 local function InstanceDifficultyToken()
-    local _, instance_type, instance_difficulty, difficulty_name, _, _, is_dynamic = _G.GetInstanceInfo()
-    if not difficulty_name or difficulty_name == "" then
-        difficulty_name = "NONE"
-    end
+    local _, instance_type, instance_difficulty, _, _, _, is_dynamic = _G.GetInstanceInfo()
 
     if not instance_type or instance_type == "" then
         instance_type = "NONE"
     end
-
-    -- Raid difficulty of 2 is 25-man
-    if IsRaidFinderInstance(instance_type, instance_difficulty) then
-        difficulty_name = "LOOKING_FOR_RAID"
-    end
-    return ("%s:%s:%s"):format(instance_type:upper(), difficulty_name:upper():gsub(" ", "_"), _G.tostring(is_dynamic))
+    return ("%s:%d:%s"):format(instance_type:upper(), instance_difficulty, _G.tostring(is_dynamic))
 end
 
 
@@ -316,14 +296,22 @@ local function DBEntry(data_type, unit_id)
     if not data_type or not unit_id then
         return
     end
-    local unit = global_db[data_type][unit_id]
+    local category = global_db[data_type]
+
+    if not category then
+        category = {}
+        global_db[data_type] = category
+    end
+    local unit = category[unit_id]
 
     if not unit then
         unit = {}
-        global_db[data_type][unit_id] = unit
+        category[unit_id] = unit
     end
     return unit
 end
+
+private.DBEntry = DBEntry
 
 local NPCEntry
 do
@@ -341,13 +329,12 @@ do
         return _G.setmetatable(npc, npc_meta)
     end
 
-    function npc_prototype:EncounterData()
-        local instance_token = InstanceDifficultyToken()
+    function npc_prototype:EncounterData(difficulty_token)
         self.encounter_data = self.encounter_data or {}
-        self.encounter_data[instance_token] = self.encounter_data[instance_token] or {}
-        self.encounter_data[instance_token].stats = self.encounter_data[instance_token].stats or {}
+        self.encounter_data[difficulty_token] = self.encounter_data[difficulty_token] or {}
+        self.encounter_data[difficulty_token].stats = self.encounter_data[difficulty_token].stats or {}
 
-        return self.encounter_data
+        return self.encounter_data[difficulty_token]
     end
 end
 
@@ -399,6 +386,7 @@ local function ItemLinkToID(item_link)
     return tonumber(item_link:match("item:(%d+)"))
 end
 
+private.ItemLinkToID = ItemLinkToID
 
 local function UnitTypeIsNPC(unit_type)
     return unit_type == private.UNIT_TYPES.NPC or unit_type == private.UNIT_TYPES.VEHICLE
@@ -407,27 +395,43 @@ end
 
 local ParseGUID
 do
+    local UNIT_TYPES = private.UNIT_TYPES
     local UNIT_TYPE_BITMASK = 0x007
+
+    local NPC_ID_MAPPING = {
+        [62164] = 63191, -- Garalon
+    }
+
 
     function ParseGUID(guid)
         if not guid then
             return
         end
-        local types = private.UNIT_TYPES
-        local unit_type = _G.bit.band(tonumber(guid:sub(1, 5)), UNIT_TYPE_BITMASK)
+        local bitfield = tonumber(guid:sub(1, 5))
 
-        if unit_type ~= types.PLAYER and unit_type ~= types.PET then
-            return unit_type, tonumber(guid:sub(6, 10), 16)
+        if not bitfield then
+            return UNIT_TYPES.UNKNOWN
+        end
+        local unit_type = _G.bit.band(bitfield, UNIT_TYPE_BITMASK)
+
+        if unit_type ~= UNIT_TYPES.PLAYER and unit_type ~= UNIT_TYPES.PET then
+            local unit_idnum = tonumber(guid:sub(6, 10), 16)
+            local id_mapping = NPC_ID_MAPPING[unit_idnum]
+
+            if id_mapping and UnitTypeIsNPC(unit_type) then
+                unit_idnum = id_mapping
+            end
+            return unit_type, unit_idnum
         end
         return unit_type
     end
+
+    private.ParseGUID = ParseGUID
 end -- do-block
 
 
 local UpdateDBEntryLocation
 do
-    local pi = math.pi
-
     -- Fishing node coordinate code based on code in GatherMate2 with permission from Kagaro.
     local function FishingCoordinates(x, y, yard_width, yard_height)
         local facing = _G.GetPlayerFacing()
@@ -435,7 +439,7 @@ do
         if not facing then
             return x, y
         end
-        local rad = facing + pi
+        local rad = facing + math.pi
         return x + math.sin(rad) * 15 / yard_width, y + math.cos(rad) * 15 / yard_height
     end
 
@@ -510,8 +514,9 @@ local function HandleItemUse(item_link, bag_index, slot_index)
         if not current_line then
             break
         end
+        local is_ptr = select(4, _G.GetBuildInfo()) ~= 50100
 
-        if current_line:GetText() == _G.ITEM_OPENABLE then
+        if is_ptr or current_line:GetText() == _G.ITEM_OPENABLE then
             table.wipe(current_action)
             current_action.target_type = AF.ITEM
             current_action.identifier = item_id
@@ -591,7 +596,6 @@ do
                 local entry, source_id
 
                 if current_loot.target_type == AF.ITEM then
-                    --                    Debug(("GenericLootUpdate: current_loot.identifier: '%s'"):format(tostring(current_loot.identifier)))
                     -- Items return the player as the source, so we need to use the item's ID (disenchant, milling, etc)
                     source_id = current_loot.identifier
                     entry = DBEntry(data_type, source_id)
@@ -725,15 +729,16 @@ do
     end
 end
 
------------------------------------------------------------------------
--- Methods.
------------------------------------------------------------------------
+
+-- METHODS ------------------------------------------------------------
+
 function WDP:OnInitialize()
     local db = LibStub("AceDB-3.0"):New("WoWDBProfilerData", DATABASE_DEFAULTS, "Default")
+    private.db = db
     global_db = db.global
     char_db = db.char
 
-    local raw_db = _G["WoWDBProfilerData"]
+    local raw_db = _G.WoWDBProfilerData
     local build_num = tonumber(private.build_num)
 
     if (raw_db.version and raw_db.version < DB_VERSION) or (raw_db.build_num and raw_db.build_num < build_num) then
@@ -743,6 +748,11 @@ function WDP:OnInitialize()
     end
     raw_db.build_num = build_num
     raw_db.version = DB_VERSION
+
+    if DEBUGGING then -- TODO: Remove this when comment subsystem is finished.
+        private.InitializeCommentSystem()
+        self:RegisterChatCommand("comment", private.ProcessCommentCommand)
+    end
 end
 
 
@@ -795,7 +805,9 @@ function WDP:OnEnable()
         local _, item_link = _G.GetItemInfo(identifier)
         HandleItemUse(item_link)
     end)
+
     self:SetCurrentAreaID("OnEnable")
+    self:GROUP_ROSTER_UPDATE()
 end
 
 
@@ -952,19 +964,22 @@ do
         npc.is_pvp = _G.UnitIsPVP("target") and true or nil
         npc.reaction = ("%s:%s:%s"):format(_G.UnitLevel("player"), _G.UnitFactionGroup("player"), REACTION_NAMES[_G.UnitReaction("player", "target")])
 
-        local encounter_data = npc:EncounterData()[InstanceDifficultyToken()].stats
+        local encounter_data = npc:EncounterData(InstanceDifficultyToken()).stats
         local npc_level = ("level_%d"):format(_G.UnitLevel("target"))
+        local level_data = encounter_data[npc_level]
 
-        if not encounter_data[npc_level] then
-            encounter_data[npc_level] = {
-                max_health = _G.UnitHealthMax("target"),
-            }
+        if not level_data then
+            level_data = {}
+            encounter_data[npc_level] = level_data
+        end
+        level_data.max_health = level_data.max_health or _G.UnitHealthMax("target")
 
+        if not level_data.power then
             local max_power = _G.UnitManaMax("target")
 
             if max_power > 0 then
                 local power_type = _G.UnitPowerType("target")
-                encounter_data[npc_level].power = ("%s:%d"):format(POWER_TYPE_NAMES[_G.tostring(power_type)] or power_type, max_power)
+                level_data.power = ("%s:%d"):format(POWER_TYPE_NAMES[_G.tostring(power_type)] or power_type, max_power)
             end
         end
         name_to_id_map[_G.UnitName("target")] = unit_idnum
@@ -992,7 +1007,7 @@ do
             return
         end
         local zone_name, area_id, x, y, map_level, difficulty_token = CurrentLocationData()
-        local npc_data = npc:EncounterData()[difficulty_token].stats[("level_%d"):format(_G.UnitLevel("target"))]
+        local npc_data = npc:EncounterData(difficulty_token).stats[("level_%d"):format(_G.UnitLevel("target"))]
         local zone_token = ("%s:%d"):format(zone_name, area_id)
         npc_data.locations = npc_data.locations or {} -- TODO: Fix this. It is broken. Possibly something to do with the timed updates.
 
@@ -1016,11 +1031,13 @@ do
 end -- do-block
 
 
------------------------------------------------------------------------
--- Event handlers.
------------------------------------------------------------------------
+-- EVENT HANDLERS -----------------------------------------------------
+
 function WDP:BLACK_MARKET_ITEM_UPDATE(event_name)
-    local num_items = _G.C_BlackMarket.GetNumItems()
+    if not ALLOWED_LOCALES[CLIENT_LOCALE] then
+        return
+    end
+    local num_items = _G.C_BlackMarket.GetNumItems() or 0
 
     for index = 1, num_items do
         local name, texture, quantity, item_type, is_usable, level, level_type, seller_name, min_bid, min_increment, current_bid, has_high_bid, num_bids, time_left, item_link, market_id = _G.C_BlackMarket.GetItemInfoByIndex(index);
@@ -1028,6 +1045,45 @@ function WDP:BLACK_MARKET_ITEM_UPDATE(event_name)
         if item_link then
             DBEntry("items", ItemLinkToID(item_link)).black_market = seller_name or "UNKNOWN"
         end
+    end
+end
+
+
+function WDP:GROUP_ROSTER_UPDATE()
+    local is_raid = _G.IsInRaid()
+    local unit_type = is_raid and "raid" or "party"
+    local group_size = is_raid and _G.GetNumGroupMembers() or _G.GetNumSubgroupMembers()
+
+    table.wipe(group_member_uids)
+
+    Debug("GROUP_ROSTER_UPDATE: %s group - %d members.", unit_type, group_size)
+
+    for index = 1, group_size do
+        local group_unit = unit_type .. index
+        local unit_guid = _G.UnitGUID(group_unit)
+
+        Debug("%s (%s) added as GUID %s", group_unit, _G.UnitName(group_unit), unit_guid)
+        group_member_uids[unit_guid] = true
+    end
+    group_member_uids[_G.UnitGUID("player")] = true
+end
+
+
+function WDP:UNIT_PET(event_name, unit_id)
+    local unit_guid = _G.UnitGUID(unit_id)
+    local current_pet_guid = group_owner_guids_to_pet_guids[unit_guid]
+
+    if current_pet_guid then
+        Debug("Removing existing pet GUID for %s", _G.UnitName(unit_id))
+        group_owner_guids_to_pet_guids[unit_guid] = nil
+        group_pet_guids[current_pet_guid] = nil
+    end
+    local pet_guid = _G.UnitGUID(unit_id .. "pet")
+
+    if pet_guid then
+        Debug("Adding new pet GUID for %s.", _G.UnitName(unit_id))
+        group_owner_guids_to_pet_guids[unit_id] = pet_guid
+        group_pet_guids[pet_guid] = true
     end
 end
 
@@ -1040,30 +1096,30 @@ function WDP:SHOW_LOOT_TOAST(event_name, loot_type, item_link, quantity)
     ClearKilledBossID()
 
     if not npc then
-        Debug(("%s: NPC is nil."):format(event_name))
+        Debug("%s: NPC is nil.", event_name)
         return
     end
     local item_id = ItemLinkToID(item_link)
 
     if not item_id then
-        Debug(("%s: ItemID is nil, from item link %s"):format(event_name, item_link))
+        Debug("%s: ItemID is nil, from item link %s", event_name, item_link)
         return
     end
     local loot_type = "drops"
-    local encounter_data = npc:EncounterData()[InstanceDifficultyToken()]
+    local encounter_data = npc:EncounterData(InstanceDifficultyToken())
     encounter_data[loot_type] = encounter_data[loot_type] or {}
     encounter_data.loot_counts = encounter_data.loot_counts or {}
     encounter_data.loot_counts[loot_type] = (encounter_data.loot_counts[loot_type] or 0) + 1
 
     table.insert(encounter_data[loot_type], ("%d:%d"):format(item_id, quantity))
-    Debug(("%s: %sX%d (%d)"):format(event_name, item_link, quantity, item_id))
+    Debug("%s: %sX%d (%d)", event_name, item_link, quantity, item_id)
 end
 
 
 do
     local CHAT_MSG_LOOT_UPDATE_FUNCS = {
         [AF.NPC] = function(item_id, quantity)
-            Debug(("CHAT_MSG_LOOT: %d (%d)"):format(item_id, quantity))
+            Debug("CHAT_MSG_LOOT: %d (%d)", item_id, quantity)
         end,
         [AF.ZONE] = function(item_id, quantity)
             current_loot = {
@@ -1134,9 +1190,9 @@ do
     }
 
     local DRUNK_MATCHES = {
-        _G.DRUNK_MESSAGE_SELF2:gsub("%%s", ".+"),
-        _G.DRUNK_MESSAGE_SELF3:gsub("%%s", ".+"),
-        _G.DRUNK_MESSAGE_SELF4:gsub("%%s", ".+"),
+        (_G.DRUNK_MESSAGE_SELF2:gsub("%%s", ".+")),
+        (_G.DRUNK_MESSAGE_SELF3:gsub("%%s", ".+")),
+        (_G.DRUNK_MESSAGE_SELF4:gsub("%%s", ".+")),
     }
 
     local RECIPE_MATCH = _G.ERR_LEARN_RECIPE_S:gsub("%%s", "(.*)")
@@ -1210,13 +1266,15 @@ do
         end
 
         if bit.band(FLAGS_NPC_CONTROL, source_flags) == FLAGS_NPC_CONTROL and bit.band(FLAGS_NPC, source_flags) ~= 0 then
-            local encounter_data = NPCEntry(source_id):EncounterData()[InstanceDifficultyToken()]
+            local encounter_data = NPCEntry(source_id):EncounterData(InstanceDifficultyToken())
             encounter_data.spells = encounter_data.spells or {}
             encounter_data.spells[spell_id] = (encounter_data.spells[spell_id] or 0) + 1
         end
     end
 
     local HEAL_BATTLE_PETS_SPELL_ID = 125801
+
+    local previous_combat_event = {}
 
     local COMBAT_LOG_FUNCS = {
         SPELL_AURA_APPLIED = RecordNPCSpell,
@@ -1235,29 +1293,37 @@ do
             local unit_type, unit_idnum = ParseGUID(dest_guid)
 
             if not unit_idnum or not UnitTypeIsNPC(unit_type) then
-                Debug(("%s: %s is not an NPC, or has no ID."):format(sub_event, dest_name))
+                Debug("%s: %s is not an NPC, or has no ID.", sub_event, dest_name or _G.UNKNOWN)
                 ClearKilledNPC()
                 ClearKilledBossID()
                 private.harvesting = nil
                 return
             end
 
-            if dest_guid ~= _G.UnitGUID("target") then
+            if source_guid == "" then
+                source_guid = nil
+            end
+            local killer_guid = source_guid or previous_combat_event.source_guid
+            local killer_name = source_name or previous_combat_event.source_name
+
+            if not group_member_uids[killer_guid] and not group_pet_guids[killer_guid] then
+                Debug("%s: %s was killed by %s (not group member or pet).", sub_event, dest_name or _G.UNKNOWN, killer_name or _G.UNKNOWN)
                 ClearKilledNPC()
                 ClearKilledBossID()
                 return
             end
+            Debug("%s: %s was killed by %s.", sub_event, dest_name or _G.UNKNOWN, killer_name or _G.UNKNOWN)
 
             if private.RAID_FINDER_BOSS_IDS[unit_idnum] then
-                Debug(("%s: Matching boss %s."):format(sub_event, dest_name))
+                Debug("%s: Matching boss %s.", sub_event, dest_name)
                 ClearKilledBossID()
                 private.raid_finder_boss_id = unit_idnum
             elseif private.WORLD_BOSS_IDS[unit_idnum] then
-                Debug(("%s: Matching world boss %s."):format(sub_event, dest_name))
+                Debug("%s: Matching world boss %s.", sub_event, dest_name)
                 ClearKilledBossID()
                 private.world_boss_id = unit_idnum
             else
-                Debug(("%s: Killed NPC %s (ID: %d) is not in LFG or World boss list."):format(sub_event, dest_name, unit_idnum))
+                Debug("%s: Killed NPC %s (ID: %d) is not in LFG or World boss list.", sub_event, dest_name, unit_idnum)
             end
 
             killed_npc_id = unit_idnum
@@ -1267,13 +1333,31 @@ do
     }
 
 
+    local NON_DAMAGE_EVENTS = {
+        SPELL_AURA_APPLIED = true,
+        SPELL_AURA_REMOVED = true,
+        SPELL_AURA_REMOVED_DOSE = true,
+        SPELL_CAST_FAILED = true,
+        SWING_MISSED = true,
+    }
+
+
     function WDP:COMBAT_LOG_EVENT_UNFILTERED(event_name, time_stamp, sub_event, hide_caster, source_guid, source_name, source_flags, source_raid_flags, dest_guid, dest_name, dest_flags, dest_raid_flags, ...)
         local combat_log_func = COMBAT_LOG_FUNCS[sub_event]
 
         if not combat_log_func then
+            if not NON_DAMAGE_EVENTS[sub_event] then
+                -- Uncomment to look for other sub-events to blacklist.
+                --                Debug("Recording for %s", sub_event)
+                previous_combat_event.source_guid = source_guid
+                previous_combat_event.source_name = source_name
+                previous_combat_event.dest_guid = dest_guid
+                previous_combat_event.dest_name = dest_name
+            end
             return
         end
         combat_log_func(sub_event, source_guid, source_name, source_flags, dest_guid, dest_name, dest_flags, ...)
+        table.wipe(previous_combat_event)
     end
 
     local DIPLOMACY_SPELL_ID = 20599
@@ -1490,7 +1574,7 @@ do
                 local npc = NPCEntry(source_id)
 
                 if npc then
-                    local encounter_data = npc:EncounterData()[difficulty_token]
+                    local encounter_data = npc:EncounterData(difficulty_token)
                     encounter_data[loot_type] = encounter_data[loot_type] or {}
 
                     if not source_list[source_guid] then
@@ -1514,7 +1598,7 @@ do
             if not npc then
                 return
             end
-            local encounter_data = npc:EncounterData()[difficulty_token]
+            local encounter_data = npc:EncounterData(difficulty_token)
             encounter_data[loot_type] = encounter_data[loot_type] or {}
 
             if not source_list[current_loot.identifier] then
@@ -1609,34 +1693,33 @@ do
         for loot_slot = 1, _G.GetNumLootItems() do
             local icon_texture, item_text, quantity, quality, locked = _G.GetLootSlotInfo(loot_slot)
             local slot_type = _G.GetLootSlotType(loot_slot)
+            local loot_info = {
+                _G.GetLootSourceInfo(loot_slot)
+            }
 
-            -- TODO: Move LOOT_SLOT_X checks within loop when money is detectable via GetLootSourceInfo
-            if slot_type == _G.LOOT_SLOT_ITEM then
-                local loot_info = {
-                    _G.GetLootSourceInfo(loot_slot)
-                }
+            -- Odd index is GUID, even is count.
+            for loot_index = 1, #loot_info, 2 do
+                local source_guid = loot_info[loot_index]
 
-                -- Odd index is GUID, even is count.
-                for loot_index = 1, #loot_info, 2 do
-                    local source_guid = loot_info[loot_index]
+                if not loot_guid_registry[current_loot.label][source_guid] then
+                    local loot_quantity = loot_info[loot_index + 1]
+                    local source_type, source_id = ParseGUID(source_guid)
+                    local source_key = ("%s:%d"):format(private.UNIT_TYPE_NAMES[source_type + 1], source_id)
+                    Debug("GUID: %s - Type:ID: %s - Amount: %d", loot_info[loot_index], source_key, loot_quantity)
 
-                    if not loot_guid_registry[current_loot.label][source_guid] then
-                        local loot_quantity = loot_info[loot_index + 1]
-                        local source_type, source_id = ParseGUID(source_guid)
-                        local source_key = ("%s:%d"):format(private.UNIT_TYPE_NAMES[source_type + 1], source_id)
-                        Debug(("GUID: %s - Type:ID: %s - Amount: %d"):format(loot_info[loot_index], source_key, loot_quantity))
-
+                    if slot_type == _G.LOOT_SLOT_ITEM then
                         local item_id = ItemLinkToID(_G.GetLootSlotLink(loot_slot))
                         current_loot.sources[source_guid] = current_loot.sources[source_guid] or {}
                         current_loot.sources[source_guid][item_id] = current_loot.sources[source_guid][item_id] or 0 + loot_quantity
                         guids_used[source_guid] = true
+                    elseif slot_type == _G.LOOT_SLOT_MONEY then
+                        Debug("money:%d", _toCopper(item_text))
+                        table.insert(current_loot.list, ("money:%d"):format(_toCopper(item_text)))
+                    elseif slot_type == _G.LOOT_SLOT_CURRENCY then
+                        Debug("Found currency: %s", icon_texture)
+                        table.insert(current_loot.list, ("currency:%d:%s"):format(quantity, icon_texture:match("[^\\]+$"):lower()))
                     end
                 end
-                --            elseif slot_type == _G.LOOT_SLOT_MONEY then
-                --                table.insert(current_action.loot_list, ("money:%d"):format(_toCopper(item_text)))
-            elseif slot_type == _G.LOOT_SLOT_CURRENCY then
-                Debug(("Found currency: %s"):format(icon_texture))
-                table.insert(current_loot.list, ("currency:%d:%s"):format(quantity, icon_texture:match("[^\\]+$"):lower()))
             end
         end
 
@@ -1988,13 +2071,13 @@ end
 
 
 function WDP:TRAINER_SHOW(event_name)
-    local unit_type, unit_idnum = ParseGUID(_G.UnitGUID("target"))
+    local unit_type, unit_idnum = ParseGUID(_G.UnitGUID("npc"))
     local trainer = NPCEntry(unit_idnum)
 
     if not trainer then
         return
     end
-    local trainer_standing = select(2, UnitFactionStanding("target"))
+    local trainer_standing = select(2, UnitFactionStanding("npc"))
     trainer.teaches = trainer.teaches or {}
 
     private.trainer_shown = true

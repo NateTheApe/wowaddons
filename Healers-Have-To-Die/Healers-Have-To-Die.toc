@@ -1,5 +1,7 @@
-## Interface: 50100
-## X-Curse-Packaged-Version: 2.0.4
+## Interface: 50300
+## X-Max-Interface: 50300
+## X-Min-Interface: 50200
+## X-Curse-Packaged-Version: 2.1.4
 ## X-Curse-Project-Name: Healers have to die
 ## X-Curse-Project-ID: healers-have-to-die
 ## X-Curse-Repository-ID: wow/healers-have-to-die/mainline
@@ -14,29 +16,27 @@
 ## Notes-koKR: Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)
 ## Notes-ruRU: Мгновенно обнаружить этих чертовых лекарей и воздать им по заслугам! (PVP и PVE).
 ## Notes-zhCN: 立刻曝光那些该死的治疗并帮助他们走完自己的使命！（PvP 和 PvE）
-## Notes-zhTW: Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)
+## Notes-zhTW: 立刻曝光那些該死的治療並幫助他們走完自己的使命！（PvP 和 PvE）
 ## Notes-itIT: Spot those bloody healers instantly and help them accomplish their destiny! (PVP and PVE)
 
 
 ## Author: John Wellesz
-## Version: 2.0.4
+## Version: 2.1.4
 
 ## LoadManagers: AddonLoader
 
 ## X-LoadOn-Slash: /hhtd
 ## X-LoadOn-Always: delayed
 
-## X-Max-Interface: 50100
-## X-Min-Interface: 50001
 
 ## SavedVariables: Healers_Have_To_Die
 
 ## X-License: All Rights Reserved
 
-## OptionalDeps: Ace3, LibNameplate-1.0, LibShefkiTimer-1.0
-## X-Embeds: Ace3, LibNameplate-1.0, LibShefkiTimer-1.0
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
 
-## X-ReleaseDate: "2012-12-09T23:48:25Z"
+## X-ReleaseDate: "2013-05-21T20:59:53Z"
 ## X-Category: PvP
 ## X-eMail: archarodim@teaser.fr
 ## X-Website: http://www.2072productions.com/to/healers-have-to-die.php
@@ -49,6 +49,7 @@ Core.lua
 utils.lua
 
 NamePlateHooker.lua
+NamePlateRegistry.lua
 
 GraphicalReporter.lua
 

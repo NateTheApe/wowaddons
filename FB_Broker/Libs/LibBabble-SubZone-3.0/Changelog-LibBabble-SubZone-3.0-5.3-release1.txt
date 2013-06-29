@@ -1,0 +1,38 @@
+------------------------------------------------------------------------
+r155 | arith | 2013-05-21 17:33:23 +0000 (Tue, 21 May 2013) | 1 line
+Changed paths:
+   A /tags/5.3-release1 (from /trunk:154)
+
+Tagging as 5.3-release1
+------------------------------------------------------------------------
+r154 | arith | 2013-05-21 16:44:57 +0000 (Tue, 21 May 2013) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+translation exported; support WoW 5.3 now
+------------------------------------------------------------------------
+r153 | arith | 2013-05-21 15:46:34 +0000 (Tue, 21 May 2013) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+   M /trunk/LibBabble-SubZone-3.0.toc
+
+to trigger database export, DO NOT use this revision
+------------------------------------------------------------------------
+r152 | arith | 2013-05-20 15:45:55 +0000 (Mon, 20 May 2013) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+new zones from 5.3
+------------------------------------------------------------------------
+r151 | arith | 2013-05-18 08:47:48 +0000 (Sat, 18 May 2013) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added scenarios
+------------------------------------------------------------------------
+r150 | arith | 2013-05-16 16:47:38 +0000 (Thu, 16 May 2013) | 1 line
+Changed paths:
+   M /trunk/LibBabble-SubZone-3.0.lua
+
+added new strings
+------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("GrandMagusTelestra", "DBM-Party-WotLK", 8)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 47 $"):sub(12, -3))
 mod:SetCreatureID(26731)
 mod:SetModelID(24066)
 mod:SetZone()
@@ -9,7 +9,7 @@ mod:SetZone()
 mod:RegisterCombat("combat")
 
 mod:RegisterEvents(
-	"UNIT_HEALTH",
+	"UNIT_HEALTH target focus mouseover boss1",
 	"CHAT_MSG_MONSTER_YELL"
 )
 

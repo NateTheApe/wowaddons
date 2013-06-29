@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ]]--
 
-local MAJOR_VERSION = "2.40"
-local MINOR_VERSION = ("$Revision: 305 $"):match("%d+") or 1
-local DATE = string.gsub("$Date: 2013-01-29 23:17:29 +0000 (Tue, 29 Jan 2013) $", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
+local MAJOR_VERSION = "2.44"
+local MINOR_VERSION = ("$Revision: 314 $"):match("%d+") or 1
+local DATE = string.gsub("$Date: 2013-05-24 20:47:27 +0000 (Fri, 24 May 2013) $", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
 Skillet = LibStub("AceAddon-3.0"):NewAddon("Skillet", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 Skillet.title   = "Skillet"
@@ -587,6 +587,13 @@ end
 function Skillet:InitializeDatabase(player, clean)
 DebugSpam("initialize database for "..player)
 
+	if Skillet.wowVersion >= 50300 then
+		if not self.db.realm.dataVersion or self.db.realm.dataVersion < 2 then
+			self.db.realm.dataVersion = 2
+			self:FlushAllData()
+		end 
+	end
+
 	if not self.db.realm.groupDB then
 		self.db.realm.groupDB = {}
 	end
@@ -1024,7 +1031,7 @@ DebugSpam("setting tradeskill to "..player.." "..tradeID.." "..(skillIndex or "n
 			self.currentGroupLabel = self:GetTradeSkillOption("grouping")
 			self:RecipeGroupDropdown_OnShow()
 
-DebugSpam("cast: "..self:GetTradeName(tradeID))
+-- DebugSpam("cast: "..self:GetTradeName(tradeID))
 
 			CastSpellByName(self:GetTradeName(tradeID))				-- this will trigger the whole rescan process via a TRADE_SKILL_SHOW/CRAFT_SHOW event
         else
@@ -1418,10 +1425,19 @@ end
 --|c%x+|Htrade:%d+:%d+:%d+:[0-9a-fA-F]+:[<-{]+|h%[[%a%s]+%]|h|r]]
 --	[3273] = "|cffffd000|Htrade:3274:148:150:23F381A:zD<<t=|h[First Aid]|h|r",
 
+-- Patch 5.3
+-- addded Player Id and Recipe list (bitset)
+-- |cffffd000|Htrade:5000000027407E5:110406:600:600:8LPPYdAB|h[First Aid]|h|r
+
 function ProfessionPopup_SelectTradeLink(menuFrame,player,link)
 --	link = "|cffffd000|Htrade:3274:400:450:23F381A:{{{{{{|h[First Aid]|h|r"
 	ToggleDropDownMenu(1, nil, ProfessionPopupFrame, Skillet.professionPopupButton, Skillet.professionPopupButton:GetWidth(), 0)
-	local _,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[A-Za-z0-9+/]+)")
+	local _,tradeString
+	if Skillet.wowVersion >= 50300 then
+		_,_,tradeString = string.find(link, "(trade:[0-9a-fA-F]+:%d+:%d+:%d+:[A-Za-z0-9+/:]+)")
+	else
+		_,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[A-Za-z0-9+/]+)")
+	end	
 
 	SetItemRef(tradeString,link,"LeftButton")
 end

@@ -85,13 +85,10 @@ do -- Battle pets
 		C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_FAVORITES, false)
 		C_PetJournal.SetFlagFilter(LE_PET_JOURNAL_FLAG_NOT_COLLECTED, false)
 		
-		local isWild, ni = true, 1 -- Because apparently, there are wild pets. Nobody has seen any, though
-		repeat
-			for i=1,C_PetJournal.GetNumPets(isWild) do
-				ni, pets[ni] = ni + 1, C_PetJournal.GetPetInfoByIndex(i, isWild)
-			end
-			isWild = not isWild
-		until isWild
+		local ni = 1
+		for i=1,C_PetJournal.GetNumPets() do
+			ni, pets[ni] = ni + 1, C_PetJournal.GetPetInfoByIndex(i)
+		end
 		for j=ni,#pets do pets[j] = nil end
 		table.sort(pets, sortlevel)
 		

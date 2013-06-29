@@ -1,5 +1,5 @@
-## Interface: 50001
-## Version: 12.09.05
+## Interface: 50200
+## Version: 13.04.17
 ## Title: TipTacTalents
 ## Author: Aezay (Earthen Ring EU)
 ## Notes: Adds Talent Spec to Player Tooltips

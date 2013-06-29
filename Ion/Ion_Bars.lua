@@ -1729,9 +1729,9 @@ function BAR:CreateHandler()
 
 						]])
 
-	handler:SetAttribute("_onstate-current", [[ self:SetAttribute("activestate", self:GetAttribute("state-current") or "homestate") ]])
+    handler:SetAttribute("_onstate-current", [[ self:SetAttribute("activestate", self:GetAttribute("state-current") or "homestate") ]])
 
-	handler:SetAttribute("statestack", "homestate")
+    handler:SetAttribute("statestack", "homestate")
 
 	handler:SetAttribute("activestate", "homestate")
 

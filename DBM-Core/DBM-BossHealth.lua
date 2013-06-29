@@ -47,7 +47,7 @@ end
 local menu
 menu = {
 	{
-		text = DBM_CORE_RANGECHECK_LOCK,
+		text = LOCK_FRAME,
 		checked = false, -- requires DBM.Options which is not available yet
 		func = function()
 			menu[1].checked = not menu[1].checked
@@ -175,7 +175,7 @@ function updateBar(bar, percent, icon, dontShowDead)
 	local bartimer = _G[bar:GetName() .. "BarTimer"]
 	local barbar = _G[bar:GetName() .. "Bar"]
 	local barIcon = _G[bar:GetName() .. "BarIcon"]
-	bartimer:SetText((percent > 0 or dontShowDead) and math.floor(percent).."%" or DBM_CORE_DEAD)
+	bartimer:SetText((percent > 0 or dontShowDead) and math.floor(percent).."%" or DEAD)
 	barbar:SetValue(percent)
 	barbar:SetStatusBarColor((100 - percent) / 100, percent/100, 0)
 	if not icon or type(icon) ~= "number" or icon < 1 or icon > 8 then
@@ -208,11 +208,11 @@ do
 		local cType = bit.band(guid:sub(0, 5), 0x00F)
 		return (cType == 3 or cType == 5) and tonumber(guid:sub(6, 10), 16) or -1
 	end
-	
+
 --	local function compareBars(b1, b2)
 --		return b1.value > b2.value
 --	end
-	
+
 	-- gets the health and unit id of the given creature id, returns nil if the target could not be found
 	local function getHealth(cId)
 		local id = targetCache[cId] -- ask the cache if we already know where the mob is
@@ -250,7 +250,7 @@ do
 			return UnitHealth(id) / UnitHealthMax(id) * 100, id
 		end
 	end
-	
+
 	-- gets the health and unit id of the given GUID, returns nil if the target could not be found
 	-- TODO: mostly copy & paste from getHealth, these functions should probably be merged somehow...
 	local function getHealthByGuid(guid)

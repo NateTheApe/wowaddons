@@ -18,10 +18,12 @@ function Combustion_OnLoad(Frame)
         
 	Frame:RegisterForDrag("LeftButton")
 	Frame:RegisterEvent("PLAYER_LOGIN")
+	Frame:RegisterEvent("PLAYER_ALIVE")
 	Frame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	Frame:RegisterEvent("PLAYER_REGEN_DISABLED")
 	Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
  	Frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+  	Frame:RegisterEvent("PLAYER_TALENT_UPDATE")
     
  	CombuLSM.RegisterCallback(CombustionHelper , "LibSharedMedia_Registered", "SharedMedia_Registered") 
 
@@ -108,7 +110,7 @@ combuhasteplateau = {{0,10},
 
 function CombuClientVersionCheck()
 	
-    combuclientVersion  = select(4,GetBuildInfo())
+    combuclientVersion = select(4,GetBuildInfo())
 
 	CombuBombChecker ()	
 	
@@ -634,27 +636,29 @@ function CombustionFrameresize()
 	Pyrobar:SetMinMaxValues(0,100)
 	Pyrobar:SetWidth(28+combusettingstable["combubarwidth"])
 	
-    CombuMBTrackerFrame:ClearAllPoints()
-
     if (combusettingstable["MageBombTrackerPosition"] == "free") --or IsSpellKnown(11129) == false
         then CombuMBTrackerFrame:EnableMouse(true) --print(5)
-    elseif (combusettingstable["MageBombTrackerPosition"] == "upside")
-        then CombuMBTrackerFrame:SetPoint("BOTTOM",CombustionFrame,"TOP",0,-6) --print(1)
-             combumbtrackersettingstable["direction"] = "upward"
-             CombuMBTrackerFrame:EnableMouse(false)
-    elseif (combusettingstable["MageBombTrackerPosition"] == "downside")
-        then CombuMBTrackerFrame:SetPoint("TOP",CombustionFrame,"BOTTOM",0,6) --print(2)
-             combumbtrackersettingstable["direction"] = "downward"
-             CombuMBTrackerFrame:EnableMouse(false)
-    elseif (combusettingstable["MageBombTrackerPosition"] == "rightside")
-        then CombuMBTrackerFrame:SetPoint("TOPLEFT",CombustionFrame,"TOPRIGHT",-6,0) --print(3)
-             combumbtrackersettingstable["direction"] = "downward"
-             CombuMBTrackerFrame:EnableMouse(false)
-    elseif (combusettingstable["MageBombTrackerPosition"] == "leftside")
-        then CombuMBTrackerFrame:SetPoint("TOPRIGHT",CombustionFrame,"TOPLEFT",6,0) --print(4)
-             combumbtrackersettingstable["direction"] = "downward"
-             CombuMBTrackerFrame:EnableMouse(false)
-    end
+    else CombuMBTrackerFrame:ClearAllPoints()
+    	
+		if (combusettingstable["MageBombTrackerPosition"] == "upside")
+			then CombuMBTrackerFrame:SetPoint("BOTTOM",CombustionFrame,"TOP",0,-6) --print(1)
+				 combumbtrackersettingstable["direction"] = "upward"
+				 CombuMBTrackerFrame:EnableMouse(false)
+		elseif (combusettingstable["MageBombTrackerPosition"] == "downside")
+			then CombuMBTrackerFrame:SetPoint("TOP",CombustionFrame,"BOTTOM",0,6) --print(2)
+				 combumbtrackersettingstable["direction"] = "downward"
+				 CombuMBTrackerFrame:EnableMouse(false)
+		elseif (combusettingstable["MageBombTrackerPosition"] == "rightside")
+			then CombuMBTrackerFrame:SetPoint("TOPLEFT",CombustionFrame,"TOPRIGHT",-6,0) --print(3)
+				 combumbtrackersettingstable["direction"] = "downward"
+				 CombuMBTrackerFrame:EnableMouse(false)
+		elseif (combusettingstable["MageBombTrackerPosition"] == "leftside")
+			then CombuMBTrackerFrame:SetPoint("TOPRIGHT",CombustionFrame,"TOPLEFT",6,0) --print(4)
+				 combumbtrackersettingstable["direction"] = "downward"
+				 CombuMBTrackerFrame:EnableMouse(false)
+		end
+	
+	end
 
     for i = 1,#combuwidgetlist["bars"] do _G[(combuwidgetlist["bars"])[i]]:SetStatusBarTexture(CombuLSM:Fetch("statusbar",combusettingstable["combutexturename"])) end
     for i = 1,#combuwidgetlist["text"] do 	_G[(combuwidgetlist["text"])[i]]:SetFont(CombuLSM:Fetch("font",combusettingstable["combufontname"]),select(2,_G[(combuwidgetlist["text"])[i]]:GetFont())) end   
@@ -1132,6 +1136,8 @@ function Combustion_OnEvent(self, event, ...)
     	CombuSavedVariablesConvert ()
     	CombuClientVersionCheck()
         CombuGlyphCheck ()
+        
+	    CombustionScale (combusettingstable["combuscale"]) -- Scale check on startup
                
 	    if (CombustionFrame:GetFrameLevel() == 0) then
 	        CombustionFrame:SetFrameLevel(1) -- fix when frame is at FrameLevel 0
@@ -1152,24 +1158,28 @@ function Combustion_OnEvent(self, event, ...)
 	        	 CombustionFrame:FadeIn(combusettingstable["combufadeinspeed"])
 	             combutalent = true
         end
-        
--------------------------------
+                       	
+        CombuLanguageCheck()
+
+    end
+	
+	if event == "PLAYER_ALIVE" then
+	
+	-------------------------------
 --Frame lock check on startup
         if (combusettingstable["combulock"] == false) 
 	 		then CombustionFrame:EnableMouse(true)
         elseif (combusettingstable["combulock"] == true) 
 	    	then CombustionFrame:EnableMouse(false)
         end	
-               	
-	    CombustionScale (combusettingstable["combuscale"]) -- Scale check on startup
+        
 	    CombustionFrameresize() -- Combustion Frame size check on startup 
-        CombuLanguageCheck()
 
-    end
+	end
 	
 -------------------------------
 --Combustion spell check      
-    if (event == "ACTIVE_TALENT_GROUP_CHANGED") then
+    if event == "ACTIVE_TALENT_GROUP_CHANGED" or event == "PLAYER_TALENT_UPDATE" then
     	
     	CombuClientVersionCheck()
         CombuGlyphCheck ()
@@ -1186,7 +1196,7 @@ function Combustion_OnEvent(self, event, ...)
                 CombustionFrame:FadeIn(combusettingstable["combufadeinspeed"])
                 combutalent = true
                 if (combusettingstable["combuchat"]==true) then ChatFrame1:AddMessage(CombuLoc["combuoff"]) end
-                CombustionFrameresize()
+                --CombustionFrameresize()
         end
                 
     end

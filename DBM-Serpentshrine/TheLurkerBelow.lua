@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("LurkerBelow", "DBM-Serpentshrine")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 474 $"):sub(12, -3))
 mod:SetCreatureID(21217)
 mod:SetModelID(20216)
 mod:SetZone()
@@ -21,7 +21,7 @@ local warnEmergeSoon	= mod:NewAnnounce("WarnEmergeSoon", 3)
 local warnSpout			= mod:NewSpellAnnounce(37433, 4)
 local warnWhirl			= mod:NewSpellAnnounce(37363, 3)
 
-local specWarnSpout		= mod:NewSpecialWarningSpell(37433)
+local specWarnSpout		= mod:NewSpecialWarningSpell(37433, nil, nil, nil, 2)
 
 local timerSubmerge		= mod:NewTimer(90, "TimerSubmerge", 39091)
 local timerEmerge		= mod:NewTimer(60, "TimerEmerge", 39088)
@@ -30,32 +30,31 @@ local timerSpout		= mod:NewCastTimer(22, 37433)
 local timerWhirlCD		= mod:NewCDTimer(17, 37363)
 
 function mod:CheckDive()
-	local foundIt
 	self:ScheduleMethod(0.5, "CheckDive")
-	for i = 1, DBM:GetGroupMembers() do
-		if UnitName("raid"..i.."target") == L.name then
-			foundIt = true
-			break
+	for uId in DBM:GetGroupMembers() do
+		if self:GetUnitCreatureId(uId.."target") == 21217 then
+			return
 		end
 	end
-	if not foundIt then
-		warnSubmerge:Show()
-		timerEmerge:Show()
-		timerSpoutCD:Start(63)
-		warnEmerge:Schedule(60)
-		self:UnscheduleMethod("CheckDive")
-		self:ScheduleMethod(150, "CheckDive")
-	end
+	warnSubmerge:Show()
+	timerEmerge:Start()
+	warnEmergeSoon:Schedule(50)
+	warnEmerge:Schedule(60)
+	timerSubmerge:Schedule(60)
+	timerSpoutCD:Schedule(60, 3)
+	self:UnscheduleMethod("CheckDive")
+	self:ScheduleMethod(150, "CheckDive")
 end
 
 function mod:OnCombatStart(delay)
 	timerWhirlCD:Start(17-delay)
 	timerSpoutCD:Start(37-delay)
+	timerSubmerge:Start(-delay)
 	warnSubmergeSoon:Schedule(80)
 	self:ScheduleMethod(90, "CheckDive")
 end
 
-function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
+function mod:SPELL_DAMAGE(_, _, _, _, _, _, _, _, spellId)
 	if spellId == 37363 and self:AntiSpam(10) then
 		warnWhirl:Show()
 		timerWhirlCD:Start()

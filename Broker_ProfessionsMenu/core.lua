@@ -3,14 +3,14 @@
 -- Author: Sanori/Pathur                                                      --
 --------------------------------------------------------------------------------
 local _, me = ...                                 --Includes all functions and variables
-me.version = "Version: 2.5 (4. Nov. 2012)"
+me.version = "Version: 2.7 (27. May. 2013)"
 
 
 
 --------------------------------------------------------------------------------
 -- Events, Libs, Variables                                                    --
 --------------------------------------------------------------------------------
---Register Events
+--<< Register Events >>--
 me.frame = CreateFrame("FRAME")
 me.frame:RegisterEvent("ADDON_LOADED")
 me.frame:RegisterEvent("PLAYER_LOGIN")
@@ -31,17 +31,16 @@ me.scantip:AddFontStrings(
 	me.scantip:CreateFontString( "$parentTextLeft1", nil, "GameTooltipText" ),
 	me.scantip:CreateFontString( "$parentTextRight1", nil, "GameTooltipText" )
 );
-
+--<< Include libs >>--
+me.dropdown = LibStub('LibDewdrop-3.0')			--Dropdownmenu
 me.LDB = LibStub:GetLibrary("LibDataBroker-1.1")	--Data Broker
 me.TipHooker = LibStub("LibTipHooker-1.1")			--Tooltip mod
-
+--<< Init variables and constants >>--
 me.quicklauncher = {}										--Quick Launcher
 me.sharedcds = {}												--shared cds
-me.quicktradeskills = {}									--Quicktradeskills
 BPMAutoloot=nil												--Global Variable for Auto Loot Script
 local my = UnitName("player")								--player name
-
---Keys
+--<< Key short cuts >>--
 me.keys = {														--Keys
 	{['Key']='left',       ['Button']=me.L.leftclick},
 	{['Key']='shiftleft',  ['Button']=me.L.leftclick,  ['Mod']=me.L.shift},
@@ -69,90 +68,9 @@ end
 
 
 --------------------------------------------------------------------------------
--- Functions                                                                  --
+-- Events                                                                     --
 --------------------------------------------------------------------------------
---Filter Tradewindows and Tradeskills
-function me:GetProfs(sorted)
-	local result={}
-	--Ignorelist
-	local ignore={}
-	--Additional
-	local additional={--UnitClass("player") create atomaically the correct title
-		[53428]=UnitClass("player"),		--Rune Forging
-		[1804]=UnitClass("player"),		--Pick Look
-	}
-	--Professions
-	for _,index in pairs({GetProfessions()}) do
-		if index then
-			local name, texture, rank, maxRank, numSpells, spelloffset, skillLine = GetProfessionInfo(index)
-			for i=1, numSpells do
-				if (not ignore[name] and not IsPassiveSpell(spelloffset+i, BOOKTYPE_PROFESSION)) then
-					local subname,_ = GetSpellBookItemName(spelloffset+i, BOOKTYPE_PROFESSION)
-					if not ignore[subname] then
-						if sorted then
-							if not result[name] then result[name]={} end
-							result[name][subname] = GetSpellBookItemTexture(spelloffset+i, BOOKTYPE_PROFESSION)
-						else
-							result[subname] = GetSpellBookItemTexture(spelloffset+i, BOOKTYPE_PROFESSION)
-						end
-					end
-				end
-			end
-		end
-	end
-	--Additional
-	for id,title in pairs(additional) do
-		local name,_,icon,_ = GetSpellInfo(id)
-		if GetSpellBookItemInfo(name) then
-			if sorted then
-				if not result[title] then result[title]={} end
-				result[title][name] = icon
-			else
-				result[name] = icon
-			end
-		end
-	end
-	return result
-end
---Table Alphabetical Sort Function
-function me:pairsByKeys (t, f)
-	local a = {}
-	for n in pairs(t) do table.insert(a, n) end
-		table.sort(a, f)
-		local i = 0                                    --iterator variable
-		local iter = function ()                       --iterator function
-		i = i + 1
-		if a[i] == nil then
-			return nil
-		else
-			return a[i], t[a[i]]
-		end
-	end
-	return iter
-end
---Count of Table Elements
-function me:tcount(tab)
-	local n = #tab
-	if (n == 0) then
-		for _ in pairs(tab) do
-			n = n + 1
-		end
-	end
-	return n
-end
---GetSpellId
-function me:GetSpellID(spell)
-	if not spell then return end
-	local link,_ = GetSpellLink(spell)
-	if not link then return end
-	return tonumber(strmatch(link,"|Hspell:(%d+)|h"))
-end
 
-
-
---------------------------------------------------------------------------------
--- Load/Save Saved Variables                                                  --
---------------------------------------------------------------------------------
 me.frame:SetScript("OnEvent", function(self, event, ...)
 	local arg1, arg2 = ...
 	if event == "ADDON_LOADED" and arg1 == "Broker_ProfessionsMenu" then
@@ -447,6 +365,7 @@ end)
 --------------------------------------------------------------------------------
 -- Modifying Tooltips                                                         --
 --------------------------------------------------------------------------------
+
 function me:modifytooltip(tooltip,id,isitem)
 	if not id or not tooltip or not me.save[my].config.tooltip.ShowIfYouCanCraftThisInItemTooltips then return end
 	local chars,prof
@@ -497,8 +416,10 @@ end)
 
 
 --------------------------------------------------------------------------------
--- Init LibDataBroker (Main Window)                                           --
+-- Data broker                                                                --
 --------------------------------------------------------------------------------
+
+--<< Main data broker >>--------------------------------------------------------
 function me:InitLDB()
 	--Create Secure Frame Overlay
 	me.secureframe = CreateFrame("Button", nil, UIParent, "SecureActionButtonTemplate");
@@ -533,11 +454,7 @@ function me:InitLDB()
 	})
 end
 
-
-
---------------------------------------------------------------------------------
--- Creates Launchers                                                          --
---------------------------------------------------------------------------------
+--<< Launchers >>---------------------------------------------------------------
 function me:newlauncher(id)
 	local spell,_,icon = GetSpellInfo(id)
 	if (not spell) then return end
@@ -571,28 +488,9 @@ end
 
 
 --------------------------------------------------------------------------------
--- Refresh broker icon/text                                                   --
+-- Secure action frame                                                        --
 --------------------------------------------------------------------------------
-function me:Professions_UpdateInfo(txt,icon)
-	if txt=="---" then txt=me.L.professions end
-	me.dataobj.text = txt
-	me.dataobj.icon = icon
-end
 
-
-
---------------------------------------------------------------------------------
--- Error Messages / Other Messages                                            --
---------------------------------------------------------------------------------
-function me:Error(txt)
-	UIErrorsFrame:AddMessage(txt,1.0,0,0,100,3);
-end
-
-
-
---------------------------------------------------------------------------------
--- Secure Frame Stuff                                                         --
---------------------------------------------------------------------------------
 function me:Broker_OnEnter(brokerframe,secureframe,tooltipfunc)
 	if InCombatLockdown() then return end
 	--Hover Events
@@ -654,8 +552,90 @@ end
 
 
 --------------------------------------------------------------------------------
--- Trainer Frame                                                              --
+-- Functions                                                                  --
 --------------------------------------------------------------------------------
+
+--<< Filter tradewindows and tradeskills >>-------------------------------------
+function me:GetProfs(sorted)
+	local result={}
+	--Ignorelist
+	local ignore={}
+	--Additional
+	local additional={--UnitClass("player") create atomaically the correct title
+		[53428]=UnitClass("player"),		--Rune Forging
+		[1804]=UnitClass("player"),		--Pick Look
+	}
+	--Professions
+	for _,index in pairs({GetProfessions()}) do
+		if index then
+			local name, texture, rank, maxRank, numSpells, spelloffset, skillLine = GetProfessionInfo(index)
+			for i=1, numSpells do
+				if (not ignore[name] and not IsPassiveSpell(spelloffset+i, BOOKTYPE_PROFESSION)) then
+					local subname,_ = GetSpellBookItemName(spelloffset+i, BOOKTYPE_PROFESSION)
+					if not ignore[subname] then
+						if sorted then
+							if not result[name] then result[name]={} end
+							result[name][subname] = GetSpellBookItemTexture(spelloffset+i, BOOKTYPE_PROFESSION)
+						else
+							result[subname] = GetSpellBookItemTexture(spelloffset+i, BOOKTYPE_PROFESSION)
+						end
+					end
+				end
+			end
+		end
+	end
+	--Additional
+	for id,title in pairs(additional) do
+		local name,_,icon,_ = GetSpellInfo(id)
+		if GetSpellBookItemInfo(name) then
+			if sorted then
+				if not result[title] then result[title]={} end
+				result[title][name] = icon
+			else
+				result[name] = icon
+			end
+		end
+	end
+	return result
+end
+
+--<< Table alphabetical sort function >>----------------------------------------
+function me:pairsByKeys (t, f)
+	local a = {}
+	for n in pairs(t) do table.insert(a, n) end
+		table.sort(a, f)
+		local i = 0                                    --iterator variable
+		local iter = function ()                       --iterator function
+		i = i + 1
+		if a[i] == nil then
+			return nil
+		else
+			return a[i], t[a[i]]
+		end
+	end
+	return iter
+end
+
+--<< Count of table elements >>-------------------------------------------------
+function me:tcount(tab)
+	local n = #tab
+	if (n == 0) then
+		for _ in pairs(tab) do
+			n = n + 1
+		end
+	end
+	return n
+end
+
+--<< GetSpellId >>--------------------------------------------------------------
+function me:GetSpellID(spell)
+	if not spell then return end
+	local link,_ = GetSpellLink(spell)
+	if not link then return end
+	return tonumber(strmatch(link,"|Hspell:(%d+)|h"))
+end
+
+--<< TrainerFrame: Refresh function >-------------------------------------------
 function me:Trainer_Refresh()
 	if (not me.Trainer or me.save[my].config.trainerdisabled) then return end
 	if not IsTradeSkillLinked() and GetNumTradeSkills() and GetTradeSkillListLink() and me.Trainer.showframe then
@@ -725,15 +705,11 @@ function me:Trainer_Refresh()
 	end
 end
 
-
-
---------------------------------------------------------------------------------
--- scan for cooldowns end recepts                                             --
---------------------------------------------------------------------------------
+--<< TradeSkillFrame: Scan for cooldowns end recepts >>-------------------------
 function me:ScanTradeSkillFrame()
 	if me.Trainer then me.Trainer.showbtn:Disable() end
 	if not IsTradeSkillLinked() and GetTradeSkillListLink() then
-		local profid, NoSpezi, _profid=me:TransProfID(tonumber(strmatch(GetTradeSkillListLink(),"|Htrade:(%d+)")))
+		local profid, NoSpezi, _profid=me:TransProfID(tonumber(strmatch(GetTradeSkillListLink(),"|Htrade:%x+:(%d+)")))
 		if NoSpezi then
 			me.save[my].tradelinks[profid] = GetTradeSkillListLink()			--Save Trade Link
 		else
@@ -790,9 +766,7 @@ function me:ScanTradeSkillFrame()
 	if not me.notrainer then me:Trainer_Refresh() end
 end
 
-
-
---because me:GetSpellID() returns different Prof.-IDs for different ranks, I need a translation function to return always the same id (rank 1) (for saving, ...)
+--<< Translate profession id to the id of rank one (for save purpos) >>---------
 me.profidtable={	--format {id of rank 1,id2,id3,id4,...,other ids[elixir master, etc.]}   ->   return "id of rank 1", "max skill"
 	{2259,3101,3464,11611,28596,51304,80731,105206,28677,28675,28672}, 	--Alchemy
 	{2575,2576,3564,10248,29354,50310,74517,2656},
@@ -822,4 +796,60 @@ function me:TransProfID(profid)
 		end
 	end
 	return profid, nil, profid
+end
+
+--<< Quicktradeskill scan function >>-------------------------------------------
+-- List of all aviable quick trade skills and their localized name (for scanning of the tooltip)
+local skills = {
+	[GetSpellInfo(13262)] = ITEM_DISENCHANT_ANY_SKILL,
+	[GetSpellInfo(51005)] = ITEM_MILLABLE,
+	[GetSpellInfo(31252)] = ITEM_PROSPECTABLE,
+}
+-- Scanfuntion
+function me:scanBagForQuickTradeSkillItems(skillname, onlyAviableCheck)
+	if (not (skillname and skills[skillname])) then return end
+	if (onlyAviableCheck) then return true end
+	local result={}
+	for i=0, NUM_BAG_SLOTS do
+		for j=1, GetContainerNumSlots(i) do
+			if GetContainerItemID(i,j) then
+				local texture, itemCount, _, quality, _ = GetContainerItemInfo(i, j)
+				local itemName,_,_,_,itemMinLevel,itemType,itemSubType = GetItemInfo(GetContainerItemID(i,j))
+				-- Check
+				local add = false
+				if (skills[skillname] == ITEM_DISENCHANT_ANY_SKILL) then --Disenchant
+					if ((itemType==ENCHSLOT_WEAPON or itemType==ARMOR) and quality>1 and quality<5) then add = true end
+				else -- Scan Tooltip
+					me.scantip:SetBagItem(i,j)
+					for i=1, me.scantip:NumLines() do
+						if (_G["BPM_ScanTipTextLeft"..i] and _G["BPM_ScanTipTextLeft"..i]:GetText()==skills[skillname] and itemCount>=5) then
+							add = true
+							break
+						end
+					end
+				end
+				-- Create Entry
+				if (add) then
+					if (itemCount>1) then itemCount = " ("..itemCount..")" else itemCount="" end
+					result[quality.."-"..itemName.."-"..i.."-"..j] = {
+						name="|c"..select(4,GetItemQualityColor(quality))..itemName..itemCount.."|r",
+						icon=texture,
+						action={
+							["type1"]="macro",
+							["macrotext"]="/script if(GetCVar('AutoLootDefault')=='0') then BPMAutoloot=true end\n/cast "..skillname.."\n/use "..i.." "..j
+						},
+						tooltip=function()
+							self = GameTooltip:GetOwner()
+							GameTooltip:SetOwner(self, "ANCHOR_NONE")
+							GameTooltip:SetPoint(me:GetTipAnchor2(self))
+							GameTooltip:SetBagItem(i,j)
+							GameTooltip:AddLine(" ")
+							GameTooltip:AddLine(me.L["leftclick"]..": "..skillname..me.L["autoloot"],0,1,0)
+						end,
+					}
+				end
+			end
+		end
+	end
+	return result
 end

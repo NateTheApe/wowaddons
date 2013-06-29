@@ -5,6 +5,11 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("Broker_MicroMenu", "enUS", true)
 
 if L then
+	L["Advanced"] = true
+	L["Enable this if you want to fine tune the displayed text."] = true
+	L["Enable"] = true
+	L["Custom Text"] = true
+	
 	L["Show FPS"] = true
 	L["Show frames per second."] = true
 	L["Show World Latency"] = true
@@ -38,11 +43,18 @@ end
 
 local L = AceLocale:NewLocale("Broker_MicroMenu", "zhTW")
 if L then
-	L["Disable Coloring"] = "禁用著色" -- Needs review
-L["ms"] = "毫秒" -- Needs review
-L["Show FPS First"] = "優先顯示FPS" -- Needs review
-L["Show Home Latency"] = "顯示本地延遲" -- Needs review
-L["Show World Latency"] = "顯示世界延遲" -- Needs review
+	L["Advanced"] = "進階"
+L["Custom Text"] = "自訂文字"
+L["Disable Coloring"] = "禁用著色"
+L["Enable"] = "啟用"
+L["Enable this if you want to fine tune the displayed text."] = "啟用此如果你想微調顯示文字。"
+L["General"] = "一般"
+L["ms"] = "毫秒"
+L["Show FPS First"] = "優先顯示FPS"
+L["Show Home Latency"] = "顯示本地延遲"
+L["Show latency for chat data, auction house stuff some addon data, and various other data."] = "顯示延遲的聊天數據，拍賣場原料的附加數據，和其他各種數據。"
+L["Show latency for combat data, data from the people around you (specs, gear, enchants, etc.)."] = "顯示延遲的戰鬥數據，你身邊人的數據(天賦，裝備，附魔..等等)"
+L["Show World Latency"] = "顯示世界延遲"
 
 	return
 end

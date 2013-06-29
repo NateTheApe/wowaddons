@@ -1,0 +1,12 @@
+tag v1.8
+37a2f0f58a8f82da169d2c909e0fff5934bafc66
+iceeagle <ciprianmihai.coman@gmail.com>
+2013-03-11 13:24:51 +0200
+
+Tag as v1.8
+
+
+--------------------
+
+iceeagle:
+	- toc update for patch 5.2

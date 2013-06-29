@@ -1,0 +1,26 @@
+------------------------------------------------------------------------
+r32 | yess | 2013-04-02 02:06:01 +0000 (Tue, 02 Apr 2013) | 1 line
+Changed paths:
+   A /tags/v1.3.4 (from /trunk:31)
+
+Tagging as v1.3.4
+------------------------------------------------------------------------
+r31 | yess | 2013-04-02 02:01:34 +0000 (Tue, 02 Apr 2013) | 1 line
+Changed paths:
+   M /trunk/Broker_MicroMenu.lua
+
+Fix PVP Toggle.
+------------------------------------------------------------------------
+r29 | yess | 2013-03-25 22:35:55 +0000 (Mon, 25 Mar 2013) | 1 line
+Changed paths:
+   M /trunk/Broker_MicroMenu.lua
+   M /trunk/Broker_MicroMenu.toc
+
+TOC update.
+------------------------------------------------------------------------
+r28 | yess | 2012-09-11 02:31:08 +0000 (Tue, 11 Sep 2012) | 1 line
+Changed paths:
+   M /trunk/Broker_MicroMenu.lua
+
+Fix error when there is no keybinding for the spell book.
+------------------------------------------------------------------------

@@ -2,6 +2,8 @@ Gnosis = LibStub("AceAddon-3.0"):NewAddon("Gnosis", "AceConsole-3.0", "AceEvent-
 Gnosis.gui = LibStub("AceGUI-3.0");
 Gnosis.lsm = LibStub("LibSharedMedia-3.0", 1);
 Gnosis.smw = LibStub("AceGUISharedMediaWidgets-1.0");
+Gnosis.range = LibStub("LibRangeCheck-2.0");
+Gnosis.dialog = LibStub("LibDialog-1.0");
 
 -- local functions
 local UnitName = UnitName;
@@ -20,9 +22,13 @@ local string_len = strlenutf8;
 -- local variables
 local _;
 
+-- LibSharedMedia
 if(Gnosis.lsm) then
 	Gnosis.lsm:Register("statusbar", "Waterline", "Interface\\Addons\\Gnosis\\Textures\\Waterline");
+	Gnosis.lsm:Register("statusbar", "Gnosis_Plain", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Plain");
+	Gnosis.lsm:Register("statusbar", "Gnosis_Gradient", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Gradient");
 	Gnosis.lsm:Register("font", "Desyrel", "Interface\\Addons\\Gnosis\\Fonts\\DESYREL_.ttf");
+	Gnosis.lsm:Register("font", "Accidental Presidency", "Interface\\Addons\\Gnosis\\Fonts\\Accidental Presidency\\accid___.ttf");
 end
 
 function Gnosis:InitialConfig()
@@ -67,7 +73,7 @@ function Gnosis:En(status)
 		if(self.s.bHidePetVeh) then
 			self:HideBlizzardPetCastbar(true);
 		end
-
+		
 		-- scan table, fast lookup tablese
 		self:CreateCBTables();
 		-- trigger talent update event (gone with 5.04 sent too early)
@@ -120,18 +126,13 @@ end
 
 function Gnosis:HideBlizzardCastbar(status)
 	if(status) then	-- hide castbar
-		for key, value in pairs(self.tCastbarEvents) do
+		for key, value in pairs(self.tBlizzCastbar) do
 			if(CastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.blizzcastbar, value);
-			end
-			CastingBarFrame:UnregisterEvent(value);
+				CastingBarFrame:UnregisterEvent(value);
+			end			
 		end
-		for key, value in pairs(self.tMiscEvents) do
-			if(CastingBarFrame:IsEventRegistered(value)) then
-				table_insert(self.blizzcastbar, value);
-			end
-			CastingBarFrame:UnregisterEvent(value);
-		end
+		
 		if(#self.blizzcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisBlizCB"]);
@@ -145,6 +146,7 @@ function Gnosis:HideBlizzardCastbar(status)
 		for key, value in pairs(self.blizzcastbar) do
 			CastingBarFrame:RegisterEvent(value);
 		end
+		
 		if(#self.blizzcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgBlizCBRestored"]);
@@ -174,18 +176,13 @@ end
 
 function Gnosis:HideBlizzardPetCastbar(status)
 	if(status) then	-- hide pet castbar
-		for key, value in pairs(self.tCastbarEvents) do
+		for key, value in pairs(self.tBlizzCastbar) do
 			if(PetCastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.petcastbar, value);
-			end
-			PetCastingBarFrame:UnregisterEvent(value);
+				PetCastingBarFrame:UnregisterEvent(value);
+			end			
 		end
-		for key, value in pairs(self.tMiscEvents) do
-			if(PetCastingBarFrame:IsEventRegistered(value)) then
-				table_insert(self.petcastbar, value);
-			end
-			PetCastingBarFrame:UnregisterEvent(value);
-		end
+		
 		if(#self.petcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisPetCB"]);
@@ -199,24 +196,46 @@ function Gnosis:HideBlizzardPetCastbar(status)
 		for key, value in pairs(self.petcastbar) do
 			PetCastingBarFrame:RegisterEvent(value);
 		end
+		
 		if(#self.petcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgPetCBRestored"]);
 			end
 		end
+		
 		self.petcastbar = {};
 	end
 end
 
 function Gnosis:HideBlizzardMirrorCastbar(status)
 	if(status) then	-- hide castbar
-		for key, value in pairs(self.tMirrorEvents) do
+		for key, value in pairs(self.tBlizzMirrorUiParent) do
 			if(UIParent:IsEventRegistered(value)) then
-				table_insert(self.blizzmirrorcastbar, value);
-			end
-			UIParent:UnregisterEvent(value);
+				table_insert(self.blizzmirroruiparent, value);
+				UIParent:UnregisterEvent(value);
+			end			
 		end
-		if(#self.blizzmirrorcastbar > 0) then
+		
+		for key, value in pairs(self.tBlizzMirror123) do
+			if(MirrorTimer1:IsEventRegistered(value)) then
+				table_insert(self.blizzmirror1, value);
+				MirrorTimer1:UnregisterEvent(value);
+			end
+			if(MirrorTimer2:IsEventRegistered(value)) then
+				table_insert(self.blizzmirror2, value);
+				MirrorTimer2:UnregisterEvent(value);
+			end
+			if(MirrorTimer3:IsEventRegistered(value)) then
+				table_insert(self.blizzmirror3, value);
+				MirrorTimer3:UnregisterEvent(value);
+			end
+		end
+		
+		MirrorTimer1:Hide();
+		MirrorTimer2:Hide();
+		MirrorTimer3:Hide();
+		
+		if(#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisMirrCB"]);
 			end
@@ -226,15 +245,29 @@ function Gnosis:HideBlizzardMirrorCastbar(status)
 			end
 		end
 	else	-- restore mirror castbar events, it might not actually enable the blizzard mirror castbar if another addon hides it
-		for key, value in pairs(self.blizzmirrorcastbar) do
+		for key, value in pairs(self.blizzmirroruiparent) do
 			UIParent:RegisterEvent(value);
 		end
-		if(#self.blizzmirrorcastbar > 0) then
+		for key, value in pairs(self.blizzmirror1) do
+			MirrorTimer1:RegisterEvent(value);
+		end
+		for key, value in pairs(self.blizzmirror2) do
+			MirrorTimer2:RegisterEvent(value);
+		end
+		for key, value in pairs(self.blizzmirror3) do
+			MirrorTimer3:RegisterEvent(value);
+		end
+		
+		if(#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgMirrCBRestored"]);
 			end
 		end
-		self.blizzmirrorcastbar = {};
+		
+		self.blizzmirroruiparent = {};
+		self.blizzmirror1 = {};
+		self.blizzmirror2 = {};
+		self.blizzmirror3 = {};
 	end
 end
 
@@ -565,6 +598,7 @@ function Gnosis:SetupChanneledSpellsTable()
 
 	-- priest
 	self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 2);	-- mind flay
+	self:AddChanneledSpellById(129197, 3, false, 4, false, false, "shadow", false, 1);	-- mind flay (insanity)
 	self:AddChanneledSpellById(32000, 5, false, 6, false, true, "shadow", false, 2); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
 	self:AddChanneledSpellById(64843, 4, true, 15, false, true, "holy", true, 3);		-- divine hymn
@@ -717,14 +751,14 @@ function Gnosis:GenerateCombattext(cc, cs, bClip)
 
 	-- hits, crits, ticks, dmg, dps, clipped
 	local dpstime = 1000 / (cc.freqtest and min(cc.freqtest-cc.starttime,cc.duration) or cc.duration);
-	local tickscrits = string_format("%d%s", cc.ticks, tick);
+	local tickscrits = string_format("%d%s", cc.ticks + cc.mastery, tick);
 	if(cc.crits > 0) then tickscrits = string_format("%s, %d%s", tickscrits, cc.crits, crit); end
 
 	str = string_gsub(str, "tickscrits", tickscrits);
 	str = string_gsub(str, "spellname", string_format("%s", cc.spell));
 	str = string_gsub(str, "hits", string_format("%d", cc.hits) .. hit);
 	str = string_gsub(str, "crits", string_format("%d", cc.crits) .. crit);
-	str = string_gsub(str, "ticks", string_format("%d", cc.ticks) .. tick);
+	str = string_gsub(str, "ticks", string_format("%d", cc.ticks + cc.mastery) .. tick);
 	str = string_gsub(str, "dmg", string_format("%d", cc.dmg));
 	str = string_gsub(str, "dps", string_format("%d", cc.dmg * dpstime));
 	str = string_gsub(str, "eh", string_format("%d", cc.eh));
@@ -794,12 +828,14 @@ function Gnosis:SetupChannelData()
 		cc.ticks = 0;
 		cc.hits = 0;
 		cc.crits = 0;
+		cc.mastery = 0;
 		cc.bcliptest = cs.bcliptest;
 		cc.baeo = cs.baoe;
 		cc.texture = texture;
 		cc.target = self.strLastTarget;
 		cc.class = self.strLastTargetClass;
 		cc.bticksound = cs.bticksound;
+		cc.lastticktime = nil;
 
 		-- ticks table
 		cc.tticks = {};
@@ -911,7 +947,7 @@ function Gnosis:ClipTest(fCurTime)
 	end
 end
 
-function Gnosis:AddBasicCastbar(name, unit, movefactor_y, movefactor_x, scale)
+function Gnosis:AddCustomBar(name, unit, width, height, scale, movefactor_y, movefactor_x, unlockicon)
 	local fScale = UIParent:GetScale();
 	local cfg;
 
@@ -923,37 +959,30 @@ function Gnosis:AddBasicCastbar(name, unit, movefactor_y, movefactor_x, scale)
 
 	cfg = self.s.cbconf[name];
 	
-	if(scale ~= self.tCastbarDefaults.scale) then
-		cfg.scale = scale;
-		Gnosis:SetBarParams(name);
-	end
+	cfg.scale = scale;
+	cfg.width = width;
+	cfg.height = height;
+	cfg.bIconUnlocked = unlockicon;
+	Gnosis:SetBarParams(name);
 	
 	cfg.anchor.py = cfg.anchor.py + movefactor_y * (self.tCastbarDefaults.height/GetScreenHeight() + 0.01) * fScale;
 	cfg.anchor.px = cfg.anchor.px + movefactor_x * (self.tCastbarDefaults.height/GetScreenHeight()*2.5 + self.tCastbarDefaults.width/GetScreenWidth() + 0.01) * fScale;
-	self:AnchorBar(name);
+	self:AnchorBar(name);	
 end
 
-function Gnosis:CreateBasicCastbarSet()
-	self:AddBasicCastbar(self.L["CBSetPlayer"], "player", 2, 0, 1.35);
-	self:AddBasicCastbar(self.L["CBSetTarget"], "target", 1, 0, 1.0);
-	self:AddBasicCastbar(self.L["CBSetFocus"], "focus", 0, 0, 1.0);
-	self:AddBasicCastbar(self.L["CBSetPet"], "pet", -2, 0, 1.0);
-	self:AddBasicCastbar(self.L["CBSetMirror"], "mirror", 4, 0, 1.0);
-end
-
-function Gnosis:CreateMadnessSet()
-	local i;
-	for i = 1, 99 do
-		self:AddBasicCastbar("Player " .. i, "player", 10-i%20, -2+floor(i/20), 1.0);
-	end
+function Gnosis:CreateCustomCastbarSet()
+	self:AddCustomBar(self.L["CBSetPlayer"], "player", 300, 28, 1.0, 3, 0, true);
+	self:AddCustomBar(self.L["CBSetTarget"], "target", 250, 20, 1.0, 1, 0, false);
+	self:AddCustomBar(self.L["CBSetFocus"], "focus", 250, 20, 1.0, -1, 0, false);
+	self:AddCustomBar(self.L["CBSetPet"], "pet", 250, 20, 1.0, -3, 0, false);
+	self:AddCustomBar(self.L["CBSetMirror"], "mirror", 250, 20, 1.0, 6, 0, false);
 end
 
 function Gnosis:CreateGCDSwingTimers()
-	self:AddBasicCastbar(self.L["CBSetGCD"], "gcd", -3, 0, 1.0);
-	self:AddBasicCastbar(self.L["CBSetSwing"], "smr", -4, 0, 1.0);
+	self:AddCustomBar(self.L["CBSetGCD"], "gcd", 250, 3, 1.0, -5, 0);
+	self:AddCustomBar(self.L["CBSetSwing"], "smr", 250, 3, 1.0, -6, 0);
 
 	local cfg = self.s.cbconf[self.L["CBSetGCD"]];
-	cfg.height = 3;
 	cfg.border = 0;
 	cfg.colBar = { 0.85, 0.85, 0.85, 0.70 };
 	cfg.strNameFormat = "";
@@ -962,7 +991,6 @@ function Gnosis:CreateGCDSwingTimers()
 	self:SetBarParams(self.L["CBSetGCD"]);
 
 	cfg = self.s.cbconf[self.L["CBSetSwing"]];
-	cfg.height = 3;
 	cfg.border = 0;
 	cfg.colBar = { 0.85, 0.85, 0.85, 0.70 };
 	cfg.strNameFormat = "";
@@ -1038,7 +1066,8 @@ function Gnosis:CheckForFirstStart(bForce)
 		btnLCS:SetWidth(230);
 		btnLCS:SetText(Gnosis.L["IfCCSetup"]);
 		btnLCS:SetCallback("OnClick", function()
-				Gnosis:CreateBasicCastbarSet();
+				--Gnosis:CreateBasicCastbarSet();
+				Gnosis:CreateCustomCastbarSet();
 				Gnosis:HideBlizzardCastbarIfStatusChange(true);
 				Gnosis:HideBlizzardMirrorCastbarIfStatusChange(true);
 				Gnosis:HideBlizzardPetCastbarIfStatusChange(true);

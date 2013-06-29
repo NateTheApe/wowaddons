@@ -2,10 +2,10 @@
 ************************************************************************
 Custom.lua
 ************************************************************************
-File date: 2012-12-08T08:50:38Z
-File hash: fd3b173
-Project hash: 3df9ad7
-Project version: 2.4.4
+File date: 2013-04-09T02:35:09Z
+File hash: c70fb0f
+Project hash: 3fa6ce4
+Project version: 2.4.8
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -72,8 +72,9 @@ function addon:InitCustom()
 	AddCustom("PREREQ")
 	AddCustom("BLACK_MARKET_AUCTION_HOUSE")
 	AddCustom("MOP_RAIDS_RANDOM", Z.HEART_OF_FEAR)
-	AddCustom("BANANA_INFUSED_RUM", Z.KRASARANG_WILDS)
-	AddCustom("FOUR_SENSES_BREW", Z.KUN_LAI_SUMMIT)
+	AddCustom("BANANA_INFUSED_RUM", Z.KRASARANG_WILDS, 52.3, 88.7)
+	AddCustom("FOUR_SENSES_BREW", Z.KUN_LAI_SUMMIT, 44.7, 52.3)
+	AddCustom("LEARNT_BY_ACCEPTING_QUEST")
 
 	self.InitCustom = nil
 end

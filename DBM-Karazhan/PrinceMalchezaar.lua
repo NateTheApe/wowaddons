@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Prince", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(15690)
 mod:SetModelID(19274)
 mod:RegisterCombat("combat")
@@ -45,7 +45,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(30852) then
+	if args.spellId == 30852 then
 		warningNovaCast:Show()
 		timerNovaCast:Start()
 		specWarnNova:Show()
@@ -64,9 +64,9 @@ end
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(30854, 30898) then
 		warningSWP:Show(args.destName)
-	elseif args:IsSpellID(39095) then
+	elseif args.spellId == 39095 then
 		warningAmpMagic:Show(args.destName)
-	elseif args:IsSpellID(30843) then
+	elseif args.spellId == 30843 then
 		enfeebleTargets[#enfeebleTargets + 1] = args.destName
 		timerEnfeeble:Start()
 		if args:IsPlayer() then

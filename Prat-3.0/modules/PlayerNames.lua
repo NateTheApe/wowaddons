@@ -466,7 +466,7 @@ Prat:AddModuleToLoad(function()
 	["Prat_Playernames: Stored Player Data Cleared"] = "Prat_Playernames: Информация о собеседниках очищена",
 	["Query the server for all player names we do not know. Note: This happpens pretty slowly, and this data is not saved."] = "Запрос сервера для всех неизвестных играков. Заметка: Это происходит дастаточно медленно, и их данные не сохраняются.",
 	Random = "Случайно",
-	realidcolor_desc = "Окрашивание имен RealID", -- Needs review
+	realidcolor_desc = "Окрашивание имен RealID",
 	realidcolor_name = "RealID Цвет",
 	["Reset Settings"] = "Сброс настроек",
 	["Restore default settings, and delete stored character data."] = "Восстановить настройки по умолчанию и удалить сохраненную информацию о собеседниках.",
@@ -493,7 +493,7 @@ Prat:AddModuleToLoad(function()
 	["Unknown Use Common Color"] = "Общий цвет для неизвестных",
 	["Use Channel Color"] = "Использовать цвет канала",
 	["Use Player Color"] = "Использовать цвет игрока",
-	["Use toon name for RealID"] = "Использовать имя персонажа вместо RealID", -- Needs review
+	["Use toon name for RealID"] = "Использовать имя персонажа вместо RealID",
 }
 
   )

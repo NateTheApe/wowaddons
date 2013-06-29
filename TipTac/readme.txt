@@ -46,7 +46,7 @@ In this file, you will have to locate "SavedVariables", and change it into "Save
 Lacking Features, Ideas & Problems
 ----------------------------------
 - Colorblind mode does not work properly with owned combat pets with a custom name.
-- ItemRefTooltip: Does not support "archaeology". "currency" should be supported now, but need verification.
+- ItemRefTooltip: Does not support "archaeology". The "currency" type should be supported now, but need verification.
 - ItemRefTooltip does not position well if scaled below 1.
 - Remove font size delta, add slider for each font size.
 - Add hover tips to "GuildBankMessageFrame".

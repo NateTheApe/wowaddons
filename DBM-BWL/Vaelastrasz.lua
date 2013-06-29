@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Vaelastrasz", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 389 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(13020)
 mod:SetModelID(13992)
 mod:RegisterCombat("combat")
@@ -25,14 +25,14 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(23461) then
+	if args.spellId == 23461 then
 		warnBreath:Show()
 		timerBreath:Start()
 	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(18173) then
+	if args.spellId == 18173 then
 		warnAdrenaline:Show(args.destName)
 		timerAdrenaline:Start(args.destName)
 		if args:IsPlayer() then

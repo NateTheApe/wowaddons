@@ -1,9 +1,8 @@
 local mod	= DBM:NewMod(689, "DBM-MogushanVaults", nil, 317)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 8416 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 9663 $"):sub(12, -3))
 mod:SetCreatureID(60009)--60781 Soul Fragment
-mod:SetModelID(41192)
 mod:SetZone()
 mod:SetUsedIcons(8, 7, 6)
 
@@ -18,7 +17,9 @@ mod:RegisterEventsInCombat(
 	"SPELL_DAMAGE",
 	"SPELL_MISSED",
 	"CHAT_MSG_MONSTER_YELL",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_SPELLCAST_SUCCEEDED boss1",
+	"UNIT_SPELLCAST_STOP boss1",
+	"UNIT_SPELLCAST_CHANNEL_STOP boss1"
 )
 --Phase order is controlled by players. it is only pre determined order in LFR and LFR only.
 --Heroic a player can do ANY phase first. It even says this in encounter journal.
@@ -30,54 +31,47 @@ local warnPhase						= mod:NewAnnounce("WarnPhase", 1, "Interface\\Icons\\Spell_
 local warnLightningLash				= mod:NewStackAnnounce(131788, 3, nil, mod:IsTank())
 local warnLightningFists			= mod:NewSpellAnnounce(116157, 3)
 local warnEpicenter					= mod:NewCountAnnounce(116018, 4)
-
 --Fire/Spear
 local warnFlamingSpear				= mod:NewStackAnnounce(116942, 3, nil, mod:IsTank())
 local warnWildSpark					= mod:NewTargetCountAnnounce(116784, 4)
 local yellWildSpark					= mod:NewYell(116784)
 local warnDrawFlame					= mod:NewCountAnnounce(116711, 4)
 local warnWildfireInfusion			= mod:NewStackAnnounce(116821, 3, nil, mod:IsHealer())
-
 --Arcane/Staff
 local warnArcaneShock				= mod:NewStackAnnounce(131790, 3, nil, mod:IsTank())
 local warnArcaneResonance			= mod:NewTargetAnnounce(116417, 4)
 local warnArcaneVelocity			= mod:NewCountAnnounce(116364, 4)
-
 --Shadow/Shield (Heroic Only)
 local warnShadowBurn				= mod:NewStackAnnounce(131792, 3, nil, mod:IsTank())
 local warnChainsOfShadow			= mod:NewSpellAnnounce(118783, 2, nil, false)
 local warnSiphoningShield			= mod:NewCountAnnounce(117203, 4)
-
 --Tank Abilities
 local warnReversalLightningFists	= mod:NewTargetAnnounce(118302, 2)--this spell can interrupt Epicenter, so needs to warn.
-local warnNullBarrior				= mod:NewSpellAnnounce(115817, 2)
+local warnNullBarrier				= mod:NewSpellAnnounce(115817, 1)
 
 --Nature/Fist
 local specWarnLightningLash			= mod:NewSpecialWarningStack(131788, mod:IsTank(), 2)
 local specWarnLightningLashOther	= mod:NewSpecialWarningTarget(131788, mod:IsTank())
 local specWarnEpicenter				= mod:NewSpecialWarningRun(116018, nil, nil, nil, true)
-
 --Fire/Spear
 local specWarnFlamingSpear			= mod:NewSpecialWarningStack(116942, mod:IsTank(), 2)
 local specWarnFlamingSpearOther		= mod:NewSpecialWarningTarget(116942, mod:IsTank())
 local specWarnWildSpark				= mod:NewSpecialWarningYou(116784)
 local specWarnWildfire				= mod:NewSpecialWarningMove(116793)
-local specWarnDrawFlame				= mod:NewSpecialWarningSpell(116711, nil, nil, nil, true)
-
+local specWarnDrawFlame				= mod:NewSpecialWarningSpell(116711, nil, nil, nil, 2)
 --Arcane/Staff
 local specWarnArcaneShock			= mod:NewSpecialWarningStack(131790, mod:IsTank(), 2)
 local specWarnArcaneShockOther		= mod:NewSpecialWarningTarget(131790, mod:IsTank())
 local specWarnArcaneResonance		= mod:NewSpecialWarningYou(116417)
 local yellArcaneResonance			= mod:NewYell(116417)
-local specWarnArcaneVelocity		= mod:NewSpecialWarningSpell(116364, nil, nil, nil, true)
-
+local specWarnArcaneVelocity		= mod:NewSpecialWarningSpell(116364, nil, nil, nil, 2)
 --Shadow/Shield (Heroic Only)
 local specWarnShadowBurn			= mod:NewSpecialWarningStack(131792, mod:IsTank(), 2)
 local specWarnShadowBurnOther		= mod:NewSpecialWarningTarget(131792, mod:IsTank())
 local specWarnSiphoningShield		= mod:NewSpecialWarningSpell(117203)
-
 --Tank Abilities
-local specWarnNullBarrior			= mod:NewSpecialWarningSpell(115817) -- Null Barrier is important all members, espcially Earth and Arcane Phase.
+local specWarnBarrierNow			= mod:NewSpecialWarning("specWarnBarrierNow")--Because i'm so damn tired of tanks not having a clue how/when to use this in LFR
+local specWarnNullBarrier			= mod:NewSpecialWarningSpell(115817) -- Null Barrier is important all members, espcially Earth and Arcane Phase.
 
 --Nature/Fist
 local timerLightningLash			= mod:NewTargetTimer(20, 131788, nil, mod:IsTank())
@@ -85,33 +79,29 @@ local timerLightningLashCD			= mod:NewCDTimer(9, 131788, nil, mod:IsTank())--9-2
 local timerLightningFistsCD			= mod:NewCDTimer(14, 116157)
 local timerEpicenterCD				= mod:NewCDCountTimer(30, 116018)
 local timerEpicenter				= mod:NewBuffActiveTimer(10, 116018)
-
 --Fire/Spear
 local timerFlamingSpear				= mod:NewTargetTimer(20, 116942, nil, mod:IsTank())
 local timerFlamingSpearCD			= mod:NewCDTimer(9, 116942, nil, mod:IsTank())--8-11second variation, usually 10 though.
 local timerWildSpark				= mod:NewTargetTimer(5, 116784)
 local timerDrawFlame				= mod:NewBuffActiveTimer(6, 116711)
 local timerDrawFlameCD				= mod:NewNextCountTimer(30, 116711)--30 seconds after last ended.
-
 --Arcane/Staff
 local timerArcaneShock				= mod:NewTargetTimer(20, 131790, nil, mod:IsTank())
 local timerArcaneShockCD			= mod:NewCDTimer(9, 131790, nil, mod:IsTank())--not comfirmed
 local timerArcaneResonanceCD		= mod:NewCDTimer(15.5, 116417)
 local timerArcaneVelocityCD			= mod:NewCDCountTimer(18, 116364)--18 seconds after last ended.
 local timerArcaneVelocity			= mod:NewBuffActiveTimer(8, 116364)
-
 --Shadow/Shield (Heroic Only)
 local timerShadowBurn				= mod:NewTargetTimer(20, 131792, nil, mod:IsTank())
 local timerShadowBurnCD				= mod:NewCDTimer(9, 131792, nil, mod:IsTank())
 local timerChainsOfShadowCD			= mod:NewCDTimer(6, 118783, nil, false)--6-10sec variation noted
 local timerSiphoningShieldCD		= mod:NewCDCountTimer(35, 117203)--35-38sec variation noted
-
 --Tank Abilities
 local timerReversalLightningFists	= mod:NewBuffFadesTimer(20, 118302)
-local timerNullBarrior				= mod:NewBuffFadesTimer(6, 115817)
-local timerNullBarriorCD			= mod:NewCDTimer(55, 115817)
+local timerNullBarrier				= mod:NewBuffFadesTimer(6, 115817)
+local timerNullBarrierCD			= mod:NewCDTimer(55, 115817)
 
-local soundEpicenter				= mod:NewSound(116018)
+local soundEpicenter				= mod:NewSound(116018, nil, false)
 local soundWildSpark				= mod:NewSound(116784)
 
 mod:AddBoolOption("SetIconOnWS", true)
@@ -152,26 +142,26 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(131788) then
+	if args.spellId == 131788 then
 		warnLightningLash:Show(args.destName, 1)
 		timerLightningLash:Start(args.destName)
 		timerLightningLashCD:Start()
-	elseif args:IsSpellID(116942) then
+	elseif args.spellId == 116942 then
 		warnFlamingSpear:Show(args.destName, 1)
 		timerFlamingSpear:Start(args.destName)
 		timerFlamingSpearCD:Start()
-	elseif args:IsSpellID(131790) then
+	elseif args.spellId == 131790 then
 		warnArcaneShock:Show(args.destName, 1)
 		timerArcaneShock:Start(args.destName)
 		timerArcaneShockCD:Start()
-	elseif args:IsSpellID(131792) then
+	elseif args.spellId == 131792 then
 		warnShadowBurn:Show(args.destName, 1)
 		timerShadowBurn:Start(args.destName)
 		timerShadowBurnCD:Start()
-	elseif args:IsSpellID(118302) then
+	elseif args.spellId == 118302 then
 		warnReversalLightningFists:Show(args.destName)
 		timerReversalLightningFists:Start()
-	elseif args:IsSpellID(116784) then
+	elseif args.spellId == 116784 then
 		sparkCount = sparkCount + 1
 		warnWildSpark:Show(sparkCount, args.destName)
 		timerWildSpark:Start(args.destName)
@@ -183,16 +173,19 @@ function mod:SPELL_AURA_APPLIED(args)
 			soundWildSpark:Play()
 			yellWildSpark:Yell()
 		end
-	elseif args:IsSpellID(116711) then
+	elseif args.spellId == 116711 then
 		sparkCount = 0
 		specialCount = specialCount + 1
 		warnDrawFlame:Show(specialCount)
 		timerDrawFlame:Start()
 		specWarnDrawFlame:Show()
-	elseif args:IsSpellID(116821) then
+		if UnitBuff(GetSpellInfo(115811), "player") and self:IsDifficulty("lfr25") then
+			specWarnBarrierNow:Show()
+		end
+	elseif args.spellId == 116821 then
 		wildfireCount = 1
 		warnWildfire()
-	elseif args:IsSpellID(116417) then
+	elseif args.spellId == 116417 then
 		arcaneResonanceTargets[#arcaneResonanceTargets + 1] = args.destName
 		if self.Options.SetIconOnAR then
 			self:SetIcon(args.destName, arIcon)
@@ -204,17 +197,20 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnArcaneResonance:Show()
 			yellArcaneResonance:Yell()
 		end
-	elseif args:IsSpellID(116364) then
+	elseif args.spellId == 116364 then
 		specialCount = specialCount + 1
 		warnArcaneVelocity:Show(specialCount)
 		specWarnArcaneVelocity:Show()
 		timerArcaneVelocity:Start()
+		if UnitBuff(GetSpellInfo(115811), "player") and self:IsDifficulty("lfr25") then
+			specWarnBarrierNow:Show()
+		end
 	end
 end
 
 -- split Flaming Spear (Arcane Resonance also uses SPELL_AURA_APPLIED_DOSE, buggy)
 function mod:SPELL_AURA_APPLIED_DOSE(args)
-	if args:IsSpellID(131788) then
+	if args.spellId == 131788 then
 		warnLightningLash:Show(args.destName, args.amount or 1)
 		timerLightningLash:Start(args.destName)
 		timerLightningLashCD:Start()
@@ -225,7 +221,7 @@ function mod:SPELL_AURA_APPLIED_DOSE(args)
 				specWarnLightningLashOther:Show(args.destName)
 			end
 		end
-	elseif args:IsSpellID(116942) then
+	elseif args.spellId == 116942 then
 		warnFlamingSpear:Show(args.destName, args.amount or 1)
 		timerFlamingSpear:Start(args.destName)
 		timerFlamingSpearCD:Start()
@@ -236,7 +232,7 @@ function mod:SPELL_AURA_APPLIED_DOSE(args)
 				specWarnFlamingSpearOther:Show(args.destName)
 			end
 		end
-	elseif args:IsSpellID(131790) then
+	elseif args.spellId == 131790 then
 		warnArcaneShock:Show(args.destName, args.amount or 1)
 		timerArcaneShock:Start(args.destName)
 		timerArcaneShockCD:Start()
@@ -247,7 +243,7 @@ function mod:SPELL_AURA_APPLIED_DOSE(args)
 				specWarnArcaneShockOther:Show(args.destName)
 			end
 		end
-	elseif args:IsSpellID(131792) then
+	elseif args.spellId == 131792 then
 		warnShadowBurn:Show(args.destName, args.amount or 1)
 		timerShadowBurn:Start(args.destName)
 		timerShadowBurnCD:Start()
@@ -258,67 +254,70 @@ function mod:SPELL_AURA_APPLIED_DOSE(args)
 				specWarnShadowBurnOther:Show(args.destName)
 			end
 		end
-	elseif args:IsSpellID(116821) then
+	elseif args.spellId == 116821 then
 		wildfireCount = args.amount or 1
 		warnWildfire()
 	end
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(131788) then
+	if args.spellId == 131788 then
 		timerLightningLash:Cancel(args.destName)
-	elseif args:IsSpellID(116942) then
+	elseif args.spellId == 116942 then
 		timerFlamingSpear:Cancel(args.destName)
-	elseif args:IsSpellID(131790) then
+	elseif args.spellId == 131790 then
 		timerArcaneShock:Cancel(args.destName)
-	elseif args:IsSpellID(131792) then
+	elseif args.spellId == 131792 then
 		timerShadowBurn:Cancel(args.destName)
-	elseif args:IsSpellID(118302) then
+	elseif args.spellId == 118302 then
 		timerReversalLightningFists:Cancel()
-	elseif args:IsSpellID(116018) then
+	elseif args.spellId == 116018 then
 		timerEpicenter:Cancel()--Epicenter can be removed by Lightning Fists (tank can steal). So added remove stuff.
-	elseif args:IsSpellID(116784) then
+	elseif args.spellId == 116784 then
 		timerWildSpark:Cancel(args.destName)
-	elseif args:IsSpellID(116711) then
+	elseif args.spellId == 116711 then
 		timerDrawFlameCD:Start(nil, specialCount + 1)
-	elseif args:IsSpellID(116417) then
+	elseif args.spellId == 116417 then
 		if self.Options.SetIconOnAR then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(116364) then
+	elseif args.spellId == 116364 then
 		timerArcaneVelocity:Cancel()
 		timerArcaneVelocityCD:Start(nil, specialCount + 1)
 	end
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(116018) then
+	if args.spellId == 116018 then
 		specialCount = specialCount + 1
 		warnEpicenter:Show(specialCount)
 		specWarnEpicenter:Show()
 		soundEpicenter:Play()
 		timerEpicenter:Start()
 		timerEpicenterCD:Start(nil, specialCount + 1)
-	elseif args:IsSpellID(116157) then
+		if UnitBuff(GetSpellInfo(115811), "player") and self:IsDifficulty("lfr25") then
+			specWarnBarrierNow:Schedule(2)
+		end
+	elseif args:IsSpellID(116157, 116295) then
 		warnLightningFists:Show()
 		timerLightningFistsCD:Start()
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(118783) then
+	if args.spellId == 118783 then
 		warnChainsOfShadow:Show()
 		timerChainsOfShadowCD:Start()
-	elseif args:IsSpellID(115817) then
-		warnNullBarrior:Show()
-		specWarnNullBarrior:Show()
-		timerNullBarrior:Start()
+	elseif args.spellId == 115817 then
+		warnNullBarrier:Show()
+		specWarnNullBarrier:Show()
+		timerNullBarrier:Start()
 		if self:IsDifficulty("lfr25") then
-			timerNullBarriorCD:Start(25)
+			timerNullBarrierCD:Start(25)
 		else
-			timerNullBarriorCD:Start()
+			timerNullBarrierCD:Start()
 		end
-	elseif args:IsSpellID(116417) then
+	elseif args.spellId == 116417 then
 		arIcon = 8
 		timerArcaneResonanceCD:Start()
 	end
@@ -385,7 +384,7 @@ function mod:OnSync(msg)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
-	if spellId == 117203 and self:AntiSpam(2, 1) then--Siphoning Shield
+	if spellId == 117203 then--Siphoning Shield
 		specialCount = specialCount + 1
 		warnSiphoningShield:Show(specialCount)
 		specWarnSiphoningShield:Show()
@@ -406,3 +405,10 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 		timerChainsOfShadowCD:Cancel()
 	end
 end
+
+function mod:UNIT_SPELLCAST_STOP(uId, _, _, _, spellId)
+	if spellId == 116018 then
+		timerEpicenter:Cancel()
+	end
+end
+mod.UNIT_SPELLCAST_CHANNEL_STOP = mod.UNIT_SPELLCAST_STOP

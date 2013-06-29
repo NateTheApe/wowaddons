@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Skarloc", "DBM-Party-BC", 11)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 399 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 mod:SetCreatureID(17862)
 mod:SetModelID(17387)
 
@@ -21,20 +21,20 @@ local timerHammer               = mod:NewTargetTimer(6, 13005)
 local specWarnConsecration      = mod:NewSpecialWarningMove(38385)
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(29427) and self:IsInCombat() then
+	if args.spellId == 29427 and self:IsInCombat() then
 		warnHeal:Show()
 	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(13005) and self:IsInCombat() then
+	if args.spellId == 13005 and self:IsInCombat() then
 		warnHammer:Show(args.destName)
 		timerHammer:Start(args.destName)
 	end
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(13005) then
+	if args.spellId == 13005 then
 		timerHammer:Cancel(args.destName)
 	end
 end

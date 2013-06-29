@@ -4,6 +4,86 @@ Healers Have To Die
 *Change log*
 ------------
 
+**version 2.1.4 (2013-05-21):**
+
+- Fixed a rare Lua error that would cause '?' to be displayed on human healers'
+  symbols instead of their ranks.
+
+- HHTD now Hooks nameplates' base frame instead of hooking the health bar's
+  frame. This should make HHTD more tolerant to sub-elements hiding (such as
+  hiding the original health bar to gain performances).
+
+
+**version 2.1.3 (2013-04-15):**
+
+- Enhanced add-on incompatibility detection (when using another add-on
+  which modifies nameplates in the wrong way): the nameplate module will disable
+  itself instead of displaying wrong information (such as a healer symbol above
+  a warrior's nameplate...) because it can't reliably identify nameplates anymore.
+
+  There are many nameplate add-ons around and only a few of them are _not_ coded
+  selfishly. Most of these add-ons modify the default nameplates instead of
+  making them _invisible_ and creating their own frames. These modifications,
+  which are particular to each of these add-ons, prevent HHTD (and any other
+  add-ons wanting to use nameplates) from working properly as they can't
+  identify and read the nameplates anymore.
+
+  I could have coded around the modifications of a few of these selfish add-ons
+  (the most used ones) but I chose not to, it's far better to have their author
+  fix them and code responsibly than creating exceptions and bugs for everyone.
+
+  So if you want HHTD to be compatible with your favorite nameplate add-ons,
+  just ask their author to do things the right way, it'll be better for everyone.
+
+
+**version 2.1.2 (2013-04-05):**
+
+- HHTD's nameplate module broke completely whenever someone's nameplate changed
+  side (upon mind controls and the likes). Thanks to all the people who helped
+  me to diagnose the problem and to test the alpha versions leading to this
+  release.
+
+- HHTD will fail more graciously if another add-on is unduly modifying
+  Blizzard's nameplates (a message is displayed but no Lua error is thrown).
+
+
+**version 2.1.1 (2013-03-17):**
+
+- Fix huge compatibility problems with other (selfish) add-ons breaking
+  nameplates hooking. This caused HHTD's symbols being displayed above the
+  wrong players. HHTD will also denounce these add-ons in the chat so you can
+  ask their author to fix them.
+
+- HHTD will also disable its nameplate module when another add-on unilaterally
+  modifies nameplate making them unusable for other add-ons. A message will be
+  displayed. (FYI: the add-on ["Tidy Plates"][tidyplates] doesn't do this and
+  therefore is fully compatible with HHTD)
+
+- Fix automatic healer role setting while in combat which was causing a
+  'protected function call' exception pop-up for BG leaders.
+
+- Fix a problem which could lead into healer symbols not being hidden.
+
+- Special thanks to Cegthlhekz who helped a lot by testing the numerous alpha
+  versions leading to this release of Healers Have To Die.
+
+
+**version 2.1.0 (2013-03-06):**
+
+- HHTD no longer relies on LibNamePlate-1.0. The HHTD's NamePlateHooker module
+  includes its own highly optimized sub-module (written from scratch) to handle
+  nameplates. I might turn this sub-module into a library since LibNamePlate-1.0
+  has become too difficult to maintain and would need a complete rewrite. This
+  change should translate into an overall gain in performance and reliability for
+  HHTD's end users.
+
+- Fix 'Holy Fire' detection.
+
+- Do not display any 'Friendly healer under attack' alert if the healer being
+  attacked turns out to be ourself...
+
+- Using AceTimer-3.0 again. 
+
 **version 2.0.4 (2012-12-10):**
 
 - Fix: the chat announcer was no longer working in Battlegrounds
@@ -191,3 +271,4 @@ Until then, just use the command /HHTDG to access HHTD's option panel.
 
 [spelllist]: http://www.wowace.com/addons/healers-have-to-die/pages/specialized-healers-spells/
 [localization]: http://www.wowace.com/addons/healers-have-to-die/localization/
+[tidyplates]: http://www.curse.com/addons/wow/tidy-plates

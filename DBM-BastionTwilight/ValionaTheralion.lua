@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(157, "DBM-BastionTwilight", nil, 72)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 20 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 58 $"):sub(12, -3))
 mod:SetCreatureID(45992, 45993)
 mod:SetModelID(34812)
 mod:SetZone()
@@ -23,8 +23,8 @@ mod:RegisterEventsInCombat(
 	"SPELL_HEAL",
 	"SPELL_PERIODIC_HEAL",
 	"RAID_BOSS_EMOTE",
-	"UNIT_AURA",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_AURA player",
+	"UNIT_SPELLCAST_SUCCEEDED boss1 boss2"
 )
 
 --Valiona Ground Phase
@@ -104,14 +104,14 @@ do
 		return math.max(1, math.floor(healed / maxAbsorb * 100))
 	end
 	
-	function mod:SPELL_HEAL(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId, spellName, spellSchool, amount, overheal, absorbed)
+	function mod:SPELL_HEAL(_, _, _, _, destGUID, _, _, _, _, _, _, _, _, absorbed)
 		if destGUID == BlackoutTarget then
 			healed = healed + (absorbed or 0)
 		end
 	end	
 	mod.SPELL_PERIODIC_HEAL = mod.SPELL_HEAL
 	
-	function setBlackoutTarget(mod, target, name)--86788, 92876, 92877, 92878
+	function setBlackoutTarget(mod, target, name)
 		BlackoutTarget = target
 		healed = 0
 		maxAbsorb = mod:IsDifficulty("heroic25") and 75000 or
@@ -241,7 +241,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(86788, 92876, 92877, 92878) then
+	if args.spellId == 86788 then
 		blackoutActive = true
 		warnBlackout:Show(args.destName)
 		timerBlackout:Start(args.destName)
@@ -254,7 +254,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		setBlackoutTarget(self, args.destGUID, args.destName)
 		self:Schedule(15, clearBlackoutTarget, self, args.destName)
-	elseif args:IsSpellID(86622, 95639, 95640, 95641) then
+	elseif args.spellId == 86622 then
 		engulfingMagicTargets[#engulfingMagicTargets + 1] = args.destName
 		timerEngulfingMagicNext:Start()
 		if args:IsPlayer() then
@@ -272,7 +272,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		else
 			self:Schedule(0.3, showEngulfingMagicWarning)
 		end
-	elseif args:IsSpellID(93051) then
+	elseif args.spellId == 93051 then
 		warnTwilightShift:Show(args.destName, args.amount or 1)
 		timerTwilightShift:Cancel(args.destName.." (1)")
 		timerTwilightShift:Cancel(args.destName.." (2)")
@@ -283,7 +283,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerTwilightShiftCD:Start()
 		self:Unschedule(AMSTimerDelay)
 		self:Schedule(20, AMSTimerDelay)--Cause when a DK AMSes it we don't get another timer.
-	elseif args:IsSpellID(92887) and args:IsPlayer() then
+	elseif args.spellId == 92887 and args:IsPlayer() then
 		if (args.amount or 1) >= 20 and self:AntiSpam(5, 1) then
 			specWarnTwilightZone:Show(args.amount)
 		end
@@ -295,7 +295,7 @@ mod.SPELL_AURA_REFRESH = mod.SPELL_AURA_APPLIED
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(86788, 92876, 92877, 92878) then
+	if args.spellId == 86788 then
 		timerBlackout:Cancel(args.destName)
 		if self.Options.BlackoutIcon then
 			self:SetIcon(args.destName, 0)
@@ -303,11 +303,11 @@ function mod:SPELL_AURA_REMOVED(args)
 		blackoutActive = false
 		self:Unschedule(clearBlackoutTarget)
 		clearBlackoutTarget(self, args.destName)
-	elseif args:IsSpellID(86622, 95639, 95640, 95641) then
+	elseif args.spellId == 86622 then
 		if self.Options.EngulfingIcon then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(93051) then
+	elseif args.spellId == 93051 then
 		timerTwilightShift:Cancel(args.destName.." (1)")
 		timerTwilightShift:Cancel(args.destName.." (2)")
 		timerTwilightShift:Cancel(args.destName.." (3)")
@@ -321,7 +321,7 @@ function mod:SPELL_CAST_START(args)
 		warnDevouringFlames:Show()
 		timerDevouringFlamesCD:Start()
 		specWarnDevouringFlames:Show()
-	elseif args:IsSpellID(86408) then
+	elseif args.spellId == 86408 then
 		dazzlingCast = dazzlingCast + 1
 		warnDazzlingDestruction:Show(dazzlingCast)
 		if dazzlingCast == 1 then
@@ -330,7 +330,7 @@ function mod:SPELL_CAST_START(args)
 			self:Schedule(5, theralionDelay)--delayed so we don't cancel blackout timer until after 3rd cast.
 			dazzlingCast = 0
 		end
-	elseif args:IsSpellID(86369, 92898, 92899, 92900) then--First cast of this is true phase change, as theralion can still cast his grounded phase abilities until he's fully in air casting this instead.
+	elseif args.spellId == 86369 then--First cast of this is true phase change, as theralion can still cast his grounded phase abilities until he's fully in air casting this instead.
 		self:ScheduleMethod(0.1, "TwilightBlastTarget")
 		if not ValionaLanded then
 			timerNextFabFlames:Cancel()
@@ -340,7 +340,7 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
-	if (spellId == 86505 or spellId == 92907 or spellId == 92908 or spellId == 92909) and destGUID == UnitGUID("player") and GetTime() - lastFab > 3 then
+	if spellId == 86505 and destGUID == UnitGUID("player") and GetTime() - lastFab > 3 then
 		specWarnFabulousFlames:Show()
 		lastFab = GetTime()
 	end
@@ -363,7 +363,6 @@ function mod:RAID_BOSS_EMOTE(msg)
 end
 
 function mod:UNIT_AURA(uId)
-	if uId ~= "player" then return end
 	if UnitDebuff("player", meteorTarget) and not markWarned then
 		specWarnTwilightMeteorite:Show()
 		timerTwilightMeteorite:Start()

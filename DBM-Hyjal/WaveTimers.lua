@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("HyjalWaveTimers", "DBM-Hyjal")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 411 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
 
 mod:RegisterEvents(
 	"UPDATE_WORLD_STATES",
@@ -80,7 +80,7 @@ function mod:UNIT_DIED(args)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(31538) then
+	if args.spellId == 31538 then
 		warnCannibalize:Show()
 	end
 end

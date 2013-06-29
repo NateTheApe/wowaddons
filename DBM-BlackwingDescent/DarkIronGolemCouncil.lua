@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(169, "DBM-BlackwingDescent", nil, 73)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 21 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 48 $"):sub(12, -3))
 mod:SetCreatureID(42180, 42178, 42179, 42166)
 mod:SetModelID(32688)
 mod:SetZone()
@@ -203,7 +203,7 @@ function mod:OnCombatEnd()
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(78740, 95016, 95017, 95018) then--Ignore any activates that fire too close to eachother thanks to 4.1 screwing it up.
+	if args.spellId == 78740 then--Ignore any activates that fire too close to eachother thanks to 4.1 screwing it up.
 		warnActivated:Show(args.destName)
 		bossActivate(args.destName)
 		if pulled then -- prevent show warning when first pulled.
@@ -225,9 +225,9 @@ function mod:SPELL_AURA_APPLIED(args)
 				end
 			end
 		end
-	elseif args:IsSpellID(78726) then
+	elseif args.spellId == 78726 then
 		bossInactive(args.destName)
-	elseif args:IsSpellID(79501, 92035, 92036, 92037) then
+	elseif args.spellId == 79501 then
 		warnAcquiringTarget:Show(args.destName)
 		if self:IsDifficulty("heroic10", "heroic25") then
 			timerAcquiringTarget:Start(27)
@@ -241,7 +241,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.AcquiringTargetIcon then
 			self:SetIcon(args.destName, 7, 8)
 		end
-	elseif args:IsSpellID(79888, 91431, 91432, 91433) then
+	elseif args.spellId == 79888 then
 		warnLightningConductor:Show(args.destName)
 		if args:IsPlayer() then
 			specWarnConductor:Show()
@@ -258,26 +258,26 @@ function mod:SPELL_AURA_APPLIED(args)
 			timerLightningConductor:Start(args.destName)
 			timerLightningConductorCD:Start()
 		end
-	elseif args:IsSpellID(80094) then
+	elseif args.spellId == 80094 then
 		warnFixate:Show(args.destName)
 		if args:IsPlayer() then
 			specWarnBombTarget:Show()
 			soundFixate:Play()
 			yellFixate:Yell()
 		end
-	elseif args:IsSpellID(80161, 91472, 91473) and args:IsPlayer() and GetTime() - cloudSpam > 4 then
+	elseif args.spellId == 80161 and args:IsPlayer() and GetTime() - cloudSpam > 4 then
 		specWarnChemicalCloud:Show()
 		cloudSpam = GetTime()
-	elseif args:IsSpellID(79629, 91555, 91556, 91557) and args:IsDestTypeHostile() then--Check if Generator buff is gained by a hostile.
+	elseif args.spellId == 79629 and args:IsDestTypeHostile() then--Check if Generator buff is gained by a hostile.
 		local targetCID = self:GetUnitCreatureId("target")--Get CID of current target
 		if args:GetDestCreatureID() == targetCID and args:GetDestCreatureID() ~= 42897 then--If target gaining buff is target then not an ooze (only hostiles left filtering oozes is golems)
 			specWarnGenerator:Show(args.destName)--Show special warning to move him out of it.
 		end
-	elseif args:IsSpellID(92048) then--Shadow Infusion, debuff 5 seconds before shadow conductor.
+	elseif args.spellId == 92048 then--Shadow Infusion, debuff 5 seconds before shadow conductor.
 		timerNefAbilityCD:Start()
 		warnShadowConductorCast:Show()
 		timerShadowConductorCast:Start()
-	elseif args:IsSpellID(92023) then
+	elseif args.spellId == 92023 then
 		if args:IsPlayer() then
 			encasing = true
 		end
@@ -286,7 +286,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		specWarnEncasingShadows:Show(args.destName)
 		timerNefAbilityCD:Start()
-	elseif args:IsSpellID(92053) then
+	elseif args.spellId == 92053 then
 		specWarnShadowConductor:Show(args.destName)
 		timerShadowConductor:Show(args.destName)
 		timerLightningConductor:Cancel()
@@ -300,11 +300,11 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(79888, 91431, 91432, 91433) then
+	if args.spellId == 79888 then
 		if self.Options.ConductorIcon then
 			self:SetIcon(args.destName, 0)
 		end
-	elseif args:IsSpellID(92053) then
+	elseif args.spellId == 92053 then
 		timerShadowConductor:Cancel(args.destName)
 		if self.Options.ShadowConductorIcon then
 			self:SetIcon(args.destName, 0)
@@ -313,7 +313,7 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(79023, 91519, 91520, 91521) then
+	if args.spellId == 79023 then
 		incinerateCast = incinerateCast + 1
 		warnIncineration:Show()
 		if incinerateCast == 1 then--Only cast twice on heroic, 3 times on normal.
@@ -321,36 +321,36 @@ function mod:SPELL_CAST_START(args)
 		elseif incinerateCast == 2 and self:IsDifficulty("normal10", "normal25") then
 			timerIncinerationCD:Start(32)--3rd cast on normal is 32 seconds. 10 27 32 series.
 		end
-	elseif args:IsSpellID(79582, 91516, 91517, 91518) then
+	elseif args.spellId == 79582 then
 		warnBarrier:Show()
 		timerBarrier:Start()
 		if self:GetUnitCreatureId("target") == 42178 then
 			specWarnBarrier:Show()
 		end
-	elseif args:IsSpellID(79900, 91447, 91448, 91449) then
+	elseif args.spellId == 79900 then
 		warnUnstableShield:Show()
 		timerUnstableShield:Start()
 		if self:GetUnitCreatureId("target") == 42179 then
 			specWarnUnstableShield:Show()
 		end
-	elseif args:IsSpellID(79835, 91501, 91502, 91503) then
+	elseif args.spellId == 79835 then
 		warnShell:Show()
 		timerShell:Start()
 		if self:GetUnitCreatureId("target") == 42180 then
 			specWarnShell:Show()
 		end
-	elseif args:IsSpellID(79729, 91543, 91544, 91545) then
+	elseif args.spellId == 79729 then
 		warnConversion:Show()
 		timerConversion:Start()
 		if self:GetUnitCreatureId("target") == 42166 then
 			specWarnConversion:Show()
 		end
-	elseif args:IsSpellID(91849) then--Grip
+	elseif args.spellId == 91849 then--Grip
 		warnGrip:Show()
 		specWarnGrip:Show()
 		timerNefAbilityCD:Start()
 		cloudSpam = GetTime()
-	elseif args:IsSpellID(79710, 91540, 91541, 91542) then
+	elseif args.spellId == 79710 then
 		if self:IsMelee() and (self:GetUnitCreatureId("target") == 42166 or self:GetUnitCreatureId("focus") == 42166) or not self:IsMelee() then
 			specWarnAnnihilator:Show(args.sourceName)--Only warn for melee targeting him or exclicidly put him on focus, else warn regardless if he's your target/focus or not if you aren't a melee
 		end
@@ -358,10 +358,10 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(80157) then
+	if args.spellId == 80157 then
 		timerChemicalBomb:Start()--Appears same on heroic
 		self:ScheduleMethod(0.1, "ChemicalBombTarget")--Since this is an instance cast scanning accurately is very hard.
-	elseif args:IsSpellID(80053, 91513, 91514, 91515) then
+	elseif args.spellId == 80053 then
 		warnPoisonProtocol:Show()
 		if self:GetUnitCreatureId("target") ~= 42180 then--You're not targeting toxitron
 			specWarnPoisonProtocol:Show()
@@ -371,14 +371,14 @@ function mod:SPELL_CAST_SUCCESS(args)
 		else
 			timerPoisonProtocolCD:Start()
 		end
-	elseif args:IsSpellID(79624) then
+	elseif args.spellId == 79624 then
 		warnGenerator:Show()
 		if self:IsDifficulty("heroic10", "heroic25") then
 			timerGeneratorCD:Start(20)
 		else
 			timerGeneratorCD:Start()
 		end
-	elseif args:IsSpellID(91857) then
+	elseif args.spellId == 91857 then
 		warnOverchargedGenerator:Show()
 		specWarnOvercharged:Show()
 		timerArcaneBlowback:Start()
@@ -387,8 +387,8 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:SPELL_INTERRUPT(args)
-	if (type(args.extraSpellId) == "number" and (args.extraSpellId == 79710 or args.extraSpellId == 91540 or args.extraSpellId == 91541 or args.extraSpellId == 91542)) and self:AntiSpam(2, 2) then
-		if args:IsSpellID(2139) then															--Counterspell
+	if (type(args.extraSpellId) == "number" and args.extraSpellId == 79710) and self:AntiSpam(2, 2) then
+		if args.spellId == 2139 then															--Counterspell
 			timerArcaneLockout:Start(7.5)
 		elseif args:IsSpellID(72, 19647) then													--Shield Bash (will be removed in 4.1), Spell Lock (Fel Hunter)
 			timerArcaneLockout:Start(6.5)--Shield bash verified, spell lock assumed since it's same lockout duration.
@@ -396,14 +396,14 @@ function mod:SPELL_INTERRUPT(args)
 			timerArcaneLockout:Start(5)--4 out of 6 verified, skull bash needs logs to review for certainty.
 		elseif args:IsSpellID(34490, 15487) then												--Silencing Shot, Silence
 			timerArcaneLockout:Start(3.5)--Drycoded, needs verification for both spells.
-		elseif args:IsSpellID(57994) then														--Wind Shear
+		elseif args.spellId == 57994 then														--Wind Shear
 			timerArcaneLockout:Start(2.5)
 		end
 	end
 end
 
-function mod:SPELL_DAMAGE(sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, spellId)
-	if (spellId == 79710 or spellId == 91540 or spellId == 91541 or spellId == 91542) then--An interrupt failed (or wasn't cast)
+function mod:SPELL_DAMAGE(_, _, _, _, _, _, _, _, spellId)
+	if spellId == 79710 then--An interrupt failed (or wasn't cast)
 		timerArcaneLockout:Cancel()--Cancel bar just in case one was started by a late SPELL_INTERRUPT event that showed in combat log while cast went off anyways.
 	end
 end
