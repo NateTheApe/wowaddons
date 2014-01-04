@@ -14,11 +14,6 @@ local function RegisterHandlers(...)
 	end
 end
 
-local switchSetting = "ClickToSwitch";
-local function MenuInit()
-   FishingBuddy.MakeDropDown(FBConstants.CLICKTOSWITCH_ONOFF, switchSetting)
-end
-
 local function Do_OnClick(self, button)
 	if ( FishingBuddy and FishingBuddy.IsLoaded() ) then
 		if ( button == "LeftButton" ) then
@@ -28,10 +23,21 @@ local function Do_OnClick(self, button)
 				FishingBuddy.Command("")
 			end
 		else
-			local menu = FB_Broker_Menu
-			if (not menu) then
-				menu = CreateFrame("FRAME", "FB_Broker_Menu", self, "UIDropDownMenuTemplate")
-				UIDropDownMenu_Initialize(menu, MenuInit, "MENU")
+			local switchSetting = "ClickToSwitch";
+			local menu;
+			
+			if (FishingBuddy.GetDropDown) then
+				menu = FishingBuddy.GetDropDown(FBConstants.CLICKTOSWITCH_ONOFF, switchSetting)
+			else
+				menu = FB_Broker_Menu
+				if (not menu) then
+					menu = CreateFrame("FRAME", "FB_Broker_Menu", self, "UIDropDownMenuTemplate")
+					UIDropDownMenu_Initialize(menu,
+											  function()
+												FishingBuddy.MakeDropDown(FBConstants.CLICKTOSWITCH_ONOFF, switchSetting)
+											  end,
+											  "MENU")
+				end
 			end
 			menu.point = "TOPRIGHT"
 			menu.relativePoint = "CENTER"

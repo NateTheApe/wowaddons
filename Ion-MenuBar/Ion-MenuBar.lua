@@ -1,4 +1,4 @@
-﻿--Ion Menu Bar, a World of Warcraft® user interface addon.
+--Ion Menu Bar, a World of Warcraft® user interface addon.
 --Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved.
 
 local ION, GDB, CDB, PEW = Ion
@@ -431,7 +431,7 @@ function ION.TalentButton_OnEvent(self, event, ...)
 
 	if (event == "PLAYER_LEVEL_UP") then
 
-		UpdateMicroButtons()
+		updateMicroButtons()
 
 		if (not CharacterFrame:IsShown()) then
 			SetButtonPulse(self, 60, 1)
@@ -439,7 +439,7 @@ function ION.TalentButton_OnEvent(self, event, ...)
 
 	elseif (event == "UNIT_LEVEL" or event == "PLAYER_ENTERING_WORLD") then
 
-		UpdateMicroButtons()
+		updateMicroButtons()
 
 	elseif (event == "UPDATE_BINDINGS") then
 
@@ -458,7 +458,7 @@ end
 function ION.AchievementButton_OnEvent(self, event, ...)
 
 	if (event == "PLAYER_ENTERING_WORLD") then
-		AchievementMicroButton_OnEvent(self, event, ...)
+		updateMicroButtons()
 	elseif (event == "UPDATE_BINDINGS") then
 		self.tooltipText =  MicroButtonTooltipText(TALENTS_BUTTON, "TOGGLETALENTS")
 	end
@@ -518,7 +518,7 @@ function ION.GuildButton_OnEvent(self, event, ...)
 	if (event == "UPDATE_BINDINGS") then
 		self.tooltipText = MicroButtonTooltipText(GUILD, "TOGGLEGUILDTAB")
 	elseif (event == "PLAYER_GUILD_UPDATE") then
-		UpdateMicroButtons()
+		updateMicroButtons()
 	end
 end
 

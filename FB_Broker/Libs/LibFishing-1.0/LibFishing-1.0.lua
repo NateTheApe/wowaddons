@@ -1,13 +1,13 @@
 ﻿--[[
-Name: FishLib-1.0
+Name: LibFishing-1.0
 Maintainers: Sutorix <sutorix@hotmail.com>
-Description: A library with common routines used by Fishing Buddy and Fishing Ace.
+Description: A library with fishing support routines used by Fishing Buddy, Fishing Ace and FB_Broker.
 Copyright (c) by Bob Schumaker
 Licensed under a Creative Commons "Attribution Non-Commercial Share Alike" License
 --]]
 
 local MAJOR_VERSION = "LibFishing-1.0"
-local MINOR_VERSION = 90000 + tonumber(("$Rev: 784 $"):match("%d+"))
+local MINOR_VERSION = 90000 + tonumber(("$Rev: 845 $"):match("%d+"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -16,9 +16,12 @@ if not FishLib then
 	return
 end
 
-if (oldLib) then
-	for k,v in oldLib do
-		FishLib.k = v;
+-- keep the old stuff, in case we want some of the settings.
+if oldLib then
+	oldLib = {}
+	for k, v in pairs(FishLib) do
+		FishLib[k] = nil
+		oldLib[k] = v
 	end
 end
 
@@ -339,9 +342,22 @@ function FishLib:FindBestLure(b, state, usedrinks)
 	-- return nil;
 end
 
+if oldlib then
+	FishLib.caughtSoFar = oldlib.caughtSoFar or 0;
+	FishLib.gearcheck = oldlib.gearcheck;
+	FishLib.hasgear = oldlib.hasgear;
+	FishLib.FindFishID = oldlib.FindFishID;
+	FishLib.BOBBER_NAME = oldlib.BOBBER_NAME;
+	FishLib.watchBobber = oldlib.watchBobber;
+	FishLib.ActionBarID = oldlib.ActionBarID;
+else
+	FishLib.caughtSoFar = 0;
+	FishLib.gearcheck = true;
+	FishLib.hasgear = false;
+end
+
 -- Handle events we care about
 local canCreateFrame = false;
-FishLib.caughtSoFar = 0;
 
 local FISHLIBFRAMENAME="FishLibFrame";
 local fishlibframe = getglobal(FISHLIBFRAMENAME);
@@ -388,67 +404,61 @@ fishlibframe:Show();
 
 -- set up a table of slot mappings for looking up item information
 local slotinfo = {
-	[0] = { name = "AmmoSlot", tooltip = AMMOSLOT },
-	[1] = { name = "HeadSlot", tooltip = HEADSLOT },
-	[2] = { name = "NeckSlot", tooltip = NECKSLOT },
-	[3] = { name = "ShoulderSlot", tooltip = SHOULDERSLOT },
-	[4] = { name = "BackSlot", tooltip = BACKSLOT },
-	[5] = { name = "ChestSlot", tooltip = CHESTSLOT },
-	[6] = { name = "ShirtSlot", tooltip = SHIRTSLOT },
-	[7] = { name = "TabardSlot", tooltip = TABARDSLOT },
-	[8] = { name = "WristSlot", tooltip = WRISTSLOT },
-	[9] = { name = "HandsSlot", tooltip = HANDSSLOT },
-	[10] = { name = "WaistSlot", tooltip = WAISTSLOT },
-	[11] = { name = "LegsSlot", tooltip = LEGSSLOT },
-	[12] = { name = "FeetSlot", tooltip = FEETSLOT },
-	[13] = { name = "Finger0Slot", tooltip = FINGER0SLOT },
-	[14] = { name = "Finger1Slot", tooltip = FINGER1SLOT },
-	[15] = { name = "Trinket0Slot", tooltip = TRINKET0SLOT },
-	[16] = { name = "Trinket1Slot", tooltip = TRINKET1SLOT },
-	[17] = { name = "MainHandSlot", tooltip = MAINHANDSLOT },
-	[18] = { name = "SecondaryHandSlot", tooltip = SECONDARYHANDSLOT },
+	[1] = { name = "HeadSlot", tooltip = HEADSLOT, id = INVSLOT_HEAD },
+	[2] = { name = "NeckSlot", tooltip = NECKSLOT, id = INVSLOT_NECK },
+	[3] = { name = "ShoulderSlot", tooltip = SHOULDERSLOT, id = INVSLOT_SHOULDER },
+	[4] = { name = "BackSlot", tooltip = BACKSLOT, id = INVSLOT_BACK },
+	[5] = { name = "ChestSlot", tooltip = CHESTSLOT, id = INVSLOT_CHEST },
+	[6] = { name = "ShirtSlot", tooltip = SHIRTSLOT, id = INVSLOT_BODY },
+	[7] = { name = "TabardSlot", tooltip = TABARDSLOT, id = INVSLOT_TABARD },
+	[8] = { name = "WristSlot", tooltip = WRISTSLOT, id = INVSLOT_WRIST },
+	[9] = { name = "HandsSlot", tooltip = HANDSSLOT, id = INVSLOT_HAND },
+	[10] = { name = "WaistSlot", tooltip = WAISTSLOT, id = INVSLOT_WAIST },
+	[11] = { name = "LegsSlot", tooltip = LEGSSLOT, id = INVSLOT_LEGS },
+	[12] = { name = "FeetSlot", tooltip = FEETSLOT, id = INVSLOT_FEET },
+	[13] = { name = "Finger0Slot", tooltip = FINGER0SLOT, id = INVSLOT_FINGER1 },
+	[14] = { name = "Finger1Slot", tooltip = FINGER1SLOT, id = INVSLOT_FINGER2 },
+	[15] = { name = "Trinket0Slot", tooltip = TRINKET0SLOT, id = INVSLOT_TRINKET1 },
+	[16] = { name = "Trinket1Slot", tooltip = TRINKET1SLOT, id = INVSLOT_TRINKET2 },
+	[17] = { name = "MainHandSlot", tooltip = MAINHANDSLOT, id = INVSLOT_MAINHAND },
+	[18] = { name = "SecondaryHandSlot", tooltip = SECONDARYHANDSLOT, id = INVSLOT_OFFHAND },
 }
-for i=0,18,1 do
-	local sn = slotinfo[i].name;
-	slotinfo[i].id, _ = GetInventorySlotInfo(sn);
-end
-local mainhand = slotinfo[17].id;
 
 -- A map of item types to locations
 local slotmap = {
-	["INVTYPE_AMMO"] = { 0 },
-	["INVTYPE_HEAD"] = { 1 },
-	["INVTYPE_NECK"] = { 2 },
-	["INVTYPE_SHOULDER"] = { 3 },
-	["INVTYPE_BODY"] = { 4 },
-	["INVTYPE_CHEST"] = { 5 },
-	["INVTYPE_ROBE"] = { 5 },
-	["INVTYPE_CLOAK"] = { 5 },
-	["INVTYPE_WAIST"] = { 7 },
-	["INVTYPE_LEGS"] = { 8 },
-	["INVTYPE_FEET"] = { 9 },
-	["INVTYPE_WRIST"] = { 10 },
-	["INVTYPE_HAND"] = { 11 },
-	["INVTYPE_FINGER"] = { 12,13 },
-	["INVTYPE_TRINKET"] = { 14,15 },
-	["INVTYPE_WEAPON"] = { 16,17 },
-	["INVTYPE_SHIELD"] = { 17 },
-	["INVTYPE_2HWEAPON"] = { 16 },
-	["INVTYPE_WEAPONMAINHAND"] = { 16 },
-	["INVTYPE_WEAPONOFFHAND"] = { 17 },
-	["INVTYPE_HOLDABLE"] = { 17 },
-	["INVTYPE_RANGED"] = { 18 },
-	["INVTYPE_THROWN"] = { 18 },
-	["INVTYPE_RANGEDRIGHT"] = { 18 },
-	["INVTYPE_RELIC"] = { 18 },
-	["INVTYPE_TABARD"] = { 19 },
+	["INVTYPE_AMMO"] = { INVSLOT_AMMO },
+	["INVTYPE_HEAD"] = { INVSLOT_HEAD },
+	["INVTYPE_NECK"] = { INVSLOT_NECK },
+	["INVTYPE_SHOULDER"] = { INVSLOT_SHOULDER },
+	["INVTYPE_BODY"] = { INVSLOT_BODY },
+	["INVTYPE_CHEST"] = { INVSLOT_CHEST },
+	["INVTYPE_ROBE"] = { INVSLOT_CHEST },
+	["INVTYPE_CLOAK"] = { INVSLOT_CHEST },
+	["INVTYPE_WAIST"] = { INVSLOT_WAIST },
+	["INVTYPE_LEGS"] = { INVSLOT_LEGS },
+	["INVTYPE_FEET"] = { INVSLOT_FEET },
+	["INVTYPE_WRIST"] = { INVSLOT_WRIST },
+	["INVTYPE_HAND"] = { INVSLOT_HAND },
+	["INVTYPE_FINGER"] = { INVSLOT_FINGER1,INVSLOT_FINGER2 },
+	["INVTYPE_TRINKET"] = { INVSLOT_TRINKET1,INVSLOT_TRINKET2 },
+	["INVTYPE_WEAPON"] = { INVSLOT_MAINHAND,INVSLOT_OFFHAND },
+	["INVTYPE_SHIELD"] = { INVSLOT_OFFHAND },
+	["INVTYPE_2HWEAPON"] = { INVSLOT_MAINHAND },
+	["INVTYPE_WEAPONMAINHAND"] = { INVSLOT_MAINHAND },
+	["INVTYPE_WEAPONOFFHAND"] = { INVSLOT_OFFHAND },
+	["INVTYPE_HOLDABLE"] = { INVSLOT_OFFHAND },
+	["INVTYPE_RANGED"] = { INVSLOT_RANGED },
+	["INVTYPE_THROWN"] = { INVSLOT_RANGED },
+	["INVTYPE_RANGEDRIGHT"] = { INVSLOT_RANGED },
+	["INVTYPE_RELIC"] = { INVSLOT_RANGED },
+	["INVTYPE_TABARD"] = { INVSLOT_TABARD },
 	["INVTYPE_BAG"] = { 20,21,22,23 },
 	["INVTYPE_QUIVER"] = { 20,21,22,23 }, 
 	[""] = { },
 };
 
 function FishLib:GetSlotInfo()
-	return slotinfo[17].id, slotinfo[18].id, slotinfo;
+	return INVSLOT_MAINHAND, INVSLOT_OFFHAND, slotinfo;
 end
 
 function FishLib:GetSlotMap()
@@ -533,8 +543,7 @@ function FishLib:GetItemInfo(link)
 	return itemName, itemLink, itemRarity, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemLevel, itemSellPrice;
 end
 
-function FishLib:IsLinkableItem(item)
-	local link = "item:"..item;
+function FishLib:IsLinkableItem(link)
 	local n,l,_,_,_,_,_,_ = self:GetItemInfo(link);
 	return ( n and l );
 end
@@ -615,7 +624,7 @@ function FishLib:AddSchoolName(name)
 end
 
 function FishLib:GetMainHandItem(id)
-	local itemLink = GetInventoryItemLink("player", mainhand);
+	local itemLink = GetInventoryItemLink("player", INVSLOT_MAINHAND);
 	if ( not id ) then
 		return itemLink;
 	end
@@ -652,9 +661,6 @@ function FishLib:IsFishingPole(itemLink)
 	end
 	return false;
 end
-
-FishLib.gearcheck = true;
-FishLib.hasgear = false;
 
 function FishLib:ForceGearCheck()
 	self.gearcheck = true;
@@ -772,7 +778,6 @@ end
 local ACTIONDOUBLEWAIT = 0.4;
 local MINACTIONDOUBLECLICK = 0.05;
 
-FishLib.watchBobber = false;
 function FishLib:WatchBobber(flag)
 	self.watchBobber = flag;
 end
@@ -1167,16 +1172,63 @@ function FishLib:CreateSAButton()
 		btn = CreateFrame("Button", SABUTTONNAME, holder, "SecureActionButtonTemplate");
 		btn.holder = holder;
 		btn:EnableMouse(true);
-		btn:RegisterForClicks("RightButtonUp");
+		btn:RegisterForClicks(nil);
 		btn:Show();
 
 		holder:SetPoint("LEFT", UIParent, "RIGHT", 10000, 0);
 		holder:SetFrameStrata("LOW");
 		holder:Hide();
 	end
+	if (not self.buttonevent) then
+		self.buttonevent = "RightButtonUp";
+	end
 	btn:SetScript("PostClick", ClickHandled);
+	btn:RegisterForClicks(self.buttonevent);
 	self.sabutton = btn;
 	btn.fl = self;
+end
+
+FishLib.MOUSE1 = "RightButtonUp";
+FishLib.MOUSE2 = "Button4Up";
+FishLib.MOUSE3 = "Button5Up";
+FishLib.CastButton = {};
+FishLib.CastButton[FishLib.MOUSE1] = "RightButton";
+FishLib.CastButton[FishLib.MOUSE2] = "Button4";
+FishLib.CastButton[FishLib.MOUSE3] = "Button5";
+FishLib.CastKey = {};
+FishLib.CastKey[FishLib.MOUSE1] = "BUTTON2";
+FishLib.CastKey[FishLib.MOUSE2] = "BUTTON4";
+FishLib.CastKey[FishLib.MOUSE3] = "BUTTON5";
+
+function FishLib:GetSAMouseEvent()
+	if (not self.buttonevent) then
+		self.buttonevent = "RightButtonUp";
+	end
+	return self.buttonevent;
+end
+
+function FishLib:GetSAMouseButton()
+	return self.CastButton[self:GetSAMouseEvent()];
+end
+
+function FishLib:GetSAMouseKey()
+	return self.CastKey[self:GetSAMouseEvent()];
+end
+
+function FishLib:SetSAMouseEvent(buttonevent)
+	if (not buttonevent) then
+		buttonevent = "RightButtonUp";
+	end
+	if (self.CastButton[buttonevent]) then
+		self.buttonevent = buttonevent;
+		local btn = getglobal(SABUTTONNAME);
+		if ( btn ) then
+			btn:RegisterForClicks(nil);		
+			btn:RegisterForClicks(self.buttonevent);		
+		end
+		return true;
+	end
+	-- return nil;
 end
 
 function FishLib:InvokeFishing(useaction)
@@ -1187,13 +1239,13 @@ function FishLib:InvokeFishing(useaction)
 	local _, name = self:GetFishingSkillInfo();
 	local findid = self:GetFishingActionBarID();	  
 	if ( not useaction or not findid ) then
-	  btn:SetAttribute("type", "spell");
-	  btn:SetAttribute("spell", name);
-	  btn:SetAttribute("action", nil);
+		btn:SetAttribute("type", "spell");
+		btn:SetAttribute("spell", name);
+		btn:SetAttribute("action", nil);
 	else
-	  btn:SetAttribute("type", "action");
-	  btn:SetAttribute("action", findid);
-	  btn:SetAttribute("spell", nil);
+		btn:SetAttribute("type", "action");
+		btn:SetAttribute("action", findid);
+		btn:SetAttribute("spell", nil);
 	end
 	btn:SetAttribute("item", nil);
 	btn:SetAttribute("target-slot", nil);
@@ -1208,7 +1260,7 @@ function FishLib:InvokeLuring(id)
 	btn:SetAttribute("type", "item");
 	if ( id ) then
 		btn:SetAttribute("item", "item:"..id);
-		btn:SetAttribute("target-slot", mainhand);
+		btn:SetAttribute("target-slot", INVSLOT_MAINHAND);
 	else
 		btn:SetAttribute("item", nil);
 		btn:SetAttribute("target-slot", nil);
@@ -1223,11 +1275,20 @@ function FishLib:OverrideClick(postclick)
 	if ( not btn ) then
 		return;
 	end
+	local buttonkey = self:GetSAMouseKey();
 	fishlibframe.fl = self;
 	btn.fl = self;
 	btn.postclick = postclick;
-	SetOverrideBindingClick(btn, true, "BUTTON2", SABUTTONNAME);
+	SetOverrideBindingClick(btn, true, buttonkey, SABUTTONNAME);
 	btn.holder:Show();
+end
+
+function FishLib:ClickSAButton()
+	local btn = self.sabutton;
+	if ( not btn ) then
+		return;
+	end
+	btn:Click(self:GetSAMouseButton());
 end
 
 -- Taken from wowwiki tooltip handling suggestions
@@ -1296,7 +1357,7 @@ end
 function FishLib:GetPoleBonus()
 	if (self:IsFishingPole()) then
 		-- get the total bonus for the pole
-		local total = self:FishingBonusPoints(mainhand, true);
+		local total = self:FishingBonusPoints(INVSLOT_MAINHAND, true);
 		local hmhe,_,_,_,_,_ = GetWeaponEnchantInfo();
 		if ( hmhe ) then
 			-- IsFishingPole has set mainhand for us
@@ -1319,6 +1380,12 @@ function FishLib:GetOutfitBonus()
 	for i=1,16,1 do
 		bonus = bonus + self:FishingBonusPoints(slotinfo[i].id, 1);
 	end
+	-- Blizz seems to have capped this at 50, plus there seems
+	-- to be a maximum of +5 in enchants. Need to do some more work
+	-- to verify.
+	-- if (bonus > 50) then
+	-- 	bonus = 50;
+	-- end
 	local pole, lure = self:GetPoleBonus();
 	return bonus + pole, lure;
 end
@@ -1332,7 +1399,7 @@ function FishLib:GetFishingOutfitItems(wearing, nopole)
 	local itemtable = {};
 	for invslot=1,17,1 do
 		local slotid = slotinfo[invslot].id;
-		local ismain = (slotid == mainhand);
+		local ismain = (slotid == INVSLOT_MAINHAND);
 		if ( not nopole or not ismain ) then
 			local slotname = slotinfo[invslot].name;
 			local maxb = -1;
@@ -1353,7 +1420,7 @@ function FishLib:GetFishingOutfitItems(wearing, nopole)
 			wipe(itemtable);
 			itemtable = GetInventoryItemsForSlot(slotid, itemtable);
 			for location,id in pairs(itemtable) do
-				local player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(location);
+				local player, bank, bags, void, slot, bag = EquipmentManager_UnpackLocation(location);
 				if ( bags and slot and bag ) then
 					link = GetContainerItemLink(bag, slot);
 				else
@@ -1378,6 +1445,76 @@ function FishLib:GetFishingOutfitItems(wearing, nopole)
 		end
 	end
 	return outfit;
+end
+
+function FishLib:GetBagItemStats(bag, slot)
+	local link;
+	local c, i, n;
+	if ( bag ) then
+		link = GetContainerItemLink (bag,slot);
+	else
+		link = GetInventoryItemLink("player", slot);
+	end
+	if (link) then
+		c, i, n = self:SplitFishLink(link);
+	end
+	return c, i, n;
+end
+
+-- look in a particular bag
+function FishLib:CheckThisBag(bag, id, skipcount)
+	-- get the number of slots in the bag (0 if no bag)
+	local numSlots = GetContainerNumSlots(bag);
+	if (numSlots > 0) then
+		-- check each slot in the bag
+		for slot=1, numSlots do
+			local c, i, n = self:GetBagItemStats(bag, slot);
+			if ( i and id == i ) then
+				if ( skipcount == 0 ) then
+					return slot, skipcount;
+				end
+				skipcount = skipcount - 1;
+			end
+		end
+	end
+	return nil, skipcount;
+end
+
+-- look for the item anywhere we can find it, skipping if we're looking
+-- for more than one
+function FishLib:FindThisItem(id, skipcount)
+	if ( not id ) then
+		return nil,nil;
+	end
+	local skipcount = skipcount or 0;
+	-- force id to be a number
+	local n,l,_,_,_,_,_,_ = GetItemInfo(id);
+	if (not n) then
+		n,l,_,_,_,_,_,_ = GetItemInfo("item:"..id);
+	end
+	_, id, _ = self:SplitFishLink(l);
+	-- check each of the bags on the player
+	for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
+		local slot;
+		slot, skipcount = self:CheckThisBag(bag, id, skipcount);
+		if ( slot ) then
+			return bag, slot;
+		end
+	end
+
+	local _,_,slotnames = self:GetSlotInfo();
+	for _,si in ipairs(slotnames) do
+		local slot = si.id;
+		local c, i, n = self:GetBagItemStats(nil, slot);
+		if ( i and id == i ) then
+			if ( skipcount == 0 ) then
+				return nil, slot;
+			end
+			skipcount = skipcount - 1;
+		end
+	end
+
+	-- return nil, nil;
 end
 
 -- Is this item openable?

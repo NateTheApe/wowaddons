@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Magmadar", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 477 $"):sub(12, -3))
 mod:SetCreatureID(11982)
 mod:SetModelID(10193)
 mod:RegisterCombat("combat")
@@ -18,9 +18,6 @@ local warnEnrage	= mod:NewSpellAnnounce(19451)
 local timerPanicCD	= mod:NewCDTimer(30, 19408)
 local timerPanic	= mod:NewBuffActiveTimer(8, 19408)
 local timerEnrage	= mod:NewBuffActiveTimer(8, 19451)
-
-function mod:OnCombatStart(delay)
-end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 19451 then

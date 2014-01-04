@@ -2,10 +2,10 @@
 ************************************************************************
 Custom.lua
 ************************************************************************
-File date: 2013-04-09T02:35:09Z
-File hash: c70fb0f
-Project hash: 3fa6ce4
-Project version: 2.4.8
+File date: 2013-11-03T22:33:53Z
+File hash: a88f694
+Project hash: e8a8419
+Project version: 2.5.13
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -45,36 +45,23 @@ function addon:InitCustom()
 	AddCustom("HENRY_STERN_RFD", Z.RAZORFEN_DOWNS)
 	AddCustom("ENG_GNOMER", Z.GNOMEREGAN)
 	AddCustom("ENG_FLOOR_ITEM_BRD", Z.BLACKROCK_DEPTHS)
-	AddCustom("AQ40_RANDOM_BOP", Z.AHNQIRAJ_THE_FALLEN_KINGDOM)
-	AddCustom("SUNWELL_RANDOM", Z.SUNWELL_PLATEAU)
-	AddCustom("BRD_MAIL", Z.BLACKROCK_DEPTHS)
-	AddCustom("BRD_SHOULDERS", Z.BLACKROCK_DEPTHS)
-	AddCustom("MC_RANDOM", Z.MOLTEN_CORE)
-	AddCustom("HYJAL_RANDOM", Z.HYJAL_SUMMIT)
-	AddCustom("SCHOLO_BOOK_SPAWN", Z.SCHOLOMANCE)
+	AddCustom("BRD_MAIL")
+	AddCustom("BRD_SHOULDERS")
 	AddCustom("STRATH_BS_PLANS", Z.STRATHOLME)
 	AddCustom("DM_TRIBUTE", Z.DIRE_MAUL, 59.04, 48.82)
-	AddCustom("BT_RANDOM", Z.BLACK_TEMPLE)
-	AddCustom("TK_RANDOM", Z.TEMPEST_KEEP)
-	AddCustom("OGRI_DRAGONS")
+	AddCustom("OGRI_DRAGONS", Z.BLADES_EDGE_MOUNTAINS)
+	AddCustom("NORMAL")
+	AddCustom("HEROIC")
 	AddCustom("KUNG")
-	AddCustom("SSC_RANDOM", Z.SERPENTSHRINE_CAVERN)
 	AddCustom("DAILY_COOKING_DAL", Z.DALARAN)
-	AddCustom("ULDUAR_RANDOM", Z.ULDUAR)
-	AddCustom("TOC25_RANDOM", Z.TRIAL_OF_THE_CRUSADER)
-	AddCustom("LORE_NORTH")
-	AddCustom("NORTH_DUNG")
-	AddCustom("BUGGED")
 	AddCustom("ARCH_DROP_ULD", Z.ULDUM)
 	AddCustom("REMOVED_FROM_GAME")
-	AddCustom("FIRELANDS_RANDOM", Z.FIRELANDS)
-	AddCustom("DRAGONSOUL_RANDOM", Z.DRAGON_SOUL)
 	AddCustom("PREREQ")
-	AddCustom("BLACK_MARKET_AUCTION_HOUSE")
-	AddCustom("MOP_RAIDS_RANDOM", Z.HEART_OF_FEAR)
 	AddCustom("BANANA_INFUSED_RUM", Z.KRASARANG_WILDS, 52.3, 88.7)
 	AddCustom("FOUR_SENSES_BREW", Z.KUN_LAI_SUMMIT, 44.7, 52.3)
 	AddCustom("LEARNT_BY_ACCEPTING_QUEST")
+	AddCustom("TIMELESS_ISLE_COOKING", Z.TIMELESS_ISLE, 52.1, 46.1)
+	AddCustom("ANCIENT_GUO-LAI_CACHE", Z.VALE_OF_ETERNAL_BLOSSOMS)
 
 	self.InitCustom = nil
 end

@@ -1,15 +1,15 @@
-## Interface: 50300
-## Title: Gnosis (|cffaaff44Castbars and Timers|r) v4.02
+## Interface: 50400
+## Title: Gnosis (|cffaaff44Castbars and Timers|r) v4.20
 ## Notes: Highly configurable castbar and single timer addon.
 ## Author: elchefe <>
-## Version: v4.02
+## Version: v4.20
 ## SavedVariables: GnosisDB, GnosisConfigs
 ## SavedVariablesPerCharacter: GnosisChar, GnosisCharConfig
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## X-Embeds: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## LoadOnDemand: 0
 ## DefaultState: enabled
-## X-Curse-Packaged-Version: v4.02
+## X-Curse-Packaged-Version: v4.20
 ## X-Curse-Project-Name: Gnosis (Castbars and Timers)
 ## X-Curse-Project-ID: gnosis
 ## X-Curse-Repository-ID: wow/gnosis/mainline
@@ -20,6 +20,7 @@ Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 Libs\AceAddon-3.0\AceAddon-3.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceComm-3.0\AceComm-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
 Libs\AceConsole-3.0\AceConsole-3.0.xml
 Libs\AceDB-3.0\AceDB-3.0.xml
@@ -29,6 +30,8 @@ Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 Libs\LibRangeCheck-2.0\LibRangeCheck-2.0.lua
 Libs\LibDialog-1.0\lib.xml
 Libs\LibBetterBlizzOptions-1.0\LibBetterBlizzOptions-1.0\lib.xml
+Libs\AceSerializer-3.0\AceSerializer-3.0.xml
+Libs\LibCompress\lib.xml
 #@end-no-lib-strip@
 
 # xml
@@ -43,6 +46,7 @@ Options.lua
 Variables.lua
 Bars.lua
 Timers.lua
+Encoding.lua
 
 # Gnosis' StatusBar implementation
 CreateStatusBar.lua

@@ -584,11 +584,11 @@ function Skillet:TradeButton_OnEnter(button)
 
 	local data = self:GetSkillRanks(player, tradeID)
 
-	if not data or data == "" then
+	if not data or data == {} then
 		GameTooltip:AddLine(L["No Data"],1,0,0)
 	else
 
-		local rank, maxRank = string.split(" ", data)
+		local rank, maxRank = data.rank, data.maxRank
 
 		GameTooltip:AddLine("["..rank.."/"..maxRank.."]",0,1,0)
 
@@ -635,9 +635,10 @@ function Skillet:TradeButton_OnClick(this,button)
 	tradeID = tonumber(tradeID)
 
 	local data =  self:GetSkillRanks(player, tradeID)
+	DebugSpam("TradeButton_OnClick "..(name or "nil").." "..(player or "nil").." "..(tradeID or "nil"))
 
 	if button == "LeftButton" then
-		if player == UnitName("player") or (data and data ~= "") then
+		if player == UnitName("player") or (data and data ~= nil) then
 			if self.currentTrade == tradeID and IsShiftKeyDown() then
 				local link=GetTradeSkillListLink();
 				local activeEditBox =  ChatEdit_GetActiveWindow();
@@ -651,9 +652,11 @@ function Skillet:TradeButton_OnClick(this,button)
 			if player == UnitName("player") then
 				self:SetTradeSkill(self.currentPlayer, tradeID)
 			else
-				local link = self.db.realm.linkDB[player][tradeID]
+				local link = self.db.realm.tradeSkills[player][tradeID].link
 				local _,tradeString
-				if Skillet.wowVersion >= 50300 then
+				if Skillet.wowVersion >= 50400 then
+					_,_,tradeString = string.find(link, "(trade:[0-9a-fA-F]+:%d+:[a-zA-Z0-9+/:]+)")
+				elseif Skillet.wowVersion >= 50300 then
 					_,_,tradeString = string.find(link, "(trade:[0-9a-fA-F]+:%d+:%d+:%d+:[a-zA-Z0-9+/:]+)")
 				else
 					_,_,tradeString = string.find(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[a-zA-Z0-9+/]+)")
@@ -713,11 +716,15 @@ function Skillet:UpdateTradeButtons(player)
 		local ranks = self:GetSkillRanks(player, tradeID)
 		local tradeLink
 
-		if self.db.realm.linkDB[player] then
-			tradeLink = self.db.realm.linkDB[player][tradeID]
+		if self.db.realm.tradeSkills[player] then
 
 			if nonLinkingTrade[tradeID] then
 				tradeLink = nil
+			else
+				local tradePlayer = self.db.realm.tradeSkills[player][tradeID]
+				if tradePlayer then 
+					tradeLink = tradePlayer.link
+				end
 			end
 		end
 
@@ -1046,14 +1053,14 @@ function Skillet:internal_UpdateTradeSkillWindow()
 	-- Tell the Stitch library about the queued items so it knows how
 	-- to adjust its item counts.
 --    self:SetReservedReagentsList(queued_reagents);
-
-
-	local rank,maxRank = string.split(" ", self:GetSkillRanks(self.currentPlayer, self.currentTrade) or "0 0")
-
-	rank = tonumber(rank)
-	maxRank = tonumber(maxRank)
-
-
+	
+	
+	local rank,maxRank = 0,0
+	local skillRanks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
+	if skillRanks then
+		rank,maxRank = skillRanks.rank, skillRanks.maxRank
+	end
+	
 	-- Progression status bar
 	SkilletRankFrame:SetMinMaxValues(0, maxRank)
 	SkilletRankFrame:SetValue(rank)
@@ -1737,7 +1744,7 @@ function Skillet:SetReagentToolTip(reagentID, numNeeded, numCraftable)
 					local rankData = self:GetSkillRanks(player, recipe.tradeID)
 
 					if rankData then
-						local rank, maxRank = string.split(" ", rankData)
+						local rank, maxRank = rankData.rank, rankData.maxRank
 
 						GameTooltip:AddDoubleLine("  "..player,"["..(rank or "?").."/"..(maxRank or "?").."]",1,1,1)
 					else
@@ -2741,24 +2748,67 @@ function Skillet:PushSkill(player, tradeID, skillIndex)
 end
 
 
+function Skillet:getGuildPerk()
+	-- icy: calculate working overtime bonus
+	local wot1 = 14
+	local wot2 = 22
+
+	local gLevel = GetGuildLevel()
+	if (gLevel < wot1 ) then
+		return 0
+	elseif ((gLevel >= wot1) and (gLevel < wot2)) then
+		return 1.10
+	else
+		return 1.20
+	end
+end
+
+
+function Skillet:getLvlUpChance()
+	-- icy: 03.03.2012:
+	-- according to pope (http://www.wowhead.com/spell=83949#comments)
+	-- % to level up with this receipt is calculated by: (greySkill - yourSkill) / (greySkill - yellowSkill
+	-- Lets add this information to skillet :)
+	local skilRanks = self:GetSkillRanks(self.currentPlayer, self.currentTrade)
+	local currentLevel, maxlevel = 0, 0
+	if skilRanks then
+		currentLevel, maxlevel = skilRanks.rank, skilRanks.maxRank
+	end
+	local gray = tonumber(SkilletRankFrame.subRanks.green:GetValue())
+	local yellow = tonumber(SkilletRankFrame.subRanks.orange:GetValue())
+	local chance
+	local guildperk = Skillet:getGuildPerk()
+	if (currentLevel > gray) then
+		return 0
+	end
+	
+	if (gray - yellow) == 0 then return 0 end
+	
+	chance = ((gray - currentLevel) / ( gray - yellow ))
+	chance = chance * guildperk
+	chance = chance * 100
+	return chance
+end
+
 -- Called when then mouse enters the rank status bar
 function Skillet:RankFrame_OnEnter(button)
-
-
---	if button ~= SkilletRankFrame then
-		GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
-		local r,g,b = SkilletSkillName:GetTextColor()
-		GameTooltip:AddLine(SkilletSkillName:GetText(),r,g,b)
-
-		local gray = SkilletRankFrame.subRanks.green:GetValue()
-		local green = SkilletRankFrame.subRanks.yellow:GetValue()
-		local yellow = SkilletRankFrame.subRanks.orange:GetValue()
-		local orange = SkilletRankFrame.subRanks.red:GetValue()
-
-		GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray)
-
-		GameTooltip:Show()
---	end
+	
+	-- if button ~= SkilletRankFrame then
+	GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
+	local r,g,b = SkilletSkillName:GetTextColor()
+	GameTooltip:AddLine(SkilletSkillName:GetText(),r,g,b)
+	
+	local gray = SkilletRankFrame.subRanks.green:GetValue()
+	local green = SkilletRankFrame.subRanks.yellow:GetValue()
+	local yellow = SkilletRankFrame.subRanks.orange:GetValue()
+	local orange = SkilletRankFrame.subRanks.red:GetValue()
+	
+	-- lets add the chance to level up that skill with that receipt
+	local chance = Skillet:getLvlUpChance()
+	GameTooltip:AddLine(COLORORANGE..orange.."|r/"..COLORYELLOW..yellow.."|r/"..COLORGREEN..green.."|r/"..COLORGRAY..gray.."|r/ Chance:"..chance.."|r%")
+	
+	GameTooltip:Show()
+-- end
 end
 
 

@@ -1,0 +1,13 @@
+tag v1.10
+352456245c427a0c82c07aa1bd9d91f433078827
+iceeagle <ciprianmihai.coman@gmail.com>
+2013-12-01 10:35:40 +0200
+
+Tag as v1.10
+
+
+--------------------
+
+iceeagle:
+	- package new release
+	- add options for coordinates decimal precision (issue 11)

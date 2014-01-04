@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod("Lanathel", "DBM-Icecrown", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 58 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(37955)
+mod:SetEncounterID(1103)
 mod:SetModelID(31165)
 mod:SetUsedIcons(4, 5, 6, 7, 8)
 
@@ -186,7 +187,7 @@ mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg:match(L.SwarmingShadows) then
-		local target = DBM:GetFullNameByShortName(target)
+		local target = DBM:GetUnitFullName(target)
 		warnSwarmingShadows:Show(target)
 		timerNextSwarmingShadows:Start()
 		if target == UnitName("player") then

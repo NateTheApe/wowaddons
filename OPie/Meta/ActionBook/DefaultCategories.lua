@@ -1,32 +1,45 @@
 local AB = assert(OneRingLib.ext.ActionBook:compatible(1,2), "Requires a compatible ActionBook library version")
 
 do -- spellbook
-	local spells, mark = {}, {}
-	local function addEntry(ni, ok, st, sid)
-		if st == "SPELL" and not IsPassiveSpell(sid) and ((mark[sid] or ni) >= ni or spells[mark[sid]] ~= sid) then
-			spells[ni], mark[sid], ni = sid, ni, ni + 1
-		elseif st == "FLYOUT" then
-			for j=1,select(3,GetFlyoutInfo(sid)) do
-				local sid, osid, ik, sname = GetFlyoutSlotInfo(sid, j)
-				ni = ik and addEntry(ni, true, "SPELL", sid) or ni
+	local function book(actionType)
+		local spells, mark = {}, {}
+		local function addEntry(ni, ok, st, sid, ...)
+			if st == "SPELL" and not IsPassiveSpell(sid) and ((mark[sid] or ni) >= ni or spells[mark[sid]] ~= sid) then
+				spells[ni], mark[sid], ni = sid, ni, ni + 1
+			elseif st == "FLYOUT" then
+				for j=1,select(3,GetFlyoutInfo(sid)) do
+					local sid, osid, ik, sname = GetFlyoutSlotInfo(sid, j)
+					ni = ik and addEntry(ni, true, "SPELL", sid) or ni
+				end
 			end
+			return ni
 		end
-		return ni
-	end
-	local function search()
-		local ni = 1
-		for i=1,GetNumSpellTabs()+12 do
-			local n, tex, ofs, c, isG, sid = GetSpellTabInfo(i)
-			for j=ofs+1,sid == 0 and (ofs+c) or 0 do
-				ni = addEntry(ni, pcall(GetSpellBookItemInfo, j, "spell"))
+		return function()
+			local ni = 1
+			if actionType == "petspell" then
+				if PetHasSpellbook() then
+					for i=1,HasPetSpells() or 0 do
+						ni = addEntry(ni, pcall(GetSpellBookItemInfo, i, "pet"))
+					end
+					spells[ni], spells[ni+1], spells[ni+2], spells[ni+3] = "attack", "move", "stay", "follow"
+					spells[ni+4], spells[ni+5], spells[ni+6], ni = "assist", "defend", "passive", ni + 7
+				end
+			else
+				for i=1,GetNumSpellTabs()+12 do
+					local n, tex, ofs, c, isG, sid = GetSpellTabInfo(i)
+					for j=ofs+1,sid == 0 and (ofs+c) or 0 do
+						ni = addEntry(ni, pcall(GetSpellBookItemInfo, j, "spell"))
+					end
+				end
 			end
-		end
-		for i=#spells,ni,-1 do
-			spells[i] = nil
-		end
-		return ni-1
+			for i=#spells,ni,-1 do
+				spells[i] = nil
+			end
+			return ni - 1
+		end, function(id) return actionType, spells[id] end
 	end
-	AB:category("Abilities", search, function(id) return "spell", spells[id] end)
+	AB:category("Abilities", book("spell"))
+	AB:category("Pet abilities", book("petspell"))
 end
 do -- Items
 	local items, seen = {}, {}
@@ -146,7 +159,8 @@ do -- data broker launchers
 		if waiting and count() > 0 then AB:category("DataBroker", count, get) waiting = nil end
 		if not waiting then AB:notify("opie.databroker.launcher") end
 	end
-	EC_Register("ADDON_LOADED", "opie.databroker.launcher", function()
+	local _, T = ...
+	T.Evie.RegisterEvent("ADDON_LOADED", function()
 		if LDB or checkLDB() or LDB then
 			register()
 			if waiting then LDB.RegisterCallback("opie.databroker.launcher", "LibDataBroker_DataObjectCreated", register) end

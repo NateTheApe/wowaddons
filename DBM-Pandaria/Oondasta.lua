@@ -1,12 +1,13 @@
 local mod	= DBM:NewMod(826, "DBM-Pandaria", nil, 322)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9469 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10466 $"):sub(12, -3))
 mod:SetCreatureID(69161)
-mod:SetQuestID(32519)--Note, this is currently bugged and returns nalak's answer (ie, yes if nalak has been killed no if nalak hasn't, it doesn't reference oondasta at all until blizzard fixes it)
-mod:SetZone(929)--Isle of Giants
+mod:SetReCombatTime(20)
+mod:SetZone()
+mod:SetMinSyncRevision(10466)
 
-mod:RegisterCombat("combat")
+mod:RegisterCombat("combat_yell", L.Pull)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
@@ -16,34 +17,27 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_REMOVED"
 )
 
-mod:RegisterEvents(
-	"CHAT_MSG_MONSTER_YELL"
-)
-
 local warnCrush					= mod:NewStackAnnounce(137504, 2, nil, mod:IsTank() or mod:IsHealer())--Cast every 30 seconds roughly, lasts 1 minute. you need 3 tanks to be able to tank the boss without debuff. 2 tanks CAN do but they will always have 1 stack and take 25% more damage
-local warnPiercingRoar			= mod:NewSpellAnnounce(137457, 2, nil)
+local warnPiercingRoar			= mod:NewSpellAnnounce(137457, 2)
 local warnSpiritfireBeam		= mod:NewTargetAnnounce(137511, 3)
-local warnFrillBlast			= mod:NewSpellAnnounce(137505, 4)--While this SHOULD be a tank only warning, thanks to terrible blizzard design, this fight is anything but a tanked fight, so it's now an everyone warning since god knows what fucking way the boss will be facing when he casts this
+local warnFrillBlast			= mod:NewSpellAnnounce(137505, 4, nil, mod:IsTank() or mod:IsHealer())
 
 local specWarnCrush				= mod:NewSpecialWarningStack(137504, mod:IsTank(), 2)
-local specWarnCrushOther		= mod:NewSpecialWarningTarget(137504, mod:IsTank())--This should not go over 1 stack so don't need stack warning just a "taunt the boss" warning
+local specWarnCrushOther		= mod:NewSpecialWarningTarget(137504, mod:IsTank())
 local specWarnPiercingRoar		= mod:NewSpecialWarningCast(137457, mod:IsRanged() or mod:IsHealer())
 local specWarnFrillBlast		= mod:NewSpecialWarningSpell(137505, nil, nil, nil, 2)
 
 local timerCrush				= mod:NewTargetTimer(60, 137504, nil, mod:IsTank() or mod:IsHealer())
 local timerCrushCD				= mod:NewCDTimer(26, 137504)
 local timerPiercingRoarCD		= mod:NewCDTimer(25, 137457)--25-60sec variation (i'm going to guess like all the rest of the variations, the timers are all types of fucked up when the boss is running around untanked, which delays casts of crush and frill blast, but makes him cast spitfire twice as often)
---local timerSpiritfireBeamCD		= mod:NewCDTimer(25, 137511)--25-30sec variation (disabled because he also seems to spam it far more often if there is no tank, making it difficult to find an ACTUAL cd when fight is done incorrectly
 local timerFrillBlastCD			= mod:NewCDTimer(25, 137505)--25-30sec variation
 
 mod:AddBoolOption("RangeFrame", true)
+mod:AddReadyCheckOption(32519, false)
 
-local yellTriggered = false
-
-function mod:OnCombatStart(delay)
+function mod:OnCombatStart(delay, yellTriggered)
 	if yellTriggered then--We know for sure this is an actual pull and not diving into in progress
 --		timerCrushCD:Start(-delay)--There was no tank, so he pretty much never cast this, just ran like a wild animal around area while corpse cannoned
---		timerSpiritfireBeamCD:Start(15-delay)
 		timerPiercingRoarCD:Start(20-delay)
 		timerFrillBlastCD:Start(40-delay)
 	end
@@ -56,7 +50,6 @@ function mod:OnCombatEnd()
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Hide()
 	end
-	yellTriggered = false
 end
 
 function mod:SPELL_CAST_START(args)
@@ -74,7 +67,6 @@ end
 function mod:SPELL_CAST_SUCCESS(args)
 	if args:IsSpellID(137508, 137511) then
 		warnSpiritfireBeam:Show(args.destName)
---		timerSpiritfireBeamCD:Start()
 	end
 end
 
@@ -92,20 +84,10 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 	end
 end
-mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED--<--if this happens you're doing fight wrong. But we announce it anyways to identify the problem
+mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REMOVED(args)
 	if args.spellId == 137504 then
 		timerCrush:Cancel(args.destName)
 	end
 end
-
-function mod:CHAT_MSG_MONSTER_YELL(msg)
-	if msg == L.Pull and not self:IsInCombat() then
-		if self:GetCIDFromGUID(UnitGUID("target")) == 69161 or self:GetCIDFromGUID(UnitGUID("targettarget")) == 69161 then--Whole zone gets yell, so lets not engage combat off yell unless he is our target (or the target of our target for healers)
-			yellTriggered = true
-			DBM:StartCombat(self, 0)
-		end
-	end
-end
-

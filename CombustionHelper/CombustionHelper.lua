@@ -13,6 +13,8 @@ local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceR
 local combuhastetick, combucurrenthaste, combuexpectedtickdmg, combustiontime, combuglyph
 
 function Combustion_OnLoad(Frame) 
+
+    CombuLanguageCheck()
                                                
     if select(2, UnitClass("player")) ~= "MAGE" then CombustionFrame:Hide() return end
         
@@ -39,7 +41,6 @@ function Combustion_OnLoad(Frame)
     CombuClientVersionCheck()
 	CombuTableCopy()
 	CombustionVarReset()
-    CombuLanguageCheck()
         	
 end
                             
@@ -88,7 +89,6 @@ combudefaultsettingstable = {["combulock"] = false,
                         	["insets"] = 5,
                             ["language"] = "Default",
                             ["thresholdalert"] = true,
-							["MageBombTrackerPosition"] = "upside",
                             ["combutickpredict"] = true,
                             ["pyromaniac"] = true,
                             ["hotstreak"] = true,
@@ -156,7 +156,6 @@ function CombuLanguageCheck()
             CombuLoc = CombuLocFR
             combuoptioninfotable = combuoptioninfotableFR
             CombuOptLoc = CombuOptLocFR
-            CombuLBposition = CombuLBpositionFR
             CombuAutohideList = CombuAutohideListFR
             CombuLabel = CombuLabelFR
 
@@ -167,18 +166,26 @@ function CombuLanguageCheck()
             CombuLoc = CombuLocDE
             combuoptioninfotable = combuoptioninfotableDE
             CombuOptLoc = CombuOptLocDE
-            CombuLBposition = CombuLBpositionDE
             CombuAutohideList = CombuAutohideListDE
             CombuLabel = CombuLabelDE
 
             CombufontstringGlobal("Friz Quadrata TT")
             
+        elseif combusettingstable["language"] == "Italiano" or combusettingstable["language"] == "Default" and GetLocale() == "itIT" then
+            
+            CombuLoc = CombuLocIT
+            combuoptioninfotable = combuoptioninfotableIT
+            CombuOptLoc = CombuOptLocIT
+            CombuAutohideList = CombuAutohideListIT
+            CombuLabel = CombuLabelIT
+
+            CombufontstringGlobal("Friz Quadrata TT")
+
         elseif combusettingstable["language"] == "Chinese Traditional 繁體中文" or combusettingstable["language"] == "Default" and GetLocale() == "zhTW" then
             
             CombuLoc = CombuLocTW
             combuoptioninfotable = combuoptioninfotableTW
             CombuOptLoc = CombuOptLocTW
-            CombuLBposition = CombuLBpositionTW
             CombuAutohideList = CombuAutohideListTW
             CombuLabel = CombuLabelTW
             
@@ -189,7 +196,6 @@ function CombuLanguageCheck()
             CombuLoc = CombuLocCN
             combuoptioninfotable = combuoptioninfotableCN
             CombuOptLoc = CombuOptLocCN
-            CombuLBposition = CombuLBpositionCN
             CombuAutohideList = CombuAutohideListCN
             CombuLabel = CombuLabelCN
             
@@ -200,7 +206,6 @@ function CombuLanguageCheck()
             CombuLoc = CombuLocKR
             combuoptioninfotable = combuoptioninfotableKR
             CombuOptLoc = CombuOptLocKR
-            CombuLBposition = CombuLBpositionKR
             CombuAutohideList = CombuAutohideListKR
             CombuLabel = CombuLabelKR
 
@@ -209,7 +214,6 @@ function CombuLanguageCheck()
         else CombuLoc = CombuLocEN
             combuoptioninfotable = combuoptioninfotableEN
             CombuOptLoc = CombuOptLocEN
-            CombuLBposition = CombuLBpositionEN
             CombuAutohideList = CombuAutohideListEN
             CombuLabel = CombuLabelEN
 
@@ -220,7 +224,6 @@ function CombuLanguageCheck()
     else CombuLoc = CombuLocEN
         combuoptioninfotable = combuoptioninfotableEN
         CombuOptLoc = CombuOptLocEN
-        CombuLBposition = CombuLBpositionEN
         CombuAutohideList = CombuAutohideListEN
         CombuLabel = CombuLabelEN
 
@@ -636,30 +639,6 @@ function CombustionFrameresize()
 	Pyrobar:SetMinMaxValues(0,100)
 	Pyrobar:SetWidth(28+combusettingstable["combubarwidth"])
 	
-    if (combusettingstable["MageBombTrackerPosition"] == "free") --or IsSpellKnown(11129) == false
-        then CombuMBTrackerFrame:EnableMouse(true) --print(5)
-    else CombuMBTrackerFrame:ClearAllPoints()
-    	
-		if (combusettingstable["MageBombTrackerPosition"] == "upside")
-			then CombuMBTrackerFrame:SetPoint("BOTTOM",CombustionFrame,"TOP",0,-6) --print(1)
-				 combumbtrackersettingstable["direction"] = "upward"
-				 CombuMBTrackerFrame:EnableMouse(false)
-		elseif (combusettingstable["MageBombTrackerPosition"] == "downside")
-			then CombuMBTrackerFrame:SetPoint("TOP",CombustionFrame,"BOTTOM",0,6) --print(2)
-				 combumbtrackersettingstable["direction"] = "downward"
-				 CombuMBTrackerFrame:EnableMouse(false)
-		elseif (combusettingstable["MageBombTrackerPosition"] == "rightside")
-			then CombuMBTrackerFrame:SetPoint("TOPLEFT",CombustionFrame,"TOPRIGHT",-6,0) --print(3)
-				 combumbtrackersettingstable["direction"] = "downward"
-				 CombuMBTrackerFrame:EnableMouse(false)
-		elseif (combusettingstable["MageBombTrackerPosition"] == "leftside")
-			then CombuMBTrackerFrame:SetPoint("TOPRIGHT",CombustionFrame,"TOPLEFT",6,0) --print(4)
-				 combumbtrackersettingstable["direction"] = "downward"
-				 CombuMBTrackerFrame:EnableMouse(false)
-		end
-	
-	end
-
     for i = 1,#combuwidgetlist["bars"] do _G[(combuwidgetlist["bars"])[i]]:SetStatusBarTexture(CombuLSM:Fetch("statusbar",combusettingstable["combutexturename"])) end
     for i = 1,#combuwidgetlist["text"] do 	_G[(combuwidgetlist["text"])[i]]:SetFont(CombuLSM:Fetch("font",combusettingstable["combufontname"]),select(2,_G[(combuwidgetlist["text"])[i]]:GetFont())) end   
     
@@ -1077,7 +1056,7 @@ function CombustionPredict()
 
 	if combuigndamage > 0 then
 	
-		combuigndps = combuigndamage / 2
+		combuigndps = combuigndamage / 5
 	
 	else combuigndps = 0
 	

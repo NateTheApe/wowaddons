@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod("Mimiron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 49 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(33432)
+mod:SetEncounterID(1138)
 mod:SetModelID(28578)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
 
@@ -10,10 +11,13 @@ mod:RegisterCombat("yell", L.YellPull)
 mod:RegisterCombat("yell", L.YellHardPull)
 
 mod:RegisterEvents(
+	"CHAT_MSG_MONSTER_YELL"
+)
+
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
 	"SPELL_CAST_SUCCESS",
 	"SPELL_AURA_APPLIED",
-	"CHAT_MSG_MONSTER_YELL",
 	"SPELL_AURA_REMOVED",
 	"UNIT_SPELLCAST_CHANNEL_STOP target focus",
 	"CHAT_MSG_LOOT",
@@ -50,7 +54,7 @@ local timerNextFlames			= mod:NewNextTimer(27.5, 64566)
 local timerNextFrostBomb        = mod:NewNextTimer(30, 64623)
 local timerBombExplosion		= mod:NewCastTimer(15, 65333)
 
-local soundShockBlast			= mod:NewSound(63631, nil, mod:IsMelee())
+local soundShockBlast			= mod:NewSound(63631, mod:IsMelee())
 local soundDarkGlare			= mod:NewSound(63414)
 
 mod:AddBoolOption("HealthFramePhase4", true)
@@ -93,7 +97,6 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:OnCombatEnd()
-	DBM.BossHealth:Hide()
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Hide()
 	end
@@ -133,8 +136,9 @@ end
 function mod:CHAT_MSG_LOOT(msg)
 	-- DBM:AddMsg(msg) --> Meridium receives loot: [Magnetic Core]
 	local player, itemID = msg:match(L.LootMsg)
+	player = DBM:GetUnitFullName(player)
 	if player and itemID and tonumber(itemID) == 46029 and self:IsInCombat() then
-		lootannounce:Show(player)
+		self:SendSync("LootMsg", player)
 	end
 end
 
@@ -203,7 +207,7 @@ end
 function mod:NextPhase()
 	phase = phase + 1
 	if phase == 1 then
-		if self.Options.HealthFrame then
+		if DBM.BossHealth:IsShown() then
 			DBM.BossHealth:Clear()
 			DBM.BossHealth:AddBoss(33432, L.MobPhase1)
 		end
@@ -214,7 +218,7 @@ function mod:NextPhase()
 		timerFlameSuppressant:Stop()
 		timerPlasmaBlastCD:Stop()
 		timerP1toP2:Start()
-		if self.Options.HealthFrame then
+		if DBM.BossHealth:IsShown() then
 			DBM.BossHealth:Clear()
 			DBM.BossHealth:AddBoss(33651, L.MobPhase2)
 		end
@@ -233,7 +237,7 @@ function mod:NextPhase()
 		timerNextDarkGlare:Cancel()
 		timerNextFrostBomb:Cancel()
 		timerP2toP3:Start()
-		if self.Options.HealthFrame then
+		if DBM.BossHealth:IsShown() then
 			DBM.BossHealth:Clear()
 			DBM.BossHealth:AddBoss(33670, L.MobPhase3)
 		end
@@ -247,7 +251,8 @@ function mod:NextPhase()
 			end
 		end
 		timerP3toP4:Start()
-		if self.Options.HealthFramePhase4 or self.Options.HealthFrame then
+		if self.Options.HealthFramePhase4 or DBM.BossHealth:IsShown() then
+			DBM.BossHealth:Clear()
 			DBM.BossHealth:Show(L.name)
 			DBM.BossHealth:AddBoss(33670, L.MobPhase3)
 			DBM.BossHealth:AddBoss(33651, L.MobPhase2)
@@ -323,5 +328,7 @@ function mod:OnSync(event, args)
 		self:NextPhase()
 	elseif event == "Phase4" and phase == 3 then
 		self:NextPhase()
+	elseif event == "LootMsg" and args then
+		lootannounce:Show(args)
 	end
 end

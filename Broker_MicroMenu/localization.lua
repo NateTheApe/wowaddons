@@ -48,6 +48,7 @@ L["Custom Text"] = "自訂文字"
 L["Disable Coloring"] = "禁用著色"
 L["Enable"] = "啟用"
 L["Enable this if you want to fine tune the displayed text."] = "啟用此如果你想微調顯示文字。"
+L["fps"] = "fps" -- Needs review
 L["General"] = "一般"
 L["ms"] = "毫秒"
 L["Show FPS First"] = "優先顯示FPS"
@@ -81,13 +82,39 @@ end
 
 local L = AceLocale:NewLocale("Broker_MicroMenu", "esES")
 if L then
-	
+	L["Advanced"] = "Avanzado"
+L["Custom Text"] = "Texto personalizado"
+L["Disable Coloring"] = "Desactivar coloración"
+L["Enable"] = "Activar"
+L["Enable this if you want to fine tune the displayed text."] = "Actívalo si quieres personalizar el texto mostrado."
+L["fps"] = "fps"
+L["General"] = "General"
+L["ms"] = "ms"
+L["Show FPS First"] = "Mostrar el FPS primero"
+L["Show Home Latency"] = "Mostrar latencia del cliente"
+L["Show latency for chat data, auction house stuff some addon data, and various other data."] = "Mostrar la latencia del chat, la casa de subastas, la comunicación entre los addons, y algos otros tipos de datos."
+L["Show latency for combat data, data from the people around you (specs, gear, enchants, etc.)."] = "Mostrar la latencia de los datos del combate y la información de los jugadores cercanos (especializaciones, equipamiento, encantamientos, etc)"
+L["Show World Latency"] = "Mostrar latencia del servidor"
+
 	return
 end
 
 local L = AceLocale:NewLocale("Broker_MicroMenu", "esMX")
 if L then
-	
+	L["Advanced"] = "Avanzado" -- Needs review
+L["Custom Text"] = "Texto personalizado"
+L["Disable Coloring"] = "Desactivar coloración"
+L["Enable"] = "Activar" -- Needs review
+L["Enable this if you want to fine tune the displayed text."] = "Actívalo si quieres personalizar el texto mostrado."
+L["fps"] = "fps"
+L["General"] = "General" -- Needs review
+L["ms"] = "ms" -- Needs review
+L["Show FPS First"] = "Mostrar el FPS primero"
+L["Show Home Latency"] = "Mostrar latencia del cliente"
+L["Show latency for chat data, auction house stuff some addon data, and various other data."] = "Mostrar la latencia del chat, la casa de subastas, la comunicación entre los addons, y algos otros tipos de datos."
+L["Show latency for combat data, data from the people around you (specs, gear, enchants, etc.)."] = "Mostrar la latencia de los datos del combate y la información de los jugadores cercanos (especializaciones, equipamiento, encantamientos, etc)"
+L["Show World Latency"] = "Mostrar latencia del servidor"
+
 	return
 end
 local L = AceLocale:NewLocale("Broker_MicroMenu", "ptBR")

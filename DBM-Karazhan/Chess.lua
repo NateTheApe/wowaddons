@@ -2,20 +2,24 @@ local mod	= DBM:NewMod("Chess", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
 local playerFactoin = UnitFactionGroup("player")
-mod:SetRevision(("$Revision: 473 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 527 $"):sub(12, -3))
 --UNIT_DIED firing for king assumed
 if playerFactoin == "Alliance" then
 	mod:SetCreatureID(21752)--Warchief Blackhand
 else
 	mod:SetCreatureID(21684)--King Llane
 end
+mod:SetModelID(18720)
 mod:RegisterCombat("combat")--Actually not how we register combat, bogus because SetWipeTime needs it
 mod:SetWipeTime(600)
 
 mod:RegisterEvents(
-	"SPELL_AURA_APPLIED",
-	"SPELL_AURA_REMOVED",
+	"SPELL_AURA_APPLIED"
+)
+
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_SUCCESS",
+	"SPELL_AURA_REMOVED",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_DIED"
 )
@@ -58,27 +62,9 @@ function mod:SPELL_CAST_SUCCESS(args)
 	end
 end
 
---Cheat detection can be detected with unit event but only if medivh is focus or target. otherwise we have to use emote. Since almost no one would do this, we just use emote method
---"<120.0 00:59:30> [UNIT_SPELLCAST_SUCCEEDED] Echo of Medivh [[focus:Karazhan - Chess, Medivh CHEAT: Fury of Medivh, Target Alliance::0:39344]]", -- [367]
---"<120.0 00:59:30> [CHAT_MSG_RAID_BOSS_EMOTE] CHAT_MSG_RAID_BOSS_EMOTE#Echo of Medivh cheats!#Echo of Medivh###Omegall##0#0##0#3458#nil#0#false#false", -- [368]
---Second cheat seems to sometimes come after 120 instead of 108
---We always start the 108 timer, but schedule a check for 110 that if second cheat hasn't come yet, we know it's a 120 one and to update timer
-local function cheatDelayed()
-	timerNextCheat:Start(10)
-end
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 	if msg == L.EchoCheats then
-		if not firstCheat then
-			firstCheat = true
-			timerNextCheat:Start()--Start 108 timer since it's about 50/50 for this one
-			self:Schedule(110, cheatDelayed)--But if not cheated by 110, start a 10 second timer for when the cheat will happen, at 120.
-		else
-			if not secondCheat then
-				self:Unschedule(cheatDelayed)
-				secondCheat = true
-			end
-			timerNextCheat:Start()--All other cheats should be every 108 like clockwork. Only the second is random. Ie, 111, 120, 108 repeating, OR 111, 108 repeating.
-		end
+		timerNextCheat:Start()--All other cheats should be every 108 like clockwork. Only the second is random. Ie, 111, 120, 108 repeating, OR 111, 108 repeating.
 	end
 end
 

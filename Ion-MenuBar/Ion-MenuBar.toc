@@ -1,7 +1,7 @@
-﻿## Interface: 50300
+## Interface: 50400
 ## Title: Ion: Menu Bar
 ## Author: Maul
-## Version: Hydrogen-4
+## Version: Hydrogen-5
 ## Notes: Menu bar for Ion
 ## DefaultState: enabled
 ## Dependencies: Ion

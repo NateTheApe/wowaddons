@@ -1,13 +1,14 @@
 local mod	= DBM:NewMod("Archavon", "DBM-VoA")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 36 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(31125)
+mod:SetEncounterID(1126)
 mod:SetModelID(26967)
 
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
 	"SPELL_CAST_SUCCESS",
 	"SPELL_AURA_APPLIED",
@@ -57,6 +58,6 @@ end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg and msg:match(L.TankSwitch) or msg:find(L.TankSwitch) then
-		warnGrab:Show(DBM:GetFullNameByShortName(target))
+		warnGrab:Show(DBM:GetUnitFullName(target))
 	end
 end

@@ -1306,8 +1306,8 @@
 				</Scripts>
 			</CheckButton>
 
-
-	   <Frame name="LBtrackerPosition" inherits="CombuFrametemplate">
+        
+    <Frame name="CombuAutohideInfo" inherits="CombuFrametemplate">
         <Size>
           <AbsDimension x="250" y="9" />
         </Size>
@@ -1315,96 +1315,6 @@
 		  <Anchor point="TOPLEFT" relativeTo="CombuPyroEnableButton" relativePoint="TOPLEFT">
             <Offset>
               <AbsDimension x="0" y="-40" />
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Layers>
-          <Layer>
-            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
-              <Anchors>
-                <Anchor point="TOPLEFT" />
-                <Anchor point="BOTTOMRIGHT" />
-              </Anchors>
-              <FontHeight>
-                <AbsValue val="12" />
-              </FontHeight>
-              <Color r="1" g="1" b="1" />
-              <Shadow>
-                <Color r="0" g="0" b="0" />
-                <Offset>
-                  <AbsDimension x="1" y="-1" />
-                </Offset>
-              </Shadow>
-            </FontString>
-            </Layer>
-        </Layers>
-            </Frame>
-            
-    <Frame name="LBtrackerDropDown" inherits="UIDropDownMenuTemplate">
-                <Size>
-                  <AbsDimension x="400" />
-                </Size>
-                <Anchors>
-                  <Anchor point="TOPLEFT" relativeTo="LBtrackerPosition" relativePoint="TOPLEFT">
-                    <Offset>
-                      <AbsDimension x="150" y="8" />
-                    </Offset>
-                  </Anchor>
-                </Anchors>
-               <Scripts>
-                <OnShow>
-
-local function LBpositionOnClick(self)
-
-   UIDropDownMenu_SetSelectedID(LBtrackerDropDown, self:GetID())
-   
-   if (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 1) then combusettingstable["MageBombTrackerPosition"] = "upside"
-   elseif (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 2) then combusettingstable["MageBombTrackerPosition"] = "downside"
-   elseif (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 3) then combusettingstable["MageBombTrackerPosition"] = "rightside"
-   elseif (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 4) then combusettingstable["MageBombTrackerPosition"] = "leftside"
-   elseif (UIDropDownMenu_GetSelectedID(LBtrackerDropDown, self:GetID())  == 5) then combusettingstable["MageBombTrackerPosition"] = "free"
-   end
- 
-   CombustionFrameresize()
-   CombuMBTrackerCreateBombRow()
-   
-end   
-                
-local function initialize(self, level)
-   local info = UIDropDownMenu_CreateInfo()
-   for k,v in pairs(CombuLBposition) do
-      info = UIDropDownMenu_CreateInfo()
-      info.text = v
-      info.value = v
-      info.func = LBpositionOnClick
-      UIDropDownMenu_AddButton(info, level)
-   end
-end
- 
- 
-UIDropDownMenu_Initialize(LBtrackerDropDown, initialize)
-UIDropDownMenu_SetWidth(LBtrackerDropDown, 220);
-UIDropDownMenu_SetButtonWidth(LBtrackerDropDown, 124)
-UIDropDownMenu_JustifyText(LBtrackerDropDown, "LEFT")
-                
-   if combusettingstable["MageBombTrackerPosition"] == "upside" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[1])
-   elseif combusettingstable["MageBombTrackerPosition"] == "downside" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[2])
-   elseif combusettingstable["MageBombTrackerPosition"] == "rightside" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[3])
-   elseif combusettingstable["MageBombTrackerPosition"] == "leftside" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[4])
-   elseif combusettingstable["MageBombTrackerPosition"] == "free" then UIDropDownMenu_SetText(LBtrackerDropDown, CombuLBposition[5])
-   end
-                </OnShow>
-                </Scripts>
-        </Frame>
-        
-    <Frame name="CombuAutohideInfo" inherits="CombuFrametemplate">
-        <Size>
-          <AbsDimension x="250" y="9" />
-        </Size>
-        <Anchors>
-		  <Anchor point="TOPLEFT" relativeTo="LBtrackerPosition" relativePoint="TOPLEFT">
-            <Offset>
-              <AbsDimension x="0" y="-33" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -1531,6 +1441,7 @@ CombuLanguage = {
    "English",
    "Francais",
    "Deutsch",
+   "Italiano",
    "Chinese Traditional 繁體中文",
    "Chinese Simplified 简体中文",
    "Korean"

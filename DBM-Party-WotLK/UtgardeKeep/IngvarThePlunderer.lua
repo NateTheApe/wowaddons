@@ -1,15 +1,15 @@
-local mod	= DBM:NewMod("IngvarThePlunderer", "DBM-Party-WotLK", 10)
+local mod	= DBM:NewMod(640, "DBM-Party-WotLK", 10, 285)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(23980, 23954)
-mod:SetModelID(21953)
+mod:SetEncounterID(575, 576)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
 mod:RegisterKill("yell", L.YellCombatEnd)
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_REMOVED"

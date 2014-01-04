@@ -35,7 +35,7 @@ local DROPDOWN_BARTEXTFORMAT = {
 	["Deficit"] = "deficit",
 };
 
--- Options
+-- Options -- The "y" value of a category subtable, will further increase the vertical position of the *next* item
 local activePage = 1;
 local frames = {};
 local options = {
@@ -55,10 +55,11 @@ local options = {
 	-- Special
 	{
 		[0] = "Special",
-		{ type = "Slider", var = "gttScale", label = "GameTooltip Scale", min = 0.2, max = 4, step = 0.05 },
+		{ type = "Slider", var = "gttScale", label = "Tooltip Scale", min = 0.2, max = 4, step = 0.05 },
 		{ type = "Slider", var = "updateFreq", label = "Tip Update Frequency", min = 0, max = 5, step = 0.05, y = 24 },
 		{ type = "Check", var = "enableChatHoverTips", label = "Enable ChatFrame Hover Hyperlinks", tip = "When hovering the mouse over a link in the chatframe, show the tooltip without having to click on it" },
-		{ type = "Check", var = "hideFactionText", label = "Hide Faction Text", tip = "Strips the Alliance or Horde faction text from the tooltip", y = 16 },
+		{ type = "Check", var = "hideFactionText", label = "Hide Faction Text", tip = "Strips the Alliance or Horde faction text from the tooltip" },
+		{ type = "Check", var = "hideRealmText", label = "Hide Coalesced Realm Text", tip = "Strips the Coalesced Realm text from the tooltip" },
  	},
 	-- Colors
 	{
@@ -69,7 +70,7 @@ local options = {
 		{ type = "Color", subType = 2, var = "colRace", label = "Race & Creature Type Color", tip = "The color of the race and creature type text" },
 		{ type = "Color", subType = 2, var = "colLevel", label = "Neutral Level Color", tip = "Units you cannot attack will have their level text shown in this color", y = 12 },
 		{ type = "Check", var = "colorNameByClass", label = "Color Player Names by Class Color", tip = "With this option on, player names are colored by their class color, otherwise they will be colored by reaction" },
-		{ type = "Check", var = "classColoredBorder", label = "Color Tip Border by Class Color", tip = "For players, the border color will be colored to match the color of their class", y = 12 },
+		{ type = "Check", var = "classColoredBorder", label = "Color Tip Border by Class Color", tip = "For players, the border color will be colored to match the color of their class" },
 	},
 	-- Reactions
 	{

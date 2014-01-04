@@ -1,15 +1,16 @@
 local mod	= DBM:NewMod("ValkTwins", "DBM-Coliseum")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 35 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(34497, 34496)
+mod:SetEncounterID(1089)
 mod:SetModelID(29240)
 mod:SetMinCombatTime(30)
 mod:SetUsedIcons(5, 6, 7, 8)
 
-mod:RegisterCombat("yell", L.YellPull)
+mod:RegisterCombat("yell", L.YellPull)--TODO: why is this using pull yell instead of combat?
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_REMOVED",
@@ -182,7 +183,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		self:ScheduleMethod(0.75, "warnDebuff")
 	elseif args:IsSpellID(65879, 65916) then -- Power of the Twins 
 		self:Schedule(0.1, showPowerWarning, self, args:GetDestCreatureID())
-	elseif args:IsSpellID(65874, 65858) then -- Shield of Darkness/Lights
+	elseif args:IsSpellID(65874, 65858) and DBM.BossHealth:IsShown() then -- Shield of Darkness/Lights
 		showShieldHealthBar(self, args.destGUID, args.spellName)
 	end
 end
@@ -193,13 +194,17 @@ function mod:SPELL_AURA_REMOVED(args)
 			specWarnKickNow:Show()
 		end
 		self:Unschedule(hideShieldHealthBar)
-		hideShieldHealthBar()
+		if DBM.BossHealth:IsShown() then
+			hideShieldHealthBar()
+		end
 	elseif args.spellId == 65858 then		-- Shield of Lights
 		if UnitCastingInfo("target") and self:GetUnitCreatureId("target") == 34497 then
 			specWarnKickNow:Show()
 		end
 		self:Unschedule(hideShieldHealthBar)
-		hideShieldHealthBar()
+		if DBM.BossHealth:IsShown() then
+			hideShieldHealthBar()
+		end
 	elseif args.spellId == 65950 then	-- Touch of Light
 		timerLightTouch:Stop(args.destName)
 		if self.Options.SetIconOnDebuffTarget then

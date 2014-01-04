@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
+    Decursive (v 2.7.3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -78,7 +78,7 @@ T._LoadedFiles["koKR.lua"] = false;
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "koKR");
 
 if not L then
-    T._LoadedFiles["koKR.lua"] = "2.7.2.9";
+    T._LoadedFiles["koKR.lua"] = "2.7.3";
     return;
 end;
 
@@ -113,8 +113,8 @@ L["CLASS_HUNTER"] = "사냥꾼"
 L["CLEAR_PRIO"] = "C"
 L["CLEAR_SKIP"] = "C"
 L["COLORALERT"] = "'%s'|1이;가; 필요할때의 알림 색상을 설정합니다."
-L["COLORCHRONOS"] = "크로노미터"
-L["COLORCHRONOS_DESC"] = "크로노미터의 색상을 설정합니다."
+L["COLORCHRONOS"] = "크로노미터" -- Needs review
+L["COLORCHRONOS_DESC"] = "크로노미터의 색상을 설정합니다." -- Needs review
 L["COLORSTATUS"] = "MUF 상태가 '%s'일때 색상을 설정합니다."
 L["CTRL"] = "Ctrl"
 L["CURE_PETS"] = "소환수 탐색과 해제"
@@ -165,7 +165,6 @@ L["GLOR4"] = [=[사랑과 우정은 그들은 언제 어디에서나 얻을 수 
 그는 가상 세계 속의 단지 익명 플레이어로써 훗날 38의 나이에 떠나갔지만, 진정한 친구들이라면 그를 영원히 그리워 할 것입니다.]=]
 L["GLOR5"] = "그는 언제나 기억될 것입니다..."
 L["HANDLEHELP"] = "작은 유닛 프레임(MUFs) 모두 이동"
-L["HIDE_LIVELIST"] = "실시간 목록 숨김"
 L["HIDE_MAIN"] = "Decursive 창 숨김"
 L["HIDESHOW_BUTTONS"] = "버튼 표시/숨김" -- Needs review
 L["HLP_LEFTCLICK"] = "좌-클릭"
@@ -209,7 +208,7 @@ L["OPT_ADDDEBUFF_USAGE"] = "<디버프명>"
 L["OPT_ADVDISP"] = "고급 표시 설정"
 L["OPT_ADVDISP_DESC"] = "각 MUF 사이 간격 설정을 위해 테두리와 가운데 구분의 투명도를 설정할 수 있습니다."
 L["OPT_AFFLICTEDBYSKIPPED"] = "%s - %s에 걸리면 무시합니다."
-L["OPT_ALLOWMACROEDIT"] = "매크로 형식 허용"
+L["OPT_ALLOWMACROEDIT"] = "매크로 형식 허용" -- Needs review
 L["OPT_ALLOWMACROEDIT_DESC"] = "당신이 원하는 편집할 수 있도록 해당 매크로가 Decursive로부터 업데이트되지 않도록 설정할 수 있습니다."
 L["OPT_ALWAYSIGNORE"] = "비전투시에도 항상 무시"
 L["OPT_ALWAYSIGNORE_DESC"] = "선택 시 해당 디버프는 전투 중이 아닐때도 무시됩니다."
@@ -244,8 +243,8 @@ L["OPT_CURINGOPTIONS_EXPLANATION"] = [=[당신이 치료를 원하는 재난의 
 http://www.wowace.com/addons/decursive/]=] -- Needs review
 L["OPT_CURINGORDEROPTIONS"] = "피해 형식과 우선순위"
 L["OPT_CURSECHECK_DESC"] = "체크 시 저주에 걸린 대상을 표시하고 치료합니다."
-L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "매크로 편집 허용 (고급 사용자용)"
-L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = "사용자 주문의 Decursive에서 사용하기 위해 내부 매크로를 편집하기 원하면 이것을 선택하세요."
+L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "매크로 편집 허용 (고급 사용자용)" -- Needs review
+L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = "사용자 주문의 Decursive에서 사용하기 위해 내부 매크로를 편집하기 원하면 이것을 선택하세요." -- Needs review
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "피해 형식"
 L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "이 주문은 Decursive 자동 구성설정의 일부입니다. 만약 이 주문이 올바르게 작동하지않으면, Decursive 동작 기본값을 되돌려 삭제 또는 비활성할 수 있습니다."
 L["OPT_CUSTOM_SPELL_MACRO_MISSING_NOMINAL_SPELL"] = "경고: 당신 매크로 상 %q 주문은 존재하지 않음, 거리와 대기시간 정보와 일치하지 않음..."
@@ -287,7 +286,6 @@ L["OPT_FILTEROUTCLASSES_FOR_X"] = "당신이 전투중인 동안 %q로 지정된
 L["OPT_GENERAL"] = "기본 설정"
 L["OPT_GROWDIRECTION"] = "MUF 표시 반전"
 L["OPT_GROWDIRECTION_DESC"] = "MUF를 하단에서 상단으로 표시합니다."
-L["OPT_HIDELIVELIST_DESC"] = "숨긴다면 해제된 대상의 정보를 표시합니다."
 L["OPT_HIDEMFS_GROUP"] = "솔로 또는 파티"
 L["OPT_HIDEMFS_GROUP_DESC"] = "MUF 창을 공격대에 속해있지 않을 때 숨겨둡니다."
 L["OPT_HIDEMFS_NEVER"] = "자동숨김 사용안함"
@@ -316,7 +314,7 @@ L["OPT_MACROBIND_DESC"] = [=['Decursive' 매크로를 호출 할 키를 지정�
 
 키를 누르고 키보드의 'Enter'키를 누르면 새롭게 지정된 키가 저장됩니다.(당신의 마우스 커서가 편집 구역내에 있어야 합니다)]=]
 L["OPT_MACROOPTIONS"] = "매크로 설정"
-L["OPT_MACROOPTIONS_DESC"] = "Decursive에 의해 생성된 매크로의 동작을 설정합니다."
+L["OPT_MACROOPTIONS_DESC"] = "Decursive에 의해 생성된 매크로의 동작을 설정합니다." -- Needs review
 L["OPT_MAGICCHARMEDCHECK_DESC"] = "체크 시 지배에 걸린 대상을 표시하고 치료합니다."
 L["OPT_MAGICCHECK_DESC"] = "체크 시 마법에 걸린 대상을 표시하고 치료합니다."
 L["OPT_MAXMFS"] = "표시할 최대 유닛"
@@ -382,10 +380,6 @@ L["OPT_REVERSE_LIVELIST_DESC"] = "실시간 목록을 아래에서 위로 생성
 L["OPT_SCANLENGTH_DESC"] = "각 탐색의 시간 간격을 지정합니다."
 L["OPT_SHOWBORDER"] = "직업 색상 테두리 표시"
 L["OPT_SHOWBORDER_DESC"] = "MUF에 유닛의 직업에 따른 색상을 테두리로 표시합니다."
-L["OPT_SHOWCHRONO"] = "크로노미터 표시"
-L["OPT_SHOWCHRONO_DESC"] = "유닛이 주문에 걸린 이후 경과된 초의 숫자를 표시합니다."
-L["OPT_SHOWCHRONOTIMElEFT"] = "남은 시간"
-L["OPT_SHOWCHRONOTIMElEFT_DESC"] = "경과한 시간 대신 남은 시간을 표시합니다."
 L["OPT_SHOWHELP"] = "도움말 표시"
 L["OPT_SHOWHELP_DESC"] = "작은 유닛 프레임에 마우스를 올리면 정보 툴팁을 표시합니다."
 L["OPT_SHOWMFS"] = "작은 유닛 프레임(MUF) 표시"
@@ -452,4 +446,4 @@ L["UNSTABLERELEASE"] = "비안정화판 배포"
 
 
 
-T._LoadedFiles["koKR.lua"] = "2.7.2.9";
+T._LoadedFiles["koKR.lua"] = "2.7.3";

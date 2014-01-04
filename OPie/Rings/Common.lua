@@ -1,5 +1,5 @@
-local AB = assert(OneRingLib.ext.ActionBook:compatible(1,5), "Requires a compatible version of ActionBook")
-local ORI = OneRingLib.ext.OPieUI
+local AB, _, T = assert(OneRingLib.ext.ActionBook:compatible(1,5), "Requires a compatible version of ActionBook"), ...
+local ORI, EV = OneRingLib.ext.OPieUI, T.Evie
 
 local function generateColor(c, n)
 	local hue, v, s = (15+(c-1)*360/n) % 360, 1, 0.85
@@ -16,12 +16,10 @@ local function generateColor(c, n)
 end
 
 do -- OPieTrinkets
-	OneRingLib:SetRing("OPieTrinkets", {
-		action=AB:create("collection", nil, { "OPieBundleTrinket0", "OPieBundleTrinket1",
-			OPieBundleTrinket0 = AB:get("item", (GetInventorySlotInfo("Trinket0Slot")), false, true),
-			OPieBundleTrinket1 = AB:get("item", (GetInventorySlotInfo("Trinket1Slot")), false, true),
-		}), name="Trinkets"
-	});
+	OneRingLib:SetRing("OPieTrinkets", AB:create("collection", nil, { "OPieBundleTrinket0", "OPieBundleTrinket1",
+		OPieBundleTrinket0 = AB:get("item", (GetInventorySlotInfo("Trinket0Slot")), false, true),
+		OPieBundleTrinket1 = AB:get("item", (GetInventorySlotInfo("Trinket1Slot")), false, true),
+	}), {name="Trinkets"});
 end
 do -- OPieTracker
 	local collectionData, map = {}, {}
@@ -53,9 +51,9 @@ do -- OPieTracker
 		end
 	end
 	local col = AB:create("collection", nil, collectionData)
-	OneRingLib:SetRing("OPieTracking", {name="Minimap Tracking", hotkey="ALT-F", action=col})
+	OneRingLib:SetRing("OPieTracking", col, {name="Minimap Tracking", hotkey="ALT-F"})
 	AB:observe("internal.collection.preopen", preClick, col)
-	EC_Register("PLAYER_ENTERING_WORLD", "OPie.AutoTrackerInit", function() return "remove", preClick(col, nil, col) end)
+	EV.RegisterEvent("PLAYER_ENTERING_WORLD", function() return "remove", preClick(col, nil, col) end)
 end
 do -- OPieAutoQuest
 	local whitelist, questItems, collection, inring, colId, ctok, current, changed = {[33634]=true, [35797]=true, [37888]=true, [37860]=true, [37859]=true, [37815]=true, [46847]=true, [47030]=true, [39213]=true, [42986]=true, [49278]=true, [86425]={31332, 31333, 31334, 31335, 31336, 31337}, [87214]={31752}, [90006]=true, [86536]=true, [86534]=true, [97268]=true}, {[30148]="72986 72985"}, {}, {}
@@ -145,7 +143,7 @@ do -- OPieAutoQuest
 		end
 	end
 	colId = AB:create("collection", nil, collection)
-	OneRingLib:SetRing("OPieAutoQuest", {name="Quest Items", hotkey="ALT-Q", action=colId})
+	OneRingLib:SetRing("OPieAutoQuest", colId, {name="Quest Items", hotkey="ALT-Q"})
 	AB:observe("internal.collection.preopen", syncRing)
-	EC_Register("PLAYER_REGEN_DISABLED", "OPie.AutoQuest", function() syncRing(nil, nil, colId) end);
+	EV.RegisterEvent("PLAYER_REGEN_DISABLED", function() syncRing(nil, nil, colId) end);
 end

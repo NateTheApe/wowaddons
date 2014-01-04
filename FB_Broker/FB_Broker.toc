@@ -1,8 +1,8 @@
-## Interface: 50300
+## Interface: 50400
 ## Title: Broker: Fishing Buddy
 ## Notes: Fishing Buddy controls using LibDataBroker 
 ## Author: Sutorix=AT=hotmail.com
-## Version: 1.19j
+## Version: 1.19n
 ## X-Category: Professions
 ## OptionalDeps: FishingBuddy
 ## SavedVariablesPerCharacter: FB_BrokerData

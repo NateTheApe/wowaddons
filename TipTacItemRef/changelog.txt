@@ -1,3 +1,8 @@
+TipTacItemRef Changes | 2013 Sep 21
+-----------------------------------
+- Changed the TOC version to 50400 for the 5.4 patch.
+- GetUpgradedItemLevel: Patch 5.4: Added IDs 491 to 498 to the table.
+
 TipTacItemRef Changes | 2013 May 22
 -----------------------------------
 - Changed the TOC version to 50300 for the 5.3 patch.

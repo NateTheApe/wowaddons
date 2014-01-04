@@ -6,7 +6,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("GladiatorlosSA")
 local LSM = LibStub("LibSharedMedia-3.0")
 local self, GSA = GladiatorlosSA, GladiatorlosSA
 local GSA_TEXT = "GladiatorlosSA"
-local GSA_VERSION = " v2.0.4"
+local GSA_VERSION = " v2.0.5"
 local GSA_AUTHOR = " updated by superk"
 
 local GSA_LOCALEPATH = {
@@ -113,7 +113,7 @@ local dbDefaults = {
 	}	
 }
 
-local function log(msg) DEFAULT_CHAT_FRAME:AddMessage("|cFF33FF22GSA|r:"..msg) end
+GSA.log = function(msg) DEFAULT_CHAT_FRAME:AddMessage("|cFF33FF22GladiatorlosSA|r: "..msg) end
 
 function GladiatorlosSA:OnInitialize()
 	if not self.spellList then

@@ -37,6 +37,7 @@ L.Color_soon = "Soon to expire"
 L.Color_seconds = "Under a minute"
 L.Color_minutes = "Under an hour"
 L.Color_hours = "One hour or more"
+L.Color_charging = "Restoring charges"
 
 L.SpiralOpacity = "Spiral transparency"
 L.UseAniUpdater = "Optimize performance"

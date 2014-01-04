@@ -1,4 +1,4 @@
-## Interface: 50300
+## Interface: 50400
 ## X-Min-Interface: 50001
 ## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Onyxia|r
 ## Title-frFR:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Repaire d'Onyxia|r
@@ -19,7 +19,6 @@
 ## X-DBM-Mod-No-Heroic: 1
 ## X-DBM-Mod-Sort: 203
 ## X-DBM-Mod-MapID: 249
-## X-DBM-Mod-LoadZoneID: 718
 localization.en.lua
 localization.de.lua
 localization.fr.lua
@@ -29,5 +28,4 @@ localization.kr.lua
 localization.tw.lua
 localization.es.lua
 localization.cn.lua
-MapSizes.lua
 Onyxia.lua

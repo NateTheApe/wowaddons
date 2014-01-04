@@ -1,12 +1,15 @@
-## Interface: 50300
+## Interface: 50400
 ## Title: OPie
+## Version: Mango 1
 ## Notes: Group abilities into rings that appear when you hold down a binding.
+## Notes-deDE: Gruppiere Fähigkeiten in Ringen die erscheinen wenn eine Tastenbelegung ausgelöst wird.
+## Notes-zhCN: 当你按下快捷键时显示一个环形的技能分组.
 ## Author: foxlit
 ## SavedVariables: OneRing_Config
-## Version: Lime 5
 ## X-Update-FeedURL: http://www.townlong-yak.com/opie/rss/main
 ## X-Website: http://www.townlong-yak.com/opie/
-EventLib.lua
+Evie.lua
+Meta\Reverse\Reverse.xml
 Locale.lua
 OneRingLib.lua
 OneRingIndication.lua

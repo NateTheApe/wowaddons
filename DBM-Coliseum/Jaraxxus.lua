@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod("Jaraxxus", "DBM-Coliseum")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 34 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(34780)
+mod:SetEncounterID(1087)
 mod:SetModelID(29615)
 mod:SetMinCombatTime(30)
 mod:SetUsedIcons(7, 8)
@@ -10,39 +11,35 @@ mod:SetUsedIcons(7, 8)
 mod:RegisterCombat("combat")
 
 mod:RegisterEvents(
+	"CHAT_MSG_MONSTER_YELL"
+)
+
+mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_REMOVED",
 	"SPELL_CAST_START",
 	"SPELL_CAST_SUCCESS",
 	"SPELL_DAMAGE",
 	"SPELL_HEAL",
-	"SPELL_PERIODIC_HEAL",
-	"CHAT_MSG_MONSTER_YELL"
+	"SPELL_PERIODIC_HEAL"
 )
-
-local isDispeller = select(2, UnitClass("player")) == "MAGE"
-	    		 or select(2, UnitClass("player")) == "PRIEST"
-	    		 or select(2, UnitClass("player")) == "SHAMAN"
-
-local isMagicDispeller = select(2, UnitClass("player")) == "PALADIN"
-	    		 or select(2, UnitClass("player")) == "PRIEST"
 
 local warnFelFireball			= mod:NewCastAnnounce(66532, 2)
 local warnPortalSoon			= mod:NewSoonAnnounce(66269, 3)
 local warnVolcanoSoon			= mod:NewSoonAnnounce(66258, 3)
 local warnFlame					= mod:NewTargetAnnounce(66197, 4)
 local warnFlesh					= mod:NewTargetAnnounce(66237, 4, nil, mod:IsHealer())
-local warnNetherPower			= mod:NewAnnounce("WarnNetherPower", 4, 67009)
+local warnNetherPower			= mod:NewTargetAnnounce(67009, 4)
 
 local specWarnFlame				= mod:NewSpecialWarningRun(66877)
 local specWarnFlesh				= mod:NewSpecialWarningYou(66237)
 local specWarnKiss				= mod:NewSpecialWarningYou(66334, false)
-local specWarnNetherPower		= mod:NewSpecialWarning("SpecWarnNetherPower", isDispeller)
+local specWarnNetherPower		= mod:NewSpecialWarningDispel(67009, mod:IsMagicDispeller())
 local specWarnFelInferno		= mod:NewSpecialWarningMove(66496)
-local SpecWarnFelFireball		= mod:NewSpecialWarning("SpecWarnFelFireball", false)
-local SpecWarnFelFireballDispel	= mod:NewSpecialWarningDispel(66532, isMagicDispeller)
+local SpecWarnFelFireball		= mod:NewSpecialWarningInterrupt(66532, false)
+local SpecWarnFelFireballDispel	= mod:NewSpecialWarningDispel(66532, mod:IsHealer())
 
-local timerCombatStart			= mod:NewTimer(84, "TimerCombatStart", 2457)--rollplay for first pull
+local timerCombatStart			= mod:NewCombatTimer(84)--rollplay for first pull
 local enrageTimer				= mod:NewBerserkTimer(600)
 local timerFlame 				= mod:NewTargetTimer(8, 66197)--There are 8 debuff Ids. Since we detect first to warn, use an 8sec timer to cover duration of trigger spell and damage debuff.
 local timerFlameCD				= mod:NewCDTimer(30, 66197)
@@ -54,15 +51,13 @@ local timerVolcanoCD			= mod:NewCDTimer(120, 66258)
 
 local soundLegionFlame			= mod:NewSound(66197)
 
-mod:AddBoolOption("LegionFlameWhisper", false, "announce")
-mod:AddBoolOption("LegionFlameIcon", true)
-mod:AddBoolOption("IncinerateFleshIcon", true)
-
-mod:RemoveOption("HealthFrame")
+mod:AddSetIconOption("LegionFlameIcon", 66197)
+mod:AddSetIconOption("IncinerateFleshIcon", 66237)
 mod:AddBoolOption("IncinerateShieldFrame", true, "misc")
 
 function mod:OnCombatStart(delay)
-	if self.Options.IncinerateShieldFrame then
+	if self.Options.IncinerateShieldFrame and DBM.BossHealth:IsShown() then
+		DBM.BossHealth:Clear()
 		DBM.BossHealth:Show(L.name)
 		DBM.BossHealth:AddBoss(34780, L.name)
 	end
@@ -73,10 +68,6 @@ function mod:OnCombatStart(delay)
 	timerFleshCD:Start(14-delay)
 	timerFlameCD:Start(20-delay)
 	enrageTimer:Start(-delay)
-end
-
-function mod:OnCombatEnd()
-	DBM.BossHealth:Clear()
 end
 
 function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
@@ -134,9 +125,10 @@ function mod:SPELL_AURA_APPLIED(args)
 		if args:IsPlayer() then
 			specWarnFlesh:Show()
 		end
-		setIncinerateTarget(self, args.destGUID, args.destName)
-		self:Schedule(15, clearIncinerateTarget, self, args.destName)
-
+		if DBM.BossHealth:IsShown() and self.Options.IncinerateShieldFrame then
+			setIncinerateTarget(self, args.destGUID, args.destName)
+			self:Schedule(15, clearIncinerateTarget, self, args.destName)
+		end
 	elseif args.spellId == 66197 then		-- Legion Flame ids 66199 (second debuff) do the actual damage. First 2 seconds are trigger debuff only.
 		local targetname = args.destName
 		timerFlame:Start(args.destName)
@@ -147,9 +139,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		end		
 		if self.Options.LegionFlameIcon then
 			self:SetIcon(args.destName, 7, 8)
-		end
-		if DBM:GetRaidRank() > 0 and self.Options.LegionFlameWhisper then
-			self:SendWhisper(L.WhisperFlame, targetname)
 		end
 	elseif args.spellId == 66334 and args:IsPlayer() then
 		specWarnKiss:Show()
@@ -164,7 +153,9 @@ function mod:SPELL_AURA_REMOVED(args)
 	if args.spellId == 66237 then			-- Incinerate Flesh
 		timerFlesh:Stop()
 		self:Unschedule(clearIncinerateTarget)
-		clearIncinerateTarget(self, args.destName)
+		if DBM.BossHealth:IsShown() and self.Options.IncinerateShieldFrame then
+			clearIncinerateTarget(self, args.destName)
+		end
 	end
 end
 

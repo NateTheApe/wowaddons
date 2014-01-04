@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod("GunshipBattle", "DBM-Icecrown", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 58 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 local AddsIcon
+--mod:SetEncounterID(1099)--TODO< see if this is better way than using yells, this may fire too late for my timers
 if UnitFactionGroup("player") == "Alliance" then
 	mod:RegisterCombat("yell", L.PullAlliance)
 	mod:RegisterKill("yell", L.KillAlliance)
@@ -19,11 +20,11 @@ end
 mod:SetMinCombatTime(50)
 
 mod:RegisterEventsInCombat(
+	"CHAT_MSG_MONSTER_YELL",
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_APPLIED_DOSE",
 	"SPELL_AURA_REMOVED",
-	"SPELL_CAST_START",
-	"CHAT_MSG_MONSTER_YELL"
+	"SPELL_CAST_START"
 )
 
 --TODO, see if IEEU fires here and if we need yell triggers for engage
@@ -36,7 +37,7 @@ local warnBladestorm		= mod:NewSpellAnnounce(69652, 3, nil, mod:IsMelee())
 local warnWoundingStrike	= mod:NewTargetAnnounce(69651, 2)
 local warnAddsSoon			= mod:NewAnnounce("WarnAddsSoon", 2, AddsIcon)
 
-local timerCombatStart		= mod:NewTimer(45, "TimerCombatStart", 2457)
+local timerCombatStart		= mod:NewCombatTimer(45)
 local timerBelowZeroCD		= mod:NewNextTimer(37.5, 69705)
 local timerBattleFuryActive	= mod:NewBuffActiveTimer(17, 69638, nil, mod:IsTank() or mod:IsHealer())
 local timerAdds				= mod:NewTimer(60, "TimerAdds", AddsIcon)
@@ -54,7 +55,6 @@ function mod:Adds()
 end
 
 function mod:OnCombatStart(delay)
-	DBM.BossHealth:Clear()
 	timerCombatStart:Show(-delay)
 	timerAdds:Start(60-delay)--First adds might come early or late so timer should be taken as a proximity only.
 	warnAddsSoon:Schedule(55)

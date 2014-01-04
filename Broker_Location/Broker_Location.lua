@@ -33,6 +33,7 @@ local DATABASE_DEFAULTS = {
 		show_zone = true,
 		show_subzone = true,
 		show_cords = true,
+		cords_decimal_precision = 0,
 		show_zonelevel = true,
 		show_minimap = false,
 		show_recommended = true,
@@ -111,7 +112,6 @@ addon.options = {
 				show_cords = {
 					order = 5,
 					type = 'toggle',
-					width = "full",
 					name = "Show coordinates",
 					desc = "Toggle to show coordinates.",
 					get = function()
@@ -121,8 +121,24 @@ addon.options = {
 						profileDB.show_cords = value
 					end,
 				},
-				show_zonelevel = {
+				cords_decimal_precision = {
 					order = 6,
+					type = "range",
+					name = "Coordinates decimal precision",
+					desc = "Set the number of visible decimals.",
+					min = 0, max = 2, step = 1,
+					get = function()
+						return profileDB.cords_decimal_precision
+					end,
+					set = function(key, value)
+						profileDB.cords_decimal_precision = value
+					end,
+					disabled = function()
+						return not profileDB.show_cords
+					end,
+				},
+				show_zonelevel = {
+					order = 7,
 					type = 'toggle',
 					width = "full",
 					name = "Show zone level",
@@ -135,7 +151,7 @@ addon.options = {
 					end,
 				},
 				show_minimap = {
-					order = 7,
+					order = 8,
 					type = 'toggle',
 					width = "full",
 					name = "Show location above minimap.",
@@ -328,7 +344,8 @@ function addon:GetLocationText()
 		if text ~= "" then
 			text = text .. " "
 		end
-		text = text .. _G.string.format("(%.0f, %.0f)", mapPositionX * 100, mapPositionY * 100)
+		local p = profileDB.cords_decimal_precision
+		text = text .. _G.string.format("(%."..p.."f, %."..p.."f)", mapPositionX * 100, mapPositionY * 100)
 	end
 
 	--color text

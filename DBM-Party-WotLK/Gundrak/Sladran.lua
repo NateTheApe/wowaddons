@@ -1,14 +1,14 @@
-local mod	= DBM:NewMod("Sladran", "DBM-Party-WotLK", 5)
+local mod	= DBM:NewMod(592, "DBM-Party-WotLK", 5, 274)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 7 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(29304)
-mod:SetModelID(26422)
+mod:SetEncounterID(383, 384)
 --mod:SetZone()
 
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_START"
 )
 

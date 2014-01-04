@@ -58,13 +58,8 @@ end
 local MinimapEvents = {};
 MinimapEvents[FBConstants.OPT_UPDATE_EVT] = function()
 	if (icon:IsRegistered(FBConstants.NAME)) then
-		if (GSB("MinimapButtonVisible")) then
-			icon:Show(FBConstants.NAME);
-			FishingBuddy_Player["MinimapData"].hide = false;
-		else
-			icon:Hide(FBConstants.NAME);
-			FishingBuddy_Player["MinimapData"].hide = true;
-		end
+		FishingBuddy_Player["MinimapData"].hide = not GSB("MinimapButtonVisible");
+		icon:Refresh(FBConstants.NAME, FishingBuddy_Player["MinimapData"]);
 	end
 end
 

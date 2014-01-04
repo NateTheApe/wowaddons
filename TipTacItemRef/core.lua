@@ -154,7 +154,7 @@ local function SetUnitAura_Hook(self,unit,index,filter)
 	if (cfg.if_enable) and (cfg.if_showAuraCaster) then
 		local _, _, _, _, _, _, _, casterUnit = UnitAura(unit,index,filter);
 		if (UnitExists(casterUnit)) then
-			self:AddLine(format("<Applied by %s>",UnitName(casterUnit) or UNKNOWN),unpack(cfg.if_infoColor));
+			self:AddLine(format("<Applied by %s>",UnitName(casterUnit) or UNKNOWNOBJECT),unpack(cfg.if_infoColor));
 			self:Show();
 		end
 	end

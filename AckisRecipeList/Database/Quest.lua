@@ -2,10 +2,10 @@
 ************************************************************************
 Quest.lua
 ************************************************************************
-File date: 2013-02-12T01:48:38Z
-File hash: de80792
-Project hash: 3fa6ce4
-Project version: 2.4.8
+File date: 2013-11-03T21:13:58Z
+File hash: bb16047
+Project hash: e8a8419
+Project version: 2.5.13
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -72,7 +72,6 @@ function addon:InitQuest()
 	AddQuest(7604,	Z.BLACKROCK_DEPTHS,		0,	0,	"Neutral")
 	AddQuest(8313,	Z.SILITHUS,			43.6,	42.0,	"Neutral")
 	AddQuest(8323,	Z.SILITHUS,			67.1,	69.7,	"Neutral")
-	AddQuest(8798,	Z.WINTERSPRING,			59.2,	49.8,	"Neutral")
 	AddQuest(9171,	Z.GHOSTLANDS,			48.3,	30.9,	"Horde")
 	AddQuest(9356,	Z.HELLFIRE_PENINSULA,		49.2,	74.8,	"Neutral")
 	AddQuest(9454,	Z.AZUREMYST_ISLE,		49.8,	51.9,	"Alliance")
@@ -108,6 +107,9 @@ function addon:InitQuest()
 	AddQuest(26623,	Z.DUSKWOOD,			73.8,	43.6,	"Alliance")
 	AddQuest(26860,	Z.LOCH_MODAN,			34.9,	49.1,	"Alliance")
 	AddQuest(31539,	Z.THE_JADE_FOREST,		54.8,	45.0,	"Neutral")
+	AddQuest(33022, Z.VALLEY_OF_THE_FOUR_WINDS,	53.6,	51.2,	"Neutral")
+	AddQuest(33024, Z.VALLEY_OF_THE_FOUR_WINDS,	53.6,	51.2,	"Neutral")
+	AddQuest(33027, Z.VALLEY_OF_THE_FOUR_WINDS,	53.6,	51.2,	"Neutral")
 
 	self.InitQuest = nil
 end

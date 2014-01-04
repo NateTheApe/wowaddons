@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod(744, "DBM-HeartofFear", nil, 330)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9668 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10819 $"):sub(12, -3))
 mod:SetCreatureID(62543)
+mod:SetEncounterID(1504)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
@@ -26,7 +27,7 @@ local warnBladeTempest					= mod:NewCastAnnounce(125310, 4)--Phase 1 heroic
 local warnStormUnleashed				= mod:NewSpellAnnounce(123815, 3)--Phase 2
 
 local specWarnUnseenStrike				= mod:NewSpecialWarningYou(122949)
-local specWarnUnseenStrikeOther			= mod:NewSpecialWarningTarget(122949)--Everyone needs to know this, and run to this person.
+local specWarnUnseenStrikeOther			= mod:NewSpecialWarningMoveTo(122949)--Everyone needs to know this, and run to this person.
 local yellUnseenStrike					= mod:NewYell(122949)
 local specWarnOverwhelmingAssault		= mod:NewSpecialWarningStack(123474, mod:IsTank(), 2)
 local specWarnOverwhelmingAssaultOther	= mod:NewSpecialWarningTarget(123474, mod:IsTank())
@@ -137,7 +138,7 @@ end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg:find("spell:122949") then--Does not show in combat log except for after it hits. IT does fire a UNIT_SPELLCAST event but has no target info. You can get target 1 sec faster with UNIT_AURA but it's more cpu and not worth the trivial gain IMO
-		local target = DBM:GetFullNameByShortName(target)
+		local target = DBM:GetUnitFullName(target)
 		warnUnseenStrike:Show(target)
 		timerUnseenStrike:Start()
 		timerUnseenStrikeCD:Start()

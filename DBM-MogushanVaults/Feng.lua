@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod(689, "DBM-MogushanVaults", nil, 317)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9663 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10819 $"):sub(12, -3))
 mod:SetCreatureID(60009)--60781 Soul Fragment
+mod:SetEncounterID(1390)
 mod:SetZone()
 mod:SetUsedIcons(8, 7, 6)
 
@@ -62,7 +63,7 @@ local specWarnDrawFlame				= mod:NewSpecialWarningSpell(116711, nil, nil, nil, 2
 --Arcane/Staff
 local specWarnArcaneShock			= mod:NewSpecialWarningStack(131790, mod:IsTank(), 2)
 local specWarnArcaneShockOther		= mod:NewSpecialWarningTarget(131790, mod:IsTank())
-local specWarnArcaneResonance		= mod:NewSpecialWarningYou(116417)
+local specWarnArcaneResonance		= mod:NewSpecialWarningMoveAway(116417)
 local yellArcaneResonance			= mod:NewYell(116417)
 local specWarnArcaneVelocity		= mod:NewSpecialWarningSpell(116364, nil, nil, nil, 2)
 --Shadow/Shield (Heroic Only)
@@ -101,7 +102,7 @@ local timerReversalLightningFists	= mod:NewBuffFadesTimer(20, 118302)
 local timerNullBarrier				= mod:NewBuffFadesTimer(6, 115817)
 local timerNullBarrierCD			= mod:NewCDTimer(55, 115817)
 
-local soundEpicenter				= mod:NewSound(116018, nil, false)
+local soundEpicenter				= mod:NewSound(116018, false)
 local soundWildSpark				= mod:NewSound(116784)
 
 mod:AddBoolOption("SetIconOnWS", true)

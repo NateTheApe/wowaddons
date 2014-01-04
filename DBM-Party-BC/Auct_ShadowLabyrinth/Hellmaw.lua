@@ -1,17 +1,17 @@
-local mod = DBM:NewMod("Hellmaw", "DBM-Party-BC", 10)
+local mod = DBM:NewMod(544, "DBM-Party-BC", 10, 253)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 337 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 526 $"):sub(12, -3))
 
 mod:SetCreatureID(18731)
-mod:SetModelID(18821)
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_SUCCESS"
 )
 
 local warnFear      = mod:NewSpellAnnounce(33547)
+
 local timerFear     = mod:NewNextTimer(25, 33547)
 
 local enrageTimer	= mod:NewBerserkTimer(180)

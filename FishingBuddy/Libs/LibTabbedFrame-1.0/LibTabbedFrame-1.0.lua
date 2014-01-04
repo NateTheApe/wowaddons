@@ -367,13 +367,11 @@ end
 tinsert(copyfuncs, "ToggleTab");
 
 local function HandlerFrame_OnShow(self)
-	UpdateMicroButtons();
 	self:ResetTabFrames();
 	return self.onshow and self.onshow(self);
 end
 
 function HandlerFrame_OnHide(self)
-	UpdateMicroButtons();
 	return self.onhide and self.onhide(self);
 end
 

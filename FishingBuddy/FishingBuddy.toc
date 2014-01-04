@@ -1,6 +1,6 @@
-## Interface: 50300
+## Interface: 50400
 ## Title: Fishing Buddy
-## Version: 1.2n
+## Version: 1.3a
 ## Notes: Help with fishing related tasks -- clothing, fish information, etc.
 ## Notes-deDE: Erleichtert das Angeln - Ausr\195\188stung und Fish-Infos
 ## Notes-frFR: Vous facilite la vie de pecheur. Informations sur les poissons, changement d'habits, etc.

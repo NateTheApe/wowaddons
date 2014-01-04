@@ -1,4 +1,4 @@
-﻿--Ion, a World of Warcraft® user interface addon.
+--Ion, a World of Warcraft® user interface addon.
 --Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved.
 
 Ion = {
@@ -68,6 +68,8 @@ IonCDB = {
 	perCharBinds = false,
 
 	fix07312012 = false,
+	
+	firstRun = true,
 
 	debug = {},
 }
@@ -2310,11 +2312,6 @@ local function control_OnEvent(self, event, ...)
 			end
 		end
 
-		-- if statements for 4.x compatibility
-		if (TalentMicroButtonAlert) then
-			TalentMicroButtonAlert:HookScript("OnShow", hideAlerts)
-		end
-
 		if (CompanionsMicroButtonAlert) then
 			CompanionsMicroButtonAlert:HookScript("OnShow", hideAlerts)
 		end
@@ -2322,6 +2319,7 @@ local function control_OnEvent(self, event, ...)
 	elseif (event == "PLAYER_ENTERING_WORLD" and not PEW) then
 
 		GDB.firstRun = false
+		CDB.firstRun = false
 
 		ION:UpdateSpellIndex()
 		ION:UpdatePetSpellIndex()
@@ -2346,7 +2344,7 @@ local function control_OnEvent(self, event, ...)
 	elseif (event == "ACTIVE_TALENT_GROUP_CHANGED" or
 		  event == "LEARNED_SPELL_IN_TAB" or
 		  event == "CHARACTER_POINTS_CHANGED" or
-          event == "SPELLS_CHANGED") then
+		  event == "SPELLS_CHANGED") then
 
 		updater.elapsed = 0
 		updater:Show()
@@ -2357,7 +2355,9 @@ local function control_OnEvent(self, event, ...)
 
 	elseif (event == "UNIT_PET" and ... == "player") then
 
-		ION:UpdatePetSpellIndex()
+		if (PEW) then
+			ION:UpdatePetSpellIndex()
+		end
 
 	elseif (event == "UNIT_LEVEL" and ... == "player") then
 

@@ -183,8 +183,7 @@ L:SetGeneralLocalization({
 })
 
 L:SetOptionLocalization({
-	SpecialWarningInjection		= "Spezialwarnung, wenn du von $spell:28169 betroffen bist",
-	SetIconOnInjectionTarget	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(28169)
+	SpecialWarningInjection		= "Spezialwarnung, wenn du von $spell:28169 betroffen bist"
 })
 
 L:SetWarningLocalization({
@@ -226,8 +225,8 @@ L:SetOptionLocalization({
 	WarningChargeChanged	= "Spezialwarnung, wenn deine Polarität gewechselt hat",
 	WarningChargeNotChanged	= "Spezialwarnung, wenn deine Polarität nicht gewechselt hat",
 	ArrowsEnabled			= "Zeige Pfeile (normale \"2-Camps\"-Strategie)",
-	ArrowsRightLeft			= "Zeige Links-/Rechtspfeil für die \"4-Camps\"-Strategie\n(Linkspfeil bei Polaritätsänderung, Rechtspfeil bei keiner Änderung)",
-	ArrowsInverse			= "Umgedrehte \"4-Camps\"-Strategie\n(Rechtspfeil bei Polaritätsänderung, Linkspfeil bei keiner Änderung)"
+	ArrowsRightLeft			= "Zeige Links-/Rechtspfeil für die \"4-Camps\"-Strategie<br/>(Linkspfeil bei Polaritätsänderung, Rechtspfeil bei keiner Änderung)",
+	ArrowsInverse			= "Umgedrehte \"4-Camps\"-Strategie<br/>(Rechtspfeil bei Polaritätsänderung, Linkspfeil bei keiner Änderung)"
 })
 
 L:SetWarningLocalization({
@@ -364,7 +363,7 @@ L:SetWarningLocalization({
 	WarningAirPhaseSoon	= "Luftphase in 10 Sek",
 	WarningAirPhaseNow	= "Luftphase",
 	WarningLanded		= "Bodenphase",
-	WarningDeepBreath	= "Frostatem",
+	WarningDeepBreath	= "Frostatem"
 })
 
 L:SetTimerLocalization({
@@ -387,9 +386,6 @@ L:SetOptionLocalization({
 	TimerPhase2			= "Zeige Zeit bis Phase 2",
 	specwarnP2Soon		= "Spezialwarnung 10 Sekunden bevor Kel'Thuzad angreift",
 	warnAddsSoon		= "Zeige Vorwarnung für Wächter von Eiskrone",
-	SetIconOnMC			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(28410),
-	SetIconOnManaBomb	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(27819),
-	SetIconOnFrostTomb	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(27808),
 	ShowRange			= "Zeige Abstandsfenster, wenn Phase 2 startet"
 })
 

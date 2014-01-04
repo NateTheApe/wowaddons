@@ -19,11 +19,13 @@ DBM_CORE_BIGWIGS_ICON_CONFLICT		= "DBM has detected that you have raid icons tur
 DBM_CORE_COMBAT_STARTED				= "%s engaged. Good luck and have fun! :)"
 DBM_CORE_COMBAT_STARTED_IN_PROGRESS	= "Engaged an in progress fight against %s. Good luck and have fun! :)"
 DBM_CORE_SCENARIO_STARTED			= "%s started. Good luck and have fun! :)"
+DBM_CORE_SCENARIO_STARTED_IN_PROGRESS	= "Joined %s as in progress. Good luck and have fun! :)"
 DBM_CORE_BOSS_DOWN					= "%s down after %s!"
 DBM_CORE_BOSS_DOWN_I				= "%s down! You have %d total victories."
 DBM_CORE_BOSS_DOWN_L				= "%s down after %s! Your last kill took %s and your fastest kill took %s. You have %d total victories."
 DBM_CORE_BOSS_DOWN_NR				= "%s down after %s! This is a new record! (Old record was %s). You have %d total victories."
 DBM_CORE_SCENARIO_COMPLETE			= "%s completed after %s!"
+DBM_CORE_SCENARIO_COMPLETE_I		= "%s completed! You have %d total clears."
 DBM_CORE_SCENARIO_COMPLETE_L		= "%s completed after %s! Your last clear took %s and your fastest clear took %s. You have %d total clears."
 DBM_CORE_SCENARIO_COMPLETE_NR		= "%s completed after %s! This is a new record! (Old record was %s). You have %d total clears."
 DBM_CORE_COMBAT_ENDED_AT			= "Combat against %s (%s) ended after %s."
@@ -43,7 +45,8 @@ DBM_CORE_MIN_FMT					= "%d min"
 DBM_CORE_SEC						= "sec"
 DBM_CORE_SEC_FMT					= "%d sec"
 
-DBM_CORE_GENERIC_WARNING_DUPLICATE	= "One of the %s"
+DBM_CORE_GENERIC_WARNING_OTHERS		= "and one other"
+DBM_CORE_GENERIC_WARNING_OTHERS2	= "and %d others"
 DBM_CORE_GENERIC_WARNING_BERSERK	= "Berserk in %s %s"
 DBM_CORE_GENERIC_TIMER_BERSERK		= "Berserk"
 DBM_CORE_OPTION_TIMER_BERSERK		= "Show timer for $spell:26662"
@@ -74,7 +77,8 @@ DBM_CORE_VERSIONCHECK_ENTRY			= "%s: %s (r%d)"--One Boss mod
 DBM_CORE_VERSIONCHECK_ENTRY_TWO		= "%s: %s (r%d) & %s (r%d)"--Two Boss mods
 DBM_CORE_VERSIONCHECK_ENTRY_NO_DBM	= "%s: No boss mod installed"
 DBM_CORE_VERSIONCHECK_FOOTER		= "Found %d player(s) with DBM & %d player(s) with Bigwigs"
-DBM_CORE_YOUR_VERSION_OUTDATED      = "Your version of Deadly Boss Mods is out-of-date. Please visit http://dev.deadlybossmods.com to get the latest version."
+DBM_CORE_YOUR_VERSION_OUTDATED      = "Your version of Deadly Boss Mods is out-of-date. Please visit http://www.deadlybossmods.com to get the latest version."
+DBM_CORE_OUTDATED_PVP_MODS			= "Your DBM-PvP mods are out of date and should be removed if they are not used, or updated to new stand alone package. These mods are no longer included with DBM-Core download. Latest PVP mods can be found at http://www.deadlybossmods.com"
 DBM_BIG_WIGS						= "BigWigs"
 DBM_BIG_WIGS_ALPHA					= "BigWigs Alpha"
 
@@ -82,8 +86,8 @@ DBM_CORE_UPDATEREMINDER_HEADER			= "Your version of Deadly Boss Mods is out-of-d
 DBM_CORE_UPDATEREMINDER_HEADER_ALPHA	= "Your alpha version of Deadly Boss Mods is out-of-date.\n You are at least %d test versions behind. It is recommended that DBM users use the latest alpha or latest stable version. Out of date alphas can lead to poor or incomplete functionality."
 DBM_CORE_UPDATEREMINDER_FOOTER			= "Press " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  " to copy the download link to your clipboard."
 DBM_CORE_UPDATEREMINDER_FOOTER_GENERIC	= "Press " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  " to copy the link to your clipboard."
-DBM_CORE_UPDATEREMINDER_NOTAGAIN		= "Show popup when a new version is available"
-DBM_CORE_UPDATEREMINDER_DISABLE			= "WARNING: Do to your Deadly Boss Mods being drastically (%d revisions) out of date, it has been disabled until updated. This is to ensure old and incompatable code doesn't cause poor play experience for yourself or fellow raid members."
+DBM_CORE_UPDATEREMINDER_DISABLE			= "WARNING: Do to your Deadly Boss Mods being drastically out of date (%d revisions), it has been disabled until updated. This is to ensure old and incompatable code doesn't cause poor play experience for yourself or fellow raid members."
+DBM_CORE_UPDATEREMINDER_HOTFIX			= "Your version of DBM will have incorrect timers or warnings during this boss encounter. This is corrected in an upcoming release or can be corrected immediately by updating to latest alpha release."
 
 DBM_CORE_MOVABLE_BAR				= "Drag me!"
 
@@ -123,16 +127,16 @@ DBM_CORE_SLASHCMD_HELP				= {
 	"/dbm broadcast timer <x> <text>: Broadcasts a <x> second DBM Timer with the name <text> to the raid (requires leader/promoted status).",
 	"/dbm break <min>: Starts a break timer for <min> minutes. Gives all raid members with DBM a break timer (requires leader/promoted status).",
 	"/dbm pull <sec>: Starts a pull timer for <sec> seconds. Gives all raid members with DBM a pull timer (requires leader/promoted status).",
-	"/dbm arrow: shows the DBM arrow, see /dbm arrow help for details.",
-	"/dbm lockout: asks raid members for their current raid instance lockouts (aliases: lockouts, ids) (requires leader/promoted status).",
-	"/dbm help: Shows this message.",
+	"/dbm arrow: Shows the DBM arrow, see /dbm arrow help for details.",
+	"/dbm lockout: Asks raid members for their current raid instance lockouts (aliases: lockouts, ids) (requires leader/promoted status).",
+	"/dbm lag: Performs a raid-wide latency check.",
+	"/dbm help: Shows this message."
 }
 
 DBM_ERROR_NO_PERMISSION				= "You don't have the required permission to do this."
 
 DBM_CORE_BOSSHEALTH_HIDE_FRAME		= "Close health frame"
 
-DBM_CORE_WORLD_BOSS					= "World Boss"
 DBM_CORE_UNKNOWN					= "unknown"--UNKNOWN which is "Unknown" (does u vs U matter?)
 DBM_CORE_LEFT						= "Left"
 DBM_CORE_RIGHT						= "Right"
@@ -146,7 +150,7 @@ DBM_CORE_TIMER_BREAK				= "Break time!"
 DBM_CORE_ANNOUNCE_BREAK_OVER		= "Break time is over"
 
 DBM_CORE_TIMER_PULL					= "Pull in"
-DBM_CORE_ANNOUNCE_PULL				= "Pull in %d sec"
+DBM_CORE_ANNOUNCE_PULL				= "Pull in %d sec (Sent by %s)"
 DBM_CORE_ANNOUNCE_PULL_NOW			= "Pull now!"
 
 DBM_CORE_ACHIEVEMENT_TIMER_SPEED_KILL = "Achievement"--BATTLE_PET_SOURCE_6
@@ -197,8 +201,11 @@ DBM_CORE_AUTO_SPEC_WARN_TEXTS = {
 	target		= "%s on >%%s<",
 	close		= "%s on >%%s< near you",
 	move		= "%s - move away",
+	moveaway	= "%s - move away from others",
+	moveto		= "%s - move to >%%s<",
 	run			= "%s - run away",
 	cast		= "%s - stop casting",
+	reflect		= "%s - stop attacking",
 	count		= "%s! (%%d)",
 	stack		= "%%d stacks of %s on you",
 	switch		= ">%s< - switch targets"
@@ -217,8 +224,11 @@ DBM_CORE_AUTO_SPEC_WARN_OPTIONS = {
 	target 		= "Show special warning when someone is affected by $spell:%s",
 	close 		= "Show special warning when someone close to you is affected by $spell:%s",
 	move 		= "Show special warning to move out from $spell:%s",
+	moveaway	= "Show special warning to move away from others for $spell:%s",
+	moveto		= "Show special warning to move to someone affected by $spell:%s",
 	run 		= "Show special warning to run away from $spell:%s",
-	cast 		= "Show special warning for $spell:%s cast",
+	cast 		= "Show special warning to stop casting for $spell:%s",--Spell Interrupt
+	reflect 	= "Show special warning to stop attacking $spell:%s",--Spell Reflect
 	count 		= "Show special warning for $spell:%s",
 	stack 		= "Show special warning when you are affected by >=%d stacks of $spell:%s",--too long?
 	switch		= "Show special warning to switch targets for $spell:%s"
@@ -255,6 +265,7 @@ DBM_CORE_AUTO_TIMER_OPTIONS = {
 
 
 DBM_CORE_AUTO_ICONS_OPTION_TEXT			= "Set icons on $spell:%s targets"
+DBM_CORE_AUTO_ICONS_OPTION_TEXT2		= "Set icons on $spell:%s"
 DBM_CORE_AUTO_SOUND_OPTION_TEXT			= "Play \"run away\" sound for $spell:%s"
 DBM_CORE_AUTO_COUNTDOWN_OPTION_TEXT		= "Play countdown sound for $spell:%s cooldown"
 DBM_CORE_AUTO_COUNTDOWN_OPTION_TEXT2	= "Play countdown sound for when $spell:%s fades"
@@ -263,7 +274,8 @@ DBM_CORE_AUTO_YELL_OPTION_TEXT			= "Yell when you are affected by $spell:%s"
 DBM_CORE_AUTO_YELL_ANNOUNCE_TEXT		= "%s on " .. UnitName("player") .. "!"
 DBM_CORE_AUTO_RANGE_OPTION_TEXT			= "Show range frame (%s) for $spell:%s"--string used for range so we can use things like "5/2" as a value for that field
 DBM_CORE_AUTO_RANGE_OPTION_TEXT_SHORT	= "Show range frame (%s)"--For when a range frame is just used for more than one thing
-
+DBM_CORE_AUTO_INFO_FRAME_OPTION_TEXT	= "Show info frame for $spell:%s"
+DBM_CORE_AUTO_READY_CHECK_OPTION_TEXT	= "Play ready check sound when boss is pulled (even if it's not targeted)"
 
 -- New special warnings
 DBM_CORE_MOVE_SPECIAL_WARNING_BAR	= "Special warning movable"
@@ -279,7 +291,7 @@ DBM_ARROW_ERROR_USAGE	= {
 	"/dbm arrow <x> <y>  creates an arrow that points to a specific locataion (0 < x/y < 100)",
 	"/dbm arrow <player>  creates and arrow that points to a specific player in your party or raid",
 	"/dbm arrow hide  hides the arrow",
-	"/dbm arrow move  makes the arrow movable",
+	"/dbm arrow move  makes the arrow movable"
 }
 
 DBM_SPEED_KILL_TIMER_TEXT	= "Record Victory"
@@ -300,3 +312,8 @@ DBM_INSTANCE_INFO_STATS_AWAY		= "Away: %s"
 DBM_INSTANCE_INFO_STATS_NO_RESPONSE	= "No recent DBM version installed: %s"
 DBM_INSTANCE_INFO_RESULTS			= "Instance ID scan results. Note that instances might show up more than once if there are players with localized WoW clients in your raid."
 DBM_INSTANCE_INFO_SHOW_RESULTS		= "Players yet to respond: %s\n|HDBM:showRaidIdResults|h|cff3588ff[Show results now]|r|h"
+
+DBM_CORE_LAG_CHECKING				= "Checking raid Latency..."
+DBM_CORE_LAG_HEADER					= "Deadly Boss Mods - Latency Results"
+DBM_CORE_LAG_ENTRY					= "%s: World delay [%d ms] / Home delay [%d ms]"
+DBM_CORE_LAG_FOOTER					= "No Response: %s"

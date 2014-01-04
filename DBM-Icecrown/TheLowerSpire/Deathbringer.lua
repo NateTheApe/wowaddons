@@ -1,12 +1,17 @@
 local mod	= DBM:NewMod("Deathbringer", "DBM-Icecrown", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 58 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(37813)
+mod:SetEncounterID(1096)
 mod:SetModelID(30790)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
 
 mod:RegisterCombat("combat")
+
+mod:RegisterEvents(
+	"CHAT_MSG_MONSTER_YELL"
+)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
@@ -14,8 +19,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_SUMMON",
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_REMOVED",
-	"UNIT_HEALTH boss1",
-	"CHAT_MSG_MONSTER_YELL"
+	"UNIT_HEALTH boss1"
 )
 
 local warnFrenzySoon		= mod:NewSoonAnnounce(72737, 2, nil, mod:IsTank() or mod:IsHealer())
@@ -30,7 +34,7 @@ local warnRuneofBlood		= mod:NewTargetAnnounce(72410, 3, nil, mod:IsTank() or mo
 local specwarnMark			= mod:NewSpecialWarningTarget(72293, false)
 local specwarnRuneofBlood	= mod:NewSpecialWarningTarget(72410, mod:IsTank())
 
-local timerCombatStart		= mod:NewTimer(48, "TimerCombatStart", 2457)
+local timerCombatStart		= mod:NewCombatTimer(48)
 local timerRuneofBlood		= mod:NewNextTimer(20, 72410, nil, mod:IsTank() or mod:IsHealer())
 local timerBoilingBlood		= mod:NewNextTimer(15.5, 72385)
 local timerBloodNova		= mod:NewNextTimer(20, 72378)
@@ -42,7 +46,6 @@ mod:AddBoolOption("RangeFrame", mod:IsRanged())
 mod:AddBoolOption("RunePowerFrame", true, "misc")
 mod:AddBoolOption("BeastIcons", true)
 mod:AddBoolOption("BoilingBloodIcons", false)
-mod:RemoveOption("HealthFrame")
 
 local warned_preFrenzy = false
 local boilingBloodTargets = {}
@@ -56,10 +59,11 @@ local function warnBoilingBloodTargets()
 end
 
 function mod:OnCombatStart(delay)
-	if self.Options.RunePowerFrame then
+	if DBM.BossHealth:IsShown() and self.Options.RunePowerFrame then
+		DBM.BossHealth:Clear()
 		DBM.BossHealth:Show(L.name)
 		DBM.BossHealth:AddBoss(37813, L.name)
-		self:ScheduleMethod(0.5, "CreateBossRPFrame")
+		self:ScheduleMethod(1, "CreateBossRPFrame")
 	end
 	if self:IsDifficulty("heroic10", "heroic25") then
 		enrageTimer:Start(360-delay)
@@ -84,7 +88,6 @@ function mod:OnCombatEnd()
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Hide()
 	end
-	DBM.BossHealth:Clear()
 end
 
 do	-- add the additional Rune Power Bar
@@ -97,7 +100,10 @@ do	-- add the additional Rune Power Bar
 		end
 	end
 	function mod:CreateBossRPFrame()
-		DBM.BossHealth:AddBoss(getRunePowerPercent, L.RunePower)
+		local percent = getShieldPercent()
+		if percent then
+			DBM.BossHealth:AddBoss(getRunePowerPercent, L.RunePower)
+		end
 	end
 end
 
@@ -199,6 +205,6 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg:find(L.PullAlliance, 1, true) then
 		timerCombatStart:Start()
 	elseif msg:find(L.PullHorde, 1, true) then
-		timerCombatStart:Start(99)
+		timerCombatStart:Start(97.5)
 	end
 end

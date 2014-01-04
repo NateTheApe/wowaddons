@@ -3,7 +3,7 @@ HealersHaveToDie World of Warcraft Add-on
 Copyright (c) 2009-2013 by John Wellesz (Archarodim@teaser.fr)
 All rights reserved
 
-Version 2.1.4
+Version 2.3
 
 This is a very simple and light add-on that rings when you hover or target a
 unit of the opposite faction who healed someone during the last 60 seconds (can
@@ -39,7 +39,36 @@ local WARNING   = 2;
 local INFO      = 3;
 local INFO2     = 4;
 
+local UNPACKAGED = "@pro" .. "ject-version@";
+local VERSION = "2.3";
+
 local ADDON_NAME, T = ...;
+
+T._FatalError = function (TheError)
+
+    if not StaticPopupDialogs["HHTD_ERROR_FRAME"] then
+        StaticPopupDialogs["HHTD_ERROR_FRAME"] = {
+            text = "|cFFFF0000HHTD Fatal Error:|r\n%s",
+            button1 = "OK",
+            OnAccept = function()
+                T._FatalError_Diaplayed = false;
+                return false;
+            end,
+            timeout = 0,
+            whileDead = 1,
+            hideOnEscape = 1,
+            showAlert = 1,
+            preferredIndex = 3,
+        };
+    end
+
+    if not T._FatalError_Diaplayed then
+        StaticPopup_Show ("HHTD_ERROR_FRAME", TheError);
+        if T._DiagStatus then
+            T._FatalError_Diaplayed = true;
+        end
+    end
+end
 
 local _, _, _, tocversion = GetBuildInfo();
 T._tocversion = tocversion;
@@ -59,12 +88,15 @@ local L = HHTD.Localized_Text;
 HHTD.Constants = {};
 local HHTD_C = HHTD.Constants;
 
-HHTD_C.Healing_Classes = {
+--[=[
+HHTD_C.Healing_Classes = { -- unused
     ["PRIEST"]  = true,
     ["PALADIN"] = true,
     ["DRUID"]   = true,
     ["SHAMAN"]  = true,
+    ["MONK"]    = true,
 };
+--]=]
 
 HHTD_C.MaxTOC = tonumber(GetAddOnMetadata("Healers-Have-To-Die", "X-Max-Interface") or math.huge); -- once GetAddOnMetadata() was bugged and returned nil...
 
@@ -395,7 +427,7 @@ do
                 type = 'toggle',
                 name = L["OPT_ON"],
                 desc = L["OPT_ON_DESC"],
-                set = function(info) HHTD.db.global.Enabled = HHTD:Enable(); return HHTD.db.global.Enabled; end,
+                set = function(info) HHTD.db.global.Enabled = true; HHTD:Enable(); return HHTD.db.global.Enabled; end,
                 get = function(info) return HHTD:IsEnabled(); end,
                 hidden = function() return HHTD:IsEnabled(); end, 
 
@@ -436,7 +468,7 @@ do
                 name = L["OPT_VERSION"],
                 desc = L["OPT_VERSION_DESC"],
                 guiHidden = true,
-                func = function () HHTD:Print(L["VERSION"], '2.1.4,', L["RELEASE_DATE"], '2013-05-21T20:59:53Z') end,
+                func = function () HHTD:Print(L["VERSION"], '2.3,', L["RELEASE_DATE"], '2013-12-31T01:21:48Z') end,
                 order = -5,
             },
             core = {
@@ -446,7 +478,7 @@ do
                 args = {
                     Info_Header = {
                         type = 'header',
-                        name = L["VERSION"] .. ' 2.1.4 -- ' .. L["RELEASE_DATE"] .. ' 2013-05-21T20:59:53Z',
+                        name = L["VERSION"] .. ' 2.3 -- ' .. L["RELEASE_DATE"] .. ' 2013-12-31T01:21:48Z',
                         order = 1,
                     },
                     Pve = {
@@ -671,7 +703,7 @@ local DEFAULT__CONFIGURATION = {
         --@end-alpha@]===]
         Log = false,
         Pve = true,
-        PvpHSpecsOnly = true,
+        PvpHSpecsOnly = false,
         UHMHAP = true,
         HMHAP = 0.05,
         SetFriendlyHealersRole = true,
@@ -682,6 +714,14 @@ local DEFAULT__CONFIGURATION = {
 
 -- = Add-on Management functions {{{
 function HHTD:OnInitialize()
+-- Catch people updating add-ons while WoW is running before they post "it doesn't work!!!!" comments.
+    local versionInTOC = GetAddOnMetadata("Healers-Have-To-Die", "Version");
+
+    if versionInTOC and versionInTOC ~= VERSION and versionInTOC ~= UNPACKAGED and VERSION ~= UNPACKAGED then
+        T._DiagStatus = 2;
+        T._Diagmessage = "You have updated Healers-Have-To-Die while WoW was still running in the background.\n\nYou need to restart WoW completely or you might experience various issues with your add-ons until you do.";
+        T._FatalError(T._Diagmessage);
+    end
 
     self.db = LibStub("AceDB-3.0"):New("Healers_Have_To_Die", DEFAULT__CONFIGURATION);
 
@@ -700,6 +740,11 @@ end
 local PLAYER_FACTION = "";
 local PLAYER_GUID    = "";
 function HHTD:OnEnable()
+
+    if T._DiagStatus == 2 then
+        self:Disable();
+        return;
+    end
 
     REGISTER_HEALERS_ONLY_SPELLS_ONCE ();
 
@@ -737,6 +782,10 @@ end
 function HHTD:OnDisable()
 
     self:Print(L["DISABLED"]);
+
+    if T._DiagStatus == 2 then
+        self:Print("|cFFD00000"..T._Diagmessage.."|r");
+    end
 
 end
 -- }}}
@@ -971,7 +1020,7 @@ do
 
         -- detect a true healer
         if not record.isTrueHeal then
-            record.isTrueHeal = HHTD_C.Healers_Only_Spells_ByName[spellName];
+            record.isTrueHeal = HHTD_C.Healers_Only_Spells_ByName[spellName] or false;
         end
 
         if configRef.Log then -- {{{
@@ -1095,8 +1144,10 @@ do
                 self:Debug(INFO, "target is a hostile NPC");
             end
         end
-
-        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, (GetSpellInfo(33891)), "", HHTD.HealThreshold + 1);
+    
+        local class = select(2, UnitClass(unit));
+        local dummySpell = ({["DRUID"] = GetSpellInfo(033891), ["SHAMAN"] = GetSpellInfo(00974), ["PRIEST"] = GetSpellInfo(047515), ["PALADIN"] = GetSpellInfo(53563), ["MONK"] = GetSpellInfo(115175)})[class] or GetSpellInfo(3273);
+        self:COMBAT_LOG_EVENT_UNFILTERED(nil, 0, "DUMMY_HEAL", false, UnitGUID(unit), (UnitName(unit)), flags, 0, destGUID, destName, flags, 0, 0, dummySpell, "", HHTD.HealThreshold + 1);
     end
 
     -- http://www.wowpedia.org/API_COMBAT_LOG_EVENT

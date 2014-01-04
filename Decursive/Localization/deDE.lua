@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
+    Decursive (v 2.7.3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -74,7 +74,7 @@ T._LoadedFiles["deDE.lua"] = false;
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "deDE");
 
 if not L then
-    T._LoadedFiles["deDE.lua"] = "2.7.2.9";
+    T._LoadedFiles["deDE.lua"] = "2.7.3";
     return;
 end;
 
@@ -110,8 +110,8 @@ L["CLASS_HUNTER"] = "Jäger"
 L["CLEAR_PRIO"] = "C"
 L["CLEAR_SKIP"] = "C"
 L["COLORALERT"] = "Warnfarbe einstellen, wenn ein '%s' benötigt wird."
-L["COLORCHRONOS"] = "Chronometer"
-L["COLORCHRONOS_DESC"] = "Chronometer-Farbe einstellen"
+L["COLORCHRONOS"] = "Chronometer" -- Needs review
+L["COLORCHRONOS_DESC"] = "Chronometer-Farbe einstellen" -- Needs review
 L["COLORSTATUS"] = "Farbe für '%s' MUF-Status einstellen."
 L["CTRL"] = "Strg"
 L["CURE_PETS"] = "Begleiter scannen und reinigen"
@@ -157,7 +157,6 @@ In seinem Leben war er wie im Spiel - selbstlos, großzügig, treu und hingebung
 Er verließ uns im Alter von 38 Jahren; er ließ nicht bloß anonyme Spieler in einer virtuellen Welt zurück, sondern eine Gruppe treuer Freunde, die ihn für immer vermissen werden.]=]
 L["GLOR5"] = "Er wird immer in Erinnerung bleiben..."
 L["HANDLEHELP"] = "Alle Mikro-Einheiten-Rahmen (MUFs) bewegen"
-L["HIDE_LIVELIST"] = "Aktuelle Liste verbergen"
 L["HIDE_MAIN"] = "Decursive-Fenster verbergen"
 L["HIDESHOW_BUTTONS"] = "Verbergen-/Anzeigen-Schaltflächen" -- Needs review
 L["HLP_LEFTCLICK"] = "Linksklick"
@@ -200,7 +199,7 @@ L["OPT_ADDDEBUFF_USAGE"] = "<Name des Gebrechens>"
 L["OPT_ADVDISP"] = "Fortgeschrittene Anzeige-Optionen"
 L["OPT_ADVDISP_DESC"] = "Erlauben, die Transparenz des Rands und der Mitte getrennt einzustellen, den Abstand zwischen jedem MUF einzustellen."
 L["OPT_AFFLICTEDBYSKIPPED"] = "%s befallen von %s, wird jedoch übergangen."
-L["OPT_ALLOWMACROEDIT"] = "Makro-Bearbeitung zulassen"
+L["OPT_ALLOWMACROEDIT"] = "Makro-Bearbeitung zulassen" -- Needs review
 L["OPT_ALLOWMACROEDIT_DESC"] = "Aktivieren, um Decursive an der Aktualisierung seines Makros zu hindern, und dir die Bearbeitung zu ermöglichen."
 L["OPT_ALWAYSIGNORE"] = "Auch außerhalb des Kampfes ignorieren"
 L["OPT_ALWAYSIGNORE_DESC"] = "Falls Markiert, wird dieses Gebrechen auch dann ignoriert, wenn du dich nicht im Kampf befindest."
@@ -253,7 +252,6 @@ L["OPT_FILTEROUTCLASSES_FOR_X"] = "%q wird bei den spezifizierten Klassen ignori
 L["OPT_GENERAL"] = "Allgemeine Optionen"
 L["OPT_GROWDIRECTION"] = "Anzeige der MUFs umkehren"
 L["OPT_GROWDIRECTION_DESC"] = "Die MUFs werden von unten nach oben angezeigt."
-L["OPT_HIDELIVELIST_DESC"] = "Wenn nicht verborgen, wird eine informative Liste der verfluchten Personen angezeigt."
 L["OPT_HIDEMFS_GROUP"] = "im Solo- oder Gruppenspiel"
 L["OPT_HIDEMFS_GROUP_DESC"] = "Das MUF-Fenster verbergen, wenn du nicht in einem Schlachtzug bist."
 L["OPT_HIDEMFS_NEVER"] = "Niemals autom. verbergen"
@@ -278,7 +276,7 @@ L["OPT_MACROBIND_DESC"] = [=[Definiert die Taste, mit der das "Decursive"-Makro 
 
 Drücke die Taste und bestätige die Eingabe mit "Enter", um die neue Zuweisung zu speichern (mit deinem Mauszeiger über dem Bearbeitungsfeld)]=]
 L["OPT_MACROOPTIONS"] = "Makro-Optionen"
-L["OPT_MACROOPTIONS_DESC"] = "Das Verhalten des von Decursive erstellten Makros festlegen."
+L["OPT_MACROOPTIONS_DESC"] = "Das Verhalten des von Decursive erstellten Makros festlegen." -- Needs review
 L["OPT_MAGICCHARMEDCHECK_DESC"] = "Falls markiert, wirst du in der Lage sein, magisch verzauberte Einheiten zu sehen und zu heilen."
 L["OPT_MAGICCHECK_DESC"] = "Falls markiert, wirst du in der Lage sein, mit magischen Gebrechen behaftete Einheiten zu sehen und zu heilen."
 L["OPT_MAXMFS"] = "Maximale Anzahl der Einheiten, die angezeigt werden sollen"
@@ -337,10 +335,6 @@ L["OPT_REVERSE_LIVELIST_DESC"] = "Die aktuelle Liste wird von unten nach oben au
 L["OPT_SCANLENGTH_DESC"] = "Definiert den Zeitabstand zwischen jedem Scanvorgang"
 L["OPT_SHOWBORDER"] = "Umrandung in Klassenfarben anzeigen"
 L["OPT_SHOWBORDER_DESC"] = "Eine farbige Umrandung wird um die MUFs angezeigt, die der Klasse der Einheiten entspricht."
-L["OPT_SHOWCHRONO"] = "Zeitmesser anzeigen"
-L["OPT_SHOWCHRONO_DESC"] = "Die Anzahl der Sekunden, die verstrichen sind, seit eine Einheit von einem Gebrechen belegt worden ist, wird angezeigt."
-L["OPT_SHOWCHRONOTIMElEFT"] = "Zeit verbleibend"
-L["OPT_SHOWCHRONOTIMElEFT_DESC"] = "Zeige verbleibende Zeit an anstatt bereits verstrichener Zeit."
 L["OPT_SHOWHELP"] = "Hilfe anzeigen"
 L["OPT_SHOWHELP_DESC"] = "Zeigt einen detaillierten Tooltip an, wenn du die Maus über einen Mikro-Einheiten-Rahmen legst."
 L["OPT_SHOWMFS"] = "Mikro-Einheiten-Rahmen anzeigen"
@@ -405,4 +399,4 @@ L["UNSTABLERELEASE"] = "Instabile Veröffentlichung"
 
 
 
-T._LoadedFiles["deDE.lua"] = "2.7.2.9";
+T._LoadedFiles["deDE.lua"] = "2.7.3";

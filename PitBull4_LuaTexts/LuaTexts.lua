@@ -816,7 +816,7 @@ end
 local function set_text(font_string, ...)
 	local success = select(1,...) -- first arg is true if user code was successful
 	if not success then
-		geterrorhandler()(select(2,...))
+		pcall(geterrorhandler(),select(2,...))
 		font_string:SetText("{err}")
 	elseif select('#',...) > 1 and select(2,...) ~= nil then
 		local success, err = pcall(font_string.SetFormattedText,font_string,select(2,...))
@@ -826,12 +826,29 @@ local function set_text(font_string, ...)
 			-- to fix the ? for the name of the function we're calling.  xpcall would handle
 			-- the latter for us but it requires a lot of overhead that's just not worth it.
 			local output = "PitBull4_LuaTexts:"..font_string.frame.layout..":"..font_string.luatexts_name.." caused the following error:\n"..err:gsub("'%?'","'SetFormattedText'")
-			geterrorhandler()(output)
+			pcall(geterrorhandler(),output)
 			font_string:SetText("{err}")
 		end
 	else
 		-- not enough parameters so just set an empty string
 		font_string:SetText('')
+	end
+end
+
+local function set_font(font_string)
+	local font, size = font_string:GetFont()
+	local success, err = pcall(font_string.SetFont,font_string,font,size,PitBull4_LuaTexts.outline)
+	if not success then
+		local output = "PitBull4_LuaTexts:"..font_string.frame.layout..":"..font_string.luatexts_name.." caused the following error when calling SetFont("..tostring(font)..","..tostring(size)..","..tostring(PitBull4_LuaTexts.outline).."):\n"..err:gsub("'%?'","'SetFont)'")
+		pcall(geterrorhandler(),output)
+	end
+end
+
+local function set_alpha(font_string)
+	local success, err = pcall(font_string.SetAlpha,font_string,PitBull4_LuaTexts.alpha)
+	if not success then
+		local output = "PitBull4_LuaTexts:"..font_string.frame.layout..":"..font_string.luatexts_name.." caused the following error when calling SetAlpha("..tostring(PitBull4_LuaTexts.alpha).."):\n"..err:gsub("'%?'","'SetAlpha)'")
+		pcall(geterrorhandler(),output)
 	end
 end
 
@@ -882,9 +899,8 @@ local function update_text(font_string, event)
 	PitBull4_LuaTexts.outline = nil
 
 	set_text(font_string,pcall(func,unit))
-	local font,size = font_string:GetFont()
-	font_string:SetFont(font,size,PitBull4_LuaTexts.outline)
-	font_string:SetAlpha(PitBull4_LuaTexts.alpha)
+	set_font(font_string)
+	set_alpha(font_string)
 end
 
 local next_spell, next_rank, next_target

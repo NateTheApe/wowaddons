@@ -158,17 +158,24 @@ L:SetWarningLocalization{
 }
 
 L:SetTimerLocalization{
-	timerCombatStarts		= "Бой начинается",
 	timerLostSoulsCD		= "Восст. Заблудшие души"
 }
 
 L:SetOptionLocalization{
 	specWarnLostSouls		= "Спец-предупреждение, когда появляются Заблудшие души",
 	specWarnEnslavePitLord	= "Спец-предупреждение поработить демона, когда Властитель преисподней активируется/освобождается",
-	timerCombatStarts		= "Отсчет времени до начала боя",
 	timerLostSoulsCD		= "Отсчет времени до появления следующих Заблудших душ"
 }
 
 L:SetMiscLocalization{
 	LostSouls				= "Face the souls of those your kind doomed to perish, Warlock!"
+}
+
+-------------------------------
+-- Finding Secret Ingredient --
+-------------------------------
+L= DBM:GetModLocalization("d745")
+
+L:SetMiscLocalization{
+	Clear		= "Well done!"
 }

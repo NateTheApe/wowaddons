@@ -46,8 +46,18 @@ CombuMBTrackerOptLocEN = {
 	["CombuMBTrackerbgcolornormal"] = "Background color",
 	["CombuMBTrackerLanguageInfo"] = "Language :",
 	["CombuMBTrackeredgecolornormal"] = "Border color",
+	["CombuMBtrackerPosition"] = "Tracker position :",
 	}
 
+-------------------------------
+-- table for Bomb tracker position dropdown
+CombuMBTrackerpositionEN = {
+   "Upside",
+   "Downside",
+   "Right Side",
+   "Left Side",
+   "Free"
+	}
 
 -------------------------------
 -- table for Autohide dropdown

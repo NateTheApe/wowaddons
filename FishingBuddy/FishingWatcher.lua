@@ -9,7 +9,7 @@ local MAX_FISHINGWATCH_LINES = 1;
 local WATCHDRAGGER_SHOW_DELAY = 0.5;
 
 local ELAPSEDTIME_LINE = 1;
-local WATCHDRAGGER_FADE_TIME = 0.15;
+local WATCHDRAGGER_FADE_TIME = 0.25;
 
 local zmto = FishingBuddy.ZoneMarkerTo;
 local zmex = FishingBuddy.ZoneMarkerEx;
@@ -32,19 +32,19 @@ local WatcherOptions = {
 		["tooltip"] = FBConstants.CONFIG_FISHWATCH_INFO,
 		["v"] = 1,
 		["m"] = 1,
+		["p"] = 1,
 		["default"] = 1 },
 	["WatchCurrentSkill"] = {
 		["text"] = FBConstants.CONFIG_FISHWATCHSKILL_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_FISHWATCHSKILL_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["default"] = 1,
 		["deps"] = { ["WatchFishies"] = "d" } },
 	["WatchOnlyWhenFishing"] = {
 		["text"] = FBConstants.CONFIG_FISHWATCHONLY_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_FISHWATCHONLY_INFO,
 		["v"] = 1,
-		["m"] = 1,
+		["m1"] = 1,
 		["default"] = 1,
 		["deps"] = { ["WatchFishies"] = "d" } },
 	["WatchCurrentZone"] = {
@@ -72,149 +72,63 @@ local WatcherOptions = {
 		["text"] = FBConstants.CONFIG_FISHWATCHPAGLE_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_FISHWATCHPAGLE_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["default"] = 1,
 		["deps"] = { ["WatchFishies"] = "d" } },
 };
 
 -- handle special frame actions
-local function PlaceDraggerFrame()
-	local where = FishingBuddy.GetSetting("WatcherLocation");
-	if ( not where ) then
+local function PlaceWatcherFrame(reset)
+	local where = FishingBuddy.BaseGetSetting("WatcherLocation");
+	if ( reset or not where ) then
 		where = {};
 		where.x = 0;
 		where.y = -384;
 	end
-	FishingWatchDrag:ClearAllPoints();
-	FishingWatchDrag:SetPoint("TOPLEFT", "UIParent", "TOPLEFT",
+	FishingWatchFrame:ClearAllPoints();
+	FishingWatchFrame:SetPoint("TOPLEFT", "UIParent", "TOPLEFT",
 											 where.x, where.y);
 end
 
--- a copy of the equivalent function from Blizz, but customized for our panel
-local function PanelTemplates_TabResize_Copy(tab, padding, absoluteSize, maxWidth, absoluteTextSize)
-	local tabName = tab:GetName();
-	
-	local buttonMiddle = getglobal(tabName.."Middle");
-	local buttonMiddleDisabled = getglobal(tabName.."MiddleDisabled");
-	local sideWidths = 2 * getglobal(tabName.."Left"):GetWidth();
-	local tabText = getglobal(tab:GetName().."Text");
-	local width, tabWidth;
-	local textWidth;
-	if ( absoluteTextSize ) then
-		textWidth = absoluteTextSize;
-	else
-		textWidth = tabText:GetWidth();
+local function SaveWatcherPosition()
+	local qx = UIParent:GetLeft()
+	local qy = UIParent:GetTop();
+	local wx = FishingWatchFrame:GetLeft()
+	local wy = FishingWatchFrame:GetTop();
+	local where;
+	if ( wx and wy ) then
+		where = {};
+		where.x = wx - qx;
+		where.y = wy - qy;
 	end
-	-- If there's an absolute size specified then use it
-	if ( absoluteSize ) then
-		if ( absoluteSize < sideWidths) then
-			width = 1;
-			tabWidth = sideWidths
-		else
-			width = absoluteSize - sideWidths;
-			tabWidth = absoluteSize
-		end
-		tabText:SetWidth(width);
-	else
-		-- Otherwise try to use padding
-		if ( padding ) then
-			width = textWidth + padding;
-		else
-			width = textWidth + 24;
-		end
-		-- If greater than the maxWidth then cap it
-		if ( maxWidth and width > maxWidth ) then
-			if ( padding ) then
-				width = maxWidth + padding;
-			else
-				width = maxWidth + 24;
-			end
-			tabText:SetWidth(width);
-		else
-			tabText:SetWidth(0);
-		end
-		tabWidth = width + sideWidths;
-	end
-	
-	if ( buttonMiddle ) then
-		buttonMiddle:SetWidth(width);
-	end
-	if ( buttonMiddleDisabled ) then
-		buttonMiddleDisabled:SetWidth(width);
-	end
-	
-	tab:SetWidth(tabWidth);
-	local highlightTexture = getglobal(tabName.."HighlightTexture");
-	if ( highlightTexture ) then
-		highlightTexture:SetWidth(tabWidth);
-	end
+	FishingBuddy.BaseSetSetting("WatcherLocation", where);
 end
 
-local function SizeDraggerFrame()
-	local width = FishingWatchFrame:GetWidth();
-	local height = FishingWatchFrame:GetHeight();
-	FishingWatchDrag:SetHeight(height);
-	FishingWatchDrag:SetWidth(width);
+local function FadingFinished()
+	FishingWatchDrag:Hide();
+	FishingWatchTab:Hide();
+	FishingWatchTab.finishedFunc = nil;	
 end
 
 local function ShowDraggerFrame()
-	if ( not FishingWatchTab:IsVisible() ) then
-		SizeDraggerFrame();
-		FishingWatchTab:SetText(FBConstants.NAME);
-		PanelTemplates_TabResize_Copy(FishingWatchTab, 10);
-		FishingWatchTab:Show();
-		FishingWatchDrag:Show();
-		UIFrameFadeIn(FishingWatchDrag, WATCHDRAGGER_FADE_TIME, 0, 0.15);
-		UIFrameFadeIn(FishingWatchTab, WATCHDRAGGER_FADE_TIME, 0, 1.0);
-	end
+	UIFrameFadeIn(FishingWatchDrag, WATCHDRAGGER_FADE_TIME, 0, 0.15);
+	UIFrameFadeIn(FishingWatchTab, WATCHDRAGGER_FADE_TIME, 0, 1.0);
 end
 
-local function FadeWatcherFrameOut(frame, alpha)
-	local fadeInfo = {};
-	fadeInfo.mode = "OUT";
-	fadeInfo.timeToFade = WATCHDRAGGER_FADE_TIME;
-	fadeInfo.startAlpha = alpha;
-	fadeInfo.endAlpha = 0;
-	local f = frame;
-	fadeInfo.finishedFunc = function() f:Hide() end;
-	UIFrameFade(frame, fadeInfo);
-end
-
-local function HideDraggerFrame(save)
-	if ( FishingWatchTab:IsVisible() ) then
-		if ( save ) then
-			local qx = UIParent:GetLeft()
-			local qy = UIParent:GetTop();
-			local wx = FishingWatchDrag:GetLeft()
-			local wy = FishingWatchDrag:GetTop();
-			local where;
-			if ( wx and wy ) then
-				where = {};
-				where.x = wx - qx;
-				where.y = wy - qy;
-			end
-			FishingBuddy.SetSetting("WatcherLocation", where);
-		end
-		FadeWatcherFrameOut(FishingWatchDrag, 0.15);
-		FadeWatcherFrameOut(FishingWatchTab, 1.0);
+local function HideDraggerFrame()
+	if (FishingWatchTab:IsShown()) then
+		FishingWatchTab.finishedFunc = FadingFinished;	
+		UIFrameFadeOut(FishingWatchDrag, WATCHDRAGGER_FADE_TIME, 0.15, 0);
+		UIFrameFadeOut(FishingWatchTab, WATCHDRAGGER_FADE_TIME, 1.0, 0);
 	end
 end
 
 local function ResetWatcherFrame(update)
-	PlaceDraggerFrame();
-	FishingWatchTab:Show();
-	FishingWatchDrag:Show();
-	FishingWatchDrag:ClearAllPoints();
-	FishingWatchDrag:SetPoint("CENTER", "UIParent", "CENTER", 0, 0);
-	HideDraggerFrame(true);
+	PlaceWatcherFrame(true);
+	SaveWatcherPosition();
 	if ( update ) then
 		FishingBuddy.WatchUpdate();
 	end
 end
-
-FishingBuddy.ShowDraggerFrame = ShowDraggerFrame;
-FishingBuddy.HideDraggerFrame = HideDraggerFrame;
-FishingBuddy.PlaceDraggerFrame = PlaceDraggerFrame;
 FishingBuddy.ResetWatcherFrame = ResetWatcherFrame;
 
 FishingBuddy.Commands[FBConstants.WATCHER] = {};
@@ -443,14 +357,20 @@ WatchEvents[FBConstants.ADD_FISHIE_EVT] = function(id, name, zone, subzone, text
 	end
 end
 
+local InvisibleOptions = {
+	-- options not directly manipulatable from the UI
+	["WatcherLocation"] = {
+		["default"] = { 0, -384 } },
+};
+
 WatchEvents["VARIABLES_LOADED"] = function()
 	ZoneFishingTime = 0;
 
-	-- Make everything draw at least once
-	ShowDraggerFrame();
-	HideDraggerFrame();
+	FishingWatchTab:SetText(FBConstants.NAME);
+	PanelTemplates_TabResize(FishingWatchTab, 10);
 	
 	FishingBuddy.OptionsFrame.HandleOptions(FBConstants.WATCHER_TAB, "Interface\\Icons\\Inv_Misc_Spyglass_03", WatcherOptions);
+	FishingBuddy.OptionsFrame.HandleOptions(nil, nil, InvisibleOptions);
 end
 
 WatchEvents[FBConstants.FISHING_ENABLED_EVT] = function()
@@ -651,11 +571,6 @@ end
 
 local function WatchUpdate()
 	local GSB = FishingBuddy.GetSettingBool;
-	local reset = FishingBuddy.GetSetting("ResetWatcher");
-	if ( not reset or reset < 1 ) then
-		ResetWatcherFrame(false);
-		FishingBuddy.SetSetting("ResetWatcher", 1);
-	end
 
 	local zone, subzone = FL:GetZoneInfo();
 	if ( zone == FBConstants.UNKNOWN ) then
@@ -663,22 +578,17 @@ local function WatchUpdate()
 	end
 
 	local noshow = NoShow();
-
+	
 	if ( noshow ) then
-		if ( FishingWatchFrame:IsVisible() ) then
-			HideDraggerFrame();
+		if ( FishingWatchFrame:IsShown() ) then
 			FishingWatchFrame:Hide();
-			for i=1, MAX_FISHINGWATCH_LINES, 1 do
-				local line = getglobal("FishingWatchLine"..i);
-				line:Hide();
-			end
 			timerframe:Hide();
 		end
 		return;
 	end
 
 	if ( not FishingWatchFrame:IsShown() ) then
-		PlaceDraggerFrame();
+		PlaceWatcherFrame();
 		FishingWatchFrame:Show();
 	end
 
@@ -739,16 +649,10 @@ local function WatchUpdate()
 
 	FishingWatchFrame:SetHeight((index - 1) * 13);
 	FishingWatchFrame:SetWidth(fishingWatchMaxWidth + 10);
-	SizeDraggerFrame();
 end
 FishingBuddy.WatchUpdate = WatchUpdate;
 
 FishingBuddy.WatchFrame.OnLoad = function(self)
-	self:ClearAllPoints();
-	self:SetPoint("TOPLEFT", "FishingWatchDrag", "TOPLEFT", 0, 0);
-
-	-- FishingWatchElapsedTime, FishingWatchCurrentZone, FishingWatchInfo, FishingWatchLine1
-	
 	timerframe = CreateFrame("FRAME");
 	timerframe:Hide();
 	timerframe:SetScript("OnUpdate", UpdateTimerLine);
@@ -769,7 +673,7 @@ FishingBuddy.WatchFrame.OnUpdate = function(self, elapsed)
 		if ( isDragging ) then
 			return;
 		end
-		if ( MouseIsOver(FishingWatchTab) or MouseIsOver(FishingWatchDrag) ) then
+		if ( MouseIsOver(FishingWatchFrame) or MouseIsOver(FishingWatchTab) ) then
 			local xPos, yPos = GetCursorPosition();
 			if ( hover ) then
 				if ( hover.xPos == xPos and hover.yPos == yPos ) then
@@ -786,31 +690,34 @@ FishingBuddy.WatchFrame.OnUpdate = function(self, elapsed)
 				hover.yPos = yPos;
 			end
 			if ( hover.hoverTime > WATCHDRAGGER_SHOW_DELAY ) then
-				ShowDraggerFrame();
-				hover.hoverTime = 0;
+				if (not hover.fadedin ) then
+					ShowDraggerFrame();
+				end
+				hover.fadedin = 1;
 			end
 		else
 			if ( hover ) then
 				hover.hoverTime = hover.hoverTime + elapsed;
 				if ( hover.hoverTime > WATCHDRAGGER_SHOW_DELAY ) then
-					HideDraggerFrame(true);
+					HideDraggerFrame();
 					hover = nil;
 				end
 			end
 		end
 	elseif ( hover ) then
-		HideDraggerFrame(true);
+		HideDraggerFrame();
 		hover = nil;
 	end
 end
 
 FishingBuddy.WatchFrame.OnDragStart = function(self)
 	isDragging = true;
-	FishingWatchDrag:StartMoving();
+	FishingWatchFrame:StartMoving();
 end
 
 FishingBuddy.WatchFrame.OnDragStop = function(self)
-	FishingWatchDrag:StopMovingOrSizing();
+	FishingWatchFrame:StopMovingOrSizing();
+	SaveWatcherPosition();
 	isDragging = nil;
 end
 

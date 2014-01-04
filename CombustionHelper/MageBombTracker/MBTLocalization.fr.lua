@@ -46,8 +46,18 @@ CombuMBTrackerOptLocFR = {
 	["CombuMBTrackerbgcolornormal"] = "Couleur du fond",
 	["CombuMBTrackerLanguageInfo"] = "Language :",
 	["CombuMBTrackeredgecolornormal"] = "Couleur des bordures",
+	["CombuMBtrackerPosition"] = "Position du moniteur :",
 	}
 
+-------------------------------
+-- table for Living bomb tracker position dropdown
+CombuMBTrackerpositionFR = {
+   "En haut",
+   "En bas",
+   "A droite",
+   "A gauche",
+   "Libre"
+	}
 
 -------------------------------
 -- table for Autohide dropdown

@@ -64,6 +64,7 @@ combumbtrackerdefaultsettingstable = {["combumbtrackerlock"] = false,
                             ["language"] = "Default",
 							["combumbtrackertimervalue"] = 2,
                             ["direction"] = "downward",
+                            ["combumbtrackerPosition"] = "upside",
 }
 
 function CombuMBTrackerLanguageCheck()
@@ -75,7 +76,7 @@ function CombuMBTrackerLanguageCheck()
             CombuMBTrackerLoc = CombuMBTrackerLocFR
             combumbtrackeroptioninfotable = combumbtrackeroptioninfotableFR
             CombuMBTrackerOptLoc = CombuMBTrackerOptLocFR
-            CombuMBTrackerLBposition = CombuMBTrackerLBpositionFR
+            CombuMBTrackerposition = CombuMBTrackerpositionFR
             CombuMBTrackerAutohideList = CombuMBTrackerAutohideListFR
             CombuMBTrackerLabel = CombuMBTrackerLabelFR
                 
@@ -84,7 +85,7 @@ function CombuMBTrackerLanguageCheck()
 			CombuMBTrackerLoc = CombuMBTrackerLocCN
 			combumbtrackeroptioninfotable = combumbtrackeroptioninfotableCN
 			CombuMBTrackerOptLoc = CombuMBTrackerOptLocCN
-			CombuMBTrackerLBposition = CombuMBTrackerLBpositionCN
+			CombuMBTrackerposition = CombuMBTrackerpositionCN
 			CombuMBTrackerAutohideList = CombuMBTrackerAutohideListCN
 			CombuMBTrackerLabel = CombuMBTrackerLabelCN
 			
@@ -93,7 +94,7 @@ function CombuMBTrackerLanguageCheck()
         else CombuMBTrackerLoc = CombuMBTrackerLocEN
             combumbtrackeroptioninfotable = combumbtrackeroptioninfotableEN
             CombuMBTrackerOptLoc = CombuMBTrackerOptLocEN
-            CombuMBTrackerLBposition = CombuMBTrackerLBpositionEN
+            CombuMBTrackerposition = CombuMBTrackerpositionEN
             CombuMBTrackerAutohideList = CombuMBTrackerAutohideListEN
             CombuMBTrackerLabel = CombuMBTrackerLabelEN
 
@@ -102,7 +103,7 @@ function CombuMBTrackerLanguageCheck()
     else CombuMBTrackerLoc = CombuMBTrackerLocEN
         combumbtrackeroptioninfotable = combumbtrackeroptioninfotableEN
         CombuMBTrackerOptLoc = CombuMBTrackerOptLocEN
-        CombuMBTrackerLBposition = CombuMBTrackerLBpositionEN
+        CombuMBTrackerposition = CombuMBTrackerpositionEN
         CombuMBTrackerAutohideList = CombuMBTrackerAutohideListEN
         CombuMBTrackerLabel = CombuMBTrackerLabelEN
         
@@ -313,6 +314,34 @@ function CombuMBTrackerFrameresize()
     CombuMBTrackerBorderFrame:SetFrameLevel(CombuMBTrackerFrame:GetFrameLevel())
     
     CombuMBTrackerAutohide()
+    
+    if (combumbtrackersettingstable["combumbtrackerPosition"] == "free") and (combumbtrackersettingstable["combumbtrackerlock"] == false) 
+        
+        then CombuMBTrackerFrame:EnableMouse(true)
+        
+    else
+        
+        CombuMBTrackerFrame:ClearAllPoints()
+    	
+		if (combumbtrackersettingstable["combumbtrackerPosition"] == "upside")
+			then CombuMBTrackerFrame:SetPoint("BOTTOM",CombustionFrame,"TOP",0,-6) --print(1)
+				 combumbtrackersettingstable["direction"] = "upward"
+				 CombuMBTrackerFrame:EnableMouse(false)
+		elseif (combumbtrackersettingstable["combumbtrackerPosition"] == "downside")
+			then CombuMBTrackerFrame:SetPoint("TOP",CombustionFrame,"BOTTOM",0,6) --print(2)
+				 combumbtrackersettingstable["direction"] = "downward"
+				 CombuMBTrackerFrame:EnableMouse(false)
+		elseif (combumbtrackersettingstable["combumbtrackerPosition"] == "rightside")
+			then CombuMBTrackerFrame:SetPoint("TOPLEFT",CombustionFrame,"TOPRIGHT",-6,0) --print(3)
+				 combumbtrackersettingstable["direction"] = "downward"
+				 CombuMBTrackerFrame:EnableMouse(false)
+		elseif (combumbtrackersettingstable["combumbtrackerPosition"] == "leftside")
+			then CombuMBTrackerFrame:SetPoint("TOPRIGHT",CombustionFrame,"TOPLEFT",6,0) --print(4)
+				 combumbtrackersettingstable["direction"] = "downward"
+				 CombuMBTrackerFrame:EnableMouse(false)
+		end
+	
+	end
     
     if CombustionFrame then CombustionFrameresize() end
 
@@ -896,6 +925,8 @@ end
 -------------------------------- ON_EVENT FUNCTION ----------------------------------------------------
 
 function CombuMBTracker_OnEvent(self, event, ...)
+    
+--~     print(event)
 
     if (event == "PLAYER_LOGIN") then
     	               
@@ -1035,7 +1066,7 @@ function CombuMBTracker_OnEvent(self, event, ...)
         
     	CombuMBTrackerBombChecker()
         
-	elseif event == "PLAYER_ALIVE" then
+	elseif event == "PLAYER_ALIVE" or event == "PLAYER_LOGIN" then
    
 -------------------------------
 --Frame lock check on startup

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Skeram", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 452 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 500 $"):sub(12, -3))
 mod:SetCreatureID(15263)
 mod:SetModelID(15345)
 mod:RegisterCombat("combat")
@@ -60,7 +60,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(20449, 4801, 8195) then
+	if args:IsSpellID(20449, 4801, 8195) and self:AntiSpam() then
 		warnTeleport:Show()
 	end
 end

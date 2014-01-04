@@ -73,7 +73,7 @@ combuoptioninfotableFR = {
 	["CombuTimervalue"] = "Entrez une valeur en secondes pour changer la zone d'alerte de toutes les barres de timers.",
 	["ComburefreshpyroButton"] = "Active les alertes dans votre fenêtre de discussion pour les oublis de Chaleur Continue et active le rapport d'utilisation en fin de combat.",
 	["CombuimpactButton"] = "Active la gestion de l'Impact et le changement de couleur de fond de la fenêtre principale quand Combustion est en cooldown.",
-	["CombutrackerButton"] = "Ajoute une barre de timer dans la zone de status pour montrer la durée de votre Combustion sur votre cible actuelle. Ajoute aussi les informations sur Combustion dans la fenetre de chat.",
+	["CombutrackerButton"] = "Ajoute une barre de timer dans la zone de status pour montrer la durée de votre Combustion sur votre cible actuelle et son cooldown. Ajoute aussi les informations sur Combustion dans la fenetre de chat.",
 	["CombuchatButton"] = "Active ou désactive l'affichage des messages de changement de configuration dans votre fenêtre de discussion.",
 	["CombuLBtrackerButton"] = "Active ou désactive le moniteur de bombe multiples. Cela ajoute un panneau à la fenêtre principale pour suivre les timers de vos bombes vivantes actives.",
 	["CombuLBtargetButton"] = "En désactivant ce réglage, le moniteur de bombe sera masqué quand vous n'avez qu'une seule bombe active et qu'elle est sur votre cible.",
@@ -137,7 +137,6 @@ CombuOptLocFR = {
 	["CombuchatButton"] = "Messages de configuration",
 	["CombuLBtrackerButton"] = "Moniteur de bombe",
 	["CombuLBtargetButton"] = "Montrer la cible dans le moniteur",
-	["LBtrackerPosition"] = "Position du moniteur :",
 	["CombuAutohideInfo"] = "Mode de masquage :",
 	["CombuBarButton"] = "Barres de timers",
 	["CombuBarSlider"] = "Largeur des barres",
@@ -175,15 +174,6 @@ CombuOptLocFR = {
 	["CombuLBEnableButton"] = "Active le suivi des bombes",
 	}
 
--------------------------------
--- table for Living bomb tracker position dropdown
-CombuLBpositionFR = {
-   "En haut",
-   "En bas",
-   "A droite",
-   "A gauche",
-   "Libre"
-	}
 
 -------------------------------
 -- table for Autohide dropdown

@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod(679, "DBM-MogushanVaults", nil, 317)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9656 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10819 $"):sub(12, -3))
 mod:SetCreatureID(60051, 60043, 59915, 60047)--Cobalt: 60051, Jade: 60043, Jasper: 59915, Amethyst: 60047
+mod:SetEncounterID(1395)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
@@ -27,7 +28,7 @@ local warnAmethystPool				= mod:NewTargetAnnounce(130774, 3, nil, false)
 local warnPowerDown					= mod:NewSpellAnnounce(116529, 4, nil, not mod:IsTank())
 
 local specWarnOverloadSoon			= mod:NewSpecialWarning("SpecWarnOverloadSoon", nil, nil, nil, 2)
-local specWarnJasperChains			= mod:NewSpecialWarningYou(130395)
+local specWarnJasperChains			= mod:NewSpecialWarningMoveTo(130395)
 local specWarnBreakJasperChains		= mod:NewSpecialWarning("specWarnBreakJasperChains", false)
 local yellJasperChains				= mod:NewYell(130395, nil, false)
 local specWarnAmethystPool			= mod:NewSpecialWarningMove(130774)
@@ -82,6 +83,18 @@ local function warnJasperChainsTargets()
 	table.wipe(jasperChainsTargets)
 end
 
+local function updateInfoFrame()
+	local lines = {}
+	for i = 1, 5 do
+		if UnitExists("boss"..i) then
+			lines[UnitName("boss"..i)] = UnitPower("boss"..i)
+		end
+	end
+	lines[UnitName("player")] = UnitPower("player", ALTERNATE_POWER_INDEX)
+
+	return lines
+end
+
 function mod:ThreeBossStart(delay)
 	for i = 1, 5 do
 		local id = self:GetUnitCreatureId("boss"..i)
@@ -106,7 +119,11 @@ function mod:OnCombatStart(delay)
 	playerHasChains = false
 	table.wipe(jasperChainsTargets)
 	table.wipe(amethystPoolTargets)
-	berserkTimer:Start()--7 min berserk on heroic 10 and 25 at least, unsure about normal/LFR, since i've never seen a log reach 7 min yet in LFR or normal
+	if self:IsDifficulty("heroic10", "heroic25") then
+		berserkTimer:Start(-delay)
+	else
+		berserkTimer:Start(485-delay)
+	end
 	if self:IsDifficulty("normal25", "heroic25") then
 		timerCobaltMineCD:Start(-delay)
 		timerJadeShardsCD:Start(-delay)
@@ -138,14 +155,15 @@ function mod:SPELL_AURA_APPLIED(args)
 			if self.Options.ArrowOnJasperChains and #jasperChainsTargets == 2 then
 				if jasperChainsTargets[1] == UnitName("player") then
 					DBM.Arrow:ShowRunTo(jasperChainsTargets[2])
+					specWarnJasperChains:Show(jasperChainsTargets[2])
 				elseif jasperChainsTargets[2] == UnitName("player") then
 					DBM.Arrow:ShowRunTo(jasperChainsTargets[1])
+					specWarnJasperChains:Show(jasperChainsTargets[1])
 				end
 			end
 		end
 		if args:IsPlayer() then
 			playerHasChains = true
-			specWarnJasperChains:Show()
 			if not self:IsDifficulty("lfr25") then
 				yellJasperChains:Yell()
 			end
@@ -238,21 +256,21 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 		timerPetrification:Start()
 		if self.Options.InfoFrame then
 			DBM.InfoFrame:SetHeader(Cobalt)
-			DBM.InfoFrame:Show(5, "enemypower", 1, nil, nil, ALTERNATE_POWER_INDEX)
+			DBM.InfoFrame:Show(5, "function", updateInfoFrame)
 		end
 	elseif spellId == 116006 then
 		activePetrification = "Jade"
 		timerPetrification:Start()
 		if self.Options.InfoFrame then
 			DBM.InfoFrame:SetHeader(Jade)
-			DBM.InfoFrame:Show(5, "enemypower", 1, nil, nil, ALTERNATE_POWER_INDEX)
+			DBM.InfoFrame:Show(5, "function", updateInfoFrame)
 		end
 	elseif spellId == 116036 then
 		activePetrification = "Jasper"
 		timerPetrification:Start()
 		if self.Options.InfoFrame then
 			DBM.InfoFrame:SetHeader(Jasper)
-			DBM.InfoFrame:Show(5, "enemypower", 1, nil, nil, ALTERNATE_POWER_INDEX)
+			DBM.InfoFrame:Show(5, "function", updateInfoFrame)
 		end
 		if playerHasChains then
 			local uId = DBM:GetBossUnitId(Jasper)
@@ -266,7 +284,7 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 		timerPetrification:Start()
 		if self.Options.InfoFrame then
 			DBM.InfoFrame:SetHeader(Amethyst)
-			DBM.InfoFrame:Show(5, "enemypower", 1, nil, nil, ALTERNATE_POWER_INDEX)
+			DBM.InfoFrame:Show(5, "function", updateInfoFrame)
 		end
 	elseif spellId == 129424 then
 		warnCobaltMine:Show()

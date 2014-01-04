@@ -3,7 +3,7 @@ HealersHaveToDie World of Warcraft Add-on
 Copyright (c) 2009-2010 by John Wellesz (Archarodim@teaser.fr)
 All rights reserved
 
-Version 2.1.4
+Version 2.3
 
 This is a very simple and light add-on that rings when you hover or target a
 unit of the opposite faction who healed someone during the last 60 seconds (can

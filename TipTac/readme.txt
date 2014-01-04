@@ -43,6 +43,16 @@ Saving Settings Per Character
 If you prefer to have TipTac configured differently on each of your characters, you will have to manually edit the "TipTac.toc" file.
 In this file, you will have to locate "SavedVariables", and change it into "SavedVariablesPerCharacter". You must restart WoW for it to take effect, and it will wipe your current settings.
 
+Upgraded Item Does Not Show the Correct ItemLevel
+-------------------------------------------------
+Preface: It's possible to avoid this issue alltogether by turning off the TipTacItemRef feature to "Show Item Level & ID".
+Unfortunately there is no API function to request the upgraded itemLevel of an item, the base itemLevel is always returned.
+This is an issue that I've tried to mend, by detecting the upgradeID on the item, and adding the upgraded levels manually.
+As new patches gets developed and items are added, new upgrades are introduced, which causes this detection to require an update as well.
+If you find an upgraded item that does not show the correct itemLevel, please do the following and report the chat output as well as the correct itemLevel.
+	/dump <shift click item into chat> <enter>
+Notice: It's possible that you do not have an addon installed which adds the /dump function to your interface. In such case, it becomes too complicated to explain here how to obtain the upgradeID.
+
 Lacking Features, Ideas & Problems
 ----------------------------------
 - Colorblind mode does not work properly with owned combat pets with a custom name.

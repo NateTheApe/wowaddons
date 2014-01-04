@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod("BPCouncil", "DBM-Icecrown", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 58 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(37970, 37972, 37973)
+mod:SetEncounterID(1095)
 mod:SetModelID(30858)
 mod:SetUsedIcons(7, 8)
 
@@ -196,7 +197,7 @@ end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg:match(L.EmpoweredFlames) then
-		local target = DBM:GetFullNameByShortName(target)
+		local target = DBM:GetUnitFullName(target)
 		warnEmpoweredFlames:Show(target)
 		if target == UnitName("player") then
 			specWarnEmpoweredFlames:Show()

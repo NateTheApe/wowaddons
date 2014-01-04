@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- Waypoint.lua
 -------------------------------------------------------------------------------
--- File date: 2013-04-22T07:39:18Z
--- File hash: 37f46d1
--- Project hash: 3fa6ce4
--- Project version: 2.4.8
+-- File date: 2013-12-08T01:31:22Z
+-- File hash: 768e80d
+-- Project hash: e8a8419
+-- Project version: 2.5.13
 -------------------------------------------------------------------------------
 -- Please see http://www.wowace.com/addons/arl/ for more information.
 -------------------------------------------------------------------------------
@@ -345,7 +345,7 @@ local WAYPOINT_FUNCS = {
 		end
 		local vendor = private.vendor_list[id_num]
 
-		if  private.Player.reputation_levels[private.reputation_list[vendor.reputation_id].name] then
+		if private.Player.reputation_levels[private.reputation_list[vendor.reputation_id].name] then
 			return vendor
 		end
 	end,
@@ -390,15 +390,7 @@ local function AddRecipeWaypoints(recipe_id, acquire_id, location_id, npc_id)
 
 		if waypoint_func and (not acquire_id or acquire_type == acquire_id) then
 			for id_num, id_info in pairs(acquire_info) do
-				if not npc_id or id_num == npc_id then
-					local waypoint = waypoint_func(id_num, recipe)
-
-					if waypoint and (not location_id or waypoint.location == location_id) then
-						waypoint.acquire_type = acquire_type
-						waypoint.reference_id = id_num
-						current_waypoints[waypoint] = recipe_id
-					end
-				elseif acquire_type == A.REPUTATION then
+				if acquire_type == A.REPUTATION then
 					for rep_level, level_info in pairs(id_info) do
 						for vendor_id in pairs(level_info) do
 							local waypoint = waypoint_func(vendor_id, recipe)
@@ -410,6 +402,14 @@ local function AddRecipeWaypoints(recipe_id, acquire_id, location_id, npc_id)
 								current_waypoints[waypoint] = recipe_id
 							end
 						end
+					end
+				elseif not npc_id or id_num == npc_id then
+					local waypoint = waypoint_func(id_num, recipe)
+
+					if waypoint and (not location_id or waypoint.location == location_id) then
+						waypoint.acquire_type = acquire_type
+						waypoint.reference_id = id_num
+						current_waypoints[waypoint] = recipe_id
 					end
 				end
 			end
@@ -568,7 +568,11 @@ function addon:AddWaypoint(recipe_id, acquire_id, location_id, npc_id)
 				table.insert(icon_list, uid)
 
 				SetWaypointIcon(uid, _G.Minimap:GetChildren())
-				SetWaypointIcon(uid, _G.TomTomMapOverlay:GetChildren())
+
+				if _G.TomTomMapOverlay then
+					SetWaypointIcon(uid, _G.TomTomMapOverlay:GetChildren())
+				end
+
 			end
 		else
 			--[===[@debug@

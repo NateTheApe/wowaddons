@@ -61,3 +61,6 @@ Future features
 - Remove "old" data from pre-current version continents (cheebc)
 - Add a way to keep track of the total "poundage" of special fish (Sarcandosa on El's Anglin')
 - Re-equip "normal" gear when you mount up after fishing (Djmcave@curse)
+- change the size of the font for the Watcher (notarika@curse)
+- approx time to next level feature (ala Titan Panel) (notarika@curse)
+- allow setting casting click to another mouse button (legba289)

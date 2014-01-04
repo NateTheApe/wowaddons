@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
+    Decursive (v 2.7.3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2012-12-10T01:03:44Z
+    This file was last updated on 2013-08-17T22:40:04Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -82,6 +82,7 @@ local UnitCanAttack     = _G.UnitCanAttack;
 local UnitName          = _G.UnitName;
 local UnitGUID          = _G.UnitGUID;
 local GetTime           = _G.GetTime;
+local IsShiftKeyDown    = _G.IsShiftKeyDown;
 
 -- GroupChanged(reason) {{{
 do
@@ -117,7 +118,7 @@ do
         end
 
         if reason ~= "UNIT_PET" then
-            if GetNumRaidMembers() ~= 0 or GetNumPartyMembers() ~= 0 then
+            if GetNumRaidMembers() ~= 0 or GetNumPartyMembers() ~= 0 then -- TO FIX
                 Grouped = true;
                 D:Debug("|cFF007700Grouped!!|r", Grouped);
             else
@@ -281,6 +282,17 @@ function D:ScheduledTasks() -- {{{
     end
 
 
+   if IsShiftKeyDown() then
+       if self.profile.CenterTextDisplay ~= "3_STACKS" then
+           self.Status.CenterTextDisplay  = "3_STACKS";
+       else
+           self.Status.CenterTextDisplay  = '1_TLEFT';
+       end
+   else
+       self.Status.CenterTextDisplay = self.profile.CenterTextDisplay;
+   end
+
+
     if self.DebuffUpdateRequest > status.MaxConcurentUpdateDebuff then
         status.MaxConcurentUpdateDebuff = self.DebuffUpdateRequest;
     end
@@ -383,6 +395,10 @@ function D:PLAYER_TARGET_CHANGED()
     else
         D.Status.TargetExists = false;
         self.Stealthed_Units["target"] = false;
+        if D.UnitDebuffed["target"] then
+            D.ForLLDebuffedUnitsNum = D.ForLLDebuffedUnitsNum - 1;
+            D.UnitDebuffed["target"] = false;
+        end
     end
 end
 
@@ -1109,6 +1125,6 @@ do
     end
 end
 
-T._LoadedFiles["Dcr_Events.lua"] = "2.7.2.9";
+T._LoadedFiles["Dcr_Events.lua"] = "2.7.3";
 
 -- The Great Below

@@ -57,7 +57,7 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	AnnounceFails			= "Объявлять игроков, потерпевших неудачу в Огненной стене и Расщелине тьмы\n(требуются права лидера или помощника)",
+	AnnounceFails			= "Объявлять игроков, потерпевших неудачу в Огненной стене и Расщелине тьмы<br/>(требуются права лидера или помощника)",
 	TimerTenebron			= "Отсчет времени до прибытия Тенеброна",
 	TimerShadron			= "Отсчет времени до прибытия Шадрона",
 	TimerVesperon			= "Отсчет времени до прибытия Весперона",
@@ -79,7 +79,7 @@ L:SetMiscLocalization({
 	FireWallOn		= "Огненная стена: %s",
 	VoidZoneOn		= "Расщелина тьмы: %s",
 	VoidZones		= "Потерпели неудачу в Расщелине тьмы (за эту попытку): %s",
-	FireWalls		= "Потерпели неудачу в Огненной стене (за эту попытку): %s",
+	FireWalls		= "Потерпели неудачу в Огненной стене (за эту попытку): %s"
 })
 
 ------------------------
@@ -99,11 +99,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	WarningSplitSoon	= "Предупреждать заранее о разделении",
-	RangeFrame			= "Показывать окно проверки дистанции (12 м)",
-	SetIconOnBrand		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74505)
-})
-
-L:SetMiscLocalization({
+	RangeFrame			= "Показывать окно проверки дистанции (12 м)"
 })
 
 -------------------------
@@ -115,18 +111,9 @@ L:SetGeneralLocalization({
 	name = "Савиана Огненная Пропасть"
 })
 
-L:SetWarningLocalization({
-	SpecialWarningTranq		= "Исступление - усмирите сейчас"
-})
-
 L:SetOptionLocalization({
-	SpecialWarningTranq		= "Спец-предупреждение о $spell:78722 (для усмирения)",
-	RangeFrame				= "Показывать окно проверки дистанции (10 м)",
-	BeaconIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74453)
+	RangeFrame				= "Показывать окно проверки дистанции (10 м)"
 })
-
-L:SetMiscLocalization{
-}
 
 --------------------------
 --  General Zarithrian  --
@@ -148,8 +135,7 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	WarnAdds		= "Объявлять новых помощников",
-	TimerAdds		= "Отсчет времени до новых помощников",
-	warnCleaveArmor	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(74367)
+	TimerAdds		= "Отсчет времени до новых помощников"
 })
 
 L:SetMiscLocalization({
@@ -166,19 +152,15 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	WarnPhase2Soon		= "Скоро фаза 2",
-	WarnPhase3Soon		= "Скоро фаза 3",
 	TwilightCutterCast	= "Применение заклинания Лезвие сумерек: 5 сек"
 })
 
 L:SetOptionLocalization({
-	WarnPhase2Soon			= "Предупреждать заранее о фазе 2 (на ~79%)",
-	WarnPhase3Soon			= "Предупреждать заранее о фазе 3 (на ~54%)",
 	TwilightCutterCast		= "Предупреждать о применении заклинания $spell:77844",
 	AnnounceAlternatePhase	= "Показывать предупреждения и таймеры для обоих миров",
-	SoundOnConsumption		= "Звуковой сигнал при $spell:74562 и $spell:74792",--We use localized text for these functions
-	SetIconOnConsumption	= "Устанавливать метки на цели заклинаний $spell:74562 и\n$spell:74792",--So we can use single functions for both versions of spell.
-	WhisperOnConsumption	= "Шепот целям заклинаний $spell:74562 и $spell:74792"
+	SoundOnConsumption		= "Звуковой сигнал при $spell:74562 или $spell:74792",--We use localized text for these functions
+	SetIconOnConsumption	= "Устанавливать метки на цели заклинаний $spell:74562 или $spell:74792",--So we can use single functions for both versions of spell.
+	WhisperOnConsumption	= "Шепот целям заклинаний $spell:74562 или $spell:74792 (требуется лидер рейда)"
 })
 
 L:SetMiscLocalization({

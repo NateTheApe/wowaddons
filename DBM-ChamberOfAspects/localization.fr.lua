@@ -97,11 +97,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	WarningSplitSoon	= "Show pre-warning for Split",
-	RangeFrame			= "Show range frame (12 yards)",
-	SetIconOnBrand		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74505)
-})
-
-L:SetMiscLocalization({
+	RangeFrame			= "Show range frame (12 yards)"
 })
 
 -------------------------
@@ -113,18 +109,9 @@ L:SetGeneralLocalization({
 	name = "Saviana Ragefire"
 })
 
-L:SetWarningLocalization({
-	SpecialWarningTranq		= "Enrage - Tranq now"
-})
-
 L:SetOptionLocalization({
-	SpecialWarningTranq		= "Show special warning for $spell:78722 (to tranq)",
-	RangeFrame				= "Show range frame (10 yards)",
-	BeaconIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74453)
+	RangeFrame				= "Show range frame (10 yards)"
 })
-
-L:SetMiscLocalization{
-}
 
 --------------------------
 --  General Zarithrian  --
@@ -146,8 +133,7 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	WarnAdds		= "Announce new adds",
-	TimerAdds		= "Show timer for new adds",
-	warnCleaveArmor	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(74367)
+	TimerAdds		= "Show timer for new adds"
 })
 
 L:SetMiscLocalization({
@@ -164,14 +150,10 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	WarnPhase2Soon		= "Phase 2 soon",
-	WarnPhase3Soon		= "Phase 3 soon",
 	TwilightCutterCast	= "Casting Twilight Cutter: 5 sec"
 })
 
 L:SetOptionLocalization({
-	WarnPhase2Soon			= "Show pre-warning for Phase 2 (at ~79%)",
-	WarnPhase3Soon			= "Show pre-warning for Phase 3 (at ~54%)",
 	TwilightCutterCast		= "Show warning when $spell:77844 is being cast",
 	AnnounceAlternatePhase	= "Show warnings/timers for phase you aren't in as well",
 	SoundOnConsumption		= "Play sound on $spell:74562 or $spell:74792",--We use localized text for these functions

@@ -12,7 +12,7 @@ L:SetGeneralLocalization{
 L:SetWarningLocalization{
 	WarnMark 		= "%s : %s",
 	WarnPhase		= "%s Phase",
-	SpecWarnMark	= "%s : %s",
+	SpecWarnMark	= "%s : %s"
 }
 
 L:SetTimerLocalization{
@@ -24,7 +24,7 @@ L:SetOptionLocalization{
 	WarnPhase		= "Show warning for next phase",
 	SpecWarnMark	= "Show warning when Marks debuff damage over 100%",
 	TimerMark		= "Show timer for next Marks",
-	RangeFrame		= "Show range frame (10 yards)"
+	RangeFrame		= DBM_CORE_AUTO_RANGE_OPTION_TEXT_SHORT:format(10)
 }
 
 L:SetMiscLocalization{
@@ -43,27 +43,19 @@ L:SetGeneralLocalization{
 
 L:SetWarningLocalization{
 	WarnSubmerge		= "Submerged",
-	WarnSubmergeSoon	= "Submerge in 10 sec",
-	WarnEmerge			= "Emerged",
-	WarnEmergeSoon		= "Emerge in 10 sec"
+	WarnEmerge			= "Emerged"
 }
 
 L:SetTimerLocalization{
-	TimerSubmerge		= "Sumberge",
-	TimerEmerge			= "Emerge"
+	TimerSubmerge		= "Sumberge CD",
+	TimerEmerge			= "Emerge CD"
 }
 
 L:SetOptionLocalization{
 	WarnSubmerge		= "Show warning when submerge",
-	WarnSubmergeSoon	= "Show pre-warning for submerge",
 	WarnEmerge			= "Show warning when emerge",
-	WarnEmergeSoon		= "Show pre-warning for emerge",
 	TimerSubmerge		= "Show time for submerge",
 	TimerEmerge			= "Show time for emerge"
-}
-
-L:SetMiscLocalization{
-	Spout	= "%s takes a deep breath!"
 }
 
 --------------------------
@@ -76,8 +68,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnPhase		= "%s Phase",
-	WarnPhaseSoon	= "%s Phase in 5 sec"
+	WarnPhase		= "%s Phase"
 }
 
 L:SetTimerLocalization{
@@ -86,7 +77,6 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	WarnPhase		= "Show warning for next phase",
-	WarnPhaseSoon	= "Show pre-warning for next phase",
 	TimerPhase		= "Show time for next phase",
 	DemonIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(37676)
 }
@@ -134,7 +124,7 @@ L:SetGeneralLocalization{
 
 L:SetWarningLocalization{
 	WarnMurlocs		= "Murlocs",
-	SpecWarnMurlocs	= "Murlocs Coming!",
+	SpecWarnMurlocs	= "Murlocs Coming!"
 }
 
 L:SetTimerLocalization{
@@ -194,5 +184,6 @@ L:SetOptionLocalization{
 
 L:SetMiscLocalization{
 	DBM_VASHJ_YELL_PHASE2	= "The time is now! Leave none standing!",
+	DBM_VASHJ_YELL_PHASE3	= "You may want to take cover.",
 	LootMsg					= "([^%s]+).*Hitem:(%d+)"
 }

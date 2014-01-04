@@ -13,7 +13,7 @@ L:SetGeneralLocalization{
 L:SetWarningLocalization{
 	WarnMark 		= "%s : %s",
 	WarnPhase		= "%s 단계",
-	SpecWarnMark	= "%s : %s",
+	SpecWarnMark	= "%s : %s"
 }
 
 L:SetTimerLocalization{
@@ -22,10 +22,9 @@ L:SetTimerLocalization{
 
 L:SetOptionLocalization{
 	WarnMark		= "징표 알림 보기",
-	WarnPhase		= "단계 변환 알림 보기",
+	WarnPhase		= "단계 전환 알림 보기",
 	SpecWarnMark	= "징표 피해가 100%를 넘을 경우 특수 경고 보기",
-	TimerMark		= "다음 징표 바 표시",
-	RangeFrame		= "거리 창 보기"
+	TimerMark		= "다음 징표 바 보기"
 }
 
 L:SetMiscLocalization{
@@ -44,27 +43,19 @@ L:SetGeneralLocalization{
 
 L:SetWarningLocalization{
 	WarnSubmerge		= "잠수",
-	WarnSubmergeSoon	= "10초 후 잠수",
-	WarnEmerge			= "재등장",
-	WarnEmergeSoon		= "10초 후 재등장"
+	WarnEmerge			= "재등장"
 }
 
 L:SetTimerLocalization{
-	TimerSubmerge		= "다음 잠수",
-	TimerEmerge			= "다음 재등장"
+	TimerSubmerge		= "잠수",
+	TimerEmerge			= "재등장"
 }
 
 L:SetOptionLocalization{
 	WarnSubmerge		= "잠수 알림 보기",
-	WarnSubmergeSoon	= "잠수 사전 알림 보기",
 	WarnEmerge			= "재등장 알림 보기",
-	WarnEmergeSoon		= "재등장 사전 알림 보기",
-	TimerSubmerge		= "다음 잠수 바 표시",
-	TimerEmerge			= "다음 재등장 바 표시"
-}
-
-L:SetMiscLocalization{
-	Spout	= "%s|1이;가; 깊은 숨을 쉽니다!"
+	TimerSubmerge		= "다음 잠수 바 보기",
+	TimerEmerge			= "다음 재등장 바 보기"
 }
 
 --------------------------
@@ -77,8 +68,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnPhase		= "%s 단계",
-	WarnPhaseSoon	= "5초 후 %s 단계"
+	WarnPhase		= "%s 단계"
 }
 
 L:SetTimerLocalization{
@@ -86,10 +76,8 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	WarnPhase		= "단계 변환 알림 보기",
-	WarnPhaseSoon	= "단계 변환 사전 알림 보기",
-	TimerPhase		= "다음 단계 변환 바 표시",
-	DemonIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(37676)
+	WarnPhase		= "단계 전환 알림 보기",
+	TimerPhase		= "다음 단계 바 보기"
 }
 
 L:SetMiscLocalization{
@@ -105,16 +93,7 @@ L:SetMiscLocalization{
 L = DBM:GetModLocalization("Fathomlord")
 
 L:SetGeneralLocalization{
-	name = "심연의 군주 카라드레스"
-}
-
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetOptionLocalization{
+	name = "심해군주 카라드레스"
 }
 
 L:SetMiscLocalization{
@@ -135,7 +114,7 @@ L:SetGeneralLocalization{
 
 L:SetWarningLocalization{
 	WarnMurlocs		= "멀록 소환",
-	SpecWarnMurlocs	= "멀록 소환!",
+	SpecWarnMurlocs	= "멀록 소환!"
 }
 
 L:SetTimerLocalization{
@@ -145,11 +124,7 @@ L:SetTimerLocalization{
 L:SetOptionLocalization{
 	WarnMurlocs		= "멀록 소환 알림 보기",
 	SpecWarnMurlocs	= "멀록 소환 특수 경고 보기",
-	TimerMurlocs	= "다음 멀록 소환 바 표시",
-	GraveIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(38049)
-}
-
-L:SetMiscLocalization{
+	TimerMurlocs	= "다음 멀록 소환 바 보기"
 }
 
 -----------------
@@ -178,22 +153,22 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	WarnElemental			= "오염된 정령 등장 사전 알림 보기",
-	WarnStrider				= "포자손 등장 사전 알림 보기",
-	WarnNaga				= "나가 등장 사전 알림 보기",
+	WarnElemental			= "오염된 정령 등장 이전에 알림 보기",
+	WarnStrider				= "포자손 등장 이전에 알림 보기",
+	WarnNaga				= "나가 등장 이전에 알림 보기",
 	WarnShield				= "보호막 사라짐 알림 보기",
 	WarnLoot				= "오염된 핵 획득 대상 알림 보기",
-	TimerElementalActive	= "오염된 정령 활성화 시간 바 표시",
-	TimerElemental			= "오염된 정령 대기시간 바 표시",
-	TimerStrider			= "다음 포자손 바 표시",
-	TimerNaga				= "다음 나가 바 표시",
+	TimerElementalActive	= "오염된 정령 활성화 시간 바 보기",
+	TimerElemental			= "오염된 정령 대기시간 바 보기",
+	TimerStrider			= "다음 포자손 바 보기",
+	TimerNaga				= "다음 나가 바 보기",
 	SpecWarnElemental		= "오염된 정령 등장 특수 경고 보기",
 	RangeFrame				= "거리 창 보기",
-	ChargeIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(38280),
 	AutoChangeLootToFFA		= "2 단계에서 전리품 획득 설정 자동으로 변경"
 }
 
 L:SetMiscLocalization{
 	DBM_VASHJ_YELL_PHASE2	= "때가 왔다! 한 놈도 살려두지 마라!",
+	DBM_VASHJ_YELL_PHASE3	= "숨을 곳이나 마련해 둬라!",
 	LootMsg					= "([^%s]+).*Hitem:(%d+)"
 }

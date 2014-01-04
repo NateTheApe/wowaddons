@@ -36,7 +36,7 @@ L:SetWarningLocalization({
 L:SetOptionLocalization({
 	WarnPhase			= "提示轉換階段",
 	specWarnBarrierNow	= "為你應該使用$spell:115817的時候顯示特別警告(只對隨機團隊有效)",
-	RangeFrame	= DBM_CORE_AUTO_RANGE_OPTION_TEXT_SHORT:format("6") .. "在祕法階段時",
+	RangeFrame	= DBM_CORE_AUTO_RANGE_OPTION_TEXT_SHORT:format("6") .. "在祕法階段時"
 })
 
 L:SetMiscLocalization({
@@ -92,8 +92,7 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	specWarnDespawnFloor		= "為地板消失之前顯示特別警告",
-	timerDespawnFloor			= "為地板消失顯示計時器",
-	SetIconOnCreature			= "為$journal:6193設置團隊圖示"
+	timerDespawnFloor			= "為地板消失顯示計時器"
 })
 
 

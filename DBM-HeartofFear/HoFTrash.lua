@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("HoFTrash", "DBM-HeartofFear")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9706 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10819 $"):sub(12, -3))
 --mod:SetModelID(47785)
 mod:SetZone()
 
@@ -16,7 +16,7 @@ local warnUnseenStrike			= mod:NewTargetAnnounce(122949, 4, 123017)
 local warnDispatch				= mod:NewSpellAnnounce(125877, 3)
 
 local specWarnUnseenStrike		= mod:NewSpecialWarningYou(123017)
-local specWarnUnseenStrikeOther	= mod:NewSpecialWarningTarget(123017)
+local specWarnUnseenStrikeOther	= mod:NewSpecialWarningMoveTo(123017)
 local yellUnseenStrike			= mod:NewYell(122949)
 local specWarnDispatch			= mod:NewSpecialWarningInterrupt(125877)
 
@@ -49,7 +49,7 @@ local function findUnseen()
 end
 
 function mod:SPELL_CAST_START(args)
-	if not mod.Options.Enabled then return end
+	if not self.Options.Enabled then return end
 	if args.spellId == 125877 then
 		warnDispatch:Show()
 		if args.sourceGUID == UnitGUID("target") then
@@ -59,7 +59,7 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
-	if not mod.Options.Enabled then return end
+	if not self.Options.Enabled then return end
 	if spellId == 122949 and self:AntiSpam() and self:GetCIDFromGUID(UnitGUID(uId)) == 64340 then
 		self:SendSync("UnseenTrash")
 	end

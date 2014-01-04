@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod("Deathwhisper", "DBM-Icecrown", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 58 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(36855)
+mod:SetEncounterID(1100)
 mod:SetModelID(30893)
 mod:SetUsedIcons(4, 5, 6, 7, 8)
 mod:RegisterCombat("combat")
@@ -53,7 +54,6 @@ mod:AddBoolOption("SetIconOnDominateMind", true)
 mod:AddBoolOption("SetIconOnDeformedFanatic", true)
 mod:AddBoolOption("SetIconOnEmpoweredAdherent", false)
 mod:AddBoolOption("ShieldHealthFrame", true)
-mod:RemoveOption("HealthFrame")
 
 local dominateMindTargets = {}
 local dominateMindIcon = 6
@@ -61,11 +61,12 @@ local deformedFanatic
 local empoweredAdherent
 
 function mod:OnCombatStart(delay)
-	if self.Options.ShieldHealthFrame then
+	if DBM.BossHealth:IsShown() and self.Options.ShieldHealthFrame then
+		DBM.BossHealth:Clear()
 		DBM.BossHealth:Show(L.name)
 		DBM.BossHealth:AddBoss(36855, L.name)
-		self:ScheduleMethod(0.5, "CreateShieldHPFrame")
-	end		
+		self:ScheduleMethod(1, "CreateShieldHPFrame")
+	end
 	berserkTimer:Start(-delay)
 	timerAdds:Start(7)
 	warnAddsSoon:Schedule(4)			-- 3sec pre-warning on start
@@ -79,10 +80,6 @@ function mod:OnCombatStart(delay)
 	empoweredAdherent = nil
 end
 
-function mod:OnCombatEnd()
-	DBM.BossHealth:Clear()
-end
-
 do	-- add the additional Shield Bar
 	local last = 100
 	local shieldName = GetSpellInfo(70842)
@@ -94,7 +91,10 @@ do	-- add the additional Shield Bar
 		end
 	end
 	function mod:CreateShieldHPFrame()
-		DBM.BossHealth:AddBoss(getShieldPercent, shieldName)
+		local percent = getShieldPercent()
+		if percent then
+			DBM.BossHealth:AddBoss(percent, shieldName)
+		end
 	end
 end
 

@@ -71,7 +71,6 @@ L:SetWarningLocalization({
 L:SetOptionLocalization({
 	specWarnCrystalShell	= "Spezialwarnung, falls dir der $spell:137633 Buff fehlt",
 	InfoFrame				= "Zeige Infofenster für Spieler ohne $spell:137633<br/>mit mehr als 90% Lebenspunkten",
-	SetIconOnTurtles		= "Setze Zeichen auf $journal:7129",
 	ClearIconOnTurtles		= "Entferne Zeichen von $journal:7129 im Zustand $spell:133971",
 	AnnounceCooldowns		= "Zähle akustisch die Anzahl der $spell:134920 Wirkungen<br/>(für \"Raid-Cooldowns\")"
 })
@@ -120,9 +119,19 @@ L:SetTimerLocalization({
 	timerFlockCD	= "Nest (%d): %s"
 })
 
+L:SetOptionLocalization({
+	ShowNestArrows		= "Zeige DBM-Pfeil für Nestaktivierung",
+	Never				= "Nie",
+	Northeast			= "Blau - Unten NO & Oben NO",
+	Southeast			= "Grün - Unten SO & Oben SO",
+	Southwest			= "Violett/Rot - Unten SW & Oben SW/Mitte (25er/10er)",
+	West				= "Rot - Unten W & Oben Mitte (nur 25er)",
+	Northwest			= "Gelb - Unten NW & Oben NW (nur 25er)",
+	Guardians			= "Nestwächter"
+})
+
 L:SetMiscLocalization({
-	eggsHatchL		= "Die Eier in einem der unteren Nester beginnen, aufzubrechen!",
-	eggsHatchU		= "Die Eier in einem der oberen Nester beginnen, aufzubrechen!",
+	eggsHatch		= "Nester beginnen, aufzubrechen!",
 	Upper			= "Oben",
 	Lower			= "Unten",
 	UpperAndLower	= "Oben & Unten",
@@ -157,7 +166,7 @@ L:SetOptionLocalization({
 	specWarnFogRevealed			= "Spezialwarnung, wenn ein Nebel offenbart wird",
 	ArrowOnBeam					= "Zeige DBM-Pfeil während $journal:6882 zur Anzeige der Ausweichrichtung",
 	InfoFrame					= "Zeige Infofenster für $spell:133795 Stapel",
-	SetParticle					= "Grafikeinstellung 'Partikeldichte' automatisch auf 'Niedrig' setzen\n(wird nach dem Kampfende auf die vorherige Einstellung zurückgesetzt)"
+	SetParticle					= "Grafikeinstellung 'Partikeldichte' automatisch auf 'Niedrig' setzen<br/>(wird nach dem Kampfende auf die vorherige Einstellung zurückgesetzt)"
 })
 
 L:SetMiscLocalization({
@@ -170,7 +179,7 @@ L:SetMiscLocalization({
 L= DBM:GetModLocalization(820)
 
 L:SetWarningLocalization({
-	warnDebuffCount				= "Mutationen: %d/5 gute, %d schlechte",
+	warnDebuffCount				= "Mutationen: %d/5 gute, %d schlechte"
 })
 
 L:SetOptionLocalization({
@@ -205,7 +214,7 @@ L:SetWarningLocalization({
 })
 
 L:SetOptionLocalization({
-	RangeFrame				= "Zeige dynamisches Abstandsfenster (10m)\n(mit Indikator für zuviele Spieler in Reichweite)",
+	RangeFrame				= "Zeige dynamisches Abstandsfenster (10m)<br/>(mit Indikator für zuviele Spieler in Reichweite)",
 	InfoFrame				= "Zeige Infofenster für Spieler mit $spell:136193"
 })
 
@@ -222,7 +231,7 @@ L:SetWarningLocalization({
 
 L:SetTimerLocalization({
 	timerDayCD		= "Nächste Tagphase",
-	timerDuskCD		= "Nächste Dämmerungsphase",
+	timerDuskCD		= "Nächste Dämmerungsphase"
 })
 
 L:SetMiscLocalization({
@@ -235,11 +244,18 @@ L:SetMiscLocalization({
 L= DBM:GetModLocalization(832)
 
 L:SetWarningLocalization({
-	specWarnIntermissionSoon	= "Unterbrechung bald"
+	specWarnIntermissionSoon	= "Unterbrechung bald",
+	warnDiffusionChainSpread	= "%s gesprungen auf >%s<"
+})
+
+L:SetTimerLocalization({
+	timerConduitCD				= "Erste Leitung CD"
 })
 
 L:SetOptionLocalization({
 	specWarnIntermissionSoon	= "Spezialvorwarnung für Unterbrechung",
+	warnDiffusionChainSpread	= "Verkünde Sprungziele von $spell:135991",
+	timerConduitCD				= "Abklingzeit der Fähigkeit der ersten Leitung anzeigen",
 	StaticShockArrow			= "Zeige DBM-Pfeil, wenn jemand von $spell:135695 betroffen ist",
 	OverchargeArrow				= "Zeige DBM-Pfeil, wenn jemand von $spell:136295 betroffen ist"
 })
@@ -253,12 +269,18 @@ L:SetMiscLocalization({
 ------------
 L= DBM:GetModLocalization(831)
 
+L:SetWarningLocalization({
+	specWarnUnstablVitaJump		= "Instabile Vita ist auf dich übergesprungen!"
+})
+
 L:SetOptionLocalization({
-	SetIconsOnVita		= "Setze Zeichen auf den Spieler mit dem Debuff $spell:138297 und den am weitesten davon entfernten Spieler"
+	specWarnUnstablVitaJump	= "Spezialwarnung, wenn $spell:138297 auf dich überspringt",
+	SetIconsOnVita			= "Setze Zeichen auf den Spieler mit dem Debuff $spell:138297 und den am weitesten davon entfernten Spieler"
 })
 
 L:SetMiscLocalization({
-	Defeat		= "Wait! I am... I am not your enemy."--translate (trigger)
+	Defeat						= "Wartet!",--needs to be verified (video-captured translation)
+	BigWigsRecommendation		= "Tipp: Du solltest für diesen Gegner die Mods \"BigWigs\" und \"BigWigs_Ra-denAssist\" nutzen, falls du eine automatische Einteilung der Spieler als Ziel für Instabile Vita benötigst."
 })
 
 -------------

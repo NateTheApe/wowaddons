@@ -98,11 +98,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	WarningSplitSoon	= "Zeige Vorwarnung für Aufspaltung",
-	RangeFrame			= "Zeige Abstandsfenster (12m)",
-	SetIconOnBrand		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74505)
-})
-
-L:SetMiscLocalization({
+	RangeFrame			= "Zeige Abstandsfenster (12m)"
 })
 
 -------------------------
@@ -114,18 +110,9 @@ L:SetGeneralLocalization({
 	name = "Saviana Flammenschlund"
 })
 
-L:SetWarningLocalization({
-	SpecialWarningTranq		= "Wutanfall - Einlullen/Beruhigen!"
-})
-
 L:SetOptionLocalization({
-	SpecialWarningTranq		= "Spezialwarnung für $spell:78722",
-	RangeFrame				= "Zeige Abstandsfenster (10m)",
-	BeaconIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74453)
+	RangeFrame				= "Zeige Abstandsfenster (10m)"
 })
-
-L:SetMiscLocalization{
-}
 
 --------------------------
 --  General Zarithrian  --
@@ -138,7 +125,7 @@ L:SetGeneralLocalization({
 
 L:SetWarningLocalization({
 	WarnAdds	= "Neue Adds",
-	warnCleaveArmor	= "%s auf >%s< (%s)"		-- Cleave Armor on >args.destName< (args.amount)
+	warnCleaveArmor	= "%s auf >%s< (%s)"
 })
 
 L:SetTimerLocalization({
@@ -147,8 +134,7 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	WarnAdds		= "Verkünde neue Adds",
-	TimerAdds		= "Zeige Zeit bis neue Adds erscheinen",
-	warnCleaveArmor	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(74367)
+	TimerAdds		= "Zeige Zeit bis neue Adds erscheinen"
 })
 
 L:SetMiscLocalization({
@@ -165,14 +151,10 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	WarnPhase2Soon		= "Phase 2 bald",
-	WarnPhase3Soon		= "Phase 3 bald",
 	TwilightCutterCast	= "Wirkt Zwielichtschnitter: 5 sec"
 })
 
 L:SetOptionLocalization({
-	WarnPhase2Soon			= "Zeige Vorwarnung für Phase 2 (bei ~79%)",
-	WarnPhase3Soon			= "Zeige Vorwarnung für Phase 3 (bei ~54%)",
 	TwilightCutterCast		= "Zeige Warnung, wenn $spell:74769 gewirkt wird",
 	AnnounceAlternatePhase	= "Zeige auch Warnungen/Timer für Phasen, in denen du dich nicht befindest",
 	SoundOnConsumption		= "Spiele Sound, wenn du von $spell:74562 oder $spell:74792 betroffen bist",

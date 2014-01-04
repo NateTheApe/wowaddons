@@ -36,24 +36,20 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("d286")
 
 L:SetWarningLocalization({
-	Submerged		= "Ахун исчез",
 	Emerged			= "Ахун появился",
 	specWarnAttack	= "Ахун уязвим - атакуйте сейчас!"
 })
 
 L:SetTimerLocalization{
 	SubmergTimer	= "Исчезновение",
-	EmergeTimer		= "Появление",
-	TimerCombat		= "Начало боя"
+	EmergeTimer		= "Появление"
 }
 
 L:SetOptionLocalization({
-	Submerged		= "Предупреждение, когда Ахун исчезает",
 	Emerged			= "Предупреждение, когда Ахун появляется",
 	specWarnAttack	= "Спец-предупреждение, когда Ахун становится уязвим",
 	SubmergTimer	= "Отсчет времени до исчезновения",
-	EmergeTimer		= "Отсчет времени до появления",
-	TimerCombat		= "Отсчет времени до начала боя",
+	EmergeTimer		= "Отсчет времени до появления"
 })
 
 L:SetMiscLocalization({
@@ -91,13 +87,8 @@ L:SetWarningLocalization({
 	warnHorsemanHead		= "Появилась голова всадника!"
 })
 
-L:SetTimerLocalization{
-	TimerCombatStart		= "Начало боя"
-}
-
 L:SetOptionLocalization({
 	WarnPhase				= "Предупреждение о смене фаз",
-	TimerCombatStart		= "Отсчет времени до начала боя",
 	warnHorsemanSoldiers	= "Предупреждать о призыве Пульсирующих тыкв",
 	warnHorsemanHead		= "Спец-предупрежение о появлении головы всадника"
 })
@@ -114,96 +105,4 @@ L = DBM:GetModLocalization("Greench")
 
 L:SetGeneralLocalization({
 	name = "Омерзительный Гринч"
-})
-
---------------------------
---  Blastenheimer 5000  --
---------------------------
-L = DBM:GetModLocalization("Cannon")
-
-L:SetGeneralLocalization({
-	name = "Подрывайстер 5000"
-})
-
--------------
---  Gnoll  --
--------------
-L = DBM:GetModLocalization("Gnoll")
-
-L:SetGeneralLocalization({
-	name = "Гноллобой"
-})
-
-L:SetWarningLocalization({
-	warnGameOverQuest	= "Заработано %d из %d возможных появившихся очков",
-	warnGameOverNoQuest	= "Игра окончилась с всего %d возможных появившихся очков",
-	warnGnoll			= "Гнолл появился",
-	warnHogger			= "Хоггер появился",
-	specWarnHogger		= "Хоггер появился!"
-})
-
-L:SetOptionLocalization({
-	warnGameOver	= "Объявлять общее возможное число очков при завершении игры",
-	warnGnoll		= "Объявлять появление Гнолла",
-	warnHogger		= "Объявлять появление Хоггера",
-	specWarnHogger	= "Спец-предупреждение при появлении Хоггера"
-})
-
-------------------------
---  Shooting Gallery  --
-------------------------
-L = DBM:GetModLocalization("Shot")
-
-L:SetGeneralLocalization({
-	name = "Тир"
-})
-
-L:SetOptionLocalization({
-	SetBubbles			= "Автоматически отключать сообщения в облачках во время $spell:101871\n(восстанавливает их после завершения игры)"
-})
-
-----------------------
---  Tonk Challenge  --
-----------------------
-L = DBM:GetModLocalization("Tonks")
-
-L:SetGeneralLocalization({
-	name = "Танковые баталии"
-})
-
------------------------
---  Darkmoon Rabbit  --
------------------------
-L = DBM:GetModLocalization("Rabbit")
-
-L:SetGeneralLocalization({
-	name = "Кролик ярмарки Новолуния"
-})
-
---------------------------
---  Plants Vs. Zombies  --
---------------------------
-L = DBM:GetModLocalization("PlantsVsZombies")
-
-L:SetGeneralLocalization({
-	name = "Растения против зомби"
-})
-
-L:SetWarningLocalization({
-	warnTotalAdds	= "Всего появилось зомби с прошлой большой волны: %d",
-	specWarnWave	= "Большая волна!"
-})
-
-L:SetTimerLocalization{
-	timerWave		= "След. большая волна"
-}
-
-L:SetOptionLocalization({
-	warnTotalAdds	= "Объявлять общее число появившихся аддов между каждой большой волной",
-	specWarnWave	= "Спец-предупреждение когда начинается большая волна",
-	timerWave		= "Отсчет времени до следующей большой волны"
-})
-
-L:SetMiscLocalization({
-	MassiveWave		= "Приближается большая волна зомби!"
 })

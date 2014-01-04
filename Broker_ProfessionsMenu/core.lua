@@ -3,7 +3,7 @@
 -- Author: Sanori/Pathur                                                      --
 --------------------------------------------------------------------------------
 local _, me = ...                                 --Includes all functions and variables
-me.version = "Version: 2.7 (27. May. 2013)"
+me.version = "Version: 2.8 (26. Sep. 2013)"
 
 
 
@@ -35,6 +35,7 @@ me.scantip:AddFontStrings(
 me.dropdown = LibStub('LibDewdrop-3.0')			--Dropdownmenu
 me.LDB = LibStub:GetLibrary("LibDataBroker-1.1")	--Data Broker
 me.TipHooker = LibStub("LibTipHooker-1.1")			--Tooltip mod
+me.libst = LibStub("ScrollingTable")			--include lib
 --<< Init variables and constants >>--
 me.quicklauncher = {}										--Quick Launcher
 me.sharedcds = {}												--shared cds
@@ -160,7 +161,6 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 	elseif event == "TRADE_SKILL_SHOW" then
 		--Trainer Data--------------------------------------------------
 		if (not me.Trainer and not me.notrainer) then	--Create Scroll List (call only once), create only if trainer module is enabled
-			me.libst = LibStub("ScrollingTable")			--include lib
 			me.Trainer = me.libst:CreateST({
 				{
 					["width"] = 20,			--icon
@@ -233,6 +233,7 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 		--Favorite Button-----------------------------------------------		
 		if not me.FavoriteButton then --Call only once
 			me.FavoriteButton=true
+			
 			--Hook Update Function
 			hooksecurefunc("TradeSkillFrame_Update",function()
 				me.FavoriteButtonProfID = nil
@@ -248,8 +249,10 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 					me.save[my].lastprofession = me.FavoriteButtonProfID	-- Save last opened profession window
 					local skillOffset = FauxScrollFrame_GetOffset(TradeSkillListScrollFrame)
 					for i=1, TRADE_SKILLS_DISPLAYED do
+						local tradeButton = _G["TradeSkillSkill"..i]		-- Get trade skill line button
+						
 						--Button Right Click Event
-						_G["TradeSkillSkill"..i]:SetScript("OnMouseDown", function(self, button)
+						tradeButton:SetScript("OnMouseDown", function(self, button)
 							if (button=="RightButton" and me.FavoriteButtonProfID and self.BPM_RecipeID) then
 								local data = me.save[my].favorites[me.FavoriteButtonProfID]
 								if not data then
@@ -267,26 +270,32 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 								TradeSkillFrame_Update()
 							end
 						end)
-						--
+						
+						-- Fav Button
 						local skillIndex = i + skillOffset;
 						if TradeSkillFilterBar:IsShown() then skillIndex=skillIndex-1 end
 						local skillName, skillType, numAvailable, isExpanded, altVerb, numSkillUps = GetTradeSkillInfo(skillIndex)
-						_G["TradeSkillSkill"..i].BPM_RecipeID = nil
+						tradeButton.BPM_Type = nil
+						tradeButton.BPM_RecipeID = nil
 						if (skillType and skillType ~= "header") then
 							local link = GetTradeSkillRecipeLink(skillIndex)
-							if link then 
+							if link then
+								-- Fav Data
 								local recipeid = tonumber(strmatch(link,"enchant:(%d+)"))
-								_G["TradeSkillSkill"..i]:SetNormalTexture("Interface\\AddOns\\Broker_ProfessionsMenu\\icons\\fav.tga")
-								if me.save[my].favorites[me.FavoriteButtonProfID] and me.save[my].favorites[me.FavoriteButtonProfID][recipeid] then
-									_G["TradeSkillSkill"..i]:GetNormalTexture():SetAlpha(1.0)
-								else
-									_G["TradeSkillSkill"..i]:GetNormalTexture():SetAlpha(0.1)
-								end
-								_G["TradeSkillSkill"..i].BPM_RecipeID = recipeid
+								tradeButton.BPM_RecipeID = recipeid
 								if altVerb then
-									_G["TradeSkillSkill"..i].BPM_Type = altVerb
+									tradeButton.BPM_Type = altVerb
 								else
-									_G["TradeSkillSkill"..i].BPM_Type = "Create"
+									tradeButton.BPM_Type = "Create"
+								end
+								-- Fav Icon
+								local text = tradeButton:GetText()
+								if text then
+									if me.save[my].favorites[me.FavoriteButtonProfID] and me.save[my].favorites[me.FavoriteButtonProfID][recipeid] then
+										tradeButton:SetText("|TInterface\\AddOns\\Broker_ProfessionsMenu\\icons\\fav.tga:0:0:0:0|t "..text)
+									else
+										tradeButton:SetText("|TInterface\\AddOns\\Broker_ProfessionsMenu\\icons\\nofav.tga:0:0:0:0|t "..text)
+									end
 								end
 							end
 						end
@@ -294,12 +303,12 @@ me.frame:SetScript("OnEvent", function(self, event, ...)
 					-- Without this lines, the HighlightFrame would sometimes hide the favicon
 					if TradeSkillHighlightFrame:IsVisible() then
 						local point, relativeFrame, relativePoint, ofsx, ofsy = TradeSkillHighlightFrame:GetPoint()
-						TradeSkillHighlightFrame:SetPoint(point, relativeFrame, relativePoint, ofsx+22, ofsy)
-						TradeSkillHighlightFrame:SetWidth(TradeSkillHighlightFrame:GetWidth()-22)
+						TradeSkillHighlightFrame:SetPoint(point, relativeFrame, relativePoint, ofsx+36, ofsy)
+						TradeSkillHighlightFrame:SetWidth(TradeSkillHighlightFrame:GetWidth()-36)
 					end
 					--
 				end
-			end)
+			end)			
 			TradeSkillFrame_Update()
 		end
 	--Scan Cooldowns--------------------------------------------------------
@@ -710,11 +719,11 @@ function me:ScanTradeSkillFrame()
 	if me.Trainer then me.Trainer.showbtn:Disable() end
 	if not IsTradeSkillLinked() and GetTradeSkillListLink() then
 		local profid, NoSpezi, _profid=me:TransProfID(tonumber(strmatch(GetTradeSkillListLink(),"|Htrade:%x+:(%d+)")))
-		if NoSpezi then
+		--[[if NoSpezi then
 			me.save[my].tradelinks[profid] = GetTradeSkillListLink()			--Save Trade Link
 		else
 			me.save[my].tradelinks[_profid] = GetTradeSkillListLink()		--Save Trade Link of spezi
-		end
+		end]] -- Not supported anymore by patch 5.4
 		me.save[my].craftableitems[profid] = ""
 		--Remove deleted Profession
 		local craftableitems = me.save[my].craftableitems
@@ -852,4 +861,164 @@ function me:scanBagForQuickTradeSkillItems(skillname, onlyAviableCheck)
 		end
 	end
 	return result
+end
+
+
+
+-- View professions of other chars
+function me:OpenAltProfFrame(name, profid)
+	if not me.AltProfFrame then -- Call only once
+		me.AltProfFrame = {}
+		me.AltProfFrame.frame = CreateFrame("FRAME")
+		me.AltProfFrame.frame:SetFrameStrata("MEDIUM")
+		me.AltProfFrame.frame:SetWidth(300)
+		me.AltProfFrame.frame:SetHeight(306)
+		me.AltProfFrame.frame:SetBackdrop({
+			bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+			edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
+			tile = true, tileSize = 16, edgeSize = 16, 
+			insets = { left = 4, right = 4, top = 4, bottom = 4 }
+		})
+		me.AltProfFrame.frame:SetBackdropColor(0,0,0,1)
+		me.AltProfFrame.frame:SetPoint("TOPLEFT",15,-130)
+		me.AltProfFrame.frame:EnableMouse(true)
+		
+		me.AltProfFrame.frame:SetScript("OnMouseDown", function(self, button)
+			if button=="LeftButton" then
+				self:StartMoving()
+			end
+		end)
+		me.AltProfFrame.frame:SetScript("OnMouseUp", function(self, button)
+			if button=="LeftButton" then
+				self:StopMovingOrSizing()
+				self:SetUserPlaced(false)
+			end
+		end)
+		me.AltProfFrame.frame:SetMovable(true)
+		
+		-- Close Button
+		me.AltProfFrame.button = CreateFrame("Button",nil,me.AltProfFrame.frame,"UIPanelCloseButton")
+		--me.AltProfFrame.button:SetFrameStrata(me.AltProfFrame.frame:GetFrameStrata())
+		me.AltProfFrame.button:SetPoint("TOPRIGHT", me.AltProfFrame.frame, "TOPRIGHT")
+		
+		-- Font Strin
+		me.AltProfFrame.title = me.AltProfFrame.frame:CreateFontString(nil, "ARTWORK")
+		me.AltProfFrame.title:SetFontObject(GameFontNormal)
+		me.AltProfFrame.title:SetPoint("TOPLEFT", me.AltProfFrame.frame, "TOPLEFT", 8, -7)
+		
+		me.AltProfFrame.prof = me.AltProfFrame.frame:CreateFontString(nil, "ARTWORK")
+		me.AltProfFrame.prof:SetFontObject(GameFontNormal)
+		me.AltProfFrame.prof:SetPoint("TOPLEFT", me.AltProfFrame.title, "BOTTOMLEFT", -3, -3)
+		
+		-- Search bar
+		me.AltProfFrame.search = CreateFrame("EditBox",nil,me.AltProfFrame.frame,"InputBoxTemplate")
+		me.AltProfFrame.search:SetPoint("TOPLEFT",me.AltProfFrame.prof,"BOTTOMLEFT",5,-3)
+		me.AltProfFrame.search:SetWidth(285)
+		me.AltProfFrame.search:SetHeight(20)
+		me.AltProfFrame.search:SetFontObject("ChatFontSmall")
+		me.AltProfFrame.search:SetAutoFocus(false)
+		me.AltProfFrame.search:SetScript("OnTextChanged", function(self)
+			local text = self:GetText()
+			if text==nil or text=="" then
+				me.AltProfFrame.ScrollFrame:SetFilter(function(self, row) return true end)
+			else
+				me.AltProfFrame.ScrollFrame:SetFilter(function(self, row)
+					if strfind(strlower(row.cols[2].value), strlower(text)) then
+						return true
+					end
+					return false
+				end)
+			end
+		end)
+		me.AltProfFrame.search:SetScript("OnEnterPressed", EditBox_ClearFocus)
+		me.AltProfFrame.search:SetScript("OnEscapePressed", EditBox_ClearFocus)
+		me.AltProfFrame.search:SetScript("OnEditFocusLost", EditBox_ClearHighlight)
+		me.AltProfFrame.search:SetScript("OnEditFocusGained", EditBox_HighlightText)
+		--me.AltProfFrame.search:SetTextInsets(16, 0, 0, 0);
+		
+		me.AltProfFrame.ScrollFrame = me.libst:CreateST({
+			{
+				["width"] = 20,			--icon
+				["align"] = "center",
+			},
+			{
+				["width"]=241,				--name
+				["align"]="left",
+				["sort"] = "desc",
+			},
+		},13,18,{["r"] = 0,["g"] = 0.2,["b"] = 1.0,["a"] = 0.3},me.AltProfFrame.frame)
+		me.AltProfFrame.ScrollFrame.frame:Hide()
+		me.AltProfFrame.ScrollFrame.frame:SetPoint("TOPLEFT",me.AltProfFrame.search,"BOTTOMLEFT",-7,-3)		
+		
+		me.AltProfFrame.ScrollFrame:RegisterEvents({
+			["OnShow"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, ...)
+				if (not row) then
+					cellFrame:Hide()	--hide title line
+				end
+			end,
+			["OnEnter"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, ...)
+				if not data or not row or not data[realrow] or not data[realrow]["cols"][2]["id"] then return end
+				GameTooltip:SetOwner(me.AltProfFrame.frame, "ANCHOR_NONE")
+				GameTooltip:SetPoint("TOPLEFT",me.AltProfFrame.frame,"BOTTOMLEFT",42,0)
+				GameTooltip:SetSpellByID(data[realrow]["cols"][2]["id"])
+				--GameTooltip:AddLine(" ")
+				--GameTooltip:AddLine("Click: Link in chat")
+				GameTooltip:Show()
+			end,
+			["OnLeave"] = function()
+				GameTooltip:Hide()
+			end,
+			["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)
+				if not data or not row or not data[realrow] or not data[realrow]["cols"][2]["id"] then return true end
+				local link = GetSpellLink(data[realrow]["cols"][2]["id"])
+				if (not ChatEdit_InsertLink(link) ) then
+					ChatFrame1EditBox:Show()
+					ChatEdit_InsertLink(link)
+				end
+				return true
+			end,
+		})
+	end
+	me.AltProfFrame.ScrollFrame.frame:Show()
+	
+	local prof, _, proficon = GetSpellInfo(profid)
+	if prof then
+		--if (me.save[name].class) then
+		--	local coords = CLASS_ICON_TCOORDS[me.save[name].class]
+		--	me.AltProfFrame.title:SetText("|TInterface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes:0:0:0:0:100:100:"..coords[1]..":"..coords[2]..":"..coords[3]..":"..coords[4].."|t"..name)
+		--else
+		me.AltProfFrame.title:SetText(name)
+		--end
+		me.AltProfFrame.prof:SetText("|T"..proficon..":0:0:0:0|t|cffffffff"..prof.."|r")
+		local table = {}
+		
+		for _, item in pairs({strsplit("|", me.save[name].craftableitems[profid])}) do
+			if item~="" then
+				local recipeid, itemid = strsplit(",", item)
+				local name, _, icon = GetSpellInfo(recipeid)
+				if name and name~="" then
+					if icon and icon~="" then
+						icon = "|T"..icon..":16:16:0:0|t"
+					else
+						icon = ""
+					end
+					tinsert(table,{
+						["cols"] = {
+							{
+								["value"] = icon,
+							},
+							{
+								["value"] = name,
+								["id"] = recipeid,
+								["color"] = {r=1.0,g=0.81,b=0},
+							},
+						},
+					})
+				end
+			end
+		end
+		me.AltProfFrame.ScrollFrame:SetData(table)
+		
+		me.AltProfFrame.frame:Show()
+	end
 end

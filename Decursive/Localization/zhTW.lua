@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
+    Decursive (v 2.7.3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -74,7 +74,7 @@ T._LoadedFiles["zhTW.lua"] = false;
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhTW");
 
 if not L then
-    T._LoadedFiles["zhTW.lua"] = "2.7.2.9";
+    T._LoadedFiles["zhTW.lua"] = "2.7.3";
     return;
 end;
 
@@ -108,8 +108,8 @@ L["CLASS_HUNTER"] = "獵人"
 L["CLEAR_PRIO"] = "C"
 L["CLEAR_SKIP"] = "C"
 L["COLORALERT"] = "設定按鍵警示'%s'的顏色"
-L["COLORCHRONOS"] = "秒錶"
-L["COLORCHRONOS_DESC"] = "設定秒錶顏色"
+L["COLORCHRONOS"] = "秒錶" -- Needs review
+L["COLORCHRONOS_DESC"] = "設定秒錶顏色" -- Needs review
 L["COLORSTATUS"] = "設定當玩家狀態是 '%s' 時的 MUF 顏色."
 L["CTRL"] = "Ctrl"
 L["CURE_PETS"] = "檢測並淨化寵物"
@@ -155,7 +155,6 @@ L["GLOR3"] = "紀念 Bertrand （1969～2007）"
 L["GLOR4"] = "對於那些在魔獸世界裡遇見過Glorfindal的人來說，他是一個重承諾的男人，也是一個有超凡魅力的領袖。友誼和慈愛將永植於他們的心中。他在遊戲中就如同在他生活中一樣的無私，彬彬有禮，樂於奉獻，最重要的是他對生活充滿熱情。他離開我們的時候才僅僅３８歲，隨他離去的絕不會是虛擬世界匿名的角色；在這裡還有一群忠實的朋友在永遠想念他。"
 L["GLOR5"] = "他將永遠被我們所銘記。"
 L["HANDLEHELP"] = "拖曳移動所有的 Micro-UnitFrames (MUFs)"
-L["HIDE_LIVELIST"] = "隱藏即時清單"
 L["HIDE_MAIN"] = "隱藏 Decursive 視窗"
 L["HIDESHOW_BUTTONS"] = "顯示/隱藏按鈕和鎖定/解鎖“Decursive”條"
 L["HLP_LEFTCLICK"] = "左-鍵"
@@ -200,7 +199,7 @@ L["OPT_ADDDEBUFF_USAGE"] = "<Debuff name>"
 L["OPT_ADVDISP"] = "進階顯示選項"
 L["OPT_ADVDISP_DESC"] = "可設定邊框與中央色塊各自的透明度，以及 MUFs 之間的距離。"
 L["OPT_AFFLICTEDBYSKIPPED"] = "%s 受到 %s 的影響，但將被忽略。"
-L["OPT_ALLOWMACROEDIT"] = "允許巨集版本"
+L["OPT_ALLOWMACROEDIT"] = "允許巨集版本" -- Needs review
 L["OPT_ALLOWMACROEDIT_DESC"] = "啟用此項以防止 Decursive 更新巨集，可自行編輯所需的巨集。"
 L["OPT_ALWAYSIGNORE"] = "即使不在戰鬥中也忽略之"
 L["OPT_ALWAYSIGNORE_DESC"] = "如果選取該選項，即使脫離戰鬥也忽略該負面效果而不解除"
@@ -236,11 +235,11 @@ L["OPT_CURINGOPTIONS_EXPLANATION"] = [=[
 http://www.wowace.com/addons/decursive/]=] -- Needs review
 L["OPT_CURINGORDEROPTIONS"] = "淨化順序設定"
 L["OPT_CURSECHECK_DESC"] = "選取後你可以看見並解除被詛咒的玩家。"
-L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "允許巨集編輯（僅限進階使用者）"
+L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "允許巨集編輯（僅限進階使用者）" -- Needs review
 L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = [=[如果要編輯內部巨集請勾選此項，Decursive 將使用您的自訂法術。
 
 注意：勾選此項將允許你編輯由 Decursive 所管理的法術。
-（--- 僅限進階使用者 ---）]=]
+（--- 僅限進階使用者 ---）]=] -- Needs review
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "傷害類型"
 L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "此法術是 Decursive 自動配置的一部份，如果此法術無法正常運作，移除或禁用此項以回復預設的 Decursive 設定。"
 L["OPT_CUSTOM_SPELL_ISPET"] = "寵物能力" -- Needs review
@@ -289,7 +288,6 @@ L["OPT_FILTEROUTCLASSES_FOR_X"] = "在戰鬥中指定的職業%q將被忽略。"
 L["OPT_GENERAL"] = "一般選項"
 L["OPT_GROWDIRECTION"] = "反向顯示 MUFs"
 L["OPT_GROWDIRECTION_DESC"] = "MUFs 會從尾巴開始顯示。"
-L["OPT_HIDELIVELIST_DESC"] = "如果未被隱藏則顯示清單，列出中了負面效果的人。"
 L["OPT_HIDEMFS_GROUP"] = "單獨或小隊"
 L["OPT_HIDEMFS_GROUP_DESC"] = "當不在團隊中的時隱藏 MUF 視窗。"
 L["OPT_HIDEMFS_NEVER"] = "從不自動隱藏"
@@ -317,7 +315,7 @@ L["OPT_MACROBIND_DESC"] = [=[定義呼叫 Decursive 巨集的按鍵。
 
 按你想設定的按鍵然後按 'Enter' 鍵儲存設定(滑鼠要移動到編輯區域)]=]
 L["OPT_MACROOPTIONS"] = "巨集設定選項"
-L["OPT_MACROOPTIONS_DESC"] = "設定 Decursive 產生的巨集如何動作"
+L["OPT_MACROOPTIONS_DESC"] = "設定 Decursive 產生的巨集如何動作" -- Needs review
 L["OPT_MAGICCHARMEDCHECK_DESC"] = "選取後你可以看見並處理被魔法媚惑的玩家。"
 L["OPT_MAGICCHECK_DESC"] = "選取後你可以看見並處理受魔法影響的玩家。"
 L["OPT_MAXMFS"] = "最多顯示幾個"
@@ -381,10 +379,6 @@ L["OPT_REVERSE_LIVELIST_DESC"] = "由下到上填滿即時清單。"
 L["OPT_SCANLENGTH_DESC"] = "設定掃描時間間隔。"
 L["OPT_SHOWBORDER"] = "顯示職業顏色邊框"
 L["OPT_SHOWBORDER_DESC"] = "MUFs 邊框會顯示出該玩家的職業代表顏色。"
-L["OPT_SHOWCHRONO"] = "顯示負面效果持續時間"
-L["OPT_SHOWCHRONO_DESC"] = "在 MUFs 上顯示負面效果持續的秒數"
-L["OPT_SHOWCHRONOTIMElEFT"] = "剩餘時間"
-L["OPT_SHOWCHRONOTIMElEFT_DESC"] = "顯示剩餘時間而不是消耗時間。"
 L["OPT_SHOWHELP"] = "顯示小提示"
 L["OPT_SHOWHELP_DESC"] = "當滑鼠移到一個 micro-unit-frame 上時顯示小提示。"
 L["OPT_SHOWMFS"] = "在螢幕上顯示 micro units Frame (MUF)"
@@ -458,4 +452,4 @@ L["UNSTABLERELEASE"] = "不穩定釋出版"
 
 
 
-T._LoadedFiles["zhTW.lua"] = "2.7.2.9";
+T._LoadedFiles["zhTW.lua"] = "2.7.3";

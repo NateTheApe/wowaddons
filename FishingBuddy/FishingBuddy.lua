@@ -28,47 +28,11 @@ local POLES = {
 	["Nat Pagle's Fish Terminator"] = "19944:0:0:0",
 }
 
--- handle key menu
-local function SetKeyValue(self, what, value)
-	local show = FBConstants.Keys[value];
-	FishingBuddy.SetSetting(what, value);
-	UIDropDownMenu_SetSelectedValue(self, show);
-	UIDropDownMenu_SetText(self, show);
-end
-
-local function LoadKeyMenu(keymenu, what)
-	local menu = keymenu.menu;
-	local info = {};
-	local menuwidth = 0;
-	local setting = FishingBuddy.GetSetting(what);
-	for value,label in pairs(FBConstants.Keys) do
-		local v = value;
-		local w = what;
-		local m = menu;
-		info.text = label;
-		info.func = function() SetKeyValue(m, w, v); end;
-		if ( setting == value ) then
-			info.checked = true;
-		else
-			info.checked = false;
-		end
-		UIDropDownMenu_AddButton(info);
-		menu.label:SetText(label);
-		local width = menu.label:GetWidth();
-		if (width > menuwidth) then
-			menuwidth = width;
-		end
-	end
-	UIDropDownMenu_SetWidth(menu, menuwidth + 32);
-	keymenu:SetLabel(FBConstants.KEYS_LABEL_TEXT);
-end
-
 local GeneralOptions = {
 	["ShowNewFishies"] = {
 		["text"] = FBConstants.CONFIG_SHOWNEWFISHIES_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_SHOWNEWFISHIES_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["default"] = 1 },
 	["TurnOffPVP"] = {
 		["text"] = FBConstants.CONFIG_TURNOFFPVP_ONOFF,
@@ -80,19 +44,18 @@ local GeneralOptions = {
 		["text"] = FBConstants.CONFIG_SORTBYPERCENT_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_SORTBYPERCENT_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["default"] = 1 },
 	["DingQuestFish"] = {
 		["text"] = FBConstants.CONFIG_DINGQUESTFISH_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_DINGQUESTFISH_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["default"] = 1, },
 	["EnhanceFishingSounds"] = {
 		["text"] = FBConstants.CONFIG_ENHANCESOUNDS_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_ENHANCESOUNDS_INFO,
 		["v"] = 1,
 		["m"] = 1,
+		["p"] = 1,
 		["default"] = 0 },
 	["BackgroundSounds"] = {
 		["text"] = FBConstants.CONFIG_BGSOUNDS_ONOFF,
@@ -118,9 +81,28 @@ local GeneralOptions = {
 		["text"] = FBConstants.CONFIG_SPARKLIES_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_SPARKLIES_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["default"] = 0,
 		["deps"] = { ["EnhanceFishingSounds"] = "d" }, },
+	["CreateMacro"] = {
+		["text"] = FBConstants.CONFIG_CREATEMACRO_ONOFF,
+		["tooltip"] = FBConstants.CONFIG_CREATEMACRO_INFO,
+		["v"] = 1,
+		["global"] = 1,
+		["default"] = 1, },
+	["PreventRecast"] = {
+		["text"] = FBConstants.CONFIG_PREVENTRECAST_ONOFF,
+		["tooltip"] = FBConstants.CONFIG_PREVENTRECAST_INFO,
+		["v"] = 1,
+		["global"] = 1,
+		["default"] = 0,
+		["deps"] = { ["CreateMacro"] = "d" }, },
+	["ToonMacro"] = {
+		["text"] = FBConstants.CONFIG_TOONMACRO_ONOFF,
+		["tooltip"] = FBConstants.CONFIG_TOONMACRO_INFO,
+		["v"] = 1,
+		["global"] = 1,
+		["default"] = 0,
+		["deps"] = { ["CreateMacro"] = "d" }, },
 };
 
 -- x87bliss has implemented IsFishWardenEnabled as a public function, so
@@ -158,6 +140,7 @@ local CastingOptions = {
 		["init"] = function(o, b) EasyCastInit(o, b); end,
 		["v"] = 1,
 		["m"] = 1,
+		["p"] = 1,
 		["default"] = 1 },
 	["EasyLures"] = {
 		["text"] = FBConstants.CONFIG_EASYLURES_ONOFF,
@@ -178,7 +161,6 @@ local CastingOptions = {
 		["text"] = FBConstants.CONFIG_LASTRESORT_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_LASTRESORT_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["primary"] = "EasyCast",
 		["deps"] = { ["EasyCast"] = "d", ["EasyLures"] = "d" },
 		["default"] = 0 },
@@ -186,7 +168,6 @@ local CastingOptions = {
 		["text"] = FBConstants.CONFIG_MOUNTEDCAST_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_MOUNTEDCAST_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["primary"] = "EasyCast",
 		["deps"] = { ["EasyCast"] = "d", },
 		["default"] = 0 },
@@ -201,34 +182,31 @@ local CastingOptions = {
 					end,
 		["v"] = 1,
 		["m"] = 1,
+		["p"] = 1,
 		["deps"] = { ["EasyCast"] = "d", ["EasyCast"] = IsWardenEnabled },
 		["default"] = 0 },
 	["AutoOpen"] = {
 		["text"] = FBConstants.CONFIG_AUTOOPEN_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_AUTOOPEN_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["deps"] = { ["EasyCast"] = "d" },
 		["default"] = 0 },
 	["UseAction"] = {
 		["text"] = FBConstants.CONFIG_USEACTION_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_USEACTION_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["deps"] = { ["EasyCast"] = "d" },
 		["default"] = 0 },
 	["PartialGear"] = {
 		["text"] = FBConstants.CONFIG_PARTIALGEAR_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_PARTIALGEAR_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["deps"] = { ["EasyCast"] = "d" },
 		["default"] = 1 },
 	["WatchBobber"] = {
 		["text"] = FBConstants.CONFIG_WATCHBOBBER_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_WATCHBOBBER_INFO,
 		["v"] = 1,
-		["m"] = 1,
 		["deps"] = { ["EasyCast"] = "d" },
 		["default"] = 1 },
 	["ContestSupport"] = {
@@ -263,16 +241,24 @@ local CastingOptions = {
 		["button"] = "FBEasyKeys",
 		["tooltipd"] = FBConstants.CONFIG_EASYCASTKEYS_INFO,
 		["deps"] = { ["EasyCast"] = "h" },
-		["init"] = function(o, b) EasyCastInit(o, b); end,
+		["init"] = function(o, b) b.InitMappedMenu(o,b); end,
 		["setup"] =
 			function(button)
 				local gs = FishingBuddy.GetSetting;
-				FBEasyKeys.menu:SetKeyValue("EasyCastKeys", gs("EasyCastKeys"));
-				button.overlay:ClearAllPoints();
-				button.overlay:SetPoint("TOPLEFT", button.label, "TOPLEFT");
-				button.overlay:SetSize(button:GetWidth(), button:GetHeight());
-				button.overlay:SetFrameLevel(button:GetFrameLevel()+2);
-				button.overlay:Show();
+				FBEasyKeys.menu:SetMappedValue("EasyCastKeys", gs("EasyCastKeys"));
+			end,
+	},
+	["MouseEvent"] = {
+		["default"] = "RightButtonUp",
+		["button"] = "FBMouseEvent",
+		["tooltipd"] = FBConstants.CONFIG_MOUSEEVENT_INFO,
+		["deps"] = { ["EasyCast"] = "h" },
+		["alone"] = 1,
+		["init"] = function(o, b) b.InitMappedMenu(o,b); end,
+		["setup"] =
+			function(button)
+				local gs = FishingBuddy.GetSetting;
+				FBMouseEvent.menu:SetMappedValue("MouseEvent", gs("MouseEvent"));
 			end,
 	},
 };
@@ -282,8 +268,6 @@ local InvisibleOptions = {
 	["TooltipInfo"] = {
 		["text"] = FBConstants.CONFIG_TOOLTIPS_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_TOOLTIPS_INFO,
-		["v"] = 1,
-		["m"] = 1,
 		["default"] = 0 },
 	["GroupByLocation"] = {
 		["default"] = 1,
@@ -384,6 +368,23 @@ FishingBuddy.BaseSetSetting = function(setting, value)
 	end
 end
 
+FishingBuddy.GlobalGetSetting = function(setting)
+	if ( not FishingBuddy_Info or
+		  not FishingBuddy_Info["Settings"] ) then
+		return;
+	end
+	return FishingBuddy_Info["Settings"][setting];
+end
+
+FishingBuddy.GlobalSetSetting = function(setting, value)
+	if ( FishingBuddy_Info and setting ) then
+		if (not FishingBuddy_Info["Settings"]) then
+			FishingBuddy_Info["Settings"] = {};
+		end
+		FishingBuddy_Info["Settings"][setting] = value;
+	end
+end
+
 FishingBuddy.ByFishie = nil;
 FishingBuddy.SortedFishies = nil;
 
@@ -399,7 +400,7 @@ local DoEscaped = nil;
 local LureState = 0;
 local LastLure = nil;
 local LastUsed = nil;
-local OpenThisFishId = nil;
+local OpenThisFishId = {};
 
 -- handle zone markers
 local function zmto(zidx, sidx)
@@ -546,15 +547,16 @@ end
 
 -- handle option keys for enabling casting
 local key_actions = {
-	[FBConstants.KEYS_NONE] = function() return false; end,
-	[FBConstants.KEYS_SHIFT] = function() return IsShiftKeyDown(); end,
-	[FBConstants.KEYS_CTRL] = function() return IsControlKeyDown(); end,
-	[FBConstants.KEYS_ALT] = function() return IsAltKeyDown(); end,
+	[FBConstants.KEYS_NONE] = function(mouse) return mouse ~= "RightButtonUp"; end,
+	[FBConstants.KEYS_SHIFT] = function(mouse) return IsShiftKeyDown(); end,
+	[FBConstants.KEYS_CTRL] = function(mouse) return IsControlKeyDown(); end,
+	[FBConstants.KEYS_ALT] = function(mouse) return IsAltKeyDown(); end,
 }
 local function CastingKeys()
 	local setting = FishingBuddy.GetSetting("EasyCastKeys");
+	local mouse = FishingBuddy.GetSetting("MouseEvent");
 	if ( setting and key_actions[setting] ) then
-		return key_actions[setting]();
+		return key_actions[setting](mouse);
 	else
 		return true;
 	end
@@ -756,12 +758,12 @@ QuestItems[58856] = {
 	["enUS"] = "Royal Monkfish",
 	open = true,
 };
-QuestItems[45902] = {
-	["enUS"] = "Phantom Ghostfish",
-	open = true,
-};
 QuestItems[69914] = {
 	["enUS"] = "Giant Catfish",
+	open = true,
+};
+QuestItems[69956] = {
+	["enUS"] = "Blind Cavefish",
 	open = true,
 };
 FishingBuddy.QuestItems = QuestItems;
@@ -790,6 +792,10 @@ QuestLures[58788] = {
 QuestLures[58949] = {
 	["enUS"] = "Stag Eye",				-- A Staggering Effort
 	spell = 80868,
+};
+QuestLures[45902] = {
+	["enUS"] = "Phantom Ghostfish",
+	spell = 45902,
 };
 
 local function SetFishingLevel(skillcheck, zone, subzone, fishid)
@@ -848,8 +854,8 @@ local function AddFishie(color, id, name, zone, subzone, texture, quantity, qual
 	-- Only quest items have matching itemType and subType values, as well
 	if ( (it and it == questType) or QuestItems[id] ) then
 		-- subtype is Quest as well
-		FishingBuddy_Info["Fishies"][id].quest = true;
 		if ( FishingBuddy_Info["Fishies"][id].canopen == nil ) then
+		FishingBuddy_Info["Fishies"][id].quest = true;
 			local canopen, locked;
 			if ( QuestItems[id] and QuestItems[id].open ) then
 				canopen = QuestItems[id].open;
@@ -863,7 +869,7 @@ local function AddFishie(color, id, name, zone, subzone, texture, quantity, qual
 			end
 		end
 		if ( FishingBuddy_Info["Fishies"][id].canopen ) then
-			OpenThisFishId = id;
+			table.insert(OpenThisFishId, id);
 		end
 	end
 
@@ -993,10 +999,13 @@ local function HideAwayAll(self, button, down)
 	FishingBuddy_PostCastUpdateFrame:Show();
 end
 
-local function UseFishingItem(itemtable)
+local function GetFishingItem(itemtable)
 	local GSB = FishingBuddy.GetSettingBool;
 	for itemid, info in pairs(itemtable) do
 		if ( GetItemCount(itemid) > 0 and (not info.setting or GSB(info.setting)) ) then
+			if (not info[CurLoc]) then
+				info[CurLoc] = GetItemInfo(itemid);
+			end
 			if ( not info.usable or info.usable(info) ) then
 				local buff = GetSpellInfo(info.spell);
 				local doit = not FL:HasBuff(buff);
@@ -1004,8 +1013,7 @@ local function UseFishingItem(itemtable)
 					doit, itemid = info.check(buff, info, doit);
 				end
 				if ( doit ) then
-					FL:InvokeLuring(itemid);
-					return true;
+					return doit, itemid, info[CurLoc];
 				end
 			end
 		end
@@ -1013,7 +1021,21 @@ local function UseFishingItem(itemtable)
 	-- return nil;
 end
 
-local function UpdateLure()
+local function GetFishieRaw(fishid)
+	local fi = FishingBuddy_Info["Fishies"][fishid];
+	if( fi ) then
+		return fishid,
+				 fi.texture,
+				 fi.color,
+				 fi.quantity,
+				 fi.quality,
+				 fi[CurLoc],
+				 fi.quest;
+	end
+end
+FishingBuddy.GetFishieRaw = GetFishieRaw;
+
+local function GetUpdateLure()
 	local GSB = FishingBuddy.GetSettingBool;
 	local usedrinks = GSB("FishingFluff") and GSB("DrinkHeavily");
 	local lureinventory, useinventory = FL:GetLureInventory();
@@ -1026,8 +1048,7 @@ local function UpdateLure()
 				local id = useinventory[1].id;
 				if ( not FL:HasBuff(useinventory[1].n) ) then
 					LastUsed = useinventory[1];
-					FL:InvokeLuring(LastUsed.id);
-					return true;
+					return true, LastUsed.id, LastUsed.n;
 				end
 			end
 		end
@@ -1036,20 +1057,31 @@ local function UpdateLure()
 	if ( GSB("EasyLures") ) then	
 		-- Is this a quest fish we should open up?
 		if ( GSB("AutoOpen") ) then
-			if ( OpenThisFishId and GetItemCount(OpenThisFishId) > 0 ) then
-				FL:InvokeLuring(OpenThisFishId);
-				return true;
+			while ( table.getn(OpenThisFishId) > 0 ) do
+				local id = OpenThisFishId[1];
+				local c = GetItemCount(id);
+				if (c < 2) then
+					table.remove(OpenThisFishId, 1);
+				end
+				if ( c > 0 ) then
+					local _,_,_,_,_,name,_ = GetFishieRaw(id);
+					return true, id, name;
+				end
 			end
 			
 			-- look for quest lures
-			if ( UseFishingItem(QuestLures) ) then
-				return true;
+			local doit, id, name = GetFishingItem(QuestLures);
+			if ( doit ) then
+				return doit, id, name;
 			end
 		end
 
 		-- look for bonus items, like the Ancient Pandaren Fishing Charm
-		if ( FishingBuddy.FishingItems and UseFishingItem(FishingBuddy.FishingItems) ) then
-			return true;
+		if ( FishingBuddy.FishingItems) then
+			local doit, id, name = GetFishingItem(FishingBuddy.FishingItems);
+			if ( doit ) then
+				return doit, id, name;
+			end
 		end
 
 		-- only apply a lure if we're actually fishing with a "real" pole
@@ -1107,10 +1139,11 @@ local function UpdateLure()
 					AddingLure = true;
 					LastLure = DoLure;
 					LureState = NextState;
-					FL:InvokeLuring(DoLure.id);
 					LastLure.time = GetTime() + RELURE_DELAY;
+					local id = DoLure.id;
+					local name = DoLure.n;
 					DoLure = nil;
-					return true;
+					return true, id, name; 
 				elseif ( LastLure and not LastLure.time ) then
 					LastLure = nil;
 					LastState = 0;
@@ -1119,6 +1152,15 @@ local function UpdateLure()
 		end
 	end
 	return false;
+end
+
+local function UpdateLure()
+	local update, id = GetUpdateLure();
+	if (update and id) then
+		FL:InvokeLuring(id);
+	end
+	
+	return update;
 end
 
 local CaptureEvents = {};
@@ -1224,7 +1266,7 @@ local SavedWFOnMouseDown;
 local function WF_OnMouseDown(...)
 	-- Only steal 'right clicks' (self is arg #1!)
 	local button = select(2, ...);
-	if ( button == "RightButton" and HijackCheck() ) then
+	if ( button == FL:GetSAMouseButton() and HijackCheck() ) then
 		if ( FL:CheckForDoubleClick() ) then
 			 -- We're stealing the mouse-up event, make sure we exit MouseLook
 			if ( IsMouselooking() ) then
@@ -1295,19 +1337,6 @@ FishingBuddy.GetFishie = function(fishid)
 	end
 end
 
-FishingBuddy.GetFishieRaw = function(fishid)
-	local fi = FishingBuddy_Info["Fishies"][fishid];
-	if( fi ) then
-		return fishid,
-				 fi.texture,
-				 fi.color,
-				 fi.quantity,
-				 fi.quality,
-				 fi[CurLoc],
-				 fi.quest;
-	end
-end
-
 -- do everything we think is necessary when we start fishing
 -- even if we didn't do the switch to a fishing pole
 local resetClickToMove = nil;
@@ -1338,6 +1367,7 @@ local function StopFishingMode(logout)
 		if ( not logout ) then
 			FishingBuddy.WatchUpdate();
 		end
+		autopoleframe:Hide();
 		handlerframe:Hide();
 		local started = FishingBuddy.StartedFishing;
 		FishingBuddy.StartedFishing = nil;
@@ -1351,11 +1381,11 @@ local function StopFishingMode(logout)
 		SetCVar("autointeract", "1");
 		resetClickToMove = nil;
 	end
-	FishingBuddy.WatchUpdate();
 end
 
 local function FishingMode()
-	if ( ReadyForFishing() ) then
+	local ready = ReadyForFishing();
+	if ( ready ) then
 		StartFishingMode();
 	else
 		StopFishingMode();
@@ -1400,12 +1430,6 @@ local function TrapWorldMouse()
 end
 FishingBuddy.TrapWorldMouse = TrapWorldMouse;
 
-local function OptionsUpdate(changed)
-	FL:WatchBobber(FishingBuddy.GetSettingBool("WatchBobber"));
-	RunHandlers(FBConstants.OPT_UPDATE_EVT, changed);
-end
-FishingBuddy.OptionsUpdate = OptionsUpdate;
-
 FishingBuddy.Commands[FBConstants.UPDATEDB] = {};
 FishingBuddy.Commands[FBConstants.UPDATEDB].help = FBConstants.UPDATEDB_HELP;
 FishingBuddy.Commands[FBConstants.UPDATEDB].func =
@@ -1438,6 +1462,114 @@ FishingBuddy.Commands[FBConstants.UPDATEDB].func =
 		FishingBuddy.Print(FBConstants.UPDATEDB_MSG, count);
 		return true;
 	end;
+
+-- Move a macro from global to perchar, or vice versa
+local function GetMacroIndex(macroname)
+	for idx = 1, _G.MAX_ACCOUNT_MACROS + _G.MAX_CHARACTER_MACROS do
+		local name, icon, body = GetMacroInfo(idx)
+		if (name and macroname == name) then
+			return idx;
+		end
+	end
+end
+
+local function CreateOrUpdateMacro(name, icon, body, perchar)
+	local exists = GetMacroIndex(name);
+	if (exists) then
+		local isglobal = (exists <= _G.MAX_ACCOUNT_MACROS);
+		if ((perchar and isglobal) or (not perchar and not isglobal)) then
+			-- switch per char and global
+			DeleteMacro(name);
+			exists = nil;
+		end
+	end
+	
+	if (exists) then
+		EditMacro(name, nil, icon, body, 1, perchar);
+	else
+		CreateMacro(name, icon, body, perchar);
+	end
+end
+
+local function CreateFishingMacro()
+	local GSB = FishingBuddy.GetSettingBool;
+	local _, fishing = FL:GetFishingSkillInfo();
+	local update, id, name = GetUpdateLure();
+	local bag, slot;
+	if (update) then
+		bag, slot = FL:FindThisItem(id);
+	end
+
+	local action = "";
+	if (slot) then
+		action = "/stopcasting\n/use "
+		if (bag) then
+			action = action..bag
+		end
+		action = action.." "..slot.."\n";
+	else
+		action = "/cast ";
+		if (GSB("PreventRecast")) then
+			action = action.." [nochanneling:"..fishing.."] ";
+		else
+			action = "/stopcasting\n"..action;
+		end
+		action = action..fishing
+	end
+
+	local numglobal,numperchar = GetNumMacros();
+	local perchar = nil;
+	local fullup;
+	if (GSB("ToonMacro")) then
+		if (numperchar >= _G.MAX_CHARACTER_MACROS) then
+			fullup = FBConstants.NOCREATEMACROPER;
+		end
+		perchar = 1;
+	else
+		if (numglobal >= _G.MAX_ACCOUNT_MACROS) then
+			fullup = FBConstants.NOCREATEMACROGLOB;
+		end
+	end
+
+	if (fullup) then
+		FishingBuddy.Message(fullup.."\""..FBConstants.MACRONAME.."\"", 1, 0, 0);
+		return;
+	end
+
+	CreateOrUpdateMacro(FBConstants.MACRONAME, "INV_Fishingpole_02", "#showtooltip Fishing\n/fb fishing start\n"..action, perchar);
+end
+
+FishingBuddy.Commands[FBConstants.FISHINGMODE] = {};
+FishingBuddy.Commands[FBConstants.FISHINGMODE].help = FBConstants.FISHINGMODE_HELP;
+FishingBuddy.Commands[FBConstants.FISHINGMODE].func =
+	function(what)
+		if(what and what == "stop") then
+			StopFishingMode();
+		else
+			StartFishingMode();
+		end
+		
+		if (FishingBuddy.GetSettingBool("CreateMacro")) then
+			CreateFishingMacro();
+		end
+		
+		return true;
+	end;
+
+local function OptionsUpdate(changed, closing)
+	FL:WatchBobber(FishingBuddy.GetSettingBool("WatchBobber"));
+	FL:SetSAMouseEvent(FishingBuddy.GetSetting("MouseEvent"));
+	
+	if (closing) then
+		if (FishingBuddy.GetSettingBool("CreateMacro")) then
+			CreateFishingMacro();
+		else
+			DeleteMacro(FBConstants.MACRONAME);
+		end
+	end
+	RunHandlers(FBConstants.OPT_UPDATE_EVT, changed, closing);
+end
+FishingBuddy.OptionsUpdate = OptionsUpdate;
 
 local function nextarg(msg, pattern)
 	if ( not msg or not pattern ) then
@@ -1665,13 +1797,10 @@ FishingBuddy.OnEvent = function(self, event, ...)
 			LureState = 0;
 		end
 	elseif ( event == "LOOT_CLOSED" ) then
-		if (OpenThisFishId) then
-			if (GetItemCount(OpenThisFishId) == 0 ) then
-				OpenThisFishId = nil
-			end
-		end
+		-- nothing to do here at the moment
 	elseif ( event == "PLAYER_LOGIN" ) then
 		FL:CreateSAButton();
+		FL:SetSAMouseEvent(FishingBuddy.GetSetting("MouseEvent"));
 		RunHandlers(FBConstants.LOGIN_EVT);
 	elseif ( event == "PLAYER_LOGOUT" ) then
 		-- reset the fishing sounds, if we need to
@@ -1685,18 +1814,18 @@ FishingBuddy.OnEvent = function(self, event, ...)
 		FishingBuddy.OptionsFrame.HandleOptions(GENERAL, nil, GeneralOptions);
 		FishingBuddy.AddSchoolFish();
 
-		local keymenu = FishingBuddy.CreateFBDropDownMenu("FBEasyKeys", "FishingBuddyDropDownMenuTemplate");
-		keymenu.menu.SetKeyValue = SetKeyValue;
-		keymenu.html:Hide();
-		
-		keymenu.menu.label:SetText(FBConstants.CONFIG_EASYCAST_ONOFF);
-		
-		UIDropDownMenu_Initialize(keymenu.menu, function()
-										  LoadKeyMenu(keymenu, "EasyCastKeys");
-									  end);
+		FishingBuddy.CreateFBMappedDropDown("FBEasyKeys", "EasyCastKeys", FBConstants.CONFIG_EASYCAST_ONOFF, FBConstants.Keys)
+		FishingBuddy.CreateFBMappedDropDown("FBMouseEvent", "MouseEvent", FBConstants.CONFIG_MOUSEEVENT_ONOFF, FBConstants.CastClick)
+
 		FishingBuddy.OptionsFrame.HandleOptions(name, "Interface\\Icons\\INV_Fishingpole_02", CastingOptions);
 		FishingBuddy.OptionsFrame.HandleOptions(nil, nil, InvisibleOptions);
 		FishingBuddy.OptionsUpdate();
+		
+		-- make sure we have the Macro globals
+		if (not IsAddOnLoaded("Blizzard_MacroUI")) then
+			LoadAddOn("Blizzard_MacroUI");
+		end
+		CreateFishingMacro();
 		
 		self:UnregisterEvent("VARIABLES_LOADED");
 		-- tell all the listeners about this one
@@ -1946,16 +2075,45 @@ if ( FishingBuddy.Debugging ) then
 			return true;
 		end
 
-	FishingBuddy.Commands["opens"] = {};
-	FishingBuddy.Commands["opens"].func =
-		function()
-			local id = 7973;
+	FishingBuddy.Commands["makeopen"] = {};
+	FishingBuddy.Commands["makeopen"].func =
+		function(id)
+			id = id or 7973;
 			QuestItems[id] = { open = true, };
 			FishingBuddy_Info["Fishies"][id].canopen = nil;
 			local name, _, _, _, _, _, _, _,_, _ = GetItemInfo(id) ;
 			FishingBuddy.Debug("Make "..name.." openable ("..GetItemCount(id)..")");
-			OpenThisFishId = id;
+			table.insert(OpenThisFishId, id);
 			return true;
 		end
 
+	FishingBuddy.Commands["showopen"] = {};
+	FishingBuddy.Commands["showopen"].func =
+		function()
+			-- FishingBuddy_Info["Fishies"][id].canopen
+			for id,info in pairs(FishingBuddy_Info["Fishies"]) do
+				if (FishingBuddy_Info["Fishies"][id].canopen) then
+					FishingBuddy.Debug("Id: %d Name: %s", id, info[CurLoc]);
+				end
+			end
+			return true;
+		end
+		
+	FishingBuddy.Commands["nowopen"] = {};
+	FishingBuddy.Commands["nowopen"].func =
+		function()
+			-- 58856
+			for idx,info in pairs(OpenThisFishId) do
+				FishingBuddy.Debug(idx, info);
+			end
+			FishingBuddy.OpenThisFishId = OpenThisFishId;
+			return true;
+		end
+		
+	FishingBuddy.Commands["macrotest"] = {};
+	FishingBuddy.Commands["macrotest"].func =
+		function()
+			CreateFishingMacro();
+			return true;
+		end
 end

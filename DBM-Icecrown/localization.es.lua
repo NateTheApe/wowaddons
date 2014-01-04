@@ -93,7 +93,7 @@ L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
-	AchievementBoned		= "Mostrar tiempo para el logro Deshuesado",
+	AchievementBoned		= "Mostrar tiempo para el logro Deshuesado"
 }
 
 -------------------------
@@ -143,13 +143,11 @@ L:SetWarningLocalization{
 }
 
 L:SetOptionLocalization{
-	TimerCombatStart	= "Mostrar tiempo para el inicio del combate",
 	WarnAddsSoon		= "Mostrar pre-aviso para la salida de nuevos adds",
 	TimerAdds			= "Mostrar tiempo para nuevos adds"
 }
 
 L:SetTimerLocalization{
-	TimerCombatStart	= "Empieza el combate",
 	TimerAdds			= "Nuevos adds"
 }
 
@@ -173,12 +171,7 @@ L:SetGeneralLocalization{
 	name = "Libramorte Colmillosauro"
 }
 
-L:SetTimerLocalization{
-	TimerCombatStart		= "Empieza el combate"
-}
-
 L:SetOptionLocalization{
-	TimerCombatStart		= "Mostrar tiempo para inicio del combate",
 	RangeFrame				= "Mostrar distancia (12 yardas)",
 	RunePowerFrame			= "Mostrar barra de vida + barra de $spell:72371",
 	BeastIcons				= "Poner iconos en las Bestias de Sangre"
@@ -202,8 +195,8 @@ L:SetGeneralLocalization{
 
 L:SetOptionLocalization{
 	RangeFrame			= "Mostrar distancia (8 yardas)",
-	AnnounceSporeIcons	= "Anunciar los iconos de los objetivos de $spell:69279 en el chat de banda\n(Necesitas ser líder de banda)",
-	AchievementCheck	= "Anunciar fallo del logro 'Sin vacunas' a la banda\n(requiere líder/ayudante)"
+	AnnounceSporeIcons	= "Anunciar los iconos de los objetivos de $spell:69279 en el chat de banda<br/>(Necesitas ser líder de banda)",
+	AchievementCheck	= "Anunciar fallo del logro 'Sin vacunas' a la banda<br/>(requiere líder/ayudante)"
 }
 
 L:SetMiscLocalization{
@@ -366,10 +359,10 @@ L:SetOptionLocalization{
 	WarnGroundphaseSoon		= "Mostrar pre-aviso para fase en el suelo",
 	TimerNextAirphase		= "Mostrar tiempo para siguiente fase aerea",
 	TimerNextGroundphase	= "Mostrar tiempo para siguiente fase en el suelo",
-	AnnounceFrostBeaconIcons= "Anunciar los iconos de los objetivos de $spell:70126 en el chat de banda\n(Necesitas ser líder de banda)",
+	AnnounceFrostBeaconIcons= "Anunciar los iconos de los objetivos de $spell:70126 en el chat de banda<br/>(Necesitas ser líder de banda)",
 	ClearIconsOnAirphase	= "Eliminar todos los iconos antes de la fase aerea",
-	AchievementCheck		= "Anunciar avisos del logro 'Sacúdete' a la banda\n(Requiere líder/ayudante)",
-	RangeFrame				= "Mostrar distancia (10 normal, 20 heroico)\n(Solo mostrará los jugadores marcados)"
+	AchievementCheck		= "Anunciar avisos del logro 'Sacúdete' a la banda<br/>(Requiere líder/ayudante)",
+	RangeFrame				= "Mostrar distancia (10 normal, 20 heroico)<br/>(Solo mostrará los jugadores marcados)"
 }
 
 L:SetMiscLocalization{
@@ -379,7 +372,7 @@ L:SetMiscLocalization{
 	YellPhase2Dem		= "Zar kiel xi romathIs zilthuras revos ruk toralar ",--translate
 	BeaconIconSet	= "Señal de Escarcha, icono {rt%d} en %s",
 	AchievementWarning	= "Aviso: %s tiene 5 marcas de Sacudida mística",
-	AchievementFailed	= ">> LOGRO FALLADO: %s tiene %d marcas de Sacudida mística <<",
+	AchievementFailed	= ">> LOGRO FALLADO: %s tiene %d marcas de Sacudida mística <<"
 }
 
 ---------------------
@@ -399,24 +392,22 @@ L:SetWarningLocalization{
 }
 
 L:SetTimerLocalization{
-	TimerCombatStart	= "Empieza el combate",
 	TimerRoleplay		= "Diálogo",
 	PhaseTransition		= "Transición de fase",
 	TimerNecroticPlagueCleanse = "Purgar Peste necrótica"
 }
 
 L:SetOptionLocalization{
-	TimerCombatStart		= "Mostrar tiempo para el inicio del combate",
 	TimerRoleplay			= "Mostrar tiempo para Diálogo",
 	WarnNecroticPlagueJump	= "Anunciar los objetivos donde $spell:73912 ha saltado",
-	TimerNecroticPlagueCleanse	= "Mostrar tiempo para purgar Peste necrótica\nantes de la primera acumulación",
+	TimerNecroticPlagueCleanse	= "Mostrar tiempo para purgar Peste necrótica<br/>antes de la primera acumulación",
 	PhaseTransition			= "Mostrar tiempo para las transiciones de fase",
 	ValkyrWarning			= "Anunciar quien ha sido agarrado por las Valkyr",
 	SpecWarnYouAreValkd		= "Mostrar aviso especial cuando seas agarrado por una Valkyr",
 	ValkyrIcon				= "Poner iconos en las Valkyr",
-	AnnounceValkGrabs		= "Aunciar el objetivo de Guardia de las Sombras Val'kyr en el chat de banda\n(necesita 'anunciar' activado y líder/ayudante)",
+	AnnounceValkGrabs		= "Aunciar el objetivo de Guardia de las Sombras Val'kyr en el chat de banda<br/>(necesita 'anunciar' activado y líder/ayudante)",
 	SpecWarnValkyrLow		= "Mostrar aviso especial cuando la Valkyr está por debajo del 55%",
-	AnnouncePlagueStack		= "Anunciar las marcas de $spell:73912 a la banda (10 marcas, cada 5 después)\n(requiere líder/ayudante)"
+	AnnouncePlagueStack		= "Anunciar las marcas de $spell:73912 a la banda (10 marcas, cada 5 después)<br/>(requiere líder/ayudante)"
 }
 
 L:SetMiscLocalization{

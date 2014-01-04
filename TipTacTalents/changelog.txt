@@ -1,3 +1,7 @@
+TipTacTalents Changes | 2013 Sep 21
+-----------------------------------
+- Changed the TOC version to 50400 for the 5.4 patch.
+
 TipTacTalents Changes | 2013 Apr 17
 -----------------------------------
 - Changed the TOC version to 50200 for the 5.2 patch.

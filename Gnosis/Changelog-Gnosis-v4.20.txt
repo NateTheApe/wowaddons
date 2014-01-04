@@ -1,0 +1,8 @@
+2013-10-27  elchefe <>  <>
+
+[e02bd890a757] [v4.20]
+* Bars.lua:
+
+minor gui related tweak
+
+

@@ -3,9 +3,8 @@ local L		= mod:GetLocalizedStrings()
 local Riplimb	= EJ_GetSectionInfo(2581)
 local Rageface	= EJ_GetSectionInfo(2583)
 
-mod:SetRevision(("$Revision: 60 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 79 $"):sub(12, -3))
 mod:SetCreatureID(53691)
-mod:SetModelID(38448)
 mod:SetZone()
 mod:SetUsedIcons(6, 8) -- cross(7) is hard to see in redish environment?
 mod:SetModelSound("Sound\\Creature\\SHANNOX\\VO_FL_SHANNOX_SPAWN.wav", "Sound\\Creature\\SHANNOX\\VO_FL_SHANNOX_KILL_04.wav")

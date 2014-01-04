@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Souls", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 447 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 527 $"):sub(12, -3))
 mod:SetCreatureID(23420)
 mod:SetModelID(21483)
 mod:SetZone()
@@ -9,10 +9,10 @@ mod:SetUsedIcons(4, 5, 6, 7, 8)
 
 mod:RegisterCombat("yell", L.Pull)
 
-mod:RegisterEvents(
-	"RAID_BOSS_EMOTE",
+mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_APPLIED_DOSE",
+	"SPELL_AURA_REMOVED",
 	"SPELL_CAST_START",
 	"SPELL_CAST_SUCCESS",
 	"SPELL_DAMAGE",
@@ -22,9 +22,9 @@ mod:RegisterEvents(
 
 local warnFixate		= mod:NewTargetAnnounce(41294, 3)
 local warnDrain			= mod:NewTargetAnnounce(41303, 3)
-local warnEnrage		= mod:NewAnnounce("WarnEnrage", 4, 41292)
-local warnEnrageSoon	= mod:NewAnnounce("WarnEnrageSoon", 3, 41292)
-local warnEnrageEnd		= mod:NewAnnounce("WarnEnrageEnd", 3, 41292)
+local warnEnrage		= mod:NewSpellAnnounce(41305, 4, 41292)
+local warnEnrageSoon	= mod:NewPreWarnAnnounce(41305, 5, 3)
+local warnEnrageEnd		= mod:NewEndAnnounce(41305, 3)
 local warnPhase2		= mod:NewPhaseAnnounce(2)
 local warnMana			= mod:NewAnnounce("WarnMana", 4, 41350)
 local warnDeaden		= mod:NewTargetAnnounce(41410, 3)
@@ -38,8 +38,8 @@ local specWarnShock		= mod:NewSpecialWarningInterrupt(41426, mod:IsMelee())
 local specWarnShield	= mod:NewSpecialWarningDispel(41431)
 local specWarnSpite		= mod:NewSpecialWarningYou(41376)
 
-local timerEnrage		= mod:NewTimer(15, "TimerEnrage", 40683)
-local timerNextEnrage	= mod:NewTimer(32, "TimerNextEnrage", 40683)
+local timerEnrage		= mod:NewBuffActiveTimer(15, 41305)
+local timerNextEnrage	= mod:NewNextTimer(32, 41305)
 local timerDeaden		= mod:NewTargetTimer(10, 41410)
 local timerNextDeaden	= mod:NewCDTimer(31, 41410)
 local timerMana			= mod:NewTimer(160, "TimerMana", 41350)
@@ -49,7 +49,6 @@ local timerNextShock	= mod:NewCDTimer(12, 41426)--Blizz lied, this is a 12-15 se
 
 mod:AddBoolOption("DrainIcon", true)
 mod:AddBoolOption("SpiteIcon", true)
-mod:AddBoolOption("SpiteWhisper", false, "announce")
 
 local warnDrainTargets = {}
 local warnSpiteTargets = {}
@@ -74,13 +73,18 @@ function mod:OnCombatStart(delay)
 	table.wipe(warnSpiteTargets)
 	timerNextEnrage:Start(47-delay)
 	warnEnrageSoon:Schedule(42-delay)
-	DBM.BossHealth:Clear()
-	DBM.BossHealth:Show(L.name)
-	DBM.BossHealth:AddBoss(23418, L.Suffering)
+	if DBM.BossHealth:IsShown() then
+		DBM.BossHealth:Clear()
+		DBM.BossHealth:Show(L.name)
+		DBM.BossHealth:AddBoss(23418, L.Suffering)
+	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args.spellId == 41431 and not args:IsDestTypePlayer() then
+	if args.spellId == 41305 then
+		warnEnrage:Show()
+		timerEnrage:Start()
+	elseif args.spellId == 41431 and not args:IsDestTypePlayer() then
 		warnShield:Show()
 		timerNextShield:Start()
 		specWarnShield:Show(args.destName)
@@ -93,9 +97,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		if args:IsPlayer() then
 			specWarnSpite:Show()
-		end
-		if DBM:GetRaidRank() > 0 and self.Options.SpiteWhisper then
-			self:SendWhisper(L.SpiteWhisper, args.destName)
 		end
 		self:Schedule(0.3, showSpite)
 	elseif args.spellId == 41303 then
@@ -116,8 +117,15 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerDeaden:Start(args.destName)
 	end
 end
-
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
+
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 41305 then
+		warnEnrageEnd:Show()
+		warnEnrageSoon:Schedule(27)
+		timerNextEnrage:Start()
+	end
+end
 
 function mod:SPELL_CAST_START(args)
 	if args.spellId == 41410 then
@@ -138,11 +146,15 @@ function mod:SPELL_CAST_SUCCESS(args)
 		timerMana:Start()
 		timerNextShield:Start(13)
 		timerNextDeaden:Start(28)
-		DBM.BossHealth:AddBoss(23419, L.Desire)
+		if DBM.BossHealth:IsShown() then
+			DBM.BossHealth:AddBoss(23419, L.Desire)
+		end
 	elseif args.spellId == 41337 then --Aura of Anger
 		warnPhase3:Show()
 		timerNextSoul:Start()
-		DBM.BossHealth:AddBoss(23450, L.Anger)
+		if DBM.BossHealth:IsShown() then
+			DBM.BossHealth:AddBoss(23450, L.Anger)
+		end
 	end
 end
 
@@ -154,16 +166,6 @@ function mod:SPELL_DAMAGE(_, _, _, _, _, _, _, _, spellId)
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
-function mod:RAID_BOSS_EMOTE(msg)
-	if (msg == L.Enrage or msg:find(L.Enrage)) and self:IsInCombat() then
-		warnEnrage:Show()
-		timerEnrage:Start()
-		timerNextEnrage:Schedule(15)
-		warnEnrageEnd:Schedule(15)
-		warnEnrageSoon:Schedule(42)
-	end
-end
-
 function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 	if spellId == 28819 and self:AntiSpam(2, 2) then--Submerge Visual
 		self:SendSync("PhaseEnd")
@@ -172,14 +174,17 @@ end
 
 function mod:OnSync(msg)
 	if msg == "PhaseEnd" then
-		timerNextEnrage:Cancel()
 		warnEnrageEnd:Cancel()
 		warnEnrageSoon:Cancel()
 		warnMana:Cancel()
+		timerNextEnrage:Cancel()
+		timerEnrage:Cancel()
 		timerMana:Cancel()
 		timerNextShield:Cancel()
 		timerNextDeaden:Cancel()
 		timerNextShock:Cancel()
-		DBM.BossHealth:Clear()
+		if DBM.BossHealth:IsShown() then
+			DBM.BossHealth:Clear()
+		end
 	end
 end

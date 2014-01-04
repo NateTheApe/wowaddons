@@ -3,9 +3,8 @@
 		Displays countdowns on widgets
 --]]
 
-local Addon = ...
+local OmniCC, GetTime = OmniCC, GetTime
 local Timer = OmniCC:New('Timer')
-local timers = {}
 
 local IconSize = 36
 local Padding = 0
@@ -16,7 +15,6 @@ local HalfDayish, HalfHourish, HalfMinuteish = Day/2 + 0.5, Hour/2 + 0.5, Minute
 
 local floor, min, type = floor, min, type
 local round = function(x) return floor(x + 0.5) end
-local OmniCC, GetTime = OmniCC, GetTime
 
 
 --[[ Constructor ]]--
@@ -31,22 +29,16 @@ function Timer:New(cooldown)
 
 	timer:SetPoint('CENTER', cooldown)
 	timer:UpdateFontSize(cooldown:GetSize())
-
-	timers[cooldown] = timer
 	return timer
-end
-
-function Timer:Get(cooldown)
-	return timers[cooldown]
 end
 
 
 --[[ Controls ]]--
 
-function Timer:Start(start, duration)
-	self.start = start
+function Timer:Start(start, duration, charges)
+	self.start, self.duration, self.charges = start, duration, tonumber(charges) or 0
 	self.visible = self.cooldown:IsVisible()
-	self.duration = duration
+	self.finish = start + duration
 	self.textStyle = nil
 	self.enabled = true
 
@@ -165,19 +157,17 @@ function Timer:UpdateShown()
 	end
 end
 
-function Timer:UpdateOpacity()
-	self.cooldown:SetAlpha(self:GetSettings().spiralOpacity)
-end
-
 
 --[[ Accessors ]]--
 
 function Timer:GetRemain()
-	return self.duration - (GetTime() - self.start)
+	return self.finish - GetTime()
 end
 
 function Timer:GetTextStyle(remain)
-	if remain < Soonish then
+	if self.charges > 0 then
+		return 'charging'
+	elseif remain < Soonish then
 		return 'soon'
 	elseif remain < Minuteish then
 		return 'seconds'
@@ -262,32 +252,17 @@ function Timer:ShouldShow()
 end
 
 
---[[ Static Functions ]]--
+--[[ Utilities ]]--
 
-function Timer:ForAll(f, ...)
-	if type(f) == 'string' then
-		f = self[f]
-	end
+function Timer:ForAll(func, ...)
+	func = self[func]
 
-	for _, timer in pairs(timers) do
-		f(timer, ...)
-	end
-end
-
-function Timer:ForAllShown(f, ...)
-	if type(f) == 'string' then
-		f = self[f]
-	end
-
-	for _, timer in pairs(timers) do
-		if timer:IsShown() then
-			f(timer, ...)
+	for cooldown in pairs(OmniCC.Cache) do
+		if cooldown.omnicc and cooldown.omnicc:IsShown() then
+			func(cooldown.omnicc, ...)
 		end
 	end
 end
-
-
---[[ Settings ]]--
 
 function Timer:GetSettings()
 	return OmniCC:GetGroupSettingsFor(self.cooldown)

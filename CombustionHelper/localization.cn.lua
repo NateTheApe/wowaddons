@@ -62,7 +62,6 @@ combuoptioninfotableCN = {
 	["CombuimpactButton"] = "燃烧冷却完毕时，监控冲击触发情形，并变更背景颜色配置。",
 	["CombutrackerButton"] = "在燃烧框架中新增计时条，显示当前目标燃烧周期伤害的持续时间。 同时添加在聊天框的信息报告。",
 	["CombuchatButton"] = "启用/停用在对话框中显示设定变更与自动隐藏的信息。",
-	["LBtrackerPosition"] = "若要设定多目标活动炸弹监控框架的位置，请从下拉式选单中选择希望将该框架设定于主框架的哪一侧。",
 	["LBtrackerDropDown"] = "若要设定多目标活动炸弹监控框架的位置，请从下拉式选单中选择希望将该框架设定于主框架的哪一侧",
 	["CombuAutohideInfo"] = "请从下拉式选单中选择自动隐藏模式。「不自动隐藏」：持续显示「燃烧助手」框架。「脱离战斗时自动隐藏」：仅在处于战斗状态时显示框架 (无论燃烧是否已冷却完毕)。「脱离战斗/燃烧冷却时自动隐藏」：仅在战斗中，且燃烧已冷却完毕时显示框架。",
 	["CombuAutohideDropDown"] = "请从下拉式选单中选择自动隐藏模式。「不自动隐藏」：持续显示「燃烧助手」框架。「脱离战斗时自动隐藏」：仅在处于战斗状态时显示框架 (无论燃烧是否已冷却完毕)。「脱离战斗/燃烧冷却时自动隐藏」：仅在战斗中，且燃烧已冷却完毕时显示框架。",
@@ -151,15 +150,6 @@ CombuOptLocCN = {
 	["CombuLBEnableButton"] = "Enable Bomb tracking",
 	}
 
--------------------------------
--- table for Living bomb tracker position dropdown
-CombuLBpositionCN = {
-   "上方",
-   "下方",
-   "右方",
-   "左方",
-   "自由",
-	}
 
 -------------------------------
 -- table for Autohide dropdown

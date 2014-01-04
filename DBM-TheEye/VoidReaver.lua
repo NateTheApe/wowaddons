@@ -1,19 +1,19 @@
 local mod	= DBM:NewMod("VoidReaver", "DBM-TheEye")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 474 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 527 $"):sub(12, -3))
 mod:SetCreatureID(19516)
 mod:SetModelID(18951)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_SUCCESS"
 )
 
-local warnOrb			= mod:NewTargetAnnounce(34172, 3)
-local warnKnockBack		= mod:NewSpellAnnounce(25778, 3)
+local warnOrb			= mod:NewTargetAnnounce(34172, 2)
+local warnKnockBack		= mod:NewSpellAnnounce(25778, 4)
 local warnPounding		= mod:NewSpellAnnounce(34162, 3)
 
 local specWarnOrb		= mod:NewSpecialWarningMove(34172)

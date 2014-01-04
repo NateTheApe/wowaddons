@@ -1,9 +1,9 @@
 local mod	= DBM:NewMod(825, "DBM-ThroneofThunder", nil, 362)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9795 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10728 $"):sub(12, -3))
 mod:SetCreatureID(67977)
-mod:SetQuestID(32747)
+mod:SetEncounterID(1565)
 mod:SetZone()
 mod:SetUsedIcons(8, 7, 6, 5, 4, 3)
 
@@ -37,19 +37,19 @@ local specWarnSummonBats			= mod:NewSpecialWarningSwitch("ej7140", mod:IsTank())
 local timerBiteCD					= mod:NewCDTimer(8, 135251, nil, mod:IsTank())
 local timerRockfallCD				= mod:NewCDTimer(10, 134476)
 local timerCallTortosCD				= mod:NewNextTimer(60.5, 136294)
-local timerStompCD					= mod:NewNextCountTimer(49, 134920)
+local timerStompCD					= mod:NewCDCountTimer(47, 134920)
 local timerBreathCD					= mod:NewCDTimer(46, 133939)--TODO, adjust timer when Growing Anger is cast, so we can use a Next bar more accurately
 local timerSummonBatsCD				= mod:NewCDTimer(45, "ej7140", nil, nil, nil, 136685)--45-47. This doesn't always sync up to furious stone breath. Longer fight goes on more out of sync they get. So both bars needed I suppose
 local timerStompActive				= mod:NewBuffActiveTimer(10.8, 134920)--Duration of the rapid caveins
 local timerShellConcussion			= mod:NewBuffFadesTimer(20, 136431)
 
-local countdownStomp				= mod:NewCountdown(49, 134920, mod:IsHealer())
-local countdownBreath				= mod:NewCountdown(46, 133939, false) -- Coundown for the kicker. mod:IsRanged() and mod:IsDps()
+local countdownStomp				= mod:NewCountdown(47, 134920, mod:IsHealer())
+local countdownBreath				= mod:NewCountdown("Alt46", 133939, false) -- Coundown for the kicker. mod:IsRanged() and mod:IsDps()
 
 local berserkTimer					= mod:NewBerserkTimer(780)
 
 mod:AddBoolOption("InfoFrame")
-mod:AddBoolOption("SetIconOnTurtles", false)
+mod:AddSetIconOption("SetIconOnTurtles", "ej7129", false, true)
 mod:AddBoolOption("ClearIconOnTurtles", false)--Different option, because you may want auto marking but not auto clearing. or you may want auto clearning when they "die" but not auto marking when they spawn
 mod:AddBoolOption("AnnounceCooldowns", mod:HasRaidCooldown())
 
@@ -62,12 +62,8 @@ local shellsRemaining = 0
 local lastConcussion = 0
 local kickedShells = {}
 local addsActivated = 0
+local startIcon = 8
 local alternateSet = false
-local adds = {}
-local AddIcon = 6
-local iconsSet = 3
-local highestVersion = 0
-local hasHighestVersion = false
 
 local function clearStomp()
 	stompActive = false
@@ -84,10 +80,9 @@ local function checkCrystalShell()
 		local percent = (UnitHealth("player") / UnitHealthMax("player")) * 100
 		if percent > 90 then
 			specWarnCrystalShell:Show(shelldName)
-		else
-			mod:Unschedule(checkCrystalShell)
-			mod:Schedule(3, checkCrystalShell)
 		end
+		mod:Unschedule(checkCrystalShell)
+		mod:Schedule(3, checkCrystalShell)
 	end
 end
 
@@ -98,16 +93,13 @@ function mod:OnCombatStart(delay)
 	shellsRemaining = 0
 	lastConcussion = 0
 	addsActivated = 0
-	highestVersion = 0
-	AddIcon = 6
-	iconsSet = 3
+	startIcon = 8
 	alternateSet = false
-	table.wipe(adds)
 	table.wipe(kickedShells)
 	timerRockfallCD:Start(15-delay)
 	timerCallTortosCD:Start(21-delay)
-	timerStompCD:Start(29-delay, 1)
-	countdownStomp:Start(29-delay)
+	timerStompCD:Start(27-delay, 1)
+	countdownStomp:Start(27-delay)
 	timerBreathCD:Start(-delay)
 	countdownBreath:Start(-delay)
 	if self:IsDifficulty("heroic10", "heroic25") then
@@ -119,9 +111,6 @@ function mod:OnCombatStart(delay)
 		berserkTimer:Start(600-delay)
 	else
 		berserkTimer:Start(-delay)
-	end
-	if DBM:GetRaidRank() > 0 and self.Options.SetIconOnTurtles and not DBM.Options.DontSetIcons then--You can set marks and you have icons turned on
-		self:SendSync("IconCheck", UnitGUID("player"), tostring(DBM.Revision))
 	end
 end
 
@@ -163,58 +152,6 @@ function mod:SPELL_CAST_START(args)
 	end
 end
 
-local function resetaddstate()
-	iconsSet = 0
-	table.wipe(adds)
-	if addsActivated >= 1 then--1 or more add is up from last set
-		if alternateSet then--We check whether we started with skull last time or moon
-			AddIcon = 3--Start with moon if we used skull last time
-			alternateSet = false
-		else
-			AddIcon = 6--Start with skull if we used moon last time
-			alternateSet = true
-		end
-	else--No turtles are up at all
-		AddIcon = 6--Always start with skull
-		alternateSet = true--And reset alternate status so we use moon next time (unless all are dead again, then re always reset to skull)
-	end
-end
-
-mod:RegisterOnUpdateHandler(function(self)
-	if DBM:GetLowestBossHealth() * 100 < 10 then return end
-	if hasHighestVersion and not (iconsSet == 3) then
-		for uId in DBM:GetGroupMembers() do
-			local unitid = uId.."target"
-			local guid = UnitGUID(unitid)
-			if adds[guid] then
-				for g,i in pairs(adds) do
-					if i == 8 and g ~= guid then -- always set skull on first we see
-						adds[g] = adds[guid]
-						adds[guid] = 8
-						break
-					end
-				end
-				SetRaidTarget(unitid, adds[guid])
-				iconsSet = iconsSet + 1
-				adds[guid] = nil
-			end
-		end
-		local guid2 = UnitGUID("mouseover")
-		if adds[guid2] then
-			for g,i in pairs(adds) do
-				if i == 8 and g ~= guid2 then -- always set skull on first we see
-					adds[g] = adds[guid2]
-					adds[guid2] = 8
-					break
-				end
-			end
-			SetRaidTarget("mouseover", adds[guid2])
-			iconsSet = iconsSet + 1
-			adds[guid2] = nil
-		end
-	end
-end, 0.2)
-
 function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 133971 then--Shell Block (turtles dying and becoming kickable)
 		shellsRemaining = shellsRemaining + 1
@@ -230,10 +167,20 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 	elseif args.spellId == 133974 and self.Options.SetIconOnTurtles then--Spinning Shell
 		if self:AntiSpam(5, 6) then
-			resetaddstate()
+			if addsActivated >= 1 then--1 or more add is up from last set
+				if alternateSet then--We check whether we started with skull last time or moon
+					startIcon = 5--Start with moon if we used skull last time
+					alternateSet = false
+				else
+					startIcon = 8--Start with skull if we used moon last time
+					alternateSet = true
+				end
+			else--No turtles are up at all
+				startIcon = 8--Always start with skull
+				alternateSet = true--And reset alternate status so we use moon next time (unless all are dead again, then re always reset to skull)
+			end
 		end
-		adds[args.destGUID] = AddIcon
-		AddIcon = AddIcon + 1
+		self:ScanForMobs(args.destGUID, 0, startIcon, 3, 0.2, 10)
 		addsActivated = addsActivated + 1
 	end
 end
@@ -284,29 +231,5 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 		warnSummonBats:Show()
 		specWarnSummonBats:Show()
 		timerSummonBatsCD:Start()
-	end
-end
-
-function mod:OnSync(msg, guid, ver)
-	if msg == "IconCheck" and guid and ver then
-		ver = tonumber(ver) or 0
-		if ver > highestVersion then
-			highestVersion = ver--Keep bumping highest version to highest we recieve from the icon setters
-			if guid == UnitGUID("player") then--Check if that highest version was from ourself
-				hasHighestVersion = true
-				self:Unschedule(self.SendSync)
-				self:Schedule(5, self.SendSync, self, "FastestPerson", UnitGUID("player"))
-			else--Not from self, it means someone with a higher version than us probably sent it
-				self:Unschedule(self.SendSync)
-				hasHighestVersion = false
-			end
-		end
-	elseif msg == "FastestPerson" and guid and self:AntiSpam(10, 4) then--Whoever sends this sync first wins all. They have highest version and fastest computer
-		self:Unschedule(self.SendSync)
-		if guid == UnitGUID("player") then
-			hasHighestVersion = true
-		else
-			hasHighestVersion = false
-		end
 	end
 end

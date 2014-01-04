@@ -1,12 +1,12 @@
-﻿## Interface: 50200
+﻿## Interface: 50400
 ## Title: Broker_Location
 ## Notes: Keeps track of your current location.
-## Version: 1.8
+## Version: 1.10
 ## Author: CodeRedLin, iceeagle
 ## OptionalDeps: Ace3, LibTourist-3.0, LibQTip-1.0
 ## SavedVariables: Broker_LocationDB
 ## DefaultState: enabled
-## X-Curse-Packaged-Version: v1.8
+## X-Curse-Packaged-Version: v1.10
 ## X-Curse-Project-Name: Broker_Location
 ## X-Curse-Project-ID: broker_location
 ## X-Curse-Repository-ID: wow/broker_location/mainline

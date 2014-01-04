@@ -646,7 +646,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerButton" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="0" y="-40"/>
+							<AbsDimension x="0" y="-38"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -697,7 +697,7 @@
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="CombuMBTrackerScaleSlider" relativePoint="LEFT">
 						<Offset>
-							<AbsDimension x="0" y="-40"/>
+							<AbsDimension x="0" y="-36"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -739,7 +739,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="CombuMBTrackerrefreshButton" relativePoint="TOPLEFT">
 						<Offset>
-							<AbsDimension x="0" y="-33"/>
+							<AbsDimension x="0" y="-30"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -776,15 +776,105 @@
 					</OnClick>				
 				</Scripts>
 			</CheckButton>
-        
-     <Frame name="CombuMBTrackerDirectionInfo" inherits="CombuMBTrackerFrametemplate">
+
+	   <Frame name="CombuMBtrackerPosition" inherits="CombuMBTrackerFrametemplate">
         <Size>
           <AbsDimension x="250" y="9" />
         </Size>
         <Anchors>
 		  <Anchor point="TOPLEFT" relativeTo="CombuMBTrackerchatButton" relativePoint="TOPLEFT">
             <Offset>
-              <AbsDimension x="0" y="-40" />
+              <AbsDimension x="0" y="-36" />
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Layers>
+          <Layer>
+            <FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="" justifyH="LEFT">
+              <Anchors>
+                <Anchor point="TOPLEFT" />
+                <Anchor point="BOTTOMRIGHT" />
+              </Anchors>
+              <FontHeight>
+                <AbsValue val="12" />
+              </FontHeight>
+              <Color r="1" g="1" b="1" />
+              <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                  <AbsDimension x="1" y="-1" />
+                </Offset>
+              </Shadow>
+            </FontString>
+            </Layer>
+        </Layers>
+            </Frame>
+            
+    <Frame name="CombuMBtrackerDropDown" inherits="UIDropDownMenuTemplate">
+                <Size>
+                  <AbsDimension x="400" />
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="CombuMBtrackerPosition" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="130" y="8" />
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+               <Scripts>
+                <OnShow>
+
+local function LBpositionOnClick(self)
+
+   UIDropDownMenu_SetSelectedID(CombuMBtrackerDropDown, self:GetID())
+   
+   if (UIDropDownMenu_GetSelectedID(CombuMBtrackerDropDown, self:GetID())  == 1) then combumbtrackersettingstable["combumbtrackerPosition"] = "upside"
+   elseif (UIDropDownMenu_GetSelectedID(CombuMBtrackerDropDown, self:GetID())  == 2) then combumbtrackersettingstable["combumbtrackerPosition"] = "downside"
+   elseif (UIDropDownMenu_GetSelectedID(CombuMBtrackerDropDown, self:GetID())  == 3) then combumbtrackersettingstable["combumbtrackerPosition"] = "rightside"
+   elseif (UIDropDownMenu_GetSelectedID(CombuMBtrackerDropDown, self:GetID())  == 4) then combumbtrackersettingstable["combumbtrackerPosition"] = "leftside"
+   elseif (UIDropDownMenu_GetSelectedID(CombuMBtrackerDropDown, self:GetID())  == 5) then combumbtrackersettingstable["combumbtrackerPosition"] = "free"
+   end
+ 
+   CombuMBTrackerFrameresize()
+   CombuMBTrackerCreateBombRow()
+   
+end   
+                
+local function initialize(self, level)
+   local info = UIDropDownMenu_CreateInfo()
+   for k,v in pairs(CombuMBTrackerposition) do
+      info = UIDropDownMenu_CreateInfo()
+      info.text = v
+      info.value = v
+      info.func = LBpositionOnClick
+      UIDropDownMenu_AddButton(info, level)
+   end
+end
+ 
+ 
+UIDropDownMenu_Initialize(CombuMBtrackerDropDown, initialize)
+UIDropDownMenu_SetWidth(CombuMBtrackerDropDown, 220);
+UIDropDownMenu_SetButtonWidth(CombuMBtrackerDropDown, 124)
+UIDropDownMenu_JustifyText(CombuMBtrackerDropDown, "LEFT")
+                
+   if combumbtrackersettingstable["combumbtrackerPosition"] == "upside" then UIDropDownMenu_SetText(CombuMBtrackerDropDown, CombuMBTrackerposition[1])
+   elseif combumbtrackersettingstable["combumbtrackerPosition"] == "downside" then UIDropDownMenu_SetText(CombuMBtrackerDropDown, CombuMBTrackerposition[2])
+   elseif combumbtrackersettingstable["combumbtrackerPosition"] == "rightside" then UIDropDownMenu_SetText(CombuMBtrackerDropDown, CombuMBTrackerposition[3])
+   elseif combumbtrackersettingstable["combumbtrackerPosition"] == "leftside" then UIDropDownMenu_SetText(CombuMBtrackerDropDown, CombuMBTrackerposition[4])
+   elseif combumbtrackersettingstable["combumbtrackerPosition"] == "free" then UIDropDownMenu_SetText(CombuMBtrackerDropDown, CombuMBTrackerposition[5])
+   end
+                </OnShow>
+                </Scripts>
+        </Frame>
+        
+     <Frame name="CombuMBTrackerDirectionInfo" inherits="CombuMBTrackerFrametemplate">
+        <Size>
+          <AbsDimension x="250" y="9" />
+        </Size>
+        <Anchors>
+		  <Anchor point="TOPLEFT" relativeTo="CombuMBtrackerPosition" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-33" />
             </Offset>
           </Anchor>
         </Anchors>

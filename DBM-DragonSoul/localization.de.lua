@@ -11,7 +11,7 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	KohcromCD		= "Kohcrom imitiert %s",
+	KohcromCD		= "Kohcrom imitiert %s"
 })
 
 L:SetOptionLocalization({
@@ -90,9 +90,6 @@ L:SetOptionLocalization({
 	TimerSpecial			= "Zeige Zeit bis erste Spezialfähigkeit gewirkt wird",
 	RangeFrame				= "Zeige Abstandsfenster für $spell:105269 (3m) bzw. $journal:4327 (10m)",
 	AnnounceFrostTombIcons	= "Verkünde Zeichen für Ziele von $spell:104451 im Schlachtzugchat (nur als Leiter)",
-	warnFrostTombCast		= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.cast:format(104448),
-	SetIconOnFrostTomb		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(104451),
-	SetIconOnFrostflake		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(109325),
 	SpecialCount			= "Spiele akustischen Countdown für $spell:105256 bzw. $spell:105465",
 	SetBubbles				= "Automatische Deaktivierung d. 'Sprechblasen' bevor $spell:104451 gewirkt wird<br/>(wird nach dem Kampfende auf die vorherige Einstellung zurückgesetzt)"
 })
@@ -107,7 +104,7 @@ L:SetMiscLocalization({
 L= DBM:GetModLocalization(331)
 
 L:SetWarningLocalization({
-	specWarnHourofTwilightN		= "%s (%d) in 5 Sek"--spellname Count
+	specWarnHourofTwilightN		= "%s (%d) in 5 Sek"
 })
 
 L:SetTimerLocalization({
@@ -140,12 +137,10 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	TimerCombatStart	= "Kampfbeginn",
 	TimerAdd			= "Nächste Elitegegner"
 })
 
 L:SetOptionLocalization({
-	TimerCombatStart	= "Zeige Zeit bis Kampfbeginn",
 	TimerAdd			= "Zeige Zeit bis nächste Zwielichtelitegegner erscheinen",
 	SpecWarnElites		= "Spezialwarnung, wenn neue Zwielichtelitegegner erscheinen",
 	SetTextures			= "Automatische Deaktivierung der Grafikeinstellung 'Projizierte Texturen' in Phase 1 (wird in Phase 2 automatisch wieder aktiviert)"
@@ -169,10 +164,8 @@ L:SetWarningLocalization({
 })
 
 L:SetOptionLocalization({
-	warnSealArmor			= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.cast:format(105847),
 	SpecWarnTendril			= "Spezialwarnung, falls dir der $spell:105563 Buff fehlt",
 	InfoFrame				= "Zeige Infofenster für Spieler ohne $spell:105563",
-	SetIconOnGrip			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(105490),
 	ShowShieldInfo			= "Zeige Lebensanzeige mit einem Balken für $spell:105479"
 })
 
@@ -190,8 +183,7 @@ L:SetMiscLocalization({
 L= DBM:GetModLocalization(333)
 
 L:SetOptionLocalization({
-	RangeFrame			= "Zeige dynamisches Abstandsfenster (10m) basierend auf Spieler-Debuffs für $spell:108649 auf heroischem Schwierigkeitsgrad",
-	SetIconOnParasite	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(108649)
+	RangeFrame			= "Zeige dynamisches Abstandsfenster (10m) basierend auf Spieler-Debuffs für $spell:108649 auf heroischem Schwierigkeitsgrad"
 })
 
 L:SetMiscLocalization({
@@ -212,7 +204,7 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	TimerDrakes			= "%s"--spellname from mod
+	TimerDrakes			= "%s"
 })
 
 L:SetOptionLocalization({

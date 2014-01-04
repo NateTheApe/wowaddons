@@ -9,4 +9,5 @@
 	<Include file="LibTourist-3.0\lib.xml" />
 	<Include file="LibFishing-1.0\lib.xml" />
 	<Include file="LibTabbedFrame-1.0\lib.xml" />
+	<Include file="LibPetJournal-2.0\LibPetJournal-2.0.lua" />
 </Ui>

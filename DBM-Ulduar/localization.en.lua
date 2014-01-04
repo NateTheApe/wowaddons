@@ -8,9 +8,6 @@ L = DBM:GetModLocalization("FlameLeviathan")
 L:SetGeneralLocalization{
 	name = "Flame Leviathan"
 }
-
-L:SetTimerLocalization{
-}
 	
 L:SetMiscLocalization{
 	YellPull	= "Hostile entities detected. Threat assessment protocol active. Primary target engaged. Time minus 30 seconds to re-evaluation.",
@@ -38,12 +35,6 @@ L = DBM:GetModLocalization("Ignis")
 
 L:SetGeneralLocalization{
 	name = "Ignis the Furnace Master"
-}
-
-L:SetTimerLocalization{
-}
-
-L:SetWarningLocalization{
 }
 
 L:SetOptionLocalization{
@@ -98,12 +89,6 @@ L:SetGeneralLocalization{
 	name = "XT-002 Deconstructor"
 }
 
-L:SetTimerLocalization{
-}
-
-L:SetWarningLocalization{
-}
-
 L:SetOptionLocalization{
 	SetIconOnLightBombTarget	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(65121),
 	SetIconOnGravityBombTarget	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(64234)
@@ -116,12 +101,6 @@ L = DBM:GetModLocalization("IronCouncil")
 
 L:SetGeneralLocalization{
 	name = "Iron Council"
-}
-
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
@@ -153,8 +132,7 @@ L:SetTimerLocalization{
 L:SetWarningLocalization{
 	WarningPhasePunch		= "Phase Punch on >%s< - Stack %d",
 	WarnPhase2Soon			= "Phase 2 soon",
-	warnStarLow				= "Collapsing Star is low",
-	FirstPullNotice			= "First pull detected, auto correcting timers."
+	warnStarLow				= "Collapsing Star is low"
 }
 
 L:SetOptionLocalization{
@@ -181,9 +159,6 @@ L = DBM:GetModLocalization("Kologarn")
 
 L:SetGeneralLocalization{
 	name = "Kologarn"
-}
-
-L:SetWarningLocalization{
 }
 
 L:SetTimerLocalization{
@@ -230,7 +205,7 @@ L:SetTimerLocalization{
 L:SetWarningLocalization{
 	SpecWarnBlast	= "Sentinel Blast - Interrupt now",
 	WarnCatDied		= "Feral Defender down (%d lives remaining)",
-	WarnCatDiedOne	= "Feral Defender down (1 life remaining)",
+	WarnCatDiedOne	= "Feral Defender down (1 life remaining)"
 }
 
 L:SetOptionLocalization{
@@ -247,12 +222,6 @@ L = DBM:GetModLocalization("Hodir")
 
 L:SetGeneralLocalization{
 	name = "Hodir"
-}
-
-L:SetWarningLocalization{
-}
-
-L:SetTimerLocalization{
 }
 
 L:SetOptionLocalization{
@@ -272,9 +241,6 @@ L:SetGeneralLocalization{
 	name = "Thorim"
 }
 
-L:SetWarningLocalization{
-}
-
 L:SetTimerLocalization{
 	TimerHardmode	= "Hard mode"
 }
@@ -282,7 +248,7 @@ L:SetTimerLocalization{
 L:SetOptionLocalization{
 	TimerHardmode	= "Show timer for hard mode",
 	RangeFrame		= "Show range frame",
-	AnnounceFails	= "Post player fails for $spell:62017 to raid chat\n(requires announce to be enabled and leader/promoted status)"
+	AnnounceFails	= "Post player fails for $spell:62017 to raid chat<br/>(requires announce to be enabled and leader/promoted status)"
 }
 
 L:SetMiscLocalization{
@@ -307,7 +273,7 @@ L:SetMiscLocalization{
 	WaterSpirit        = "Ancient Water Spirit",
 	Snaplasher         = "Snaplasher",
 	StormLasher        = "Storm Lasher",
-	YellKill           = "His hold on me dissipates. I can see clearly once more. Thank you, heroes.",
+	YellKill           = "His hold on me dissipates. I can see clearly once more. Thank you, heroes."
 }
 
 L:SetWarningLocalization{
@@ -330,15 +296,6 @@ L = DBM:GetModLocalization("Freya_Elders")
 
 L:SetGeneralLocalization{
 	name = "Freya's Elders"
-}
-
-L:SetMiscLocalization{
-}
-
-L:SetWarningLocalization{
-}
-
-L:SetOptionLocalization{
 }
 
 ---------------
@@ -413,7 +370,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	SetIconOnShadowCrash			= "Set icons on $spell:62660 targets (skull)",
 	SetIconOnLifeLeach				= "Set icons on $spell:63276 targets (cross)",
-	SpecialWarningShadowCrash		= "Show special warning for $spell:62660\n(must be targeted or focused by at least one raid member)",
+	SpecialWarningShadowCrash		= "Show special warning for $spell:62660<br/>(must be targeted or focused by at least one raid member)",
 	SpecialWarningShadowCrashNear	= "Show special warning for $spell:62660 near you",
 	SpecialWarningLLNear			= "Show special warning for $spell:63276 near you",
 	hardmodeSpawn					= "Show timer for Saronite Animus spawn (hard mode)",
@@ -477,4 +434,3 @@ L:SetOptionLocalization{
 	SetIconOnBrainLinkTarget		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(63802),
 	MaladyArrow						= "Show DBM arrow when $spell:63881 is near you"
 }
-

@@ -12,14 +12,16 @@ local FINAL_STATE = 4;
 local gearframe = CreateFrame("Frame");
 gearframe:Hide();
 gearframe:SetScript("OnUpdate", function(self)
+	FishingBuddy.Debug("gearframe state "..self.state);
 	if ( self.state == 0 ) then
 		local icon, idxm1 = GetEquipmentSetInfoByName(self.name);
-		if ( not icon ) then
+		if ( not icon or self.force ) then
 			-- make sure we're wearing everything we think we should be
 			local wearing = 1;
 			local mslot = GetInventorySlotInfo("MainHandSlot");			
 			for invslot,info in pairs(self.outfit) do
 				local link = GetInventoryItemLink("player", invslot);
+				-- FishingBuddy.Debug("link "..link.." "..info.link);
 				if (link ~= info.link) then
 					wearing = nil;
 				end
@@ -27,14 +29,15 @@ gearframe:SetScript("OnUpdate", function(self)
 					if (mslot == invslot) then
 						local _, _, _, _, _, _, _, _, _, t, _ = GetItemInfo(info.link);
 						self.maintexture = gsub( strupper(t), "INTERFACE\\ICONS\\", "" );
+						-- FishingBuddy.Debug("texture "..self.maintexture);
 					end
 				end
 			end
 			
+			-- Are we wearing everything?
 			if (wearing) then
 				SaveEquipmentSet(self.name, self.maintexture);
 				self.state = 1;
-			else
 			end
 		else
 			self.state = FINAL_STATE;
@@ -59,6 +62,7 @@ gearframe:SetScript("OnUpdate", function(self)
 		end
 		self.state = FINAL_STATE;
 	else
+		self.force = nil;
 		self:Hide();
 	end
 end)
@@ -68,25 +72,39 @@ gearframe:SetScript("OnEvent", function(self,...)
 end)
 gearframe:RegisterEvent("EQUIPMENT_SWAP_FINISHED");
 
-local function PrepGearFrame(name, outfit)
+local function PrepGearFrame(name, outfit, force)
 	gearframe.laststate = -1;
 	gearframe.name = name;
 	gearframe.state = 0;
 	gearframe.outfit = outfit;
+	gearframe.force = force;
 	gearframe.maintexture = nil;
 	gearframe:Show();
 end
 
-local function GearManagerInitialize()
+local function GearManagerInitialize(force)
 	local known, name = FL:GetFishingSkillInfo();
 	if ( known ) then
+		if (force) then
+			FishingBuddy.Debug("GearManagerInitialize forced");
+		end
+		FishingBuddy.Debug("GearManagerInitialize name "..FBConstants.NAME);
 		local icon, _ = GetEquipmentSetInfoByName(FBConstants.NAME);
-		if ( not icon ) then
+		if ( icon ) then
+			-- Validate outfit, CurseForge bug #218
+			local itemArray = GetEquipmentSetItemIDs(FBConstants.NAME);
+			-- If there is a Ranged slot, nuke this outfit
+			FishingBuddy.Dump(itemArray)
+			if (itemArray[18] and itemArray[18] ~= 0) then
+				force = true;
+			end
+		end
+		if ( not icon or force ) then
 			-- Let's build a fishing outfit
 			-- but we actually have to equip the items for this to work
 			-- let's save what we have on now...
 			SaveEquipmentSet(FB_TEMP_OUTFIT, 1);
-			for slot=1,18 do
+			for slot=1,17 do
 				EquipmentManagerIgnoreSlotForSave(slot);
 			end
 
@@ -96,7 +114,7 @@ local function GearManagerInitialize()
 				EquipmentManagerUnignoreSlotForSave(invslot);
 			end  -- for bags
 			-- let's save this puppy
-			PrepGearFrame(FBConstants.NAME, outfit);
+			PrepGearFrame(FBConstants.NAME, outfit, force);
 		end
 	end
 	-- we can (and need to) reinitialize every time we're selected
@@ -112,7 +130,7 @@ local function GuessCurrentOutfit()
 		local eq_set_name, _, _ = GetEquipmentSetInfo(set);
 		GetEquipmentSetLocations(eq_set_name, location_array);
 		for s,location in pairs(location_array) do
-			local onplayer, _, bags, _, _ = EquipmentManager_UnpackLocation(location);
+			local onplayer, _, bags, _, _, _ = EquipmentManager_UnpackLocation(location);
 			if onplayer and not bags then
 				ret[set] = ret[set] + 1;
 			end	
@@ -146,7 +164,6 @@ local function GearManagerSwitch(outfitName)
 	local GSB = FishingBuddy.GetSettingBool;
 	if ( FL:IsFishingReady(GSB("PartialGear")) ) then
 		local name = FishingBuddy_Info["LastGearSet"];
-FishingBuddy.Debug("Switching to "..FL:printable(name));
 		if ( not name ) then
 			name, _, _ = GetEquipmentSetInfo(1);
 		end
@@ -156,7 +173,6 @@ FishingBuddy.Debug("Switching to "..FL:printable(name));
 	else
 		local icon, idxm1 = GetEquipmentSetInfoByName(FBConstants.NAME);
 		if ( icon ) then
-FishingBuddy.Debug("Switching to "..FBConstants.NAME);
 			FishingBuddy_Info["LastGearSet"] = GetCurrentOutfit();
 			EquipmentManager_EquipSet(FBConstants.NAME);
 			return true;
@@ -173,7 +189,7 @@ local function OutfitPoints(outfit)
 		local ibp = function(link) return FL:FishingBonusPoints(link); end;
 		local items = GetEquipmentSetLocations(outfit);
 		for slot,loc in pairs(items) do
-			local player, bank, bags, slot, bag = EquipmentManager_UnpackLocation(loc);
+			local player, bank, bags, void, slot, bag = EquipmentManager_UnpackLocation(loc);
 			local link;
 			if ( not bags ) then -- and (player or bank) 
 				link = GetInventoryItemLink("player", slot);
@@ -220,3 +236,25 @@ FishingBuddy.OutfitManager.RegisterManager(EQUIPMENT_MANAGER,
 															 GearManagerInitialize,
 															 function(useme) end,
 															 GearManagerSwitch);
+
+if ( FishingBuddy.Debugging ) then
+	FishingBuddy.Commands["checkset"] = {};
+	FishingBuddy.Commands["checkset"].func =
+		function(what)
+			local Debug = FishingBuddy.Debug;
+			local set = GetEquipmentSetItemIDs(FBConstants.NAME);
+			for slot, item in ipairs(set) do
+				if ( item == EQUIPMENT_SET_IGNORED_SLOT ) then
+					Debug("Ignored slot "..slot);
+				end
+			end
+			return true;
+		end
+
+	FishingBuddy.Commands["newset"] = {};
+	FishingBuddy.Commands["newset"].func =
+		function(what)
+			GearManagerInitialize(true);
+			return true;
+		end
+end

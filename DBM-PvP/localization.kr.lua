@@ -1,5 +1,4 @@
 ﻿if GetLocale() ~= "koKR" then return end
-
 local L
 
 ----------------------------
@@ -17,7 +16,7 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	ColorByClass		= "전장 점수판 캐릭터명에 직업 색상 사용",
-	ShowInviteTimer		= "전장 입장까지 남은시간 바 표시",
+	ShowInviteTimer		= "전장 입장까지 남은시간 바 보기",
 	AutoSpirit			= "전장에서 사망시 자동으로 무덤 이동",
 	HideBossEmoteFrame	= "화면 가운데 나타나는 전장 메세지 숨김"
 })
@@ -40,7 +39,7 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	TimerShadow 	= "어둠의 시야 바 표시"
+	TimerShadow 	= "어둠의 시야 바 보기"
 })
 
 L:SetMiscLocalization({
@@ -58,8 +57,8 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	TimerTower 	= "탑 점령 바 표시",
-	TimerGY 	= "무덤 점령 바 표시",
+	TimerTower 	= "탑 점령 바 보기",
+	TimerGY 	= "무덤 점령 바 보기",
 	AutoTurnIn 	= "알터랙 계곡내 퀘스트 자동 완료"
 })
 
@@ -73,17 +72,16 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	TimerWin 				= "전장 승리까지 남은시간 바 표시",
-	TimerCap 				= "거점 점령 바 표시",
-	ShowAbEstimatedPoints 	= "전장 종료 순간 승/패 진영 예상 점수 표시",
-	ShowAbBasesToWin 		= "뒤지고 있을 경우 역전에 필요한 거점 수 표시"
+	TimerWin 				= "전장 승리까지 남은시간 바 보기",
+	TimerCap 				= "거점 점령 바 보기",
+	ShowAbEstimatedPoints 	= "전장 종료 순간 승/패 진영 예상 점수 보기",
+	ShowAbBasesToWin 		= "뒤지고 있을 경우 역전에 필요한 거점 수 보기"
 })
 
 L:SetMiscLocalization({
 	ScoreExpr 		= "(%d+)/1600",
 	WinBarText 		= "%s 승리",
-	BasesToWin		= "역전하기 위해 필요한 거점 수: %d",
-	Flag 			= "깃발"
+	BasesToWin		= "역전하기 위해 필요한 거점 수: %d"
 })
 
 -----------------------
@@ -96,14 +94,15 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	TimerWin 		= "전장 승리까지 남은시간 바 표시",
-	TimerFlag 		= "깃발 재생성 바 표시",
-	ShowPointFrame 	= "전장 종료 순간 승/패 진영 예상 점수 및 깃발 운반자 표시"
+	TimerWin 		= "전장 승리까지 남은시간 바 보기",
+	TimerFlag 		= "깃발 재생성 바 보기",
+	ShowPointFrame 	= "전장 종료 순간 승/패 진영 예상 점수 및 깃발 운반자 보기"
 })
 
 L:SetMiscLocalization({
 	ScoreExpr 		= "(%d+)/1600",
 	WinBarText		= "%s 승리",
+	Flag 			= "깃발",
 	FlagReset 		= "깃발이 다시 제자리로 돌아갔습니다.",
 	FlagTaken 		= "^(.+)|1이;가; 깃발을 차지했습니다!",
 	FlagCaptured 	= "(.+)|1이;가; 깃발을 차지했습니다!",
@@ -117,13 +116,13 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("z489")
 
 L:SetTimerLocalization({
-	TimerFlag 			= "깃발 재생성",
+	TimerFlag 			= "깃발 재생성"
 })
 
 L:SetOptionLocalization({
-	TimerFlag 					= "깃발 재생성 바 표시",
-	ShowFlagCarrier 	 	 	= "깃발 운반자 표시",
-	ShowFlagCarrierErrorNote	= "전투가 진행 중이어서 깃발 운반자 표시 기능이 제한될 때 알림 보기"
+	TimerFlag 					= "깃발 재생성 바 보기",
+	ShowFlagCarrier 	 	 	= "깃발 운반자 보기",
+	ShowFlagCarrierErrorNote	= "전투가 진행 중이어서 깃발 운반자 보기 기능이 제한될 때 알림 보기"
 })
 
 L:SetMiscLocalization({
@@ -133,7 +132,9 @@ L:SetMiscLocalization({
 	ExprFlagReturn 		= "(.+)|1이;가; (.+) 깃발을 되찾았습니다!",
 	FlagAlliance 		= "얼라이언스 깃발 :",
 	FlagHorde 			= "호드 깃발 :",
-	FlagBase 			= "기지"
+	FlagBase			= "기지",
+	Vulnerable1			= "약해져서",
+	Vulnerable2			= "약해져서"
 })
 
 ------------------------
@@ -143,7 +144,7 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("z628")
 
 L:SetWarningLocalization({
-	WarnSiegeEngine			= "공성 전차 준비!",
+	WarnSiegeEngine			= "공성 전차 준비 완료",
 	WarnSiegeEngineSoon		= "공성 전차 완료 10초 전"
 })
 
@@ -153,11 +154,11 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	TimerPOI				= "거점 점령 바 표시",
-	TimerSiegeEngine		= "공성 전차 제작 바 표시",
-	WarnSiegeEngine			= "공성 전차 제작 완료 알림 보기",
-	WarnSiegeEngineSoon		= "공성 전차 제작 완료 사전 알림 보기",
-	ShowGatesHealth			= "관문 체력 바 보기(진행 중인 전장에서는 맞지 않을 수도 있습니다.)"
+	TimerPOI				= "거점 점령 바 보기",
+	TimerSiegeEngine		= "공성 전차 준비 바 보기",
+	WarnSiegeEngine			= "공성 전차 준비 완료 알림 보기",
+	WarnSiegeEngineSoon		= "공성 전차 준비 완료 이전에 알림 보기",
+	ShowGatesHealth			= "관문 체력 바 보기(진행 도중인 전장에 진입한경우 맞지 않음)"
 })
 
 L:SetMiscLocalization({
@@ -183,9 +184,9 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	TimerFlag 					= "깃발 재생성 바 표시",
-	ShowFlagCarrier 	 	 	= "깃발 운반자 표시",
-	ShowFlagCarrierErrorNote	= "전투가 진행 중이어서 깃발 운반자 표시 기능이 제한될 때 알림 보기"
+	TimerFlag 					= "깃발 재생성 바 보기",
+	ShowFlagCarrier 	 	 	= "깃발 운반자 보기",
+	ShowFlagCarrierErrorNote	= "전투가 진행 중이어서 깃발 운반자 보기 기능이 제한될 때 알림 보기"
 })
 
 L:SetMiscLocalization({
@@ -210,17 +211,16 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	TimerWin 					= "전장 승리까지 남은시간 바 표시",
-	TimerCap 					= "거점 점령 바 표시",
-	ShowGilneasEstimatedPoints 	= "전장 종료 순간 승/패 진영 예상 점수 표시",
-	ShowGilneasBasesToWin 		= "뒤지고 있을 경우 역전에 필요한 거점 수 표시"
+	TimerWin 					= "전장 승리까지 남은시간 바 보기",
+	TimerCap 					= "거점 점령 바 보기",
+	ShowGilneasEstimatedPoints 	= "전장 종료 순간 승/패 진영 예상 점수 보기",
+	ShowGilneasBasesToWin 		= "뒤지고 있을 경우 역전에 필요한 거점 수 보기"
 })
 
 L:SetMiscLocalization({
 	ScoreExpr 		= "(%d+)/2000",
 	WinBarText 		= "%s 승리",
-	BasesToWin		= "역전하기 위해 필요한 거점 수: %d",
-	Flag 			= "깃발"
+	BasesToWin		= "역전하기 위해 필요한 거점 수: %d"
 })
 
 -------------------------
@@ -233,11 +233,11 @@ L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
-	TimerCart	= "수레 재생성 바 표시"
+	TimerCart	= "수레 재생성 바 보기"
 })
 
 L:SetMiscLocalization({
-	Capture = "수레를 차지"
+	Capture = "수레를 빼앗았습니다!"
 })
 
 -------------------------
@@ -246,8 +246,8 @@ L:SetMiscLocalization({
 L = DBM:GetModLocalization("z998")
 
 L:SetMiscLocalization({
-	OrbTaken 	= "차지했습니다!",
-	OrbReturn 	= "공이 돌아왔습니다!",
+	OrbTaken 	= "(.+)|1이;가; (.+) 공을 차지했습니다!",
+	OrbReturn 	= "(.+) 공이 돌아왔습니다!",
 	ScoreExpr	= "(%d+)/1600",
 	WinBarText	= "%s 승리",
 	OrbsToWin	= "역전하기 위해 필요한 공 수: %d"
@@ -255,7 +255,7 @@ L:SetMiscLocalization({
 
 
 L:SetOptionLocalization({
-	TimerWin					= "전투 승리까지 남은시간 바 표시",
-	ShowKotmoguEstimatedPoints	= "전투 종료 순간 승/패 진영 예상 점수 표시",
-	ShowKotmoguOrbsToWin		= "뒤지고 있을 경우 역전에 필요한 공 개수 표시"
+	TimerWin					= "전투 승리까지 남은시간 바 보기",
+	ShowKotmoguEstimatedPoints	= "전투 종료 순간 승/패 진영 예상 점수 보기",
+	ShowKotmoguOrbsToWin		= "뒤지고 있을 경우 역전에 필요한 공 개수 보기"
 })

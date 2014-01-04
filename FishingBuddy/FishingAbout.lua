@@ -98,6 +98,10 @@ credits[FBConstants.ROLE_HELP_BUGS] = {
 	["Ninmah"] = { "Beta tester", "Auto-loot reset bug" },
 	["WildCard_25"] = { "Fish Watcher update bug" },
 	["Grizzly_UK"] = { "Forum support and understanding" },
+	["Badmunkay@Shadow Council"] = { "Better Extravaganza time handling", },
+	["esiemiat"] = { "Minimap icon move bug help", },
+	["DirtyHarryGermany"] = { "Beta tester", },
+	["Alindrios"] = { "Fish Watcher bugs", },
 };
 
 -- Ideas and suggestions
@@ -154,6 +158,7 @@ credits[FBConstants.ROLE_ADDON_AUTHORS] = {
 	["Cryect (cryect@gmail.com)"] = { "LibGraph-2.0", },
 	["Xinhuan"] = { "LibGraph-2.0", },
 	["KarlKFI"] = { "MobileMinimapButtons" },
+	["endx7"] = { "LibPetJournal-2.0" },
 };
 
 local CREDITSKIP = 7;
@@ -176,7 +181,6 @@ local function UpdateCreditPanel(self, elapsed)
 		self.data = self.credits[self.idx]
 		self.lines[1]:SetText(self.categories[self.data.title])
 		self.lines[2]:SetText(self.data.who)
-		
 		local what = self.data.what[self.whatidx];
 		if (string.sub(what,1,1) == "v") then
 			what = "Version "..string.sub(what,2);
@@ -332,6 +336,8 @@ local function AboutSetup(self)
 		-- Dump the storage, now that we have a better table
 		credits = nil;
 		table.sort(self.credits, function (a, b) return a.sort < b.sort; end)
+		self:ClearAllPoints();
+		self:SetAllPoints(FishingBuddyFrameInset);
 	end
 end
 
@@ -339,6 +345,7 @@ local AboutOptions = {
 	["AboutFrame"] = {
 		["button"] = "FishingAboutFrame",
 		["setup"] = AboutSetup,
+		["margin"] = { 32, 16 },
 	},
 };
 
@@ -347,7 +354,6 @@ local function OnEvent(self, event)
 	self:UnregisterEvent("VARIABLES_LOADED");
 end
 
-local frame = CreateFrame("FRAME", "FishingAboutFrame", FishingBuddyFrameInset)
+local frame = CreateFrame("FRAME", "FishingAboutFrame", FishingBuddyFrame)
 frame:SetScript("OnEvent", OnEvent)
 frame:RegisterEvent("VARIABLES_LOADED")
-frame:Hide()

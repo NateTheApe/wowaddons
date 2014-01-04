@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
+    Decursive (v 2.7.3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
 
-    This file was last updated on 2013-04-13T23:28:31Z
+    This file was last updated on 2013-08-08T21:03:46Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -265,7 +265,7 @@ do
         _Debug(unpack(TIandBI));
 
 
-        DebugHeader = ("%s\n2.7.2.9  %s(%s)  CT: %0.4f D: %s %s %s BDTHFAd: %s nDrE: %d Embeded: %s W: %d LA: %d TA: %d NDRTA: %d BUIE: %d TI: [dc:%d, lc:%d, y:%d, LEBY:%d, LB:%d, TTE:%u] (%s, %s, %s, %s)"):format(instructionsHeader, -- "%s\n
+        DebugHeader = ("%s\n2.7.3  %s(%s)  CT: %0.4f D: %s %s %s BDTHFAd: %s nDrE: %d Embeded: %s W: %d LA: %d TA: %d NDRTA: %d BUIE: %d TI: [dc:%d, lc:%d, y:%d, LEBY:%d, LB:%d, TTE:%u] (%s, %s, %s, %s)"):format(instructionsHeader, -- "%s\n
         tostring(DC.MyClass), tostring(UnitLevel("player") or "??"), NiceTime(), date(), GetLocale(), -- %s(%s)  CT: %0.4f D: %s %s
         BugGrabber and "BG" .. (T.BugGrabber and "e" or "") or "NBG", -- %s
         tostring(T._BDT_HotFix1_applyed), -- BDTHFAd: %s
@@ -396,7 +396,12 @@ function T._onError(event, errorObject)
         )) then
 
         if errorml:find("dcr_diag.lua") and errorml:find("script ran too long") then
-            -- don't creaate report for these 'errors'...
+            -- don't create report for these 'errors'...
+            return;
+        end
+
+        -- Ignore errors caused by corrupted savedVariables files
+        if errorm:find("SavedVariables") then
             return;
         end
 
@@ -514,9 +519,15 @@ function T._DecursiveErrorHandler(err, ...)
     if not IsReporting and (T._CatchAllErrors or errl:find("decursive") and not errl:find("\\libs\\")) then
 
         if errl:find("dcr_diag.lua") and errl:find("script ran too long") then
-            -- don't creaate report for these 'errors'...
+            -- don't create report for these 'errors'...
             return;
         end
+
+        -- Ignore errors caused by corrupted savedVariables files
+        if err:find("SavedVariables") then
+            return;
+        end
+
 
         IsReporting = true;
         AddDebugText(err, "\n|cff00aa00STACK:|r\n", debugstack(4), "\n|cff00aa00LOCALS:|r\n", debuglocals(4), ...);
@@ -924,4 +935,4 @@ do
     end
 end
 
-T._LoadedFiles["Dcr_DIAG.lua"] = "2.7.2.9";
+T._LoadedFiles["Dcr_DIAG.lua"] = "2.7.3";

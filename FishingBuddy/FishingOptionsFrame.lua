@@ -37,13 +37,17 @@ local function GetSetting(setting)
 	local val = nil;
 	if ( setting ) then
 		local info = FindOptionInfo(setting);
-		if ( info and info.getter) then
-			val = info.getter(setting);
-			if ( val == nil ) then
-				val = GetDefault(setting);
+		if ( info ) then
+			if ( info.getter) then
+				val = info.getter(setting);
+				if ( val == nil ) then
+					val = GetDefault(setting);
+				end
+			elseif ( info.global ) then
+				val = FishingBuddy.GlobalGetSetting(setting);
+			else
+				val = FishingBuddy.BaseGetSetting(setting);
 			end
-		else
-			val = FishingBuddy.BaseGetSetting(setting);
 		end
 	end
 	return val;
@@ -59,15 +63,19 @@ FishingBuddy.GetSettingBool = GetSettingBool;
 local function SetSetting(setting, value)
 	if ( setting ) then
 		local info = FindOptionInfo(setting);
-		if ( info and info.setter ) then
-			local val = GetDefault(setting);
-			if ( val == value ) then
-				info.setter(setting, nil);
+		if ( info) then
+			if ( info.setter ) then
+				local val = GetDefault(setting);
+				if ( val == value ) then
+					info.setter(setting, nil);
+				else
+					info.setter(setting, value);
+				end
+			elseif ( info.global ) then
+				FishingBuddy.GlobalSetSetting(setting, value);
 			else
-				info.setter(setting, value);
+				FishingBuddy.BaseSetSetting(setting, value);
 			end
-		else
-			FishingBuddy.BaseSetSetting(setting, value);
 		end
 	end
 end
@@ -148,7 +156,10 @@ local function CheckBox_Able(button, value)
 			button:Disable();
 		end
 		if (button.overlay) then
-			button.overlay:SetFrameLevel(button:GetFrameLevel()+1);
+			button.overlay:ClearAllPoints();
+			button.overlay:SetPoint("TOPLEFT", button.label, "TOPLEFT");
+			button.overlay:SetSize(button:GetWidth(), button:GetHeight());
+			button.overlay:SetFrameLevel(button:GetFrameLevel()+2);
 			button.overlay:Show();
 		end
 		color = GRAY_FONT_COLOR;
@@ -419,21 +430,26 @@ local function layoutorder(btnlist, maxwidth)
 	return layout;
 end
 
-local function FirstPosition(button)
-	button:SetPoint("TOPLEFT", FishingBuddyFrameInset, "TOPLEFT", 4, -4);
+local function FirstPosition(button, xoffset, yoffset)
+	xoffset = xoffset or 4;
+	yoffset = yoffset or -4;
+	button:SetPoint("TOPLEFT", FishingBuddyFrameInset, "TOPLEFT", xoffset, yoffset);
 end
 
 local SQUISH_OFF = 6;
 local function dolayout(layout, lastbutton, firstoff)
 	for idx,line in ipairs(layout) do
 		local lb, rb = line[1], line[2];
-		local yoff = SQUISH_OFF;
+		local yoff = nil;
 		if ( lb.margin ) then
-			yoff = yoff - lb.margin[1] or 0;
+			firstoff = firstoff or 0;
+			yoff = -(lb.margin[2] or SQUISH_OFF);
+			firstoff = firstoff + lb.margin[1] or 0;
 		end
 		if ( not lastbutton ) then
-			FirstPosition(lb);
+			FirstPosition(lb, firstoff, yoff);
 		else
+			yoff = SQUISH_OFF;
 			lb:SetPoint("TOPLEFT", lastbutton, "BOTTOMLEFT", firstoff, yoff);
 			firstoff = 0;
 		end
@@ -442,7 +458,7 @@ local function dolayout(layout, lastbutton, firstoff)
 			rb.right = 1;
 			rb.adjacent = lastbutton;
 			if ( rb.margin ) then
-				yoff = yoff + rb.margin[1] or 0;
+				yoff = yoff + (rb.margin[2] or 0);
 			end
 			rb:SetPoint("TOP", lb, "TOP");
 			if ( rb.checkbox ) then
@@ -495,8 +511,6 @@ end
 
 local insidewidth = 0;
 local function Setup(options, nomap)
-	FishingOptionsFrame.groupoptions = options;
-
 	insidewidth = FishingBuddyFrameInset:GetWidth();
 
 -- Clear out all the stuff we put on the old buttons
@@ -638,7 +652,7 @@ local function Setup(options, nomap)
 	end
 
 	local layout = layoutorder(pb, insidewidth);	
-	local lastbutton = dolayout(layout, nil, 0);
+	local lastbutton = dolayout(layout);
 	
 	local primaries = {};
 	for _,name in pairs(toplevel) do
@@ -658,11 +672,16 @@ local function Setup(options, nomap)
 	for _,name in pairs(primaries) do
 		local button = optionmap[name];
 		if ( not lastbutton ) then
-			FirstPosition(button);
+			local yoff, firstoff;
+			if ( button.margin ) then
+				yoff = -(button.margin[2] or SQUISH_OFF);
+				firstoff = button.margin[1] or 0;
+			end
+			FirstPosition(button, firstoff, yoff);
 		else
 			local yoff = SQUISH_OFF;
 			if ( button.margin ) then
-				yoff = yoff - button.margin[1];
+				yoff = yoff - button.margin[2];
 			end
 			if ( lastbutton.margin ) then
 				yoff = yoff - lastbutton.margin[2];
@@ -831,6 +850,14 @@ local function HandleOptions(name, icon, options, setter, getter, last)
 			handler.index = index;
 		end
 		optiontab:SetNormalTexture(handler.icon);
+
+		-- if we show this one, then check to see if it has
+		-- any options for the drop down menu
+		for name,option in pairs(handler.options) do
+			if ( option.m ) then
+				handler.hasdd = true;
+			end
+		end	
 	end
 end
 FishingBuddy.OptionsFrame.HandleOptions = HandleOptions;
@@ -886,7 +913,7 @@ local function OptionsFrame_OnHide(self)
 	for _,tab in pairs(tabmap) do
 		tab:Hide();
 	end
-	FishingBuddy.OptionsUpdate();
+	FishingBuddy.OptionsUpdate(nil, true);
 end
 
 -- Drop-down menu support
@@ -913,46 +940,110 @@ local function MakeToggle(name, callme)
 end
 FishingBuddy.MakeToggle = MakeToggle;
 
-local function MakeDropDownEntry(switchText, switchSetting, keepShowing, callMe)
-	info = {};
-	info.text = switchText;
-	info.func = MakeToggle(switchSetting, callMe);
-	info.checked = FishingBuddy.GetSettingBool(switchSetting);
-	info.keepShownOnClick = keepShowing;
-	UIDropDownMenu_AddButton(info);
+local function MakeClickToSwitchEntry(switchText, switchSetting, level, keepShowing, callMe)
+	local entry = {};
+	entry.text = switchText;
+	entry.func = MakeToggle(switchSetting, callMe);
+	entry.checked = FishingBuddy.GetSettingBool(switchSetting);
+	entry.keepShownOnClick = keepShowing;
+	UIDropDownMenu_AddButton(entry, level);
 end
-FishingBuddy.MakeDropDownEntry = MakeDropDownEntry;
 
-local function MakeDropDownSep()
-	info = {};
-	info.disabled = 1;
-	UIDropDownMenu_AddButton(info);
+local function MakeDropDownSep(level)
+	local entry = {};
+	entry.disabled = 1;
+	UIDropDownMenu_AddButton(entry, level);
 end
-FishingBuddy.MakeDropDownSep = MakeDropDownSep;
 
+local function MakeDropDownEntry(name, option, level)
+	local addthis = true;
+	if ( option.check ) then
+		addthis = option.check();
+	end
+	if ( addthis ) then
+		local entry = {};
+		entry.text = option.text;
+		entry.func = MakeToggle(name);
+		entry.checked = FishingBuddy.GetSettingBool(name);
+		entry.keepShownOnClick = 1;
+		UIDropDownMenu_AddButton(entry, level);
+	end
+end
+
+local function MakeDropDownInitialize(self, level)
+	if ( level == 1) then
+		local entry = {};
+		if ( self.title ) then
+			entry.isTitle = 1;
+        	entry.text = self.title;
+        	entry.notCheckable = 1;
+        	UIDropDownMenu_AddButton(entry, level);
+        end
+		
+		-- If no outfit frame, we can't switch outfits...
+		if ( FishingBuddy.OutfitManager.HasManager() ) then
+			MakeClickToSwitchEntry(self.switchText, self.switchSetting, level, 1);
+			MakeDropDownSep(level);
+		end
+
+		wipe(entry);
+		for tabname,handler in pairs(FBOptionsTable) do
+			if (handler.hasdd) then
+				entry.text = tabname;
+				entry.func = self.UncheckHack;
+				entry.hasArrow = 1
+				entry.value = handler.options;
+				UIDropDownMenu_AddButton(entry, level);
+			end
+		end
+	elseif (level == 2 and type(UIDROPDOWNMENU_MENU_VALUE) == "table") then
+		for name,option in pairs(UIDROPDOWNMENU_MENU_VALUE) do
+			if ( option.m1 ) then
+				MakeDropDownEntry(name, option, level);
+			end
+		end
+		for name,option in pairs(UIDROPDOWNMENU_MENU_VALUE) do
+			if ( option.m ) then
+				MakeDropDownEntry(name, option, level);
+			end
+		end
+	end
+end
+FishingBuddy.DropDownInitFunc = MakeDropDownInitialize;
+
+local FB_DropDownMenu = CreateFrame("Frame", "FB_DropDownMenu");
+local function UncheckHack(dropdownbutton)
+    _G[dropdownbutton:GetName().."Check"]:Hide()
+end
+
+FishingBuddy.GetDropDown = function(switchText, switchSetting, title, frame)
+	if (not frame) then
+		frame = FB_DropDownMenu;
+		frame.displayMode = "MENU"
+	end
+	
+	frame.title = title or FBConstants.NAME;
+	frame.switchText = switchText;
+	frame.switchSetting = switchSetting;
+	frame.initialize = MakeDropDownInitialize;
+	frame.UncheckHack = UncheckHack;
+	
+	return frame;
+end
+
+-- Old style drop down handling, which will add taint
+-- Everything happens at level 1
 FishingBuddy.MakeDropDown = function(switchText, switchSetting)
-	local info;
 	-- If no outfit frame, we can't switch outfits...
 	if ( FishingBuddy.OutfitManager.HasManager() ) then
-		MakeDropDownEntry(switchText, switchSetting, 1);
-		MakeDropDownSep();
+		MakeClickToSwitchEntry(switchText, switchSetting, 1, 1);
+		MakeDropDownSep(1);
 	end
 
 	for _,info in pairs(FBOptionsTable) do
 		for name,option in pairs(info.options) do
-			if ( option.m ) then
-				local addthis = true;
-				if ( option.check ) then
-					addthis = option.check();
-				end
-				if ( addthis ) then
-					info = {};
-					info.text = option.text;
-					info.func = MakeToggle(name);
-					info.checked = FishingBuddy.GetSettingBool(name);
-					info.keepShownOnClick = 1;
-					UIDropDownMenu_AddButton(info);
-				end
+			if ( option.p ) then
+				MakeDropDownEntry(name, option);
 			end
 		end
 	end
@@ -961,6 +1052,9 @@ end
 -- menuname has to be set regardless, or UI drop down doesn't work
 FishingBuddy.CreateFBDropDownMenu = function(holdername, menuname)
 	local holder = CreateFrame("Frame", holdername);
+	if (not menuname) then
+		menuname = holdername.."Menu"
+	end
 	holder.menu = CreateFrame("Frame", menuname, holder, "FishingBuddyDropDownMenuTemplate");
 	holder.menu:ClearAllPoints();
 	holder.menu:SetPoint("TOPRIGHT", holder, "TOPRIGHT", 0, 0);
@@ -989,6 +1083,60 @@ FishingBuddy.CreateFBDropDownMenu = function(holdername, menuname)
 	end
 	
 	return holder;
+end
+
+-- handle menu with a mapping table for settings to displayed values
+local function SetMappedValue(self, what, value)
+	local show = self.Mapping[value];
+	FishingBuddy.SetSetting(what, value);
+	UIDropDownMenu_SetSelectedValue(self, show);
+	UIDropDownMenu_SetText(self, show);
+end
+
+local function LoadMappedMenu(keymenu)
+	local menu = keymenu.menu;
+	local menuwidth = 0;
+	local setting = FishingBuddy.GetSetting(keymenu.Setting);
+	for value,label in pairs(menu.Mapping) do
+		local info = {};
+		local v = value;
+		local w = keymenu.Setting;
+		local m = menu;
+		info.text = label;
+		info.func = function() SetMappedValue(m, w, v); end;
+		if ( setting == value ) then
+			info.checked = true;
+		else
+			info.checked = false;
+		end
+		UIDropDownMenu_AddButton(info);
+		menu.label:SetText(label);
+		local width = menu.label:GetWidth();
+		if (width > menuwidth) then
+			menuwidth = width;
+		end
+	end
+	UIDropDownMenu_SetWidth(menu, menuwidth + 32);
+	keymenu:SetLabel(keymenu.Label);
+end
+
+local function InitMappedMenu(option, button)
+	UIDropDownMenu_Initialize(button.menu, function()
+									  LoadMappedMenu(button);
+								  end);
+end
+
+FishingBuddy.CreateFBMappedDropDown = function(holdername, setting, label, mapping, menuname)
+	local keymenu = FishingBuddy.CreateFBDropDownMenu(holdername, menuname);
+	keymenu.html:Hide();	
+	keymenu.menu.label:SetText(label);
+	keymenu.Label = label;
+	keymenu.Setting = setting;
+	keymenu.Build = BuildMappedMenu
+	keymenu.menu.Mapping = mapping;
+	keymenu.menu.SetMappedValue = SetMappedValue;
+	keymenu.InitMappedMenu = InitMappedMenu;
+	return keymenu;
 end
 
 FishingBuddy.GetOptionList = function()

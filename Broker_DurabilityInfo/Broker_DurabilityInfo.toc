@@ -1,12 +1,12 @@
-﻿## Interface: 50200
+﻿## Interface: 50400
 ## Title: Broker: DurabilityInfo
 ## Notes: Displays item durability and repair cost.
-## Version: 1.17
+## Version: 1.18
 ## Author: iceeagle
 ## OptionalDeps: Ace3, LibDataBroker-1.1, LibDialog-1.0, LibCrayon-3.0
 ## SavedVariables: Broker_DurabilityInfoDB
 ## DefaultState: enabled
-## X-Curse-Packaged-Version: v1.17
+## X-Curse-Packaged-Version: v1.18
 ## X-Curse-Project-Name: Broker_DurabilityInfo
 ## X-Curse-Project-ID: broker_durabilityinfo
 ## X-Curse-Repository-ID: wow/broker_durabilityinfo/mainline

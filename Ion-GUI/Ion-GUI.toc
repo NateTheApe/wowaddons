@@ -1,13 +1,13 @@
-﻿## Interface: 50300
+## Interface: 50400
 ## Title: Ion: GUI
 ## Author: Maul
-## Version: Hydrogen-6
+## Version: Hydrogen-7
 ## Notes: GUI for Ion
 ## DefaultState: enabled
 ## Dependencies: Ion
 ## LoadOnDemand: 1
 ## SavedVariables: 
-## SavedVariablesPerCharacter: IonGUIGDB, IonGUICDB
+## SavedVariablesPerCharacter: IonBagGDB, IonGUICDB
 ## X-Child-Of: Ion
 ## X-Copyright: Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved..
 ## X-Email: trinityui@live.com

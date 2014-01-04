@@ -27,6 +27,7 @@ local TT_DefaultConfig = {
 	updateFreq = 0.5,
 	enableChatHoverTips = false,
 	hideFactionText = false,
+	hideRealmText = false,
 
 	colorGuildByReaction = true,
 	colGuild = "|cff0080cc",
@@ -230,6 +231,13 @@ local supportedHyperLinks = {
 	talent = true,
 	glyph = true,
 };
+
+-- GTT Control Variables
+local gtt_lastUpdate = 0;		-- time since last update
+local gtt_numLines = 0;			-- number of lines at last check, if this differs from gtt:NumLines() an update should be performed
+local gtt_newHeight;			-- the new height of the tooltip, this value accommodates the inclusion of health/power bars inside the tooltip
+local gtt_anchorType;			-- valid types: normal/mouse/parent
+local gtt_anchorPoint;          -- standard UI anchor point
 
 -- Data Variables
 local isColorBlind;
@@ -513,7 +521,7 @@ local function ModifyUnitTooltip()
 		else
 			if not (petLevelLineIndex) then
 				for i = 2, gtt:NumLines() do
-					local gttLineText = _G["GameTooltipTextLeft"..i]:GetText(); 
+					local gttLineText = _G["GameTooltipTextLeft"..i]:GetText();
 					if (type(gttLineText) == "string") and (gttLineText:find(TT_LevelMatchPet)) then
 						petLevelLineIndex = i;
 						break;
@@ -551,7 +559,7 @@ local function ModifyUnitTooltip()
 	if (cfg.showTarget ~= "none") then
 		local targetUnit = unit.."target";
 		local target = UnitName(targetUnit);
-		if (target) and (target ~= UNKNOWN and target ~= "" or UnitExists(targetUnit)) then
+		if (target) and (target ~= UNKNOWNOBJECT and target ~= "" or UnitExists(targetUnit)) then
 			if (cfg.showTarget == "first") then
 				lineOne[#lineOne + 1] = COL_WHITE;
 				lineOne[#lineOne + 1] = " : |r";
@@ -877,12 +885,6 @@ end
 	- Something that resizes the tip, Show() already does this, but it's also done after OnTooltipSetUnit() again. Or maybe it's just another addon's hook doing it. Tested without any addons loaded, and it still resizes after.
 --]]
 
--- GTT Control Variables
-local gtt_lastUpdate = 0;
-local gtt_newHeight;
-local gtt_anchorType;
-local gtt_anchorPoint;
-
 -- Get The Anchor Position Depending on the Tip Content and Parent Frame -- Do not depend on "u.token" here, as it might not have been cleared yet!
 -- Checking "mouseover" here isn't ideal due to actionbars, it will sometimes return true because of selfcast.
 local function GetAnchorPosition()
@@ -911,6 +913,7 @@ local gttShow = gtt.Show;
 gtt.Show = function(self,...)
 	gttShow(self,...);
 	if (bars.offset) then
+		gtt_numLines = self:NumLines();
 		gtt_newHeight = (self:GetHeight() + bars.offset);
 --		self:SetHeight(gtt_newHeight);	-- Az: Setting height here seems to cause a conflict with the XToLevel addon, which causes an empty line. But I was certain this got added to fix the very same issue, just with another addon
 	end
@@ -951,18 +954,24 @@ local function GTTHook_OnUpdate(self,elapsed)
 			elseif (gtt_lastUpdate > cfg.preFadeTime) then
 				self:SetAlpha(1 - (gtt_lastUpdate - cfg.preFadeTime) / cfg.fadeTime);
 			end
-		-- This is only really useful for worldframe unit tips, when u.token == "mouseover", they do not call the GTT:FadeOut()
+		-- This is only really needed for worldframe unit tips, as when u.token == "mouseover", the GTT:FadeOut() function is not called
 		elseif (not UnitExists(u.token)) then
 			self:FadeOut();
-		elseif (cfg.updateFreq > 0) and (gtt_lastUpdate > cfg.updateFreq) then
-			gtt_lastUpdate = 0;
-			tt:ApplyGeneralAppearance();
+		else
+			local gttCurrentLines = self:NumLines();
+			-- If number of lines differ from last time, force an update. This became an issue in 5.4 as the coalesced realm text is added after the initial Show(). This might also fix some incompatibilities with other addons.
+			if (cfg.updateFreq > 0) and (gtt_lastUpdate > cfg.updateFreq) or (gttCurrentLines ~= gtt_numLines) then
+				gtt_numLines = gttCurrentLines;
+				gtt_lastUpdate = 0;
+				tt:ApplyGeneralAppearance();
+			end
 		end
 	end
 
 	-- Resize the Tooltip if it's size has changed more than 0.1 units
-	if (gtt_newHeight) and (abs(self:GetHeight() - gtt_newHeight) > 0.1) then
---		gtt_newHeight = (self:GetHeight() + bars.offset);	-- Az: recalculating the height here would fix every issue (I think), but it also adds extra cpu cycles I'd rather be without. For now just stay with the Show() recalc.
+	local gttHeight = self:GetHeight();
+	if (gtt_newHeight) and (abs(gttHeight - gtt_newHeight) > 0.1) then
+		--gtt_newHeight = (gttHeight + bars.offset);	-- Az: Recalculating the height here would possibly fix every issue (I think), but it also adds extra cpu cycles I'd rather be without. For now just stay with the Show() recalc.
 		self:SetHeight(gtt_newHeight);
 	end
 end
@@ -1005,6 +1014,7 @@ end
 local function GTTHook_OnTooltipCleared(self,...)
 	wipe(u);
 	gtt_lastUpdate = 0;
+	gtt_numLines = 0;
 	gtt_newHeight = nil;
 	petLevelLineIndex = nil;
 	self.fadeOut = nil;
@@ -1269,12 +1279,22 @@ local function ApplyTipTacAppearance(first)
 		SetupHealthAndPowerBar();
 	end
 	UpdateHealthAndPowerBar();
-	-- Remove PVP Line, which makes the tip look a bit bad -- MoP: Now removes alliance and horde faction text as well
+	-- Remove PVP Line, which makes the tip look a bit bad -- MoP: Now removes alliance and horde faction text as well -- 5.4: Added removal of the coalesced realm line(s)
 	for i = 2, gtt:NumLines() do
 		local line = _G["GameTooltipTextLeft"..i];
 		local text = line:GetText();
 		if (text == PVP_ENABLED) or (cfg.hideFactionText and (text == FACTION_ALLIANCE or text == FACTION_HORDE)) then
 			line:SetText(nil);
+		end
+		if (cfg.hideRealmText) and (text == " ") then
+			local nextLine = _G["GameTooltipTextLeft"..(i + 1)];
+			if (nextLine) then
+				local nextText = nextLine:GetText();
+				if (nextText == COALESCED_REALM_TOOLTIP) or (nextText == INTERACTIVE_REALM_TOOLTIP) then
+					line:SetText(nil);
+					nextLine:SetText(nil);
+				end
+			end
 		end
 	end
 	-- Show & Adjust Height

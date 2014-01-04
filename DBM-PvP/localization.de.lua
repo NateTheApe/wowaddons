@@ -10,6 +10,7 @@ L:SetGeneralLocalization({
 	name = "Allgemeine Einstellungen"
 })
 
+
 L:SetTimerLocalization({
 	TimerInvite = "%s"
 })
@@ -68,7 +69,7 @@ L:SetOptionLocalization({
 L = DBM:GetModLocalization("z529")
 
 L:SetTimerLocalization({
-	TimerCap	= "%s",
+	TimerCap	= "%s"
 })
 
 L:SetOptionLocalization({
@@ -81,8 +82,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	ScoreExpr	= "(%d+)/1600",
 	WinBarText	= "%s gewinnt",
-	BasesToWin	= "benötigte Basen für Sieg: %d",
-	Flag		= "Flagge"
+	BasesToWin	= "benötigte Basen für Sieg: %d"
 })
 
 ------------------------
@@ -103,6 +103,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	ScoreExpr		= "(%d+)/1600",
 	WinBarText 		= "%s gewinnt",
+	Flag			= "Flagge",
 	FlagReset 		= "Die Flagge wurde zurückgesetzt.",
 	FlagTaken 		= "(.+) hat die Flagge aufgenommen.",
 	FlagCaptured	= "Die %w+ hat die Flagge erobert!",
@@ -135,7 +136,9 @@ L:SetMiscLocalization({
 	ExprFlagReturn		= "Die Flagge der (%w+) wurde von (.+) zu ihrem Stützpunkt zurückgebracht!",
 	FlagAlliance		= "Allianz-Flagge: ",
 	FlagHorde			= "Horde-Flagge: ",
-	FlagBase			= "Basis"
+	FlagBase			= "Basis",
+	Vulnerable1		= "Eure Angriffe verursachen nun schwerere Verletzungen bei Flaggenträgern!",
+	Vulnerable2		= "Eure Angriffe verursachen nun sehr schwere Verletzungen bei Flaggenträgern!"
 })
 
 ------------------------
@@ -145,7 +148,7 @@ L = DBM:GetModLocalization("z628")
 
 L:SetWarningLocalization({
 	WarnSiegeEngine		= "Belagerungsmaschine bereit!",
-	WarnSiegeEngineSoon	= "Belagerungsmaschine in ~10 Sekunden",
+	WarnSiegeEngineSoon	= "Belagerungsmaschine in ~10 Sekunden"
 })
 
 L:SetTimerLocalization({
@@ -158,7 +161,7 @@ L:SetOptionLocalization({
 	TimerSiegeEngine	= "Zeige Zeit bis Belagerungsmaschine bereit ist",
 	WarnSiegeEngine		= "Zeige Warnung, wenn Belagerungsmaschine bereit ist",
 	WarnSiegeEngineSoon	= "Zeige Warnung, wenn Belagerungsmaschine fast bereit ist",
-	ShowGatesHealth		= "Zeige Erhaltungsgrad beschädigter Tore (kann nach dem Beitritt\nzu einem bereits laufenden Schlachtfeld falsche Werte liefern!)"
+	ShowGatesHealth		= "Zeige Erhaltungsgrad beschädigter Tore (kann nach dem Beitritt<br/>zu einem bereits laufenden Schlachtfeld falsche Werte liefern!)"
 })
 
 L:SetMiscLocalization({
@@ -224,8 +227,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	ScoreExpr	= "(%d+)/2000",
 	WinBarText	= "%s gewinnt",
-	BasesToWin	= "benötigte Basen für Sieg: %d",
-	Flag		= "Flagge"
+	BasesToWin	= "benötigte Basen für Sieg: %d"
 })
 
 -------------------------

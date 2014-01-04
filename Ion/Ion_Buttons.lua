@@ -1,4 +1,4 @@
-﻿--Ion, a World of Warcraft® user interface addon.
+--Ion, a World of Warcraft® user interface addon.
 --Copyright© 2006-2012 Connor H. Chenoweth, aka Maul - All rights reserved.
 
 local ION, GDB, CDB, PEW, SPEC, player, realm, btnGDB, btnCDB = Ion
@@ -1668,6 +1668,8 @@ function BUTTON:MACRO_MODIFIER_STATE_CHANGED(...)
 	self:MACRO_UpdateAll(true)
 end
 
+BUTTON.MACRO_SPELL_UPDATE_USABLE = BUTTON.MACRO_MODIFIER_STATE_CHANGED
+
 function BUTTON:MACRO_ACTIONBAR_SLOT_CHANGED(...)
 	if (self.data.macro_Watch or self.data.macro_Equip) then
 		self:MACRO_UpdateIcon()
@@ -2486,9 +2488,10 @@ function BUTTON:MACRO_OnShow(...)
 	self:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 	self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
 	self:RegisterEvent("ACTIONBAR_UPDATE_STATE")
-    self:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
+    	self:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
 
-    self:RegisterEvent("SPELL_UPDATE_CHARGES")
+    	self:RegisterEvent("SPELL_UPDATE_CHARGES")
+    	self:RegisterEvent("SPELL_UPDATE_USABLE")
 
 	self:RegisterEvent("RUNE_POWER_UPDATE")
 
@@ -2541,11 +2544,12 @@ function BUTTON:MACRO_OnHide(...)
 	self:UnregisterEvent("ACTIONBAR_SLOT_CHANGED")
 	self:UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
 	self:UnregisterEvent("ACTIONBAR_UPDATE_STATE")
-    self:UnregisterEvent("ACTIONBAR_UPDATE_USABLE")
+    	self:UnregisterEvent("ACTIONBAR_UPDATE_USABLE")
 
-    self:UnregisterEvent("SPELL_UPDATE_CHARGES")
+    	self:UnregisterEvent("SPELL_UPDATE_CHARGES")
+    	self:UnregisterEvent("SPELL_UPDATE_USABLE")
 
-    self:UnregisterEvent("RUNE_POWER_UPDATE")
+   	self:UnregisterEvent("RUNE_POWER_UPDATE")
 
 	self:UnregisterEvent("TRADE_SKILL_SHOW")
 	self:UnregisterEvent("TRADE_SKILL_CLOSE")
@@ -3127,7 +3131,7 @@ function BUTTON:SetType(save, kill, init)
 		self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 		self:RegisterEvent("UPDATE_MACROS")
 		self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-		self:RegisterEvent("EQUIPMENT_SETS_CHANGED")
+		self:RegisterEvent("EQUIPMENT_SETS_CHANGED")		
 
 		self:MACRO_UpdateParse()
 

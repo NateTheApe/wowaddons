@@ -793,6 +793,10 @@ local TempData = { -- temporary table for item to spell translations.
 [94933]={cid=70258}, -- Tiny Blue Carp
 [94934]={cid=70259}, -- Tiny Green Carp
 [94935]={cid=70260}, -- Tiny White Carp
+[89367]={cid=66105}, -- Yu'lon Kite
+[104156]={cid=73533}, -- Ashleaf Spriteling
+[104157]={cid=73534}, -- Azure Crane Chick
+[104158]={cid=73352}, -- Blackfuse Bombling
 
 }
 

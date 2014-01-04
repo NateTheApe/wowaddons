@@ -371,16 +371,33 @@ function Gnosis:FindCBNext(unit)
 end
 
 function Gnosis:FindGCDBars(spell, rank, fCurTime)
+	local start, cd = GetSpellCooldown(spell);
+	if (not start or not(cd > 0 and cd <= 1.5)) then
+		return;
+	end
+	
 	local cb = self:FindCB("gcd");
-	while(cb) do
-		self:SetupGCDbar(cb, spell, rank, fCurTime, false);
+	while (cb) do
+		self:SetupGCDbar(cb, spell, rank, fCurTime, false, start, cd);
 		cb = self:FindCBNext("gcd");
 	end
 	
 	local cb = self:FindCB("gcd2");
-	while(cb) do
-		self:SetupGCDbar(cb, spell, rank, fCurTime, false);
+	while (cb) do
+		self:SetupGCDbar(cb, spell, rank, fCurTime, false, start, cd);
 		cb = self:FindCBNext("gcd2");
+	end
+	
+	if (self.current_gcd) then
+		self.current_gcd.spell = spell;
+		self.current_gcd.cd = cd;
+		self.current_gcd.finish = start + cd;
+	else
+		self.current_gcd = {
+			spell = spell,
+			cd = cd,
+			finish = start + cd
+		};
 	end
 end
 
@@ -452,7 +469,7 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	bar.conf = tParams;
 
 	-- clean up bar if multi-spell timer
-	if(tParams.bartype == "ti") then
+	if (tParams.bartype == "ti") then
 		self:CleanupCastbar(bar);
 	end
 
@@ -471,7 +488,7 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	bar.bar:SetStatusBarColor(unpack(tParams.colBar));
 
 	-- statusbar orienation
-	if(tParams.orient == 2) then
+	if (tParams.orient == 2) then
 		bar.bar:SetOrientation("VERTICAL", tParams.bInvDir);
 	else
 		bar.bar:SetOrientation("HORIZONTAL", tParams.bInvDir);
@@ -494,7 +511,7 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	bar.bicon:ClearAllPoints();
 	bar.bicon:ClearAllPoints();
 	bar.icon:SetTexture(tParams.bUnlocked and self.toyIcon or nil);
-	if(tParams.iconside ~= "NONE") then
+	if (tParams.iconside ~= "NONE") then
 		local iconside_ =
 			(tParams.iconside == "LEFT" and "RIGHT") or
 			(tParams.iconside == "RIGHT" and "LEFT") or
@@ -507,7 +524,7 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 				tParams.iconside == "BOTTOM" and 0.0 or 1.0,
 				tParams.iconside == "TOP" and 0.0 or 1.0;
 
-		if(not tParams.bIconUnlocked) then
+		if (not tParams.bIconUnlocked) then
 			-- locked to barframe
 			local iconsize_ = abs(bileft - biright) * tParams.height + abs(bitop - bibottom) * tParams.width;
 
@@ -554,16 +571,16 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	self:Rotate(bar.brtag, bar.brtan, tParams.rotatelattext);
 
 	local curFont = GameFontNormal:GetFont();
-	if(tParams.font) then
+	if (tParams.font) then
 		curFont = self.lsm:Fetch("font", tParams.font);
 	end
 	local fo = nil;
-	if(tParams.fontoutline and self.fontoutlines[tParams.fontoutline] and self.fontoutlines[tParams.fontoutline] ~= "NONE") then
+	if (tParams.fontoutline and self.fontoutlines[tParams.fontoutline] and self.fontoutlines[tParams.fontoutline] ~= "NONE") then
 		fo = self.fontoutlines[tParams.fontoutline];
 	end
 	local fssizeparam = tParams.orient == 2 and tParams.width or tParams.height;
 	local fs = fssizeparam <= 40 and fssizeparam or 40;
-	if(tParams.fontsize and tParams.fontsize > 0) then
+	if (tParams.fontsize and tParams.fontsize > 0) then
 		bar.ctext:SetFont(curFont, tParams.fontsize, fo);
 		bar.defFS = tParams.fontsize;
 	else
@@ -576,13 +593,13 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 
 	fs = fssizeparam <= 40 and fssizeparam or 40;
 	-- timer
-	if(tParams.fontsize_timer and tParams.fontsize_timer > 0) then
+	if (tParams.fontsize_timer and tParams.fontsize_timer > 0) then
 		bar.rtext:SetFont(curFont, tParams.fontsize_timer, fo);
 	else
 		bar.rtext:SetFont(curFont, max(fs*0.55,1), fo);
 	end
 	-- latency
-	if(tParams.fontsize_lat and tParams.fontsize_lat > 0) then
+	if (tParams.fontsize_lat and tParams.fontsize_lat > 0) then
 		bar.brtext:SetFont(curFont, tParams.fontsize_lat, fo);
 		bar.bltext:SetFont(curFont, tParams.fontsize_lat, fo);
 	else
@@ -600,7 +617,7 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	end
 
 	-- castbar spark
-	if(tParams.orient == 2) then
+	if (tParams.orient == 2) then
 		bar.cbs:SetWidth(tParams.fSparkHeightMulti * tParams.width * 0.3);	-- 0.3
 		bar.cbs:SetHeight(tParams.fSparkWidthMulti * tParams.width *  1.6);	-- 1.6
 		self:Rotate(bar.cbsag, bar.cbsan, 90);
@@ -613,14 +630,14 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	bar.cbs:SetVertexColor(unpack(tParams.colSpark));
 	bar:SetScale(tParams.scale);
 
-	if(not tParams.bShowCBS) then
+	if (not tParams.bShowCBS) then
 		bar.cbs:Hide();
 	end
 
 	-- border texture
 	bar.bdframe:Hide();
 	bar.backdrop.edgeFile = self.lsm:Fetch("border", tParams.bordertexture);
-	if(bar.backdrop.edgeFile) then
+	if (bar.backdrop.edgeFile) then
 		bar.bdframe:ClearAllPoints();
 		bar.bdframe:SetPoint("TOPLEFT", bar, -4, 4);
 		bar.bdframe:SetPoint("BOTTOMRIGHT", bar, 4, -4);
@@ -639,14 +656,14 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	bar.bltext:SetTextColor(unpack(tParams.colTextLag and tParams.colTextLag or tParams.colText));
 
 	-- text shadow
-	if(tParams.bEnShadowOffset) then
+	if (tParams.bEnShadowOffset) then
 		bar.ctext:SetShadowOffset(tParams.coord.shadow.x, tParams.coord.shadow.y);
 		bar.rtext:SetShadowOffset(tParams.coord.shadow.x, tParams.coord.shadow.y);
 		bar.brtext:SetShadowOffset(tParams.coord.shadow.x, tParams.coord.shadow.y);
 		bar.bltext:SetShadowOffset(tParams.coord.shadow.x, tParams.coord.shadow.y);
 	end
 
-	if(tParams.bEnShadowCol) then
+	if (tParams.bEnShadowCol) then
 		bar.ctext:SetShadowColor(unpack(tParams.colShadow));
 		bar.rtext:SetShadowColor(unpack(tParams.colShadow));
 		bar.brtext:SetShadowColor(unpack(tParams.colShadow));
@@ -665,13 +682,13 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 
 	-- alignments
 	tParams.forcefreealign = (tParams.rotatectext ~= 0 or tParams.rotatertext ~= 0);
-	if(tParams.alignment == "FREE" or tParams.forcefree) then
+	if (tParams.alignment == "FREE" or tParams.forcefree) then
 		bar.rtext:SetPoint(tParams.aligntime, bar, tParams.coord["casttime"].x, tParams.coord["casttime"].y);
 		bar.ctext:SetPoint(tParams.alignname, bar, tParams.coord["castname"].x, tParams.coord["castname"].y);
-	elseif(tParams.alignment == "TIMENAME") then
+	elseif (tParams.alignment == "TIMENAME") then
 		bar.rtext:SetPoint("LEFT", bar, "LEFT", tParams.coord["casttime"].x, tParams.coord["casttime"].y);
 		bar.ctext:SetPoint("RIGHT", bar, "RIGHT", tParams.coord["castname"].x, tParams.coord["castname"].y);
-		if(tParams.alignname == "LEFT" or tParams.alignname == "CENTER") then
+		if (tParams.alignname == "LEFT" or tParams.alignname == "CENTER") then
 			bar.ctext:SetPoint("LEFT", bar.rtext, "RIGHT", 0, 0);
 		else
 			bar.rtext:SetPoint("RIGHT", bar.ctext, "LEFT", 0, 0);
@@ -679,7 +696,7 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	else
 		bar.rtext:SetPoint("RIGHT", bar, "RIGHT", tParams.coord["casttime"].x, tParams.coord["casttime"].y);
 		bar.ctext:SetPoint("LEFT", bar, "LEFT", tParams.coord["castname"].x, tParams.coord["castname"].y);
-		if(tParams.alignname == "RIGHT" or tParams.alignname == "CENTER") then
+		if (tParams.alignname == "RIGHT" or tParams.alignname == "CENTER") then
 			bar.ctext:SetPoint("RIGHT", bar.rtext, "LEFT", 0, 0);
 		else
 			bar.rtext:SetPoint("LEFT", bar.ctext, "RIGHT", 0, 0);
@@ -696,21 +713,21 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	bar.brtext:SetPoint("BOTTOMRIGHT", bar, tParams.coord["latency"].x, tParams.coord["latency"].y);
 	bar.bltext:SetPoint("BOTTOMLEFT", bar, -tParams.coord["latency"].x, tParams.coord["latency"].y);
 
-	if(tParams.strata) then
+	if (tParams.strata) then
 		bar:SetFrameStrata(tParams.strata);
 	end
 
-	if(not tParams.bEn or (self.iCurSpec and tParams.spec > 0 and tParams.spec ~= self.iCurSpec)) then
+	if (not tParams.bEn or (self.iCurSpec and tParams.spec > 0 and tParams.spec ~= self.iCurSpec)) then
 		self:CleanupCastbar(bar);
 		bar:Hide();		-- bar disabled
 	else
-		if(tParams.bUnlocked) then
+		if (tParams.bUnlocked) then
 			self:MakeBarMovable(name, true);
 			bar:Show();
-		elseif(tParams.bShowWNC) then
+		elseif (tParams.bShowWNC) then
 			self:MakeBarMovable(name, false);
 			bar:Show();
-		elseif(not bar.bIsActive) then
+		elseif (not bar.bIsActive) then
 			self:MakeBarMovable(name, false);
 			bar:Hide();
 		end
@@ -722,11 +739,39 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	self:GenerateTimeTable(bar, true);
 
 	-- castbar? if not set bnIsCB to true
-	if(tParams.unit == "gcd" or tParams.unit == "gcd2" or
+	if (tParams.unit == "gcd" or tParams.unit == "gcd2" or
 		tParams.unit == "sm" or tParams.unit == "sr" or tParams.unit == "smr") then
 		bar.bnIsCB = true;
 	else
 		bar.bnIsCB = nil;
+	end
+	
+	-- stop any sounds of current bar
+	Gnosis:StopBarSounds(name);
+end
+
+function Gnosis:StopBarSounds(name)
+	-- stop sound if running
+	if (Gnosis.played.s[name]) then
+		for k, v in pairs(Gnosis.played.s[name]) do
+			StopSound(v.handle);
+		end
+		wipe(Gnosis.played.s[name]);
+		Gnosis.played.s[name] = nil;
+	end
+	if (Gnosis.played.m[name]) then
+		for k, v in pairs(Gnosis.played.m[name]) do
+			StopSound(v.handle);
+		end
+		wipe(Gnosis.played.m[name]);
+		Gnosis.played.m[name] = nil;
+	end
+	if (Gnosis.played.f[name]) then
+		for k, v in pairs(Gnosis.played.f[name]) do
+			StopSound(v.handle);
+		end
+		wipe(Gnosis.played.f[name]);
+		Gnosis.played.f[name] = nil;
 	end
 end
 
@@ -962,6 +1007,10 @@ function Gnosis:RemoveCastbarDialog(key)
 end
 
 function Gnosis:RemoveCastbar(key)
+	-- stop sounds
+	self:StopBarSounds(key);
+	
+	-- cleanup
 	self:CleanupCastbar(self.castbars[key]);
 	self.castbars[key]:Hide();
 	table_insert(self.unusedcastbars, self.castbars[key]);
@@ -1002,6 +1051,7 @@ end
 
 function Gnosis:OnMouseUp(button)
 	if(button == "RightButton") then
+		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 	end
 end
@@ -1098,19 +1148,13 @@ function Gnosis:SetupSwingBar(cb, spell, icon, fCurTime, bMeleeSwing)
 	self.activebars[barname] = cb;
 end
 
-function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left)
+function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left, start, cd)
 	local barname, cfg = cb.name, cb.conf;
-
-	local start, cd = GetSpellCooldown(spell);
-	if(not start or not(cd > 0 and cd <= 1.5)) then
-		return;
-	end
 
 	-- non casttime spell GCD Indicator?
 	if (cfg.unit == "gcd2") then
 		local spellcasttime = select(7, GetSpellInfo(spell));
 		local playerischanneling = UnitChannelInfo("player");
-		--local playeriscasting = UnitCastingInfo("player"); -- tested: casting often starts too late to detect correctly
 		
 		if (playerischanneling or not (spellcasttime and spellcasttime == 0)) then
 			return;
@@ -1118,33 +1162,33 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left)
 	end
 	
 		-- valid group layout?
-	if(not self:CheckGroupLayout(cfg)) then
+	if (not self:CheckGroupLayout(cfg)) then
 		return;
 	end
 
 	-- blacklisted?
-	if(cfg.bnwtypesel == 2 and cfg.bnwlist) then
+	if (cfg.bnwtypesel == 2 and cfg.bnwlist) then
 		for key, value in pairs(cfg.bnwlist) do
-			if(value == spell) then
+			if (value == spell) then
 				return;
 			end
 		end
 	-- not whitelisted?
-	elseif(cfg.bnwtypesel == 3 and cfg.bnwlist) then
+	elseif (cfg.bnwtypesel == 3 and cfg.bnwlist) then
 		local bReturn = true;
 		for key, value in pairs(cfg.bnwlist) do
-			if(value == spell) then
+			if (value == spell) then
 				bReturn = false;
 				break;
 			end
 		end
 
-		if(bReturn) then
+		if (bReturn) then
 			return;
 		end
 	end
 
-	if(self.activebars[barname] ~= nil or self.fadeoutbars[barname] ~= nil) then
+	if (self.activebars[barname] ~= nil or self.fadeoutbars[barname] ~= nil) then
 		self:CleanupCastbar(cb);
 	end
 
@@ -1167,7 +1211,7 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left)
 	self:SetupBarString(cb, cfg, fCurTime, true);
 
 	-- castbar spark
-	if(cfg.bShowCBS) then
+	if (cfg.bShowCBS) then
 		cb.cbs:SetPoint("CENTER", cb.bar, "LEFT", (cb.channel and (1-val) or val) * cb.barwidth, 0);
 		cb.cbs:Show();
 	end
@@ -1540,6 +1584,16 @@ function Gnosis:GenerateTime(cb, fValueRem, fValueMax, fP)
 	return table_concat(tGT);
 end
 
+local function selectIcon(cb, curtimer)
+	if (curtimer.ptun and UnitExists(curtimer.ptun)) then
+		SetPortraitTexture(cb.icon, curtimer.ptun);
+	elseif (curtimer.icov) then
+		cb.icon:SetTexture(curtimer.icov);
+	else
+		cb.icon:SetTexture(cb.icontex);
+	end
+end
+
 function Gnosis:SetPowerbarValue(cb, curpower, maxpower, bShowSpark)
 	local cfg = cb.conf;
 
@@ -1603,7 +1657,9 @@ function Gnosis:SetupPowerbar(cb, tiinfo)
 	cb.castname = cname and cname or "";
 
 	cb.channel = true;
-	cb.icon:SetTexture(cb.icontex);
+	
+	selectIcon(cb, curtimer);
+	
 	cb.id = nil;
 
 	-- set current value
@@ -1658,7 +1714,9 @@ function Gnosis:SetupTimerbar(cb, fCurTime, tiinfo)
 	cb.tiType = curtimer.type;
 
 	cb.channel = bChannel;
-	cb.icon:SetTexture(icon);
+	
+	selectIcon(cb, curtimer);
+	
 	cb.id = nil;
 
 	-- show castbar text
@@ -1826,7 +1884,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			return;
 		end
 	end
-
+	
 	-- tradeskill stuff
 	local bDoResize = true;
 	local bnTS = true;

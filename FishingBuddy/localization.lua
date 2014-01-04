@@ -15,11 +15,15 @@ FishingTranslations["Inject"] = {
 	DASH = " -- ",
 	
 	AUTHOR = "Sutorix (sutorix@hotmail.com)",
-	COPYRIGHT = "(c) 2005-2010 by The Software Cobbler",
+	COPYRIGHT = "(c) 2005-2013 by The Software Cobbler",
 };
 
 FishingTranslations["enUS"] = {
 	NAME = "Fishing Buddy",
+	
+	MACRONAME = "FishingBuddy",
+	NOCREATEMACROPER = "Could not create per character macro: ", -- Could name create macro: "name of macro"
+	NOCREATEMACROGLOB = "Could not create global macro: ", -- Could name create macro: "name of macro"
 	
 	-- we can (should?) translate everything below here
 	DESCRIPTION1 = "Keep track of the fish you've caught",
@@ -46,6 +50,7 @@ FishingTranslations["enUS"] = {
 	SWITCH = "switch",
 	UPDATEDB = "updatedb",
 	FORCE = "force",
+	FISHINGMODE = "fishing",
 
 	OUTFITS = "Outfits",
 	ELAPSED = "Elapsed",
@@ -93,6 +98,9 @@ FishingTranslations["enUS"] = {
 	KEYS_ALT_TEXT = "Alt",
 	CONFIG_EASYCASTKEYS_INFO = "If a modifier key is specified, then when it is down, regardless of fishing gear.",
 
+	CONFIG_MOUSEEVENT_ONOFF = "Casting Button",
+	CONFIG_MOUSEEVENT_INFO = "Use this mouse button to cast.",
+	
 	SHOWFISHIES = "Show fish",
 	SHOWFISHIES_INFO = "Display fishing history grouped by fish type.",
 
@@ -134,9 +142,12 @@ FishingTranslations["enUS"] = {
 	
 	CONFIG_FISHINGCHARM_INFO  = "If enabled, use the fishing charm while in Pandaria.",
 	CONFIG_TUSKAARSPEAR_INFO  = "If enabled, do the complicated dance to use the Tuskaar Spear.",
+
 	CONFIG_FISHINGRAFT_INFO   = "If enabled, use the fishing raft.",
-	CONFIG_MAINTAINRAFT_ONOFF = "Maintain only",
 	CONFIG_MAINTAINRAFT_INFO  = "If enabled, do not use the raft item, only maintain it if it is already being used.",
+	CONFIG_BOBBINGBERG_INFO   = "If enabled, using the bobbing berg.",
+	CONFIG_MAINTAINBERG_INFO  = "If enabled, do not use the bobbing berg item, only maintain it if it is already being used.",
+	CONFIG_MAINTAINRAFTBERG_ONOFF = "Maintain only",
 	
 	CONFIG_EASYLURES_ONOFF	 = "Easy Lures",
 	CONFIG_EASYLURES_INFO	 = "If enabled, a lure will applied to your fishing pole before you start fishing, whenever you need one.",
@@ -198,6 +209,13 @@ FishingTranslations["enUS"] = {
 	CONFIG_SHOWPOOLS_INFO	  = "If enabled, known pool locations will be displayed on the minimap.",
 	
 	CONFIG_OUTFITTER_TEXT	  = "Outfit skill bonus: %s#BR#Draznar's style score: %d ",
+
+	CONFIG_CREATEMACRO_ONOFF  = "Create macro",
+	CONFIG_CREATEMACRO_INFO   = "Create a macro that performs #NAME# functions.",
+	CONFIG_PREVENTRECAST_ONOFF = "Prevent recast",
+	CONFIG_PREVENTRECAST_INFO  = "Invoking the macro while fishing will not cast again. Lures will be reapplied if needed.",
+	CONFIG_TOONMACRO_ONOFF  = "Per player",
+	CONFIG_TOONMACRO_INFO   = "Create the fishing macro per player.",
 
 	CLICKTOSWITCH_ONOFF		  = "Click to switch",
 	CLICKTOSWITCH_INFO		  = "If enabled, a left click switches outfits, otherwise it brings up the Fishing Buddy window.",
@@ -266,10 +284,11 @@ FishingTranslations["enUS"] = {
 	WATCHER_HELP = "|c#GREEN#/fb #WATCHER#|r [|c#GREEN##WATCHER_LOCK#|r or |c#GREEN##WATCHER_UNLOCK#|r or |c#GREEN##RESET#|r]#BRSPCS#Unlock the watcher to move the window,#BRSPCS#lock to stop, reset to reset",
 	CURRENT_HELP = "|c#GREEN#/fb #CURRENT# #RESET#|r#BRSPCS#Reset the fish caught during the current session.",
 	UPDATEDB_HELP = "|c#GREEN#/fb #UPDATEDB# [#FORCE#]|r#BRSPCS#Try and find the names of all the fish we don't know already.#BRSPCS#An attempt is made to skip 'rare' fish that may disconnect you#BRSPCS#from the server -- use the '#FORCE#' option to override the check.",
+	FISHINGMODE_HELP = "|c#GREEN#/fb #FISHINGMODE# [start|stop]|r#BRSPCS#Run #NAME# fishing actions.#BRSPCS#Useful in macros along with '/cast Fishing'.",
 	TIMERRESET_HELP = "|c#GREEN#/fb #TIMER# #RESET#|r#BRSPCS#Reset the location of the Extravaganza timer by moving it to#BRSPCS#the middle of the screen.",
 	PRE_HELP = "You can use |c#GREEN#/fishingbuddy|r or |c#GREEN#/fb|r for all commands#BR#|c#GREEN#/fb|r: by itself, toggle the Fishing Buddy window#BR#|c#GREEN#/fb #HELP#|r: display this message",
 	POST_HELP = "You can bind both the window toggle and the outfit#BR#switch command to keys in the \"Key Bindings\" window.",
-
+	
 	THANKS = "Thank you, everyone!",
 	
 	ROLE_TRANSLATE_ITIT = "Italian translation",

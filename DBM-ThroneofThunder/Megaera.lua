@@ -1,10 +1,10 @@
 local mod	= DBM:NewMod(821, "DBM-ThroneofThunder", nil, 362)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9808 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10733 $"):sub(12, -3))
 mod:SetCreatureID(68065, 70235, 70247)--Frozen 70235, Venomous 70247 (only 2 heads that ever start in front, so no need to look for combat with arcane or fire for combat detection)
+mod:SetEncounterID(1578)
 mod:SetMainBossID(68065)
-mod:SetQuestID(32748)
 mod:SetZone()
 mod:SetUsedIcons(7, 6, 4, 2)
 
@@ -147,34 +147,34 @@ end
 
 local function CheckHeads(GUID)
 	for i = 1, 5 do
-		if UnitExists("boss"..i) and not activeHeadGUIDS[UnitGUID("boss"..i)] then--Check if new units exist we haven't detected and added yet.
-			activeHeadGUIDS[UnitGUID("boss"..i)] = true
+		if UnitExists("boss"..i) then--Check if new units exist we haven't detected and added yet.
 			local cid = mod:GetCIDFromGUID(UnitGUID("boss"..i))
-			if cid == 70235 then--Frozen
-				iceInFront = iceInFront + 1
-				if iceBehind > 0 then
-					iceBehind = iceBehind - 1
-				end
-			elseif cid == 70212 then--Flaming
-				fireInFront = fireInFront + 1
-				if fireBehind > 0 then
-					fireBehind = fireBehind - 1
-				end
-			elseif cid == 70247 then--Venomous
-				venomInFront = venomInFront + 1
-				if venomBehind > 0 then
-					venomBehind = venomBehind - 1
-				end
-			elseif cid == 70248 then--Arcane
-				arcaneInFront = arcaneInFront + 1
-				if arcaneBehind > 0 then
-					arcaneBehind = arcaneBehind - 1
+			if not activeHeadGUIDS[UnitGUID("boss"..i)] then
+				activeHeadGUIDS[UnitGUID("boss"..i)] = true
+				if cid == 70235 then--Frozen
+					iceInFront = iceInFront + 1
+					if iceBehind > 0 then
+						iceBehind = iceBehind - 1
+					end
+				elseif cid == 70212 then--Flaming
+					fireInFront = fireInFront + 1
+					if fireBehind > 0 then
+						fireBehind = fireBehind - 1
+					end
+				elseif cid == 70247 then--Venomous
+					venomInFront = venomInFront + 1
+					if venomBehind > 0 then
+						venomBehind = venomBehind - 1
+					end
+				elseif cid == 70248 then--Arcane
+					arcaneInFront = arcaneInFront + 1
+					if arcaneBehind > 0 then
+						arcaneBehind = arcaneBehind - 1
+					end
 				end
 			end
 		end
 	end
---	print("DBM Boss Debug: ", "Active Heads: ".."Fire: "..fireInFront.." Ice: "..iceInFront.." Venom: "..venomInFront.." Arcane: "..arcaneInFront)
---	print("DBM Boss Debug: ", "Inactive Heads: ".."Fire: "..fireBehind.." Ice: "..iceBehind.." Venom: "..venomBehind.." Arcane: "..arcaneBehind)
 end
 
 local function clearHeadGUID(GUID)
@@ -398,8 +398,6 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, _, spellId)
 			arcaneBehind = arcaneBehind + 2
 			arcaneRecent = true
 		end
---		print("DBM Boss Debug: ", "Active Heads: ".."Fire: "..fireInFront.." Ice: "..iceInFront.." Venom: "..venomInFront.." Arcane: "..arcaneInFront)
---		print("DBM Boss Debug: ", "Inactive Heads: ".."Fire: "..fireBehind.." Ice: "..iceBehind.." Venom: "..venomBehind.." Arcane: "..arcaneBehind)
 	end
 end
 

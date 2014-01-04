@@ -1,6 +1,6 @@
 ﻿--[[
 Name: LibTourist-3.0
-Revision: $Rev: 160 $
+Revision: $Rev: 165 $
 Author(s): ckknight (ckknight@gmail.com), Arrowmaster, Odica (maintainer)
 Website: http://ckknight.wowinterface.com/
 Documentation: http://www.wowace.com/addons/libtourist-3-0/
@@ -10,7 +10,7 @@ License: MIT
 ]]
 
 local MAJOR_VERSION = "LibTourist-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Revision: 160 $"):match("(%d+)"))
+local MINOR_VERSION = 90000 + tonumber(("$Revision: 165 $"):match("(%d+)"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -1561,6 +1561,8 @@ local MapIdLookupTable = {
 	[928] = "Isle of Thunder",
 	[929] = "Isle of Giants",
 	[930] = "Throne of Thunder",
+	[935] = "Deepwind Gorge",
+	[951] = "Timeless Isle",
 }
 
 local zoneTranslation = {
@@ -1599,6 +1601,7 @@ local zoneTranslation = {
 		[562] = "Blade's Edge Arena",
 		[572] = "Ruins of Lordaeron",
 		[4378] = "Dalaran Arena",
+		[6732] = "The Tiger's Peak",
 
 		-- Other
 		[4298] = "Plaguelands: The Scarlet Enclave",
@@ -1640,6 +1643,7 @@ local zoneTranslation = {
 		[562] = "Arena des Schergrats",
 		[572] = "Ruinen von Lordaeron",
 		[4378] = "Arena von Dalaran",
+		[6732] = "Der Tigergipfel", 
 
 		-- Other
 		[4298] = "Pestländer: Die Scharlachrote Enklave",
@@ -1681,6 +1685,7 @@ local zoneTranslation = {
 		[562] = "Arena Filospada",
 		[572] = "Ruinas de Lordaeron",
 		[4378] = "Arena de Dalaran",
+		[6732] = "La Cima del Tigre",
 
 		-- Other
 		[4298] = "Tierras de la Peste: El Enclave Escarlata",
@@ -1722,6 +1727,7 @@ local zoneTranslation = {
 		[562] = "Arena Filospada",
 		[572] = "Ruinas de Lordaeron",
 		[4378] = "Arena de Dalaran",
+		[6732] = "La Cima del Tigre",
 
 		-- Other
 		[4298] = "Tierras de la Peste: El Enclave Escarlata",
@@ -1763,6 +1769,7 @@ local zoneTranslation = {
 		[562] = "Arène des Tranchantes",
 		[572] = "Ruines de Lordaeron",
 		[4378] = "Arène de Dalaran",
+		[6732] = "Le croc du Tigre",
 
 		-- Other
 		[4298] = "Maleterres : l’enclave Écarlate",
@@ -1804,6 +1811,7 @@ local zoneTranslation = {
 		[562] = "Arena di Spinaguzza",
 		[572] = "Rovine di Lordaeron",
 		[4378] = "Arena di Dalaran",
+		[6732] = "Picco della Tigre",
 
 		-- Other
 		[4298] = "Terre Infette: l'Enclave Scarlatta",
@@ -1845,6 +1853,7 @@ local zoneTranslation = {
 		[562] = "칼날 산맥 투기장",
 		[572] = "로데론의 폐허",
 		[4378] = "달라란 투기장",
+		[6732] = "범의 봉우리",
 
 		-- Other
 		[4298] = "동부 역병지대: 붉은십자군 초소",
@@ -1886,7 +1895,8 @@ local zoneTranslation = {
 		[562] = "Arena da Lâmina Afiada",
 		[572] = "Ruínas de Lordaeron",
 		[4378] = "Arena de Dalaran",
-
+		[6732] = "O Pico do Tigre",
+		
 		-- Other
 		[4298] = "Terras Pestilentas: Enclave Escarlate",
 		[3508] = "Desfiladeiro Amani",
@@ -1927,7 +1937,8 @@ local zoneTranslation = {
 		[562] = "Арена Острогорья",
 		[572] = "Руины Лордерона",
 		[4378] = "Арена Даларана",
-
+		[6732] = "Пик Тигра",
+		
 		-- Other
 		[4298] = "Чумные земли: Анклав Алого ордена",
 		[3508] = "Перевал Амани",
@@ -1951,7 +1962,7 @@ local zoneTranslation = {
 		[530] = "外域",
 		[571] = "诺森德",
 		[5416] = "大漩涡",
-		[870] = "Pandaria",
+		[870] = "潘达利亚",
 		["Azeroth"] = "艾泽拉斯",
 
 		-- Transports
@@ -1968,7 +1979,8 @@ local zoneTranslation = {
 		[562] = "刀锋山竞技场",
 		[572] = "洛丹伦废墟",
 		[4378] = "达拉然竞技场",
-
+		[6732] = "虎踞峰",
+		
 		-- Other
 		[4298] = "东瘟疫之地：血色领地",
 		[3508] = "阿曼尼小径",
@@ -2009,7 +2021,8 @@ local zoneTranslation = {
 		[562] = "劍刃競技場",
 		[572] = "羅德隆廢墟",
 		[4378] = "達拉然競技場",
-
+		[6732] = "猛虎峰",
+		
 		-- Other
 		[4298] = "東瘟疫之地:血色領區",
 		[3508] = "阿曼尼小徑",
@@ -5831,6 +5844,7 @@ do
 		paths = {
 			[BZ["Temple of the Jade Serpent"]] = true,
 			[BZ["Valley of the Four Winds"]] = true,
+			[BZ["Timeless Isle"]] = true,
 			[JADEFOREST_ORGRIMMAR_PORTAL] = true,
 			[JADEFOREST_STORMWIND_PORTAL] = true,
 		},
@@ -5845,12 +5859,14 @@ do
 		continent = Pandaria,
 		instances = {
 			[BZ["Stormstout Brewery"]] = true,
+			[BZ["Deepwind Gorge"]] = true,
 		},
 		paths = {
 			[BZ["Stormstout Brewery"]] = true,
 			[BZ["The Jade Forest"]] = true,
 			[BZ["Krasarang Wilds"]] = true,
 			[BZ["The Veiled Stair"]] = true,
+			[BZ["Deepwind Gorge"]] = true,
 		},
 		fishing_min = 700,
 		battlepet_low = 23,
@@ -5876,6 +5892,7 @@ do
 		instances = {
 			[BZ["Shado-pan Monastery"]] = true,
 			[BZ["Mogu'shan Vaults"]] = true,
+			[BZ["The Tiger's Peak"]] = true,
 		},
 		paths = {
 			[BZ["Shado-pan Monastery"]] = true,
@@ -6114,8 +6131,35 @@ do
 	--	entrancePortal = { BZ["The Veiled Stair"], 66.2, 49.3 },   TODO
 	}
 	
+	-- Patch 5.3 Battleground
+	zones[BZ["Deepwind Gorge"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		paths = BZ["Valley of the Four Winds"],
+		groupSize = 15,
+		type = "Battleground",
+		texture = "DeepwindGorge",  -- TODO: verify
+	}
 	
+	-- Patch 5.3 Arena
+	zones[BZ["The Tiger's Peak"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		type = "Arena",
+	}
 	
+	-- Patch 5.4 Zone
+	zones[BZ["Timeless Isle"]] = {
+		low = 90,
+		high = 90,
+		continent = Pandaria,
+		paths = BZ["The Jade Forest"],
+		fishing_min = 825,
+		battlepet_low = 23,
+		battlepet_high = 25,
+	}
 	
 	
 

@@ -1,0 +1,7 @@
+﻿## Interface: 50200
+## X-Min-Interface: 50001
+## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Council Empower Tracker|r
+## Author: Bigmack
+## LoadOnDemand: 0
+## RequiredDeps: DBM-Core
+EmpowerTracker.lua

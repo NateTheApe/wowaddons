@@ -58,23 +58,46 @@ function IIT_verbtog()
 end
 
 function InterruptSay:COMBAT_LOG_EVENT_UNFILTERED(...)
-	local inParty = GetNumGroupMembers()>=1
-	local inRaid = GetNumGroupMembers()>=1
+	local inRealParty = GetNumGroupMembers(LE_PARTY_CATEGORY_HOME)>=1
+	local inFakeParty = GetNumGroupMembers(LE_PARTY_CATEGORY_INSTANCE)>=1
+	local iitinRaid = IsInRaid()
 	local aEvent = select(2, ...)
 	local aUser = select(5, ...)
 	local destName = select(9, ...)
 	local spellID = select(15, ...)
+	local iitjustfake = "true"
+	local iitrealnfake = "true"
+	local iitjustreal = "true"
+	local iitpartytype
 	if InterruptSayDB.intsayonoff==1 then
 		if aEvent=="SPELL_INTERRUPT" then
-			if inParty then xxx="PARTY" end
 			local ssInInstance, ssinstanceType = IsInInstance();
-			if ssinstanceType == "pvp" then 
-				xxx="BATTLEGROUND";
-			else
-			local iitinRaid = IsInRaid();
-			if iitinRaid then xxx="RAID" end
-			end
 			if InterruptSayDB.Allmembersonoff==0 and aUser~=UnitName("player") then return end 
+			if inRealParty and inFakeParty then
+				iitrealnfake = "true"
+				iitpartytype = "Mixed"
+			else
+				iitrealnfake = "false"
+			end
+			if inRealParty and (not inFakeParty) then
+				iitjustreal = "true"
+				iitpartytype = "Real"
+			else
+				iitjustreal = "false"
+			end
+			if (not inRealParty) and inFakeParty then
+				iitjustfake = "true"
+				iitpartytype = "Fake"
+			else
+				iitjustfake = "false"
+			end
+			if iitjustreal or iitrealnfake then iitpartytype="PARTY" end
+			if ssinstanceType == "pvp" then 
+				iitinstancetype="BATTLEGROUND";
+			else
+				iitinstancetype="OTHER";
+				if iitinRaid then iitpartytype="RAID" end
+			end
 			if (UnitInRaid("player")) then
 				if not UnitInRaid(aUser) then return end
 			else
@@ -106,27 +129,53 @@ function InterruptSay:COMBAT_LOG_EVENT_UNFILTERED(...)
 			elseif InterruptSayDB.INTSAYOUTPUT=='Self' then
 				print(intsaymsg)
 			elseif InterruptSayDB.INTSAYOUTPUT=='Say' then
-				if xxx == "BATTLEGROUND" then
+				if ssinstanceType == "pvp" then
 					print(intsaymsg)
 				else
 					SendChatMessage(intsaymsg, "SAY")
 				end
-			elseif InterruptSayDB.INTSAYOUTPUT=='Auto' then 
-				if (not inParty) and (not inRaid) then
+			elseif InterruptSayDB.INTSAYOUTPUT=='Auto' then
+				if IsInGroup("player") then
+					if ssinstanceType == "pvp" then
+						SendChatMessage(intsaymsg, "INSTANCE_CHAT")
+					else
+						if IsInRaid() then
+							SendChatMessage(intsaymsg, IsPartyLFG() and "INSTANCE_CHAT" or "RAID")
+						else
+							if iitjustfake or iitrealnfake then
+								SendChatMessage(intsaymsg, IsPartyLFG() and "INSTANCE_CHAT" or "PARTY")
+							else
+								SendChatMessage(intsaymsg, "PARTY")
+							end
+						end
+					end
+				else
 					print(intsaymsg)
-				else 
-					SendChatMessage(intsaymsg, xxx)
 				end
 			elseif InterruptSayDB.INTSAYOUTPUT=='Party' then 
-				if (not inParty) and (not inRaid) then
+				if IsInGroup("player") then
+					if iitjustfake=="true" then
+						if ssinstanceType == "pvp" then
+							SendChatMessage(intsaymsg, "INSTANCE_CHAT")
+						else
+							if IsInRaid() then
+								SendChatMessage(intsaymsg, IsPartyLFG() and "INSTANCE_CHAT" or "RAID")
+							else					
+								SendChatMessage(intsaymsg, IsPartyLFG() and "INSTANCE_CHAT" or "PARTY")
+							end
+						end
+					else
+						SendChatMessage(intsaymsg, "PARTY")
+					end
+				else
 					print(intsaymsg)
-				else 
-					SendChatMessage(intsaymsg, "PARTY")
 				end
 			end
 		end
 	end
 end
+
+
 
 function IIT_toggleon()
 	if InterruptSayDB.intsayonoff==1 then
@@ -198,3 +247,6 @@ SlashCmdList["IIT"] =
 		print("|c00bfffff"..InterruptSayDB.msg)
     end
 end   
+
+
+

@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- Constants.lua
 -------------------------------------------------------------------------------
--- File date: 2013-03-08T03:06:11Z
--- File hash: 693115c
--- Project hash: 3fa6ce4
--- Project version: 2.4.8
+-- File date: 2013-11-13T06:57:08Z
+-- File hash: 1999a59
+-- Project hash: e8a8419
+-- Project version: 2.5.13
 -------------------------------------------------------------------------------
 -- Please see http://www.wowace.com/addons/arl/ for more information.
 -------------------------------------------------------------------------------
@@ -189,12 +189,12 @@ private.COMMON_FLAGS_WORD1 = {
 	MOB_DROP	= 0x00000400,	-- 11
 	DISC		= 0x00000800,	-- 12
 	RETIRED		= 0x00001000,	-- 13
-	UNUSED1		= 0x00002000,	-- 14
-	UNUSED2		= 0x00004000,	-- 15
-	UNUSED3		= 0x00008000,	-- 16
-	UNUSED4		= 0x00010000,	-- 17
-	UNUSED5		= 0x00020000,	-- 18
-	UNUSED6		= 0x00040000,	-- 19
+	MISC1		= 0x00002000,	-- 14
+	UNUSED1		= 0x00004000,	-- 15
+	UNUSED2		= 0x00008000,	-- 16
+	UNUSED3		= 0x00010000,	-- 17
+	UNUSED4		= 0x00020000,	-- 18
+	UNUSED5		= 0x00040000,	-- 19
 	DPS		= 0x00080000,	-- 20
 	TANK		= 0x00100000,	-- 21
 	HEALER		= 0x00200000,	-- 22
@@ -338,6 +338,7 @@ private.ITEM_FILTER_TYPES = {
 	ALCHEMY_POTION = true,
 	ALCHEMY_TRANSMUTE = true,
 	ALCHEMY_TRINKET = true,
+	ALCHEMY_MOUNT = true,
 	-------------------------------------------------------------------------------
 	-- Blacksmithing
 	-------------------------------------------------------------------------------
@@ -411,6 +412,7 @@ private.ITEM_FILTER_TYPES = {
 	INSCRIPTION_STAFF = true,
 	INSCRIPTION_SCROLL = true,
 	INSCRIPTION_PET = true,
+	INSCRIPTION_TRINKET = true,
 	-------------------------------------------------------------------------------
 	-- Jewelcrafting
 	-------------------------------------------------------------------------------
@@ -472,29 +474,32 @@ private.ITEM_FILTER_TYPES = {
 -- Acquire types.
 -------------------------------------------------------------------------------
 private.ACQUIRE_NAMES = {
-	[1]	= L["Trainer"],
-	[2]	= L["Vendor"],
-	[3]	= L["Mob Drop"],
-	[4]	= L["Quest"],
-	[5]	= _G.GetCategoryInfo(155),
-	[6]	= _G.REPUTATION,
-	[7]	= L["World Drop"],
-	[8]	= _G.ACHIEVEMENTS,
-	[9]	= L["Discovery"],
-	[10]	= _G.MISCELLANEOUS,
+	L["Trainer"],
+	L["Vendor"],
+	L["Mob Drop"],
+	L["Quest"],
+	_G.GetCategoryInfo(155),
+	_G.REPUTATION,
+	L["World Drop"],
+	_G.ACHIEVEMENTS,
+	L["Discovery"],
+	_G.MISCELLANEOUS,
+	L["Retired"],
+
 }
 
 private.ACQUIRE_STRINGS = {
-	[1]	= "TRAINER",
-	[2]	= "VENDOR",
-	[3]	= "MOB_DROP",
-	[4]	= "QUEST",
-	[5]	= "SEASONAL",
-	[6]	= "REPUTATION",
-	[7]	= "WORLD_DROP",
-	[8]	= "ACHIEVEMENT",
-	[9]	= "DISCOVERY",
-	[10]	= "CUSTOM",
+	"TRAINER",
+	"VENDOR",
+	"MOB_DROP",
+	"QUEST",
+	"SEASONAL",
+	"REPUTATION",
+	"WORLD_DROP",
+	"ACHIEVEMENT",
+	"DISCOVERY",
+	"CUSTOM",
+	"RETIRED",
 }
 
 private.ACQUIRE_TYPES = {}
@@ -862,10 +867,12 @@ private.ZONE_NAMES = {
 	THE_VIOLET_HOLD = _G.GetMapNameByID(536),
 	GILNEAS = _G.GetMapNameByID(539),
 	TRIAL_OF_THE_CRUSADER = _G.GetMapNameByID(543),
+	THE_LOST_ISLES = _G.GetMapNameByID(544),
 	ICECROWN_CITADEL = _G.GetMapNameByID(604),
 	MOUNT_HYJAL = _G.GetMapNameByID(606),
 	SOUTHERN_BARRENS = _G.GetMapNameByID(607),
 	VASHJIR = _G.GetMapNameByID(613),
+	ABYSSAL_DEPTHS = _G.GetMapNameByID(614),
 	DEEPHOLM = _G.GetMapNameByID(640),
 	THE_CAPE_OF_STRANGLETHORN = _G.GetMapNameByID(673),
 	THE_TEMPLE_OF_ATALHAKKAR = _G.GetMapNameByID(687),
@@ -895,19 +902,23 @@ private.ZONE_NAMES = {
 	THE_DEADMINES = _G.GetMapNameByID(756),
 	RAZORFEN_DOWNS = _G.GetMapNameByID(760),
 	STRATHOLME = _G.GetMapNameByID(765),
+	AHNQIRAJ = _G.GetMapNameByID(766),
 	TWILIGHT_HIGHLANDS = _G.GetMapNameByID(770),
 	AHNQIRAJ_THE_FALLEN_KINGDOM = _G.GetMapNameByID(772),
 	HYJAL_SUMMIT = _G.GetMapNameByID(775),
 	SERPENTSHRINE_CAVERN = _G.GetMapNameByID(780),
 	TEMPEST_KEEP = _G.GetMapNameByID(782),
 	SUNWELL_PLATEAU = _G.GetMapNameByID(789),
+	MOLTEN_FRONT = _G.GetMapNameByID(795),
 	BLACK_TEMPLE = _G.GetMapNameByID(796),
 	MAGISTERS_TERRACE = _G.GetMapNameByID(798),
 	KARAZHAN = _G.GetMapNameByID(799),
 	FIRELANDS = _G.GetMapNameByID(800),
 	VALLEY_OF_THE_FOUR_WINDS = _G.GetMapNameByID(807),
+	THE_WANDERING_ISLE = _G.GetMapNameByID(808),
 	TOWNLONG_STEPPES = _G.GetMapNameByID(810),
 	VALE_OF_ETERNAL_BLOSSOMS = _G.GetMapNameByID(811),
+	DARKMOON_ISLAND = _G.GetMapNameByID(823),
 	DRAGON_SOUL = _G.GetMapNameByID(824),
 	DUSTWALLOW_MARSH = _G.GetMapNameByID(851),
 	KRASARANG_WILDS = _G.GetMapNameByID(857),
@@ -915,11 +926,15 @@ private.ZONE_NAMES = {
 	THE_VEILED_STAIR = _G.GetMapNameByID(873),
 	KUN_LAI_SUMMIT = _G.GetMapNameByID(879),
 	THE_JADE_FOREST = _G.GetMapNameByID(880),
+	TERRACE_OF_ENDLESS_SPRING = _G.GetMapNameByID(886),
+	NEW_TINKERTOWN = _G.GetMapNameByID(895),
+	MOGUSHAN_VAULTS = _G.GetMapNameByID(896),
 	HEART_OF_FEAR = _G.GetMapNameByID(897),
 	SCHOLOMANCE = _G.GetMapNameByID(898),
 	SHRINE_OF_TWO_MOONS = _G.GetMapNameByID(903),
 	SHRINE_OF_SEVEN_STARS = _G.GetMapNameByID(905),
 	ISLE_OF_THUNDER = _G.GetMapNameByID(928),
+	TIMELESS_ISLE = _G.GetMapNameByID(951),
 }
 
 do
@@ -1033,6 +1048,7 @@ private.CATEGORY_COLORS = {
 	mobdrop		= { hex = "962626",	r = 0.59,	g = 0.15,	b = 0.15 },
 	quest		= { hex = "dbdb2c",	r = 0.86,	g = 0.86,	b = 0.17 },
 	reputation	= { hex = "855a99",	r = 0.52,	g = 0.35,	b = 0.6 },
+	retired		= { hex = "bfb863",     r = 0.75,       g = 0.72,       b = 0.39 },
 	seasonal	= { hex = "80590e",	r = 0.50,	g = 0.35,	b = 0.05 },
 	trainer		= { hex = "c98e26",	r = 0.79,	g = 0.56,	b = 0.14 },
 	vendor		= { hex = "aad372",	r = 0.67,	g = 0.83,	b = 0.45 },

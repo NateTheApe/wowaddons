@@ -23,6 +23,17 @@ function Gnosis:OnUpdate()
 	Gnosis.OnUpdate = Gnosis.Update;
 end
 
+-- timer update
+function Gnosis:StartTimerUpdate(fCurTime, bForce)
+	if((fCurTime - self.lastTimerScan) > self.s.iTimerScanEvery or bForce) then
+		self.lastTimerScan = fCurTime;
+
+		for key, value in ipairs(self.ti_fl) do
+			self:ScanTimerbar(value, fCurTime);
+		end
+	end
+end
+
 -- OnUpdate handler
 function Gnosis:Update()
 	local fCurTime = GetTime() * 1000;
@@ -99,26 +110,29 @@ function Gnosis:Update()
 	end
 
 	-- timers
-	if((fCurTime - self.lastTimerScan) > self.s.iTimerScanEvery) then
-		self.lastTimerScan = fCurTime;
-
-		for key, value in ipairs(self.ti_fl) do
-			self:ScanTimerbar(value, fCurTime);
-		end
+	self:StartTimerUpdate(fCurTime);
+	
+	-- LibDialog-1.0 bandaid
+	if (Gnosis.bDelayedEsc) then
+		StaticPopup_EscapePressed();
+		Gnosis.bDelayedEsc = nil;
 	end
+								
 end
 
 -- events
 function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank)
-	local cb;
-	if(unit == "player") then
+	if (unit == "player") then
 		local fCurTime = GetTime() * 1000.0;
 		self:FindGCDBars(spell, rank, fCurTime);
-		if(self.iSwing == 2) then
-			if(spell == self.strAutoShot) then
+		-- update timer bars now (to make gcd bars appear instantly)
+		self:StartTimerUpdate(fCurTime, true);
+		
+		if (self.iSwing == 2) then
+			if (spell == self.strAutoShot) then
 				self:FindSwingTimers("sr", spell, self.iconAutoShot, fCurTime, false);
 				self:FindSwingTimers("smr", spell, self.iconAutoShot, fCurTime, false);
-			elseif(spell == self.strShootWand) then
+			elseif (spell == self.strShootWand) then
 				self:FindSwingTimers("sr", spell, self.iconShootWand, fCurTime, false);
 				self:FindSwingTimers("smr", spell, self.iconShootWand, fCurTime, false);
 			end
@@ -132,20 +146,20 @@ end
 
 function Gnosis:UNIT_SPELLCAST_START(event, unit, spell, rank)
 	local cb = self:FindCB(unit);
-	if(cb) then
+	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
-		self:CalcLag(fCurTime);
 		repeat
 			self:SetupCastbar(cb, false, fCurTime);
 			cb = self:FindCBNext(unit);
 		until cb == nil;
 	end
-
-	if(unit == "player") then
+	
+	if (unit == "player") then
 		local fCurTime = GetTime() * 1000.0;
+		self:CalcLag(fCurTime);
 		self:FindGCDBars(spell, rank, fCurTime);
-
-		if(self.iLastTradeSkillCnt) then
+		
+		if (self.iLastTradeSkillCnt) then
 			self.iLastTradeSkillCnt = self.iLastTradeSkillCnt - 1;
 			self.bNewTradeSkill = nil;
 		end
@@ -290,7 +304,9 @@ function Gnosis:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, id)
 	if(cb) then
 		local fCurTime = GetTime() * 1000.0;
 		repeat
-			if(cb.bActive) then
+			-- cb.castname == spell : bandaid for classes that can cast spells while running
+			-- the wow api sends interrupt events for previously casted spells...
+			if(cb.bActive and cb.castname == spell) then
 				local conf = cb.conf;
 				cb.bar:SetValue(cb.channel and 0 or 1.0);
 				if(cb.channel) then

@@ -1,16 +1,15 @@
-local mod	= DBM:NewMod("ForgemasterGarfrost", "DBM-Party-WotLK", 15)
+local mod	= DBM:NewMod(608, "DBM-Party-WotLK", 15, 278)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 51 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(36494)
-mod:SetModelID(30843)
+mod:SetEncounterID(833, 834)
 mod:SetUsedIcons(8)
---mod:SetMinSyncRevision(4499)
 mod:SetMinSyncRevision(7)--Could break if someone is running out of date version with higher revision
 
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_APPLIED_DOSE",
 	"RAID_BOSS_WHISPER"
@@ -18,10 +17,10 @@ mod:RegisterEvents(
 
 local warnForgeWeapon			= mod:NewSpellAnnounce(68785, 2)
 local warnDeepFreeze			= mod:NewTargetAnnounce(70381, 2)
-local warnSaroniteRock			= mod:NewAnnounce("warnSaroniteRock", 3, 68789)
-local specWarnSaroniteRock		= mod:NewSpecialWarning("specWarnSaroniteRock")
-local specWarnSaroniteRockNear	= mod:NewSpecialWarning("specWarnSaroniteRockNear")
-local specWarnPermafrost		= mod:NewSpecialWarning("specWarnPermafrost")
+local warnSaroniteRock			= mod:NewTargetAnnounce(68789, 3)
+local specWarnSaroniteRock		= mod:NewSpecialWarningYou(68789)
+local specWarnSaroniteRockNear	= mod:NewSpecialWarningClose(68789)
+local specWarnPermafrost		= mod:NewSpecialWarningStack(68786, nil, 9)
 local timerDeepFreeze			= mod:NewTargetTimer(14, 70381)
 
 mod:AddBoolOption("SetIconOnSaroniteRockTarget", true)
@@ -44,14 +43,15 @@ end
 
 function mod:SPELL_AURA_APPLIED_DOSE(args)
 	if args.spellId == 68786 then
-		if args.amount >= 9 and args:IsPlayer() and self:AntiSpam(5) then --11 stacks is what's needed for achievement, 9 to give you time to clear/dispel
-			specWarnPermafrost:Show(args.spellName, args.amount)
+		local amount = args.amount or 1
+		if amount >= 9 and args:IsPlayer() and self:AntiSpam(5) then --11 stacks is what's needed for achievement, 9 to give you time to clear/dispel
+			specWarnPermafrost:Show(args.spellName, amount)
 		end
 		if self.Options.AchievementCheck and not warnedfailed then
-			if (args.amount or 1) == 9 or (args.amount or 1) == 10 then
-				SendChatMessage(L.AchievementWarning:format(args.destName, (args.amount or 1)), "PARTY")
-			elseif (args.amount or 1) > 11 then
-				SendChatMessage(L.AchievementFailed:format(args.destName, (args.amount or 1)), "PARTY")
+			if amount == 9 or amount == 10 then
+				SendChatMessage(L.AchievementWarning:format(args.destName, amount), "PARTY")
+			elseif amount > 11 then
+				SendChatMessage(L.AchievementFailed:format(args.destName, amount), "PARTY")
 				warnedfailed = true
 			end
 		end

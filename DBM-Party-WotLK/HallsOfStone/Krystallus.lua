@@ -1,14 +1,14 @@
-local mod	= DBM:NewMod("Krystallus", "DBM-Party-WotLK", 7)
+local mod	= DBM:NewMod(604, "DBM-Party-WotLK", 7, 277)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 34 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(27977)
--- mod:SetModelID(20909)  -- barely visible
+mod:SetEncounterID(563, 564)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_SUCCESS"
 )
 

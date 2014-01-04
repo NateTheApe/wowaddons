@@ -46,8 +46,18 @@ CombuMBTrackerOptLocCN = {
 	["CombuMBTrackerbgcolornormal"] = "背景颜色",
 	["CombuMBTrackerLanguageInfo"] = "语言:",
 	["CombuMBTrackeredgecolornormal"] = "边框颜色",
+	["CombuMBtrackerPosition"] = "若要设定多目标活动炸弹监控框架的位置，请从下拉式选单中选择希望将该框架设定于主框架的哪一侧。",
 	}
 		
+-------------------------------
+-- table for Living bomb tracker position dropdown
+CombuMBTrackerpositionCN = {
+   "上方",
+   "下方",
+   "右方",
+   "左方",
+   "自由",
+	}
 		
 -------------------------------
 -- table for Autohide dropdown

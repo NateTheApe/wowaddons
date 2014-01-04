@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Nefarian-Classic", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 452 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 502 $"):sub(12, -3))
 mod:SetCreatureID(11583)
 mod:SetModelID(11380)
 mod:RegisterCombat("yell", L.YellPull)
@@ -15,10 +15,9 @@ mod:RegisterEvents(
 	"CHAT_MSG_MONSTER_YELL"
 )
 
-local warnClassCallSoon	= mod:NewAnnounce("WarnClassCallSoon", 2)
 local warnClassCall		= mod:NewAnnounce("WarnClassCall", 3)
-local warnPhaseSoon		= mod:NewAnnounce("WarnPhaseSoon", 2, "Interface\\Icons\\Spell_Nature_WispSplode")
 local warnPhase			= mod:NewAnnounce("WarnPhase", 3)
+local warnPhase3Soon	= mod:NewPrePhaseAnnounce(3)
 local warnShadowFlame	= mod:NewCastAnnounce(22539, 2)
 local warnFear			= mod:NewCastAnnounce(22686, 2)
 local warnVeilShadow	= mod:NewTargetAnnounce(22687, 3)
@@ -67,7 +66,7 @@ end
 
 function mod:UNIT_HEALTH(uId)
 	if UnitHealth(uId) / UnitHealthMax(uId) <= 0.25 and self:GetUnitCreatureId(uId) == 11583 and not prewarn_P3 then
-		warnPhaseSoon:Show("3")
+		warnPhase3Soon:Show()
 		prewarn_P3 = true
 	end
 end
@@ -95,16 +94,15 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		self:SendSync("ClassCall", "Warrior")
 	elseif msg == L.YellMonk or msg:find(L.YellMonk) then
 		self:SendSync("ClassCall", "Monk")
-	elseif msg == L.YellPhase2 or msg:find(L.YellPhase2) then
+	elseif msg == L.YellP2 or msg:find(L.YellP2) then
 		self:SendSync("Phase", 2)
-	elseif msg == L.YellPhase3 or msg:find(L.YellPhase3) then
+	elseif msg == L.YellP3 or msg:find(L.YellP3) then
 		self:SendSync("Phase", 3)
 	end
 end
 
 function mod:OnSync(msg, arg)
 	if msg == "ClassCall" then
-		warnClassCallSoon:Schedule(25)
 		warnClassCall:Show(arg)
 		timerClassCall:Start(arg)
 	elseif msg == "Phase" then

@@ -10,12 +10,11 @@ local Timer = OmniCC.Timer
 --[[ Control ]]--
 
 function Cooldown:Start(...)
-	local timer = Timer:Get(self) or Timer:New(self)
-	timer:UpdateOpacity()
+	Cooldown.UpdateOpacity(self)
 
 	if Cooldown.CanShow(self, ...) then
 		Cooldown.Setup(self)
-		timer:Start(...)
+		self.omnicc:Start(...)
 	else
 		Cooldown.Stop(self)
 	end
@@ -26,33 +25,31 @@ function Cooldown:Setup()
 		self:HookScript('OnShow', Cooldown.OnShow)
 		self:HookScript('OnHide', Cooldown.OnHide)
 		self:HookScript('OnSizeChanged', Cooldown.OnSizeChanged)
-		self.omnicc = true
+		self.omnicc = Timer:New(self)
 	end
 	
 	OmniCC:SetupEffect(self)
 end
 
 function Cooldown:Stop()
-	local timer = Timer:Get(self)
+	local timer = self.omnicc
 	if timer and timer.enabled then
 		timer:Stop()
 	end
 end
 
 function Cooldown:CanShow(start, duration, charges)
-	if self.noCooldownCount or not (start and duration) or (charges or 0) ~= 0 then
-		return false
+	if not self.noCooldownCount and start and duration then
+		local sets = OmniCC:GetGroupSettingsFor(self) 
+		return start > 0 and duration >= sets.minDuration and sets.enabled
 	end
-	
-	local sets = OmniCC:GetGroupSettingsFor(self) 
-	return start > 0 and duration >= sets.minDuration and sets.enabled
 end
 
 
 --[[ Frame Events ]]--
 
 function Cooldown:OnShow()
-	local timer = Timer:Get(self)
+	local timer = self.omnicc
 	if timer and timer.enabled then
 		if timer:GetRemain() > 0 then
 			timer.visible = true
@@ -64,7 +61,7 @@ function Cooldown:OnShow()
 end
 
 function Cooldown:OnHide()
-	local timer = Timer:Get(self)
+	local timer = self.omnicc
 	if timer and timer.enabled then
 		timer.visible = nil
 		timer:Hide()
@@ -75,9 +72,24 @@ function Cooldown:OnSizeChanged(width, ...)
 	if self.omniWidth ~= width then
 		self.omniWidth = width
 		
-		local timer = Timer:Get(self)
+		local timer = self.omnicc
 		if timer then
 			timer:UpdateFontSize(width, ...)
 		end
 	end
+end
+
+
+--[[ Updating ]]--
+
+function Cooldown:ForAll(func, ...)
+	func = self[func]
+
+	for cooldown in pairs(OmniCC.Cache) do
+		func(cooldown, ...)
+	end
+end
+
+function Cooldown:UpdateOpacity()
+	self:SetAlpha(OmniCC:GetGroupSettingsFor(self).spiralOpacity)
 end

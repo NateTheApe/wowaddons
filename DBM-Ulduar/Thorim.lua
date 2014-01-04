@@ -1,15 +1,16 @@
 local mod	= DBM:NewMod("Thorim", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 34 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(32865)
+mod:SetEncounterID(1141)
 mod:SetModelID(28977)
 mod:SetUsedIcons(8)
 
 mod:RegisterCombat("yell", L.YellPhase1)
 mod:RegisterKill("yell", L.YellKill)
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED",
 	"CHAT_MSG_MONSTER_YELL",
 	"SPELL_CAST_SUCCESS",

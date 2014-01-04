@@ -1,7 +1,7 @@
-## Interface: 50300
-## X-Max-Interface: 50300
+## Interface: 50400
+## X-Max-Interface: 50400
 ## X-Min-Interface: 50200
-## X-Curse-Packaged-Version: 2.1.4
+## X-Curse-Packaged-Version: 2.3
 ## X-Curse-Project-Name: Healers have to die
 ## X-Curse-Project-ID: healers-have-to-die
 ## X-Curse-Repository-ID: wow/healers-have-to-die/mainline
@@ -21,7 +21,7 @@
 
 
 ## Author: John Wellesz
-## Version: 2.1.4
+## Version: 2.3
 
 ## LoadManagers: AddonLoader
 
@@ -33,10 +33,10 @@
 
 ## X-License: All Rights Reserved
 
-## OptionalDeps: Ace3
-## X-Embeds: Ace3
+## OptionalDeps: Ace3, LibNameplateRegistry-1.0
+## X-Embeds: Ace3, LibNameplateRegistry-1.0
 
-## X-ReleaseDate: "2013-05-21T20:59:53Z"
+## X-ReleaseDate: "2013-12-31T01:21:48Z"
 ## X-Category: PvP
 ## X-eMail: archarodim@teaser.fr
 ## X-Website: http://www.2072productions.com/to/healers-have-to-die.php
@@ -49,7 +49,6 @@ Core.lua
 utils.lua
 
 NamePlateHooker.lua
-NamePlateRegistry.lua
 
 GraphicalReporter.lua
 

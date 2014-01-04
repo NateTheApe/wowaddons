@@ -35,9 +35,11 @@ Gnosis.L["IfCCTimers"] = "GCD/Schwung Timer erstellen"
 Gnosis.L["IfConfigs"] = "Konfigurationen"
 Gnosis.L["IfCWAction"] = "Button drücken, um das Fenster ohne Änderungen zu schließen"
 Gnosis.L["IfLFConigs"] = "Ein oder mehrere gespeicherte Konfigurationen wurden gefunden. Du kannst Gnosis konfigurieren, in dem Du eine bereits vorhandene Konfiguration durch einen der unteren Buttons lädst (Der Name des Buttons entspricht der Konfiguration die anschließend geladen wird)."
-Gnosis.L["IfNoCBs"] = "Keine Zauberleisten gefunden"
+Gnosis.L["IfNoCBs"] = "Keine Leisten gefunden"
 Gnosis.L["IfOpenGUI"] = "Einstellungen öffnen"
 Gnosis.L["Import"] = "Importieren"
+Gnosis.L["ImportFromHyperlink"] = "Import bar configuration? If the bar already exists, it's configuration values will be overwritten." -- Requires localization
+Gnosis.L["ImportKeepPos"] = "Import, keep position" -- Requires localization
 Gnosis.L["MsgBlizCBIsDis"] = "Blizzard-Zauberleiste wurde bereits durch ein anderes Addon deaktiviert"
 Gnosis.L["MsgBlizCBRestored"] = "Blizzard-Zauberleiste wiederhergestellt (siehe Konfiguration)"
 Gnosis.L["MsgDis"] = "(deaktiviert)"
@@ -81,15 +83,15 @@ Gnosis.L["OptCBBorderColInt"] = "Rahmenfarbe (nicht unterbrechbar)"
 Gnosis.L["OptCBBorderSize"] = "Rahmengröße"
 Gnosis.L["OptCBBorderTex_D"] = "Additional border texture of fixed size. You might want to unlock the icon and reduce the normal border size to 0 when using additional border textures. This border texture will not affect the icon border." -- Requires localization
 Gnosis.L["OptCBBorderTex_N"] = "Additional border texture" -- Requires localization
-Gnosis.L["OptCBBWListedSpells"] = "Zauber auf der Black-/Whitelist oder Timer Konfiguration" -- Needs review
+Gnosis.L["OptCBBWListedSpells"] = "Zauber auf der Black-/Whitelist oder Timer Konfiguration"
 Gnosis.L["OptCBCBBgCol"] = "Hintergrund"
 Gnosis.L["OptCBCBColFail"] = "Zauberleiste (fehlgeschlagen)"
 Gnosis.L["OptCBCBColInt"] = "Zauberleiste (unterbrochen)"
 Gnosis.L["OptCBCBColor"] = "Zauberleiste"
-Gnosis.L["OptCBCBNIColor"] = "Zauberleiste Farbe (nicht unterbrechbar)" -- Needs review
+Gnosis.L["OptCBCBNIColor"] = "Zauberleiste Farbe (nicht unterbrechbar)"
 Gnosis.L["OptCBCBShColor"] = "Text Schattenfarbe"
 Gnosis.L["OptCBCBSucColor"] = "Zauber erfolgreich (Farbe)"
-Gnosis.L["OptCBCenterCB"] = "Zauberleiste zentrieren"
+Gnosis.L["OptCBCenterCB"] = "Leiste zentrieren"
 Gnosis.L["OptCBChannelsAsNormal"] = "Treat channels as normal spells" -- Requires localization
 Gnosis.L["OptCBCombatSelAlways"] = "in- und außerhalb eines Kampfes"
 Gnosis.L["OptCBCombatSelInC"] = "nur im Kampf"
@@ -103,6 +105,8 @@ Gnosis.L["OptCBEnCB"] = "Zauberleiste aktivieren"
 Gnosis.L["OptCBEnList"] = "Aktiveren/Deaktivieren der Black-/Whitelist"
 Gnosis.L["OptCBEnShCol"] = "Aktiviere Text Schattenfarbe"
 Gnosis.L["OptCBExportBar"] = "Zauberleiste exportieren"
+Gnosis.L["OptCBExportBarChatlink_D"] = "Requires the chat frame's edit box to be shown." -- Requires localization
+Gnosis.L["OptCBExportBarChatlink_N"] = "Paste import link to chat" -- Requires localization
 Gnosis.L["OptCBExtendChannels_D"] = "Extend channeled spell while chain-casting same spell if recast before the last channel ended." -- Requires localization
 Gnosis.L["OptCBExtendChannels_N"] = "Extend channels" -- Requires localization
 Gnosis.L["OptCBFadeout"] = "Ausblendzeit"
@@ -125,45 +129,28 @@ Gnosis.L["OptCBLatBoxCol"] = "Latenzbox"
 Gnosis.L["OptCBListBlack"] = "blacklist"
 Gnosis.L["OptCBListNeither"] = "weder"
 Gnosis.L["OptCBListWhite"] = "whitelist"
+Gnosis.L["OptCBLockAll_D"] = "Lock all bars" -- Requires localization
+Gnosis.L["OptCBLockAll_N"] = "Lock" -- Requires localization
 Gnosis.L["OptCBMaxLatBox"] = "Maximalgröße der Latenzbox [in %]"
-Gnosis.L["OptCBNewCB_D"] = "Neue Zauberleiste erstellen. Ein gültiger Name muss angegeben werden."
-Gnosis.L["OptCBNewCB_N"] = "Neue Zauberleiste"
+Gnosis.L["OptCBNewCB_D"] = [=[Neue Leiste erstellen. Ein gültiger Namen muss angeben werden.
+
+Halten der Shift-Taste erstellte eine Icon-artige Leiste.]=]
+Gnosis.L["OptCBNewCB_N"] = "Neue Leiste"
 Gnosis.L["OptCBNewCBName_D"] = "Name eingeben"
-Gnosis.L["OptCBNewListElem_D"] = [=[Castbars:
-Enter names of spells to black- or whitelist.
+Gnosis.L["OptCBNewListElem_D"] = [=[Zauberleisten:
+Zaubersprüche für die Black-/Whitelist hinzufügen.
 
 Multi-Spell Timer:
-Basic format for every entry: cmds:spell
+Standardformat der Einträge: cmds:spell/effect/item
 
-Auras (buffs&debuffs):
-buff, debuff, dot, hot, aura, help, harm, mine
-
-Cooldowns:
-cd (for spells), itemcd (for items)
-runecd (DK runes 1..6)
-innercd/proc [norefresh] (inner cd, proc duration/cd)
-
-Durations:
-totemdur (Shaman totems 1..4)
-enchmh or enchoh:weapon imbue or poison
-(mh=main hand, oh=off hand)
-
-Spellcasts (no castbar replacement):
-cast:all or cast:spellname
-
-Resources:
-resource:health, power, combopoints, altpower, heal,
-threat, soulshards, eclipse, holypower, chi,
-shadoworbs, burningembers, demonicfury
-
-More info @ Gnosis' description page at curse/wowinterface.]=] -- Needs review
+Weitere Informationen auf der Gnosis bei curse.com oder in dem beiliegenden .pdf (WoW Ordner/Addons/Gnosis) (in Arbeit).]=]
 Gnosis.L["OptCBNewListElem_N"] = "Zaubername eingeben zum Hinzufügen"
 Gnosis.L["OptCBOrient"] = "Richtung"
 Gnosis.L["OptCBRelSel"] = "Zeige Zauber von"
 Gnosis.L["OptCBRelSelAll"] = "alle einheiten"
 Gnosis.L["OptCBRelSelEnemy"] = "gegnerische einheiten"
 Gnosis.L["OptCBRelSelFriendly"] = "freundliche einheiten"
-Gnosis.L["OptCBRemCB"] = "Zauberleiste entfernen"
+Gnosis.L["OptCBRemCB"] = "Leiste entfernen"
 Gnosis.L["OptCBRemListElem"] = "Aktuellen Eintrag entfernen"
 Gnosis.L["OptCBRotIcon"] = "Symbol drehen (°)"
 Gnosis.L["OptCBRotLatencyN"] = "Rotate latency" -- Requires localization
@@ -194,6 +181,8 @@ Gnosis.L["OptCBTexture"] = "Textur der Zauberleiste"
 Gnosis.L["OptCBUnit"] = "Einheit"
 Gnosis.L["OptCBUnl_D"] = "Zauberleiste freigeben (dauerhaft angezeigt)"
 Gnosis.L["OptCBUnl_N"] = "Zauberleiste freigeben"
+Gnosis.L["OptCBUnlockAll_D"] = "Unlock all bars. Disabled bars or bars selected for another talent specialization will be unlocked but will still not be visible." -- Requires localization
+Gnosis.L["OptCBUnlockAll_N"] = "Unlock" -- Requires localization
 Gnosis.L["OptCBUnlockIcon_D"] = "Symbol von Leiste lösen"
 Gnosis.L["OptCBUnlockIcon_N"] = "Symbol freigeben"
 Gnosis.L["OptCHCastnameGrp"] = "Castname options" -- Requires localization
@@ -233,6 +222,7 @@ Gnosis.L["OptEn"] = "Aktivieren"
 Gnosis.L["OptEnAutoCreateOptons"] = "Optionsmenü beim Start automatisch erstellen"
 Gnosis.L["OptEnClipTest"] = "Clip test aktivieren"
 Gnosis.L["OptExportAllBars"] = "Export all bars" -- Requires localization
+Gnosis.L["OptFile"] = "File" -- Requires localization
 Gnosis.L["OptFirstStartFrame"] = "Einführungsfenster anzeigen"
 Gnosis.L["OptFirstTickInst"] = "Erster Tick sofort"
 Gnosis.L["OptFontEnShOffset"] = "Aktiviere spezifischen Schattenversatz"
@@ -312,13 +302,16 @@ col<school>: Zauberschule (Schatten,Arkan...)
 col<pre>: zur vorherigen Farbe wechseln
 col<class>: Farbe zur Ziel-Klassenfarbe ändern (falls verfügbar)
 col<cpre>: zur vorherigen Farbe wechseln (falls Ziel-Klassenfarbe verfügbar ist)]=]
-Gnosis.L["OptPlayMusic"] = "Musikdatei abspielen"
+Gnosis.L["OptPFoC"] = "Play file on clip" -- Requires localization
+Gnosis.L["OptPlayFile"] = "Play custom file" -- Requires localization
+Gnosis.L["OptPlayMusic"] = "Musik abspielen"
 Gnosis.L["OptPlaySnd"] = "Sound abspielen"
 Gnosis.L["OptPlayTickSound_D"] = "Deactivates clipping sound." -- Requires localization
 Gnosis.L["OptPlayTickSound_N"] = "Play tick sound" -- Requires localization
 Gnosis.L["OptPMoC"] = "Bei Clip Musik abspielen"
 Gnosis.L["OptPSoC"] = "Bei Clip Sound abspielen"
 Gnosis.L["OptResetPlayerData"] = "Spielerdaten zurücksetzen (lädt Interface neu)"
+Gnosis.L["OptResizeOptions"] = "Resize interface options frame on startup" -- Requires localization
 Gnosis.L["OptSaveconfigExists"] = "eine Konfiguration mit diesem Namen existiert bereits"
 Gnosis.L["OptSaveconfigInvalidName"] = "kein Konfigurationsname eingegeben"
 Gnosis.L["OptShowasminutesDesc"] = "Minuten anstatt den Sekunden anzeigen, wenn länger als 60s."
@@ -363,7 +356,7 @@ Gnosis.L["OptTotTicks"] = "Gesamte Ticks"
 Gnosis.L["OptWfCL_Desc"] = "Verzögere Ausgabe/Clip Test in ms um Kampftextverzögerung entgegenzuwirken."
 Gnosis.L["OptWfCL_Name"] = "Warte auf Kampftext [ms]"
 Gnosis.L["OptWidth"] = "Breite"
-Gnosis.L["PasteScript"] = "Füge Skript in die Edit-Box ein" -- Needs review
+Gnosis.L["PasteScript"] = "Import Daten in die Edit-Box einfügen"
 Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
 Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
 Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
@@ -387,9 +380,9 @@ Gnosis.L["TabCapRIGHT"] = "RECHTS"
 Gnosis.L["TabCapTOP"] = "OBEN"
 Gnosis.L["TabCapTOPLEFT"] = "OBEN LINKS"
 Gnosis.L["TabCapTOPRIGHT"] = "OBEN RECHTS"
-Gnosis.L["TabCastbars"] = "Zauberleisten"
+Gnosis.L["TabCastbars"] = "Leistenkonfiguration"
 Gnosis.L["TabChanneledSpells"] = "Kanalisierte Zauber"
-Gnosis.L["TabConfig"] = "Konfigurationen"
+Gnosis.L["TabConfig"] = "Konfigurationen (Profile)"
 Gnosis.L["TabCTClipTest"] = "Kampftext/Cliptest"
 Gnosis.L["TabFreeAlign"] = "Freie Anordnung"
 Gnosis.L["TabNameTime"] = "Name...Zeit"
@@ -422,9 +415,11 @@ Gnosis.L["IfCWAction"] = "按下按钮后没有任何操作关闭框体" -- Need
 Gnosis.L["IfLFConigs"] = [=[
 One or more stored configurations have been found. You can setup Gnosis by loading from any existing configuration, just press any of the buttons below (button name is the name of the configuration that will be loaded).
 ]=] -- Requires localization
-Gnosis.L["IfNoCBs"] = "没有找到施法条"
+Gnosis.L["IfNoCBs"] = "没有找到施法条" -- Needs review
 Gnosis.L["IfOpenGUI"] = "打开图形化配置界面"
 Gnosis.L["Import"] = "导入"
+Gnosis.L["ImportFromHyperlink"] = "Import bar configuration? If the bar already exists, it's configuration values will be overwritten." -- Requires localization
+Gnosis.L["ImportKeepPos"] = "Import, keep position" -- Requires localization
 Gnosis.L["MsgBlizCBIsDis"] = "暴雪施法条已经被其他插件所隐藏"
 Gnosis.L["MsgBlizCBRestored"] = "暴雪施法条恢复 (详见图形配置界面选项)"
 Gnosis.L["MsgDis"] = "(已禁用)"
@@ -490,6 +485,8 @@ Gnosis.L["OptCBEnCB"] = "启用施法条"
 Gnosis.L["OptCBEnList"] = "启用/禁用黑-白名单"
 Gnosis.L["OptCBEnShCol"] = "启用文字阴影颜色"
 Gnosis.L["OptCBExportBar"] = "导出施法条"
+Gnosis.L["OptCBExportBarChatlink_D"] = "Requires the chat frame's edit box to be shown." -- Requires localization
+Gnosis.L["OptCBExportBarChatlink_N"] = "Paste import link to chat" -- Requires localization
 Gnosis.L["OptCBExtendChannels_D"] = "Extend channeled spell while chain-casting same spell if recast before the last channel ended." -- Requires localization
 Gnosis.L["OptCBExtendChannels_N"] = "Extend channels" -- Requires localization
 Gnosis.L["OptCBFadeout"] = "淡出时间"
@@ -512,45 +509,26 @@ Gnosis.L["OptCBLatBoxCol"] = "延迟框颜色"
 Gnosis.L["OptCBListBlack"] = "黑名单"
 Gnosis.L["OptCBListNeither"] = "都"
 Gnosis.L["OptCBListWhite"] = "白名单"
+Gnosis.L["OptCBLockAll_D"] = "Lock all bars" -- Requires localization
+Gnosis.L["OptCBLockAll_N"] = "Lock" -- Requires localization
 Gnosis.L["OptCBMaxLatBox"] = "延迟框最大尺寸 [% 施法条]"
-Gnosis.L["OptCBNewCB_D"] = "创建新的施法条必须给出一个可用的施法条名"
-Gnosis.L["OptCBNewCB_N"] = "新的施法条"
+Gnosis.L["OptCBNewCB_D"] = "创建新的施法条必须给出一个可用的施法条名" -- Needs review
+Gnosis.L["OptCBNewCB_N"] = "新的施法条" -- Needs review
 Gnosis.L["OptCBNewCBName_D"] = "创建新的施法条前请输入可用的施法条名字"
 Gnosis.L["OptCBNewListElem_D"] = [=[Castbars:
 Enter names of spells to black- or whitelist.
 
 Multi-Spell Timer:
-Basic format for every entry: cmds:spell
+Basic format for every entry: cmds:spell/effect/item
 
-Auras (buffs&debuffs):
-buff, debuff, dot, hot, aura, help, harm, mine
-
-Cooldowns:
-cd (for spells), itemcd (for items)
-runecd (DK runes 1..6)
-innercd/proc [norefresh] (inner cd, proc duration/cd)
-
-Durations:
-totemdur (Shaman totems 1..4)
-enchmh or enchoh:weapon imbue or poison
-(mh=main hand, oh=off hand)
-
-Spellcasts (no castbar replacement):
-cast:all or cast:spellname
-
-Resources:
-resource:health, power, combopoints, altpower, heal,
-threat, soulshards, eclipse, holypower, chi,
-shadoworbs, burningembers, demonicfury
-
-More info @ Gnosis' description page at curse/wowinterface.]=] -- Needs review
+More info @ Gnosis' description page at curse.com or in the .pdf which can be found in your WoW Folder/Addons/Gnosis (not yet done).]=] -- Needs review
 Gnosis.L["OptCBNewListElem_N"] = "输入要添加的法术名"
 Gnosis.L["OptCBOrient"] = "方向"
 Gnosis.L["OptCBRelSel"] = "Show casts of" -- Requires localization
 Gnosis.L["OptCBRelSelAll"] = "所有单位"
 Gnosis.L["OptCBRelSelEnemy"] = "敌对单位"
 Gnosis.L["OptCBRelSelFriendly"] = "友方单位"
-Gnosis.L["OptCBRemCB"] = "移除施法条"
+Gnosis.L["OptCBRemCB"] = "移除施法条" -- Needs review
 Gnosis.L["OptCBRemListElem"] = "移除当前条目"
 Gnosis.L["OptCBRotIcon"] = "循环图标 (°)"
 Gnosis.L["OptCBRotLatencyN"] = "循环延迟"
@@ -581,6 +559,8 @@ Gnosis.L["OptCBTexture"] = "施法条材质"
 Gnosis.L["OptCBUnit"] = "单位"
 Gnosis.L["OptCBUnl_D"] = "解锁施法条 (总是显示)"
 Gnosis.L["OptCBUnl_N"] = "解锁施法条"
+Gnosis.L["OptCBUnlockAll_D"] = "Unlock all bars. Disabled bars or bars selected for another talent specialization will be unlocked but will still not be visible." -- Requires localization
+Gnosis.L["OptCBUnlockAll_N"] = "Unlock" -- Requires localization
 Gnosis.L["OptCBUnlockIcon_D"] = "从施法条上解锁图标"
 Gnosis.L["OptCBUnlockIcon_N"] = "解锁图标"
 Gnosis.L["OptCHCastnameGrp"] = "施法名字选项"
@@ -620,6 +600,7 @@ Gnosis.L["OptEn"] = "启用"
 Gnosis.L["OptEnAutoCreateOptons"] = "启动时自动创建选项表格"
 Gnosis.L["OptEnClipTest"] = "Enable clip test" -- Needs review
 Gnosis.L["OptExportAllBars"] = "Export all bars" -- Requires localization
+Gnosis.L["OptFile"] = "File" -- Requires localization
 Gnosis.L["OptFirstStartFrame"] = "打开初始开始框体"
 Gnosis.L["OptFirstTickInst"] = "首跳为瞬发"
 Gnosis.L["OptFontEnShOffset"] = "启用特殊阴影偏移"
@@ -696,13 +677,16 @@ col<school>: where school is shadow,arcane...
 col<pre>: change color to previous one
 col<class>: change color to target class color (if available)
 col<cpre>: revert to previous color (if target class color is available)]=] -- Requires localization
-Gnosis.L["OptPlayMusic"] = "播放音乐文件"
+Gnosis.L["OptPFoC"] = "Play file on clip" -- Requires localization
+Gnosis.L["OptPlayFile"] = "Play custom file" -- Requires localization
+Gnosis.L["OptPlayMusic"] = "播放音乐文件" -- Needs review
 Gnosis.L["OptPlaySnd"] = "播放音效"
 Gnosis.L["OptPlayTickSound_D"] = "Deactivates clipping sound." -- Requires localization
 Gnosis.L["OptPlayTickSound_N"] = "播放跳数音效" -- Needs review
 Gnosis.L["OptPMoC"] = "Play music on clip" -- Needs review
 Gnosis.L["OptPSoC"] = "Play sound on clip" -- Needs review
 Gnosis.L["OptResetPlayerData"] = "重置玩家数据 (重载界面)"
+Gnosis.L["OptResizeOptions"] = "Resize interface options frame on startup" -- Requires localization
 Gnosis.L["OptSaveconfigExists"] = "配置已经存在, 请首先删除或者改名"
 Gnosis.L["OptSaveconfigInvalidName"] = "没有给出配置名"
 Gnosis.L["OptShowasminutesDesc"] = "如果时间长于60秒则显示分钟."
@@ -747,7 +731,7 @@ Gnosis.L["OptTotTicks"] = "总跳数"
 Gnosis.L["OptWfCL_Desc"] = "Delay output/clip test after output/clip test request for given time in ms to account for possible combat log delay." -- Needs review
 Gnosis.L["OptWfCL_Name"] = "等待战斗记录 [ms]"
 Gnosis.L["OptWidth"] = "宽"
-Gnosis.L["PasteScript"] = "粘贴代码到编辑框."
+Gnosis.L["PasteScript"] = "粘贴代码到编辑框." -- Needs review
 Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
 Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
 Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
@@ -771,9 +755,9 @@ Gnosis.L["TabCapRIGHT"] = "右"
 Gnosis.L["TabCapTOP"] = "TOP" -- Requires localization
 Gnosis.L["TabCapTOPLEFT"] = "TOPLEFT" -- Requires localization
 Gnosis.L["TabCapTOPRIGHT"] = "TOPRIGHT" -- Requires localization
-Gnosis.L["TabCastbars"] = "施法条"
+Gnosis.L["TabCastbars"] = "施法条" -- Needs review
 Gnosis.L["TabChanneledSpells"] = "通道法术"
-Gnosis.L["TabConfig"] = "配置"
+Gnosis.L["TabConfig"] = "配置" -- Needs review
 Gnosis.L["TabCTClipTest"] = "战斗文字/Cliptest"
 Gnosis.L["TabFreeAlign"] = "自由对齐"
 Gnosis.L["TabNameTime"] = "名字...时间"
@@ -803,9 +787,11 @@ Gnosis.L["IfCCTimers"] = "產生 共用冷卻時間/武器揮擊 間隔指示條
 Gnosis.L["IfConfigs"] = "設定組態"
 Gnosis.L["IfCWAction"] = "按下此按鈕，即不做任何動作並關閉視窗"
 Gnosis.L["IfLFConigs"] = "搜尋到一個或者以上的設定好的組態，您可以讀取任何已存在的組態來設定Gnosis，下列按鈕即為設定好之組態(按鈕名稱為組態名稱)，按下按鈕即可用該名稱對應之組態來設定您的Gnosis。"
-Gnosis.L["IfNoCBs"] = "沒有任何施法條"
+Gnosis.L["IfNoCBs"] = "沒有任何施法條" -- Needs review
 Gnosis.L["IfOpenGUI"] = "開啟選項視窗"
 Gnosis.L["Import"] = "匯入"
+Gnosis.L["ImportFromHyperlink"] = "Import bar configuration? If the bar already exists, it's configuration values will be overwritten." -- Requires localization
+Gnosis.L["ImportKeepPos"] = "Import, keep position" -- Requires localization
 Gnosis.L["MsgBlizCBIsDis"] = "暴雪施法條已經被其他插件所隱藏"
 Gnosis.L["MsgBlizCBRestored"] = "暴雪施法條恢復 (詳見圖形配置界面選項)"
 Gnosis.L["MsgDis"] = "(已禁用)"
@@ -871,6 +857,8 @@ Gnosis.L["OptCBEnCB"] = "啟用施法條"
 Gnosis.L["OptCBEnList"] = "啟用/禁用黑-白名單"
 Gnosis.L["OptCBEnShCol"] = "啟用文字陰影顏色"
 Gnosis.L["OptCBExportBar"] = "匯出施法條"
+Gnosis.L["OptCBExportBarChatlink_D"] = "Requires the chat frame's edit box to be shown." -- Requires localization
+Gnosis.L["OptCBExportBarChatlink_N"] = "Paste import link to chat" -- Requires localization
 Gnosis.L["OptCBExtendChannels_D"] = "Extend channeled spell while chain-casting same spell if recast before the last channel ended." -- Requires localization
 Gnosis.L["OptCBExtendChannels_N"] = "Extend channels" -- Requires localization
 Gnosis.L["OptCBFadeout"] = "淡出時間"
@@ -893,45 +881,26 @@ Gnosis.L["OptCBLatBoxCol"] = "延遲框顏色"
 Gnosis.L["OptCBListBlack"] = "黑名單"
 Gnosis.L["OptCBListNeither"] = "都"
 Gnosis.L["OptCBListWhite"] = "白名單"
+Gnosis.L["OptCBLockAll_D"] = "Lock all bars" -- Requires localization
+Gnosis.L["OptCBLockAll_N"] = "Lock" -- Requires localization
 Gnosis.L["OptCBMaxLatBox"] = "延遲框最大尺寸 [% 施法條]"
-Gnosis.L["OptCBNewCB_D"] = "創建新的施法條必須給出壹個可用的施法條名"
-Gnosis.L["OptCBNewCB_N"] = "新的施法條"
+Gnosis.L["OptCBNewCB_D"] = "創建新的施法條必須給出壹個可用的施法條名" -- Needs review
+Gnosis.L["OptCBNewCB_N"] = "新的施法條" -- Needs review
 Gnosis.L["OptCBNewCBName_D"] = "創建新的施法條前請輸入可用的施法條名字"
 Gnosis.L["OptCBNewListElem_D"] = [=[Castbars:
 Enter names of spells to black- or whitelist.
 
 Multi-Spell Timer:
-Basic format for every entry: cmds:spell
+Basic format for every entry: cmds:spell/effect/item
 
-Auras (buffs&debuffs):
-buff, debuff, dot, hot, aura, help, harm, mine
-
-Cooldowns:
-cd (for spells), itemcd (for items)
-runecd (DK runes 1..6)
-innercd/proc [norefresh] (inner cd, proc duration/cd)
-
-Durations:
-totemdur (Shaman totems 1..4)
-enchmh or enchoh:weapon imbue or poison
-(mh=main hand, oh=off hand)
-
-Spellcasts (no castbar replacement):
-cast:all or cast:spellname
-
-Resources:
-resource:health, power, combopoints, altpower, heal,
-threat, soulshards, eclipse, holypower, chi,
-shadoworbs, burningembers, demonicfury
-
-More info @ Gnosis' description page at curse/wowinterface.]=] -- Needs review
+More info @ Gnosis' description page at curse.com or in the .pdf which can be found in your WoW Folder/Addons/Gnosis (not yet done).]=] -- Needs review
 Gnosis.L["OptCBNewListElem_N"] = "輸入要添加的法術名字"
 Gnosis.L["OptCBOrient"] = "方向"
 Gnosis.L["OptCBRelSel"] = "Show casts of" -- Requires localization
 Gnosis.L["OptCBRelSelAll"] = "所有單位"
 Gnosis.L["OptCBRelSelEnemy"] = "敵對"
 Gnosis.L["OptCBRelSelFriendly"] = "友方"
-Gnosis.L["OptCBRemCB"] = "移除施法條"
+Gnosis.L["OptCBRemCB"] = "移除施法條" -- Needs review
 Gnosis.L["OptCBRemListElem"] = "移除當前條目"
 Gnosis.L["OptCBRotIcon"] = "旋轉圖示"
 Gnosis.L["OptCBRotLatencyN"] = "Rotate latency" -- Requires localization
@@ -962,6 +931,8 @@ Gnosis.L["OptCBTexture"] = "施法條材質"
 Gnosis.L["OptCBUnit"] = "單位"
 Gnosis.L["OptCBUnl_D"] = "解鎖施法條 (總是顯示)"
 Gnosis.L["OptCBUnl_N"] = "解鎖施法條"
+Gnosis.L["OptCBUnlockAll_D"] = "Unlock all bars. Disabled bars or bars selected for another talent specialization will be unlocked but will still not be visible." -- Requires localization
+Gnosis.L["OptCBUnlockAll_N"] = "Unlock" -- Requires localization
 Gnosis.L["OptCBUnlockIcon_D"] = "從施法條上解鎖圖標"
 Gnosis.L["OptCBUnlockIcon_N"] = "解鎖圖標"
 Gnosis.L["OptCHCastnameGrp"] = "施法名稱選項"
@@ -1001,6 +972,7 @@ Gnosis.L["OptEn"] = "啟用"
 Gnosis.L["OptEnAutoCreateOptons"] = "初始時自動創建選項表格"
 Gnosis.L["OptEnClipTest"] = "Enable clip test" -- Needs review
 Gnosis.L["OptExportAllBars"] = "Export all bars" -- Requires localization
+Gnosis.L["OptFile"] = "File" -- Requires localization
 Gnosis.L["OptFirstStartFrame"] = "打開初始使用框體"
 Gnosis.L["OptFirstTickInst"] = "首跳為瞬發"
 Gnosis.L["OptFontEnShOffset"] = "啟用特殊陰影偏移"
@@ -1077,13 +1049,16 @@ col<school>: where school is shadow,arcane...
 col<pre>: change color to previous one
 col<class>: change color to target class color (if available)
 col<cpre>: revert to previous color (if target class color is available)]=] -- Requires localization
-Gnosis.L["OptPlayMusic"] = "播放音樂檔案"
+Gnosis.L["OptPFoC"] = "Play file on clip" -- Requires localization
+Gnosis.L["OptPlayFile"] = "Play custom file" -- Requires localization
+Gnosis.L["OptPlayMusic"] = "播放音樂檔案" -- Needs review
 Gnosis.L["OptPlaySnd"] = "播放音效"
 Gnosis.L["OptPlayTickSound_D"] = "Deactivates clipping sound." -- Requires localization
 Gnosis.L["OptPlayTickSound_N"] = "Play tick sound" -- Requires localization
 Gnosis.L["OptPMoC"] = "Play music on clip" -- Needs review
 Gnosis.L["OptPSoC"] = "Play sound on clip" -- Needs review
 Gnosis.L["OptResetPlayerData"] = "重置玩家數據 (重載界面)"
+Gnosis.L["OptResizeOptions"] = "Resize interface options frame on startup" -- Requires localization
 Gnosis.L["OptSaveconfigExists"] = "配置已經存在, 請首先刪除或者改名"
 Gnosis.L["OptSaveconfigInvalidName"] = "沒有給出配置名"
 Gnosis.L["OptShowasminutesDesc"] = "如果時間長於60秒則顯示分鐘."
@@ -1128,7 +1103,7 @@ Gnosis.L["OptTotTicks"] = "總跳數"
 Gnosis.L["OptWfCL_Desc"] = "Delay output/clip test after output/clip test request for given time in ms to account for possible combat log delay." -- Needs review
 Gnosis.L["OptWfCL_Name"] = "等待戰鬥記錄 [ms]"
 Gnosis.L["OptWidth"] = "寬"
-Gnosis.L["PasteScript"] = "貼上腳本到編輯框"
+Gnosis.L["PasteScript"] = "貼上腳本到編輯框" -- Needs review
 Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
 Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
 Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
@@ -1152,9 +1127,9 @@ Gnosis.L["TabCapRIGHT"] = "右"
 Gnosis.L["TabCapTOP"] = "頂部"
 Gnosis.L["TabCapTOPLEFT"] = "左上"
 Gnosis.L["TabCapTOPRIGHT"] = "右上"
-Gnosis.L["TabCastbars"] = "施法條"
+Gnosis.L["TabCastbars"] = "施法條" -- Needs review
 Gnosis.L["TabChanneledSpells"] = "通道法術"
-Gnosis.L["TabConfig"] = "配置"
+Gnosis.L["TabConfig"] = "配置" -- Needs review
 Gnosis.L["TabCTClipTest"] = "戰鬥文字/Cliptest"
 Gnosis.L["TabFreeAlign"] = "自由對齊"
 Gnosis.L["TabNameTime"] = "名字...時間"
@@ -1184,9 +1159,11 @@ Gnosis.L["IfCCTimers"] = "GCD/공속 타이머 생성"
 Gnosis.L["IfConfigs"] = "설정"
 Gnosis.L["IfCWAction"] = "어떠한 행동도 취하지 않고 프레임을 닫으려면 버튼을 누르세요."
 Gnosis.L["IfLFConigs"] = "하나 혹은 그 이상의 저장된 설정을 찾았습니다. 이미 있는 설정중 해당되는 것을 불러들이는 것으로 Gnosis를 설정할 수 있습니다, 아래의 버튼중 해당되는 것을 누르면 됩니다(버튼 이름은 불러들인 설정의 이름입니다)."
-Gnosis.L["IfNoCBs"] = "시전바가 없습니다"
+Gnosis.L["IfNoCBs"] = "시전바가 없습니다" -- Needs review
 Gnosis.L["IfOpenGUI"] = "설정 GUI 열기"
 Gnosis.L["Import"] = "가져오기"
+Gnosis.L["ImportFromHyperlink"] = "Import bar configuration? If the bar already exists, it's configuration values will be overwritten." -- Requires localization
+Gnosis.L["ImportKeepPos"] = "Import, keep position" -- Requires localization
 Gnosis.L["MsgBlizCBIsDis"] = "블리자드 시전바는 이미 다른 애드온에 의해 숨겨져 있습니다."
 Gnosis.L["MsgBlizCBRestored"] = "블리자드 시전바가 복구되었습니다(gui 옵션을 보세요)"
 Gnosis.L["MsgDis"] = "(비활성)"
@@ -1252,6 +1229,8 @@ Gnosis.L["OptCBEnCB"] = "시전바 활성"
 Gnosis.L["OptCBEnList"] = "차단 혹은 허용목록 활성/비활성"
 Gnosis.L["OptCBEnShCol"] = "문자 그림자 색상 사용"
 Gnosis.L["OptCBExportBar"] = "시전바 내보내기"
+Gnosis.L["OptCBExportBarChatlink_D"] = "Requires the chat frame's edit box to be shown." -- Requires localization
+Gnosis.L["OptCBExportBarChatlink_N"] = "Paste import link to chat" -- Requires localization
 Gnosis.L["OptCBExtendChannels_D"] = "시전 중인 채널링 주문을 끊고 같은 주문을 다시 시전할 때 채널링 주문을 연장합니다."
 Gnosis.L["OptCBExtendChannels_N"] = "채널링 주문 연장"
 Gnosis.L["OptCBFadeout"] = "사라짐 시간"
@@ -1274,9 +1253,11 @@ Gnosis.L["OptCBLatBoxCol"] = "지연률 박스 색상"
 Gnosis.L["OptCBListBlack"] = "제외목록"
 Gnosis.L["OptCBListNeither"] = "둘 다 안함"
 Gnosis.L["OptCBListWhite"] = "허용목록"
+Gnosis.L["OptCBLockAll_D"] = "Lock all bars" -- Requires localization
+Gnosis.L["OptCBLockAll_N"] = "Lock" -- Requires localization
 Gnosis.L["OptCBMaxLatBox"] = "지연률 박스의 최대 크기[바의 %]"
-Gnosis.L["OptCBNewCB_D"] = "새 시전바를 생성하기에, 유효한 이름이 주어져야 합니다."
-Gnosis.L["OptCBNewCB_N"] = "새 시전바"
+Gnosis.L["OptCBNewCB_D"] = "새 시전바를 생성하기에, 유효한 이름이 주어져야 합니다." -- Needs review
+Gnosis.L["OptCBNewCB_N"] = "새 시전바" -- Needs review
 Gnosis.L["OptCBNewCBName_D"] = "새 시전바를 생성하기 전에 이름을 입력합니다."
 Gnosis.L["OptCBNewListElem_D"] = [=[시전바:
 차단 혹은 허용목록에 추가할 주문이름 입력.
@@ -1303,14 +1284,14 @@ cast:all 또는 cast:주문이름
 자원들:
 resource:health, power, combopoints, altpower, heal, threat, soulshards, eclipse, holypower, chi, shadoworbs, burningembers, demonicfury
 
-자세한 정보는 curse/wowinterface 의 Gnosis' 페이지에 있습니다.]=]
+자세한 정보는 curse/wowinterface 의 Gnosis' 페이지에 있습니다.]=] -- Needs review
 Gnosis.L["OptCBNewListElem_N"] = "추가할 주문 이름 입력"
 Gnosis.L["OptCBOrient"] = "방향"
 Gnosis.L["OptCBRelSel"] = " 의 시전 보이기 : "
 Gnosis.L["OptCBRelSelAll"] = "모든 유닛"
 Gnosis.L["OptCBRelSelEnemy"] = "적대적 유닛"
 Gnosis.L["OptCBRelSelFriendly"] = "우호적 유닛"
-Gnosis.L["OptCBRemCB"] = "시전바 제거"
+Gnosis.L["OptCBRemCB"] = "시전바 제거" -- Needs review
 Gnosis.L["OptCBRemListElem"] = "현재 등록 제거"
 Gnosis.L["OptCBRotIcon"] = "아이콘 회전(°)"
 Gnosis.L["OptCBRotLatencyN"] = "지연시간 문자 회전"
@@ -1341,6 +1322,8 @@ Gnosis.L["OptCBTexture"] = "시전바 텍스쳐"
 Gnosis.L["OptCBUnit"] = "개체"
 Gnosis.L["OptCBUnl_D"] = "시전바 잠금 해제(항상 보임)"
 Gnosis.L["OptCBUnl_N"] = "시전바 잠금 해제"
+Gnosis.L["OptCBUnlockAll_D"] = "Unlock all bars. Disabled bars or bars selected for another talent specialization will be unlocked but will still not be visible." -- Requires localization
+Gnosis.L["OptCBUnlockAll_N"] = "Unlock" -- Requires localization
 Gnosis.L["OptCBUnlockIcon_D"] = "바에서 아이콘 잠금 해제"
 Gnosis.L["OptCBUnlockIcon_N"] = "아이콘 잠금 해제"
 Gnosis.L["OptCHCastnameGrp"] = "시전이름 옵션"
@@ -1380,6 +1363,7 @@ Gnosis.L["OptEn"] = "활성"
 Gnosis.L["OptEnAutoCreateOptons"] = "시작 시 자동으로 옵션 테이블 만들기"
 Gnosis.L["OptEnClipTest"] = "시전 끊김 테스트 활성"
 Gnosis.L["OptExportAllBars"] = "모든 바 내보내기"
+Gnosis.L["OptFile"] = "File" -- Requires localization
 Gnosis.L["OptFirstStartFrame"] = "첫번째 시작 틀 열기"
 Gnosis.L["OptFirstTickInst"] = "시전과 동시에 첫 틱"
 Gnosis.L["OptFontEnShOffset"] = "특정 그림자 오프셋 사용"
@@ -1459,13 +1443,16 @@ col<school>: 주문 속성 색상(암흑,비전...)
 col<pre>: 이전의 색상으로 변경
 col<class>: 대상 직업 색상으로 변경 (가능 할 때만)
 col<cpre>: 이전 색상으로 변경 (대상 직업 색상이 가능 할 때만)]=]
-Gnosis.L["OptPlayMusic"] = "음악 파일 재생"
+Gnosis.L["OptPFoC"] = "Play file on clip" -- Requires localization
+Gnosis.L["OptPlayFile"] = "Play custom file" -- Requires localization
+Gnosis.L["OptPlayMusic"] = "음악 파일 재생" -- Needs review
 Gnosis.L["OptPlaySnd"] = "소리 재생"
 Gnosis.L["OptPlayTickSound_D"] = "시전끊김 사운드 비활성화."
 Gnosis.L["OptPlayTickSound_N"] = "틱 사운드 재생"
 Gnosis.L["OptPMoC"] = "시전 끊김 시 음악 재생"
 Gnosis.L["OptPSoC"] = "시전 끊김 시 소리 재생"
 Gnosis.L["OptResetPlayerData"] = "플레이어 자료 초기화(인터페이스 재시작)"
+Gnosis.L["OptResizeOptions"] = "Resize interface options frame on startup" -- Requires localization
 Gnosis.L["OptSaveconfigExists"] = "설정이 이미 있습니다. 이전 것을 삭제하거나 이름을 변경하기 바랍니다."
 Gnosis.L["OptSaveconfigInvalidName"] = "주어진 설정 이름이 없습니다."
 Gnosis.L["OptShowasminutesDesc"] = "60초 보다 길면 초 대신에 분 보이기"
@@ -1511,7 +1498,7 @@ Gnosis.L["OptTotTicks"] = "전체 틱"
 Gnosis.L["OptWfCL_Desc"] = "전투 로그 지연을 고려해 주어진 시간만큼 출력/시전 끊김을 지연시킬 것을 요청합니다."
 Gnosis.L["OptWfCL_Name"] = "전투 기록을 위한 대기[ms]"
 Gnosis.L["OptWidth"] = "너비"
-Gnosis.L["PasteScript"] = "입력창에 스크립트 붙여넣기."
+Gnosis.L["PasteScript"] = "입력창에 스크립트 붙여넣기." -- Needs review
 Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
 Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
 Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
@@ -1535,9 +1522,9 @@ Gnosis.L["TabCapRIGHT"] = "오른쪽"
 Gnosis.L["TabCapTOP"] = "상단"
 Gnosis.L["TabCapTOPLEFT"] = "좌측상단"
 Gnosis.L["TabCapTOPRIGHT"] = "우측상단"
-Gnosis.L["TabCastbars"] = "시전바"
+Gnosis.L["TabCastbars"] = "시전바" -- Needs review
 Gnosis.L["TabChanneledSpells"] = "채널링 주문"
-Gnosis.L["TabConfig"] = "설정"
+Gnosis.L["TabConfig"] = "설정" -- Needs review
 Gnosis.L["TabCTClipTest"] = "전투문자/시전끊김"
 Gnosis.L["TabFreeAlign"] = "임의 정렬"
 Gnosis.L["TabNameTime"] = "이름...시간"
@@ -1570,6 +1557,8 @@ Gnosis.L["IfLFConigs"] = "Были найденв одна или несколь
 Gnosis.L["IfNoCBs"] = "Полос заклинаний не найдено" -- Needs review
 Gnosis.L["IfOpenGUI"] = "Открыть интерфейс настроек"
 Gnosis.L["Import"] = "Импортировать" -- Needs review
+Gnosis.L["ImportFromHyperlink"] = "Import bar configuration? If the bar already exists, it's configuration values will be overwritten." -- Requires localization
+Gnosis.L["ImportKeepPos"] = "Import, keep position" -- Requires localization
 Gnosis.L["MsgBlizCBIsDis"] = "полоса заклинаний уже скрыта другой модификацией" -- Needs review
 Gnosis.L["MsgBlizCBRestored"] = "полоса заклинаний blizzard восстанавлена (загляниете в настройки)" -- Needs review
 Gnosis.L["MsgDis"] = "(отключен)"
@@ -1635,6 +1624,8 @@ Gnosis.L["OptCBEnCB"] = "Включить полосу заклинаний" -- 
 Gnosis.L["OptCBEnList"] = "Включить черный- или белый список"
 Gnosis.L["OptCBEnShCol"] = "Включить цвет тени текста" -- Needs review
 Gnosis.L["OptCBExportBar"] = "Экспортировать полосу заклинаний" -- Needs review
+Gnosis.L["OptCBExportBarChatlink_D"] = "Requires the chat frame's edit box to be shown." -- Requires localization
+Gnosis.L["OptCBExportBarChatlink_N"] = "Paste import link to chat" -- Requires localization
 Gnosis.L["OptCBExtendChannels_D"] = "Продлить потоковое заклинание во время повторного произнесения этого заклинания, если оно было совершено до завершения предыдущего заклинания" -- Needs review
 Gnosis.L["OptCBExtendChannels_N"] = "Продлить потоковое заклинание" -- Needs review
 Gnosis.L["OptCBFadeout"] = "Время исчезновения"
@@ -1657,45 +1648,26 @@ Gnosis.L["OptCBLatBoxCol"] = "Цвет блока задержки"
 Gnosis.L["OptCBListBlack"] = "черный список"
 Gnosis.L["OptCBListNeither"] = "никакой"
 Gnosis.L["OptCBListWhite"] = "белый список"
+Gnosis.L["OptCBLockAll_D"] = "Lock all bars" -- Requires localization
+Gnosis.L["OptCBLockAll_N"] = "Lock" -- Requires localization
 Gnosis.L["OptCBMaxLatBox"] = "Максимальный размер окна задержки [% полосы]" -- Needs review
-Gnosis.L["OptCBNewCB_D"] = "Создание новой полоски заклинаний, должно быть задано допустимое название"
-Gnosis.L["OptCBNewCB_N"] = "Новая полоска заклинаний"
+Gnosis.L["OptCBNewCB_D"] = "Создание новой полоски заклинаний, должно быть задано допустимое название" -- Needs review
+Gnosis.L["OptCBNewCB_N"] = "Новая полоска заклинаний" -- Needs review
 Gnosis.L["OptCBNewCBName_D"] = "Введите название перед создание новой полоски заклинаний"
 Gnosis.L["OptCBNewListElem_D"] = [=[Castbars:
 Enter names of spells to black- or whitelist.
 
 Multi-Spell Timer:
-Basic format for every entry: cmds:spell
+Basic format for every entry: cmds:spell/effect/item
 
-Auras (buffs&debuffs):
-buff, debuff, dot, hot, aura, help, harm, mine
-
-Cooldowns:
-cd (for spells), itemcd (for items)
-runecd (DK runes 1..6)
-innercd/proc [norefresh] (inner cd, proc duration/cd)
-
-Durations:
-totemdur (Shaman totems 1..4)
-enchmh or enchoh:weapon imbue or poison
-(mh=main hand, oh=off hand)
-
-Spellcasts (no castbar replacement):
-cast:all or cast:spellname
-
-Resources:
-resource:health, power, combopoints, altpower, heal,
-threat, soulshards, eclipse, holypower, chi,
-shadoworbs, burningembers, demonicfury
-
-More info @ Gnosis' description page at curse/wowinterface.]=] -- Needs review
+More info @ Gnosis' description page at curse.com or in the .pdf which can be found in your WoW Folder/Addons/Gnosis (not yet done).]=] -- Needs review
 Gnosis.L["OptCBNewListElem_N"] = "Введите название для добовления"
 Gnosis.L["OptCBOrient"] = "Ориентация" -- Needs review
 Gnosis.L["OptCBRelSel"] = "Показать произнесения" -- Needs review
 Gnosis.L["OptCBRelSelAll"] = "все юниты" -- Needs review
 Gnosis.L["OptCBRelSelEnemy"] = "вражеские юниты" -- Needs review
 Gnosis.L["OptCBRelSelFriendly"] = "дружественные юниты" -- Needs review
-Gnosis.L["OptCBRemCB"] = "Удалить полоску заклинаний"
+Gnosis.L["OptCBRemCB"] = "Удалить полоску заклинаний" -- Needs review
 Gnosis.L["OptCBRemListElem"] = "Удалить текущую запись"
 Gnosis.L["OptCBRotIcon"] = "Повернуть иконку (°)"
 Gnosis.L["OptCBRotLatencyN"] = "Повернуть задержку" -- Needs review
@@ -1726,6 +1698,8 @@ Gnosis.L["OptCBTexture"] = "Текстура полоски заклинаний
 Gnosis.L["OptCBUnit"] = "Объект"
 Gnosis.L["OptCBUnl_D"] = "Разблокировать полоску заклинаний (всегда показывать)"
 Gnosis.L["OptCBUnl_N"] = "Разблок. полоску заклинаний"
+Gnosis.L["OptCBUnlockAll_D"] = "Unlock all bars. Disabled bars or bars selected for another talent specialization will be unlocked but will still not be visible." -- Requires localization
+Gnosis.L["OptCBUnlockAll_N"] = "Unlock" -- Requires localization
 Gnosis.L["OptCBUnlockIcon_D"] = "Разблокировать иконку от полоски"
 Gnosis.L["OptCBUnlockIcon_N"] = "Разблок. иконку"
 Gnosis.L["OptCHCastnameGrp"] = "Опции названия произнесения" -- Needs review
@@ -1765,6 +1739,7 @@ Gnosis.L["OptEn"] = "Включить"
 Gnosis.L["OptEnAutoCreateOptons"] = "Автоматически создавать таблицы опций при запуске" -- Needs review
 Gnosis.L["OptEnClipTest"] = "Включить тест обрывания"
 Gnosis.L["OptExportAllBars"] = "Export all bars" -- Requires localization
+Gnosis.L["OptFile"] = "File" -- Requires localization
 Gnosis.L["OptFirstStartFrame"] = "Открыть начальный фрейм" -- Needs review
 Gnosis.L["OptFirstTickInst"] = "Первый такт, мгновенный"
 Gnosis.L["OptFontEnShOffset"] = "Включить особый теневой отступ" -- Needs review
@@ -1840,13 +1815,16 @@ col<школа>: где школа - Arcane (Тайной магии), Shadow (�
 col<pre>: изменить цвет на предыдущий
 col<class>: изменить цвет на цвет класса (если доступно)
 col<cpre>: вернуть прежние цвета (если цвет класса доступен)]=] -- Needs review
-Gnosis.L["OptPlayMusic"] = "Проиграть файл музыки"
+Gnosis.L["OptPFoC"] = "Play file on clip" -- Requires localization
+Gnosis.L["OptPlayFile"] = "Play custom file" -- Requires localization
+Gnosis.L["OptPlayMusic"] = "Проиграть файл музыки" -- Needs review
 Gnosis.L["OptPlaySnd"] = "Приграть звук"
 Gnosis.L["OptPlayTickSound_D"] = "Отключает звук обрывания" -- Needs review
 Gnosis.L["OptPlayTickSound_N"] = "Включить звук обрывания" -- Needs review
 Gnosis.L["OptPMoC"] = "Проиграть музыку при обрывании"
 Gnosis.L["OptPSoC"] = "Проиграть звук при обрывании"
 Gnosis.L["OptResetPlayerData"] = "Сброс данных игрока (перезагрузка интерфейса)"
+Gnosis.L["OptResizeOptions"] = "Resize interface options frame on startup" -- Requires localization
 Gnosis.L["OptSaveconfigExists"] = "конфигурация уже существует, удалите или измените название"
 Gnosis.L["OptSaveconfigInvalidName"] = "не задано название конфигурации"
 Gnosis.L["OptShowasminutesDesc"] = "Показать минуты вместо секунд, если больше чем 60с."
@@ -1917,7 +1895,7 @@ Gnosis.L["TabCapTOPLEFT"] = "ВВЕРХУ СЛЕВА" -- Needs review
 Gnosis.L["TabCapTOPRIGHT"] = "ВВЕРХУ СПРАВА" -- Needs review
 Gnosis.L["TabCastbars"] = "Полосы заклинаний" -- Needs review
 Gnosis.L["TabChanneledSpells"] = "Потоковые заклинания"
-Gnosis.L["TabConfig"] = "Настройки"
+Gnosis.L["TabConfig"] = "Настройки" -- Needs review
 Gnosis.L["TabCTClipTest"] = "Текст боя/обрывания"
 Gnosis.L["TabFreeAlign"] = "Свободное выравнивание"
 Gnosis.L["TabNameTime"] = "Название...Время"
@@ -1950,9 +1928,11 @@ Gnosis.L["IfCWAction"] = "Press button to close frame without taking any action"
 Gnosis.L["IfLFConigs"] = [=[
 One or more stored configurations have been found. You can setup Gnosis by loading from any existing configuration, just press any of the buttons below (button name is the name of the configuration that will be loaded).
 ]=] -- Requires localization
-Gnosis.L["IfNoCBs"] = "No castbars found" -- Requires localization
+Gnosis.L["IfNoCBs"] = "No bars found" -- Requires localization
 Gnosis.L["IfOpenGUI"] = "Open config GUI" -- Requires localization
 Gnosis.L["Import"] = "Import" -- Requires localization
+Gnosis.L["ImportFromHyperlink"] = "Import bar configuration? If the bar already exists, it's configuration values will be overwritten." -- Requires localization
+Gnosis.L["ImportKeepPos"] = "Import, keep position" -- Requires localization
 Gnosis.L["MsgBlizCBIsDis"] = "La barre de cast Blizzard est déjà cachée par un autre addon" -- Needs review
 Gnosis.L["MsgBlizCBRestored"] = "Barre de cast de Blizzard rétablie (voir options interface)" -- Needs review
 Gnosis.L["MsgDis"] = "(désactivé)" -- Needs review
@@ -2004,7 +1984,7 @@ Gnosis.L["OptCBCBColor"] = "Castbar color" -- Requires localization
 Gnosis.L["OptCBCBNIColor"] = "Castbar color (non interruptible)" -- Requires localization
 Gnosis.L["OptCBCBShColor"] = "Text shadow color" -- Requires localization
 Gnosis.L["OptCBCBSucColor"] = "Cast success (castbar color)" -- Requires localization
-Gnosis.L["OptCBCenterCB"] = "Center castbar" -- Requires localization
+Gnosis.L["OptCBCenterCB"] = "Center bar" -- Requires localization
 Gnosis.L["OptCBChannelsAsNormal"] = "Treat channels as normal spells" -- Requires localization
 Gnosis.L["OptCBCombatSelAlways"] = "in and out of combat" -- Requires localization
 Gnosis.L["OptCBCombatSelInC"] = "in combat only" -- Requires localization
@@ -2018,6 +1998,8 @@ Gnosis.L["OptCBEnCB"] = "Enable castbar" -- Requires localization
 Gnosis.L["OptCBEnList"] = "Enable/disable black- or whitelist" -- Requires localization
 Gnosis.L["OptCBEnShCol"] = "Enable text shadow color" -- Requires localization
 Gnosis.L["OptCBExportBar"] = "Export castbar" -- Requires localization
+Gnosis.L["OptCBExportBarChatlink_D"] = "Requires the chat frame's edit box to be shown." -- Requires localization
+Gnosis.L["OptCBExportBarChatlink_N"] = "Paste import link to chat" -- Requires localization
 Gnosis.L["OptCBExtendChannels_D"] = "Extend channeled spell while chain-casting same spell if recast before the last channel ended." -- Requires localization
 Gnosis.L["OptCBExtendChannels_N"] = "Extend channels" -- Requires localization
 Gnosis.L["OptCBFadeout"] = "Fadeout time" -- Requires localization
@@ -2040,45 +2022,28 @@ Gnosis.L["OptCBLatBoxCol"] = "Latency box color" -- Requires localization
 Gnosis.L["OptCBListBlack"] = "blacklist" -- Requires localization
 Gnosis.L["OptCBListNeither"] = "neither" -- Requires localization
 Gnosis.L["OptCBListWhite"] = "whitelist" -- Requires localization
+Gnosis.L["OptCBLockAll_D"] = "Lock all bars" -- Requires localization
+Gnosis.L["OptCBLockAll_N"] = "Lock" -- Requires localization
 Gnosis.L["OptCBMaxLatBox"] = "Maximum size of latency box [% of bar]" -- Requires localization
-Gnosis.L["OptCBNewCB_D"] = "Create new castbar, valid name must be given" -- Requires localization
-Gnosis.L["OptCBNewCB_N"] = "New castbar" -- Requires localization
+Gnosis.L["OptCBNewCB_D"] = [=[Create new bar. Please enter a valid name in the adjacent edit box.
+
+Holding the shift key will create an icon-like bar.]=] -- Requires localization
+Gnosis.L["OptCBNewCB_N"] = "New (icon-like) bar" -- Requires localization
 Gnosis.L["OptCBNewCBName_D"] = "Enter name before creating new castbar" -- Requires localization
 Gnosis.L["OptCBNewListElem_D"] = [=[Castbars:
 Enter names of spells to black- or whitelist.
 
 Multi-Spell Timer:
-Basic format for every entry: cmds:spell
+Basic format for every entry: cmds:spell/effect/item
 
-Auras (buffs&debuffs):
-buff, debuff, dot, hot, aura, help, harm, mine
-
-Cooldowns:
-cd (for spells), itemcd (for items)
-runecd (DK runes 1..6)
-innercd/proc [norefresh] (inner cd, proc duration/cd)
-
-Durations:
-totemdur (Shaman totems 1..4)
-enchmh or enchoh:weapon imbue or poison
-(mh=main hand, oh=off hand)
-
-Spellcasts (no castbar replacement):
-cast:all or cast:spellname
-
-Resources:
-resource:health, power, combopoints, altpower, heal,
-threat, soulshards, eclipse, holypower, chi,
-shadoworbs, burningembers, demonicfury
-
-More info @ Gnosis' description page at curse/wowinterface.]=] -- Requires localization
+More info @ Gnosis' description page at curse.com or in the .pdf which can be found in your WoW Folder/Addons/Gnosis (not yet done).]=] -- Requires localization
 Gnosis.L["OptCBNewListElem_N"] = "Enter spell name to add" -- Requires localization
 Gnosis.L["OptCBOrient"] = "Orientation" -- Requires localization
 Gnosis.L["OptCBRelSel"] = "Show casts of" -- Requires localization
 Gnosis.L["OptCBRelSelAll"] = "all units" -- Requires localization
 Gnosis.L["OptCBRelSelEnemy"] = "enemy units" -- Requires localization
 Gnosis.L["OptCBRelSelFriendly"] = "friendly units" -- Requires localization
-Gnosis.L["OptCBRemCB"] = "Remove castbar" -- Requires localization
+Gnosis.L["OptCBRemCB"] = "Remove bar" -- Requires localization
 Gnosis.L["OptCBRemListElem"] = "Remove current entry" -- Requires localization
 Gnosis.L["OptCBRotIcon"] = "Rotate Icon (°)" -- Requires localization
 Gnosis.L["OptCBRotLatencyN"] = "Rotate latency" -- Requires localization
@@ -2109,6 +2074,8 @@ Gnosis.L["OptCBTexture"] = "Castbar texture" -- Requires localization
 Gnosis.L["OptCBUnit"] = "Unit" -- Requires localization
 Gnosis.L["OptCBUnl_D"] = "Unlock castbar (always shown)" -- Requires localization
 Gnosis.L["OptCBUnl_N"] = "Unlock castbar" -- Requires localization
+Gnosis.L["OptCBUnlockAll_D"] = "Unlock all bars. Disabled bars or bars selected for another talent specialization will be unlocked but will still not be visible." -- Requires localization
+Gnosis.L["OptCBUnlockAll_N"] = "Unlock" -- Requires localization
 Gnosis.L["OptCBUnlockIcon_D"] = "Unlock icon from bar" -- Requires localization
 Gnosis.L["OptCBUnlockIcon_N"] = "Unlock icon" -- Requires localization
 Gnosis.L["OptCHCastnameGrp"] = "Castname options" -- Requires localization
@@ -2148,6 +2115,7 @@ Gnosis.L["OptEn"] = "Enable" -- Requires localization
 Gnosis.L["OptEnAutoCreateOptons"] = "Automatically create option tables on startup" -- Requires localization
 Gnosis.L["OptEnClipTest"] = "Enable clip test" -- Requires localization
 Gnosis.L["OptExportAllBars"] = "Export all bars" -- Requires localization
+Gnosis.L["OptFile"] = "File" -- Requires localization
 Gnosis.L["OptFirstStartFrame"] = "Open first start frame" -- Requires localization
 Gnosis.L["OptFirstTickInst"] = "First tick is instant" -- Requires localization
 Gnosis.L["OptFontEnShOffset"] = "Enable specific shadow offset" -- Requires localization
@@ -2227,13 +2195,16 @@ col<school>: where school is shadow,arcane...
 col<pre>: change color to previous one
 col<class>: change color to target class color (if available)
 col<cpre>: revert to previous color (if target class color is available)]=] -- Requires localization
-Gnosis.L["OptPlayMusic"] = "Play music file" -- Requires localization
+Gnosis.L["OptPFoC"] = "Play file on clip" -- Requires localization
+Gnosis.L["OptPlayFile"] = "Play custom file" -- Requires localization
+Gnosis.L["OptPlayMusic"] = "Play music" -- Requires localization
 Gnosis.L["OptPlaySnd"] = "Play sound" -- Requires localization
 Gnosis.L["OptPlayTickSound_D"] = "Deactivates clipping sound." -- Requires localization
 Gnosis.L["OptPlayTickSound_N"] = "Play tick sound" -- Requires localization
 Gnosis.L["OptPMoC"] = "Play music on clip" -- Requires localization
 Gnosis.L["OptPSoC"] = "Play sound on clip" -- Requires localization
 Gnosis.L["OptResetPlayerData"] = "Reset player data (reloads interface)" -- Requires localization
+Gnosis.L["OptResizeOptions"] = "Resize interface options frame on startup" -- Requires localization
 Gnosis.L["OptSaveconfigExists"] = "configuration already exists, please delete first or change name" -- Requires localization
 Gnosis.L["OptSaveconfigInvalidName"] = "no configuration name given" -- Requires localization
 Gnosis.L["OptShowasminutesDesc"] = "Show minutes instead of seconds if longer than than 60s." -- Requires localization
@@ -2279,7 +2250,7 @@ Gnosis.L["OptTotTicks"] = "Total ticks" -- Requires localization
 Gnosis.L["OptWfCL_Desc"] = "Delay output/clip test after output/clip test request for given time in ms to account for possible combat log delay." -- Requires localization
 Gnosis.L["OptWfCL_Name"] = "Wait for combat log [ms]" -- Requires localization
 Gnosis.L["OptWidth"] = "Width" -- Requires localization
-Gnosis.L["PasteScript"] = "Paste script into edit box." -- Requires localization
+Gnosis.L["PasteScript"] = "Paste import data into edit box." -- Requires localization
 Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)" -- Requires localization
 Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r" -- Requires localization
 Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast" -- Requires localization
@@ -2303,9 +2274,9 @@ Gnosis.L["TabCapRIGHT"] = "RIGHT" -- Requires localization
 Gnosis.L["TabCapTOP"] = "TOP" -- Requires localization
 Gnosis.L["TabCapTOPLEFT"] = "TOPLEFT" -- Requires localization
 Gnosis.L["TabCapTOPRIGHT"] = "TOPRIGHT" -- Requires localization
-Gnosis.L["TabCastbars"] = "Castbars" -- Requires localization
+Gnosis.L["TabCastbars"] = "Bar Configuration" -- Requires localization
 Gnosis.L["TabChanneledSpells"] = "Channeled Spells" -- Requires localization
-Gnosis.L["TabConfig"] = "Configurations" -- Requires localization
+Gnosis.L["TabConfig"] = "Configurations (Profiles)" -- Requires localization
 Gnosis.L["TabCTClipTest"] = "Combattext/Cliptest" -- Requires localization
 Gnosis.L["TabFreeAlign"] = "Free alignment" -- Requires localization
 Gnosis.L["TabNameTime"] = "Name...Time" -- Requires localization
@@ -2338,9 +2309,11 @@ Gnosis.L["IfCWAction"] = "Press button to close frame without taking any action"
 Gnosis.L["IfLFConigs"] = [=[
 One or more stored configurations have been found. You can setup Gnosis by loading from any existing configuration, just press any of the buttons below (button name is the name of the configuration that will be loaded).
 ]=]
-Gnosis.L["IfNoCBs"] = "No castbars found"
+Gnosis.L["IfNoCBs"] = "No bars found"
 Gnosis.L["IfOpenGUI"] = "Open config GUI"
 Gnosis.L["Import"] = "Import"
+Gnosis.L["ImportFromHyperlink"] = "Import bar configuration? If the bar already exists, it's configuration values will be overwritten."
+Gnosis.L["ImportKeepPos"] = "Import, keep position"
 Gnosis.L["MsgBlizCBIsDis"] = "blizzard castbar already hidden by another addon"
 Gnosis.L["MsgBlizCBRestored"] = "blizzard castbar restored (see gui options)"
 Gnosis.L["MsgDis"] = "(disabled)"
@@ -2392,7 +2365,7 @@ Gnosis.L["OptCBCBColor"] = "Castbar color"
 Gnosis.L["OptCBCBNIColor"] = "Castbar color (non interruptible)"
 Gnosis.L["OptCBCBShColor"] = "Text shadow color"
 Gnosis.L["OptCBCBSucColor"] = "Cast success (castbar color)"
-Gnosis.L["OptCBCenterCB"] = "Center castbar"
+Gnosis.L["OptCBCenterCB"] = "Center bar"
 Gnosis.L["OptCBChannelsAsNormal"] = "Treat channels as normal spells"
 Gnosis.L["OptCBCombatSelAlways"] = "in and out of combat"
 Gnosis.L["OptCBCombatSelInC"] = "in combat only"
@@ -2406,6 +2379,8 @@ Gnosis.L["OptCBEnCB"] = "Enable castbar"
 Gnosis.L["OptCBEnList"] = "Enable/disable black- or whitelist"
 Gnosis.L["OptCBEnShCol"] = "Enable text shadow color"
 Gnosis.L["OptCBExportBar"] = "Export castbar"
+Gnosis.L["OptCBExportBarChatlink_D"] = "Requires the chat frame's edit box to be shown."
+Gnosis.L["OptCBExportBarChatlink_N"] = "Paste import link to chat"
 Gnosis.L["OptCBExtendChannels_D"] = "Extend channeled spell while chain-casting same spell if recast before the last channel ended."
 Gnosis.L["OptCBExtendChannels_N"] = "Extend channels"
 Gnosis.L["OptCBFadeout"] = "Fadeout time"
@@ -2428,45 +2403,28 @@ Gnosis.L["OptCBLatBoxCol"] = "Latency box color"
 Gnosis.L["OptCBListBlack"] = "blacklist"
 Gnosis.L["OptCBListNeither"] = "neither"
 Gnosis.L["OptCBListWhite"] = "whitelist"
+Gnosis.L["OptCBLockAll_D"] = "Lock all bars"
+Gnosis.L["OptCBLockAll_N"] = "Lock"
 Gnosis.L["OptCBMaxLatBox"] = "Maximum size of latency box [% of bar]"
-Gnosis.L["OptCBNewCB_D"] = "Create new castbar, valid name must be given"
-Gnosis.L["OptCBNewCB_N"] = "New castbar"
+Gnosis.L["OptCBNewCB_D"] = [=[Create new bar. Please enter a valid name in the adjacent edit box.
+
+Holding the shift key will create an icon-like bar.]=]
+Gnosis.L["OptCBNewCB_N"] = "New (icon-like) bar"
 Gnosis.L["OptCBNewCBName_D"] = "Enter name before creating new castbar"
 Gnosis.L["OptCBNewListElem_D"] = [=[Castbars:
 Enter names of spells to black- or whitelist.
 
 Multi-Spell Timer:
-Basic format for every entry: cmds:spell
+Basic format for every entry: cmds:spell/effect/item
 
-Auras (buffs&debuffs):
-buff, debuff, dot, hot, aura, help, harm, mine
-
-Cooldowns:
-cd (for spells), itemcd (for items)
-runecd (DK runes 1..6)
-innercd/proc [norefresh] (inner cd, proc duration/cd)
-
-Durations:
-totemdur (Shaman totems 1..4)
-enchmh or enchoh:weapon imbue or poison
-(mh=main hand, oh=off hand)
-
-Spellcasts (no castbar replacement):
-cast:all or cast:spellname
-
-Resources:
-resource:health, power, combopoints, altpower, heal,
-threat, soulshards, eclipse, holypower, chi,
-shadoworbs, burningembers, demonicfury
-
-More info @ Gnosis' description page at curse/wowinterface.]=]
+More info @ Gnosis' description page at curse.com or in the .pdf which can be found in your WoW Folder/Addons/Gnosis (not yet done).]=]
 Gnosis.L["OptCBNewListElem_N"] = "Enter spell name to add"
 Gnosis.L["OptCBOrient"] = "Orientation"
 Gnosis.L["OptCBRelSel"] = "Show casts of"
 Gnosis.L["OptCBRelSelAll"] = "all units"
 Gnosis.L["OptCBRelSelEnemy"] = "enemy units"
 Gnosis.L["OptCBRelSelFriendly"] = "friendly units"
-Gnosis.L["OptCBRemCB"] = "Remove castbar"
+Gnosis.L["OptCBRemCB"] = "Remove bar"
 Gnosis.L["OptCBRemListElem"] = "Remove current entry"
 Gnosis.L["OptCBRotIcon"] = "Rotate Icon (°)"
 Gnosis.L["OptCBRotLatencyN"] = "Rotate latency"
@@ -2497,6 +2455,8 @@ Gnosis.L["OptCBTexture"] = "Castbar texture"
 Gnosis.L["OptCBUnit"] = "Unit"
 Gnosis.L["OptCBUnl_D"] = "Unlock castbar (always shown)"
 Gnosis.L["OptCBUnl_N"] = "Unlock castbar"
+Gnosis.L["OptCBUnlockAll_D"] = "Unlock all bars. Disabled bars or bars selected for another talent specialization will be unlocked but will still not be visible."
+Gnosis.L["OptCBUnlockAll_N"] = "Unlock"
 Gnosis.L["OptCBUnlockIcon_D"] = "Unlock icon from bar"
 Gnosis.L["OptCBUnlockIcon_N"] = "Unlock icon"
 Gnosis.L["OptCHCastnameGrp"] = "Castname options"
@@ -2536,6 +2496,7 @@ Gnosis.L["OptEn"] = "Enable"
 Gnosis.L["OptEnAutoCreateOptons"] = "Automatically create option tables on startup"
 Gnosis.L["OptEnClipTest"] = "Enable clip test"
 Gnosis.L["OptExportAllBars"] = "Export all bars"
+Gnosis.L["OptFile"] = "File"
 Gnosis.L["OptFirstStartFrame"] = "Open first start frame"
 Gnosis.L["OptFirstTickInst"] = "First tick is instant"
 Gnosis.L["OptFontEnShOffset"] = "Enable specific shadow offset"
@@ -2615,13 +2576,16 @@ col<school>: where school is shadow,arcane...
 col<pre>: change color to previous one
 col<class>: change color to target class color (if available)
 col<cpre>: revert to previous color (if target class color is available)]=]
-Gnosis.L["OptPlayMusic"] = "Play music file"
+Gnosis.L["OptPFoC"] = "Play file on clip"
+Gnosis.L["OptPlayFile"] = "Play custom file"
+Gnosis.L["OptPlayMusic"] = "Play music"
 Gnosis.L["OptPlaySnd"] = "Play sound"
 Gnosis.L["OptPlayTickSound_D"] = "Deactivates clipping sound."
 Gnosis.L["OptPlayTickSound_N"] = "Play tick sound"
 Gnosis.L["OptPMoC"] = "Play music on clip"
 Gnosis.L["OptPSoC"] = "Play sound on clip"
 Gnosis.L["OptResetPlayerData"] = "Reset player data (reloads interface)"
+Gnosis.L["OptResizeOptions"] = "Resize interface options frame on startup"
 Gnosis.L["OptSaveconfigExists"] = "configuration already exists, please delete first or change name"
 Gnosis.L["OptSaveconfigInvalidName"] = "no configuration name given"
 Gnosis.L["OptShowasminutesDesc"] = "Show minutes instead of seconds if longer than than 60s."
@@ -2667,7 +2631,7 @@ Gnosis.L["OptTotTicks"] = "Total ticks"
 Gnosis.L["OptWfCL_Desc"] = "Delay output/clip test after output/clip test request for given time in ms to account for possible combat log delay."
 Gnosis.L["OptWfCL_Name"] = "Wait for combat log [ms]"
 Gnosis.L["OptWidth"] = "Width"
-Gnosis.L["PasteScript"] = "Paste script into edit box."
+Gnosis.L["PasteScript"] = "Paste import data into edit box."
 Gnosis.L["PremadeNfs1"] = "cast |cffff0000(rank or misc, e.g. stacks)|r (tradeskill merge)"
 Gnosis.L["PremadeNfs2"] = "cast |cffff0000(aura effect value)|r"
 Gnosis.L["PremadeNfs3"] = "|cffffff00unit name|r: cast"
@@ -2691,9 +2655,9 @@ Gnosis.L["TabCapRIGHT"] = "RIGHT"
 Gnosis.L["TabCapTOP"] = "TOP"
 Gnosis.L["TabCapTOPLEFT"] = "TOPLEFT"
 Gnosis.L["TabCapTOPRIGHT"] = "TOPRIGHT"
-Gnosis.L["TabCastbars"] = "Castbars"
+Gnosis.L["TabCastbars"] = "Bar Configuration"
 Gnosis.L["TabChanneledSpells"] = "Channeled Spells"
-Gnosis.L["TabConfig"] = "Configurations"
+Gnosis.L["TabConfig"] = "Configurations (Profiles)"
 Gnosis.L["TabCTClipTest"] = "Combattext/Cliptest"
 Gnosis.L["TabFreeAlign"] = "Free alignment"
 Gnosis.L["TabNameTime"] = "Name...Time"

@@ -1,14 +1,14 @@
-local mod	= DBM:NewMod("Ymiron", "DBM-Party-WotLK", 11)
+local mod	= DBM:NewMod(644, "DBM-Party-WotLK", 11, 286)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 34 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 112 $"):sub(12, -3))
 mod:SetCreatureID(26861)
-mod:SetModelID(28019)
+mod:SetEncounterID(583, 584)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED"
 )
 

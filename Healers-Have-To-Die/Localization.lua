@@ -3,7 +3,7 @@ HealersHaveToDie World of Warcraft Add-on
 Copyright (c) 2009-2013 by John Wellesz (Archarodim@teaser.fr)
 All rights reserved
 
-Version 2.1.4
+Version 2.3
 
 This is a very simple and light add-on that rings when you hover or target a
 unit of the opposite faction who healed someone during the last 60 seconds (can
@@ -131,7 +131,7 @@ L["OPT_POST_ANNOUNCE_THROTTLE"] = "Announce throttle"
 L["OPT_POST_ANNOUNCE_THROTTLE_DESC"] = "Set the minimum time in seconds between each possible announce."
 L["OPT_PVE"] = "Enable for PVE"
 L["OPT_PVE_DESC"] = "HHTD will also work for NPCs."
-L["OPT_PVPHEALERSSPECSONLY"] = "Healer specialization detection"
+L["OPT_PVPHEALERSSPECSONLY"] = "Specialized players only"
 L["OPT_PVPHEALERSSPECSONLY_DESC"] = "Only detect players specialized in healing. (this disables minimum heal amount filter for PVP)"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "Set friendly healers role"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "Will automatically set the raid HEALER role to friendly healers upon detection (if possible)"
@@ -195,8 +195,8 @@ L["OPT_CLEAR_LOGS"] = "Effacer les journaux"
 L["OPT_CORE_OPTIONS"] = "Options Générales"
 L["OPT_DEBUG"] = "débuggage"
 L["OPT_DEBUG_DESC"] = "Active / désactive le débuggage"
--- L["OPT_DEBUGLEVEL"] = ""
--- L["OPT_DEBUGLEVEL_DESC"] = ""
+L["OPT_DEBUGLEVEL"] = "debugging level"
+L["OPT_DEBUGLEVEL_DESC"] = "debug level: 1=all, 2=warnings, 3=errors"
 L["OPT_ENABLE_GEHR"] = "Activer le rapporteur graphique"
 L["OPT_ENABLE_GEHR_DESC"] = "Affiche une interface listant les soigneurs ennemis."
 L["OPT_HEALER_FORGET_TIMER"] = "Délai d'oubli des soigneurs"
@@ -254,7 +254,7 @@ L["OPT_POST_ANNOUNCE_THROTTLE"] = "Limiteur d'annonce"
 L["OPT_POST_ANNOUNCE_THROTTLE_DESC"] = "Régler le temps minimum (en secondes) entre deux annonces."
 L["OPT_PVE"] = "Activer en PVE"
 L["OPT_PVE_DESC"] = "HHTD fonctionnera également avec les personnages non joueurs (PNJs)"
-L["OPT_PVPHEALERSSPECSONLY"] = "Détection des spécialisations en soin"
+L["OPT_PVPHEALERSSPECSONLY"] = "Joueurs spécialisés seulement"
 L["OPT_PVPHEALERSSPECSONLY_DESC"] = "Ne détectera que les joueurs spécialisés en soins. (Cela désactive le filtrage sur les soins cumulés en PVP)"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "Assignation des rôles"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "Affectera automatiquement le rôle de soigneur aux joueurs détectés (si possible)"
@@ -373,7 +373,7 @@ L["OPT_POST_ANNOUNCE_THROTTLE"] = "Verzögerung" -- Needs review
 L["OPT_POST_ANNOUNCE_THROTTLE_DESC"] = "So viele Sekunden liegen mindestens zwischen den Meldungen." -- Needs review
 L["OPT_PVE"] = "PVE-Option aktivieren"
 L["OPT_PVE_DESC"] = "HHTD wird NPCs einbeziehen"
-L["OPT_PVPHEALERSSPECSONLY"] = "Heiler Spezialisierungserkennung"
+L["OPT_PVPHEALERSSPECSONLY"] = "Heiler Spezialisierungserkennung" -- Needs review
 L["OPT_PVPHEALERSSPECSONLY_DESC"] = "Erkenne nur Spieler die in Heilung spezialisiert sind. (Dies deaktiviert den \"Minimale Menge an Heilung\" Filter für PVP.)"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "Rolle befreundeter Heiler setzen" -- Needs review
 L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "Legt automatisch die Schlachtzug-Heiler-Rolle bei erkannten freundlichen Heilern (wenn möglich) fest." -- Needs review
@@ -416,7 +416,7 @@ L["DISABLED"] = [=[hhtd ha sido desactivado!
 Escribe /hhtd enable para reactivarlo.]=] -- Needs review
 L["ENABLED"] = "¡Activado! Escribe /HHTDG para una lista de opciones." -- Needs review
 L["HEALER_UNDER_ATTACK"] = "El sanador amigo %s esta siendo atacado por %s" -- Needs review
--- L["HUMAN"] = ""
+L["HUMAN"] = "Humano" -- Needs review
 L["IDLE"] = "Inactivo" -- Needs review
 -- L["INSTANCE_CHAT"] = ""
 L["IS_A_HEALER"] = "¡%s es un sanador!"
@@ -424,7 +424,7 @@ L["LOG_ACTIVE"] = "¡Activo!" -- Needs review
 -- L["LOG_BELOW_THRESHOLD"] = ""
 L["LOG_IDLE"] = "Inactivo" -- Needs review
 L["NO_DATA"] = "No hay datos" -- Needs review
--- L["NPC"] = ""
+L["NPC"] = "NPC" -- Needs review
 -- L["NPH"] = ""
 L["NPH_DESC"] = "Este módulo añade una cruz roja a las placas de nombre de los sanadores enemigos."
 L["OPT_ANNOUNCE"] = "Mostrar mensajes"
@@ -459,9 +459,9 @@ L["OPT_NPH_WARNING1"] = [=[AVISO: Las placas de nombre de enemigos están desact
 Puedes activar las placas de nombre a través de las opciones de interfaz de WoW o usando la tecla asignada.]=] -- Needs review
 L["OPT_NPH_WARNING2"] = [=[AVISO: Las placas de nombre de aliados están desactivadas. HHTD no puede añadir el símbolo de sanador.
 Puedes activar las placas de nombre a través de las opciones de interfaz de WoW o usando la tecla asignada.]=] -- Needs review
--- L["OPT_OFF"] = ""
+L["OPT_OFF"] = "Desactivado" -- Needs review
 L["OPT_OFF_DESC"] = "Desactiva HHTD"
--- L["OPT_ON"] = ""
+L["OPT_ON"] = "Activado" -- Needs review
 L["OPT_ON_DESC"] = "Activa HHTD"
 -- L["OPT_POST_ANNOUNCE_CHANNEL"] = ""
 L["OPT_POST_ANNOUNCE_CHANNEL_DESC"] = "Decide donde será mostrado tu anuncio" -- Needs review
@@ -632,7 +632,7 @@ do
         L["ACTIVE"] = "활성화!"
 L["Announcer"] = "알림"
 L["Announcer_DESC"] = "이 모듈은 대화창 알림과 소리 경고를 관리할 수 있습니다."
--- L["AUTO_RAID_PARTY_INSTANCE"] = ""
+L["AUTO_RAID_PARTY_INSTANCE"] = "자동: 레이드/파티/인스턴스" -- Needs review
 L["CHAT_POST_ANNOUNCE_FEATURE_NOT_CONFIGURED"] = "공격대 메시지로 알리기가 설정되어 있지 않습니다. /HHTDG를 치세요."
 L["CHAT_POST_ANNOUNCE_TOO_SOON_WAIT"] = "잠깐! 기다리세요. (알림 속도 설정을 참조하세요.)"
 L["CHAT_POST_NO_HEALERS"] = "아직 양쪽 힐러를 알 수 없음."
@@ -642,10 +642,10 @@ L["ENABLED"] = "사용! 옵션 목록을 보려면 /HHTDG 를 치세요." -- Nee
 L["HEALER_UNDER_ATTACK"] = "힐러 %s|1이;가; %s의 공격을 받고 있습니다."
 L["HUMAN"] = "인간"
 L["IDLE"] = "놀고 있음"
--- L["INSTANCE_CHAT"] = ""
+L["INSTANCE_CHAT"] = "인스턴스 채팅" -- Needs review
 L["IS_A_HEALER"] = "%s|1는;은; 힐러입니다!"
 L["LOG_ACTIVE"] = "활성화!" -- Needs review
--- L["LOG_BELOW_THRESHOLD"] = ""
+L["LOG_BELOW_THRESHOLD"] = "(임계값 아래)" -- Needs review
 L["LOG_IDLE"] = "비활성화" -- Needs review
 L["NO_DATA"] = "자료 없음"
 L["NPC"] = "NPC"
@@ -657,8 +657,8 @@ L["OPT_CLEAR_LOGS"] = "기록 지우기"
 L["OPT_CORE_OPTIONS"] = "코어 옵션"
 L["OPT_DEBUG"] = "디버그"
 L["OPT_DEBUG_DESC"] = "디버그를 사용 / 중지합니다."
--- L["OPT_DEBUGLEVEL"] = ""
--- L["OPT_DEBUGLEVEL_DESC"] = ""
+L["OPT_DEBUGLEVEL"] = "디버그 레벨" -- Needs review
+L["OPT_DEBUGLEVEL_DESC"] = "디버그 레벨: 1=모두, 2=경고, 3=에러" -- Needs review
 L["OPT_ENABLE_GEHR"] = "그래픽 보고 사용"
 L["OPT_ENABLE_GEHR_DESC"] = "다양한 기능과 함께 감지된 적 힐러를 그래픽으로 목록을 표시합니다."
 L["OPT_HEALER_FORGET_TIMER"] = "힐러 표시 시간"
@@ -708,7 +708,7 @@ L["OPT_POST_ANNOUNCE_THROTTLE_DESC"] = "알림을 초 단위로 최소 시간을
 L["OPT_PVE"] = "PVE에서 사용."
 L["OPT_PVE_DESC"] = "HHTD에서는 NPCs에 대해서도 동작합니다."
 L["OPT_PVPHEALERSSPECSONLY"] = [=[힐러 특화 감지
-]=]
+]=] -- Needs review
 L["OPT_PVPHEALERSSPECSONLY_DESC"] = "오직 치료를 전문으로 하는 플레이어를 감지합니다. (이것은 PVP에 대해 최소 치유량 필터 사용을 중지합니다.)"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "아군 힐러 역할을 설정"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "자동 감지할 때 아군 힐러를 공격대 힐러 역할로 설정합니다. (가능한 경우)"
@@ -826,7 +826,7 @@ L["OPT_POST_ANNOUNCE_THROTTLE"] = "通报阈值"
 L["OPT_POST_ANNOUNCE_THROTTLE_DESC"] = "设置每条可能通报的最小时间间隔。"
 L["OPT_PVE"] = "PvE 启用"
 L["OPT_PVE_DESC"] = "HHTD 同样作用于 NPC。"
-L["OPT_PVPHEALERSSPECSONLY"] = "治疗职业特定检测"
+L["OPT_PVPHEALERSSPECSONLY"] = "治疗职业特定检测" -- Needs review
 L["OPT_PVPHEALERSSPECSONLY_DESC"] = "只特定治疗玩家。（此项禁用 PvP 最小治疗量）"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "设置友方治疗职业角色"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "（如可能）自动设置检测团队治疗角色到友方治疗"
@@ -942,7 +942,7 @@ L["OPT_POST_ANNOUNCE_THROTTLE"] = "通報閾值"
 L["OPT_POST_ANNOUNCE_THROTTLE_DESC"] = "設置每條可能通報的最小時間間隔。"
 L["OPT_PVE"] = "PvE 啟用"
 L["OPT_PVE_DESC"] = "HHTD 同樣作用於 NPC。"
-L["OPT_PVPHEALERSSPECSONLY"] = "治療特定檢測"
+L["OPT_PVPHEALERSSPECSONLY"] = "治療特定檢測" -- Needs review
 L["OPT_PVPHEALERSSPECSONLY_DESC"] = "只特定治療玩家。（此項禁用 PvP 最小治療量）"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "設置友方治療者角色"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "（如可能）自動設置檢測團隊治療職責到友方治療"
@@ -976,7 +976,7 @@ do
         L["ACTIVE"] = "Активный!"
 L["Announcer"] = "Информатор"
 L["Announcer_DESC"] = "Модуль настройки оповещений в чате и звуковых оповещений"
--- L["AUTO_RAID_PARTY_INSTANCE"] = ""
+L["AUTO_RAID_PARTY_INSTANCE"] = "Автоматически: Рейд/Группа/Подземелье" -- Needs review
 L["CHAT_POST_ANNOUNCE_FEATURE_NOT_CONFIGURED"] = "Рейдовые оповещения не сконфигурированы. Введите /HHTDG"
 L["CHAT_POST_ANNOUNCE_TOO_SOON_WAIT"] = "Слишком быстро. Проверьте установки скорости появления оповещений"
 L["CHAT_POST_NO_HEALERS"] = "Ни наших,ни вражеских лекарей не обнаружено :/ (Пока...)"
@@ -988,7 +988,7 @@ L["ENABLED"] = [=[HHTD включен!
 L["HEALER_UNDER_ATTACK"] = "наш лекарь %s атакован %s"
 L["HUMAN"] = "Человек"
 L["IDLE"] = "Находится в режиме ожидания"
--- L["INSTANCE_CHAT"] = ""
+L["INSTANCE_CHAT"] = "Чат подземелья" -- Needs review
 L["IS_A_HEALER"] = "%s - лекарь!"
 L["LOG_ACTIVE"] = "активен"
 L["LOG_BELOW_THRESHOLD"] = "ниже порогового значения"
@@ -1003,8 +1003,8 @@ L["OPT_CLEAR_LOGS"] = "Стирает информацию в Логах"
 L["OPT_CORE_OPTIONS"] = "Основные настройки"
 L["OPT_DEBUG"] = "отладка"
 L["OPT_DEBUG_DESC"] = "Включает/выключает режим отладки."
--- L["OPT_DEBUGLEVEL"] = ""
--- L["OPT_DEBUGLEVEL_DESC"] = ""
+L["OPT_DEBUGLEVEL"] = "уровень отладки" -- Needs review
+L["OPT_DEBUGLEVEL_DESC"] = "уровень отладки: 1=все, 2=предупреждения, 3=ошибки" -- Needs review
 L["OPT_ENABLE_GEHR"] = "Включение графического информатора"
 L["OPT_ENABLE_GEHR_DESC"] = "Отображает графический список вражеских лекарей с разными дополнительными возможностями."
 L["OPT_HEALER_FORGET_TIMER"] = "Таймер забывания лекарей"
@@ -1059,7 +1059,7 @@ L["OPT_POST_ANNOUNCE_THROTTLE"] = "скорость появления обья�
 L["OPT_POST_ANNOUNCE_THROTTLE_DESC"] = "установите минимальное время в секундах между появлениями каждого из возможных обьявлений"
 L["OPT_PVE"] = "Включить для ПВЕ"
 L["OPT_PVE_DESC"] = "Разрешить использование HHTD против НИП"
-L["OPT_PVPHEALERSSPECSONLY"] = "Обнаружение специализации лекаря"
+L["OPT_PVPHEALERSSPECSONLY"] = "Обнаружение специализации лекаря" -- Needs review
 L["OPT_PVPHEALERSSPECSONLY_DESC"] = "Выявлять только игроков специализирующихся на лечении. Эта опция отключает фильтр порога количества лечения в PvP."
 L["OPT_SET_FRIENDLY_HEALERS_ROLE"] = "установите роли наших лекарей"
 L["OPT_SET_FRIENDLY_HEALERS_ROLE_DESC"] = "если возможно, автоматически установит роль Лекарь Рейда для всех обнаруженных наших лекарей"

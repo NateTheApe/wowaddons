@@ -56,6 +56,9 @@ FishingBuddy.OutfitManager.ItemStylePoints = function(itemno, enchant)
 		if ( not enchant ) then
 			_,_, itemno, enchant = string.find(itemno, "^(%d+):(%d+)");
 		end
+		if ( not enchant ) then
+			enchant = 0;
+		end
 		points = FL:FishingBonusPoints(itemno..":"..enchant);
 		itemno = tonumber(itemno);
 		if ( Accessories[itemno] ) then

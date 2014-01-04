@@ -387,6 +387,11 @@ function ArkInventory:LISTEN_COMBAT_LEAVE( )
 	
 	ArkInventory.Global.Mode.Combat = false
 	
+	if ( ArkInventory.Global.LeaveCombatRun.PetJournal ) then
+		ArkInventory.Global.LeaveCombatRun.PetJournal = false
+		ArkInventory:SendMessage( "LISTEN_PETJOURNAL_RELOAD_BUCKET", "RESCAN" )
+	end
+	
 	for loc_id in pairs( ArkInventory.Global.Location ) do
 		
 		if ArkInventory.Global.Location[loc_id].tainted then
@@ -1398,21 +1403,21 @@ function ArkInventory.ScanBag( blizzard_id )
 	local loc_id, bag_id = ArkInventory.BagID_Internal( blizzard_id )
 	
 	if not loc_id then
-		ArkInventory.OutputWaring( "aborted scan of bag [", blizzard_id, "], unknown bag id" )
+		ArkInventory.OutputWarning( "aborted scan of bag [", blizzard_id, "], unknown bag id" )
 		return
 	else
-		--ArkInventory.OutputWaring( "found bag id [", blizzard_id, "] in location ", loc_id, " [", ArkInventory.Global.Location[loc_id].Name, "]" )
+		--ArkInventory.OutputWarning( "found bag id [", blizzard_id, "] in location ", loc_id, " [", ArkInventory.Global.Location[loc_id].Name, "]" )
 	end
 	
 	if loc_id == ArkInventory.Const.Location.Bank and ArkInventory.Global.Mode.Bank == false then
-		--ArkInventory.OutputWaring( "aborted scan of bag id [", blizzard_id, "], not at bank" )
+		--ArkInventory.OutputWarning( "aborted scan of bag id [", blizzard_id, "], not at bank" )
 		return
 	end
 	
 	local cp = ArkInventory.Global.Me
 	
 	if not ArkInventory.LocationIsMonitored( loc_id ) then
-		--ArkInventory.OutputWaring( "aborted scan of bag id [", blizzard_id, "], location ", loc_id, " [", ArkInventory.Global.Location[loc_id].Name, "] is not being monitored" )
+		--ArkInventory.OutputWarning( "aborted scan of bag id [", blizzard_id, "], location ", loc_id, " [", ArkInventory.Global.Location[loc_id].Name, "] is not being monitored" )
 		return
 	end
 	
@@ -1578,7 +1583,7 @@ function ArkInventory.ScanBag( blizzard_id )
 				end
 			end
 			
-			if ( not sb ) then
+			if ( not ab ) then
 				for _, v in pairs( ArkInventory.Const.Soulbound ) do
 					if ( v and ArkInventory.TooltipContains( ArkInventory.Global.Tooltip.Scan, string.format( "^%s$", v ) ) ) then
 						--ArkInventory.Output( loc_id, ".", bag_id, ".", slot_id, " = ", h, " - ", v )
@@ -3143,6 +3148,24 @@ function ArkInventory.ObjectInfo( h )
 			itemName = string.match( h, "|h%[(.+)%]|h" )
 		end
 		
+		if ( ( itemRarity or 0 ) > 2 ) and ( itemEquipLoc ~= "" ) then
+			
+			-- check for upgraded items
+			ArkInventory.TooltipSetHyperlink( ArkInventory.Global.Tooltip.Scan, h )
+			local _, _, v1, v2 = ArkInventory.TooltipFind( ArkInventory.Global.Tooltip.Scan, ArkInventory.Localise["WOW_TOOLTIP_ITEMUPGRADELEVEL"], false, true )
+			
+			if v1 and v2 then
+				
+				if ( itemRarity == 3 ) then
+					itemLevel = ( itemLevel or 0 ) + v1 * 8
+				elseif ( itemRarity == 4 ) then
+					itemLevel = ( itemLevel or 0 ) + v1 * 4
+				end
+				
+			end
+			
+		end
+		
 		return class, itemLink, itemName, itemTexture, itemRarity or 0, itemLevel or 0, itemMinLevel or 0, itemType or "", itemSubType or "", itemStackCount or 1, itemEquipLoc or "", itemSellPrice or 0
 		
 	elseif ( class == "spell" ) then
@@ -3385,7 +3408,7 @@ function ArkInventory.ObjectCountClear( search_id, loc_id, player_id )
 	
 	local search_id = ArkInventory.ObjectIDTooltip( search_id )
 	
---	ArkInventory.Output( "ObjectCountClear( ", search_id, ", ", loc_id, ", ", player_id, " )" )
+	--ArkInventory.Output( "ObjectCountClear( ", search_id, ", ", loc_id, ", ", player_id, " )" )
 	
 	if ( search_id ) and ( loc_id ) and ( player_id ) then
 		
@@ -3489,10 +3512,12 @@ function ArkInventory.ObjectCountGet( search_id, just_me, ignore_vaults, ignore_
 	-- build raw
 	for pn, pd in pairs( ArkInventory.db.realm.player.data ) do
 		
-		if ( ( pd.info.name ) and ( not d[pn] ) ) or ( pd.info.class == "ACCOUNT" ) or ( cp.info.guild_id and ( cp.info.guild_id == pd.info.guild_id ) ) then
+		if ( ( pd.info.name ) and ( not d[pn] ) ) then -- or ( pd.info.class == "ACCOUNT" ) or ( pd.info.class == "GUILD" and cp.info.guild_id and ( cp.info.guild_id == pd.info.guild_id ) ) then
+			
+			--ArkInventory.Output( pn, " = ", ( ( pd.info.name ) and ( not d[pn] ) ), " or ", ( pd.info.class == "ACCOUNT" ), " or ", ( pd.info.class == "GUILD" and cp.info.guild_id and ( cp.info.guild_id == pd.info.guild_id ) ) )
+			--ArkInventory.Output( "rebuild ", search_id, " for ", pn )
 			
 			-- rebuild if missing, is account, or is users guild
-			
 			for l in pairs( ArkInventory.Global.Location ) do
 				
 				local ld = pd.location[l]

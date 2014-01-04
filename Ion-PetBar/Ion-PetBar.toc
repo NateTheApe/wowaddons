@@ -1,7 +1,7 @@
-﻿## Interface: 50300
+## Interface: 50400
 ## Title: Ion: Pet Action Bar
 ## Author: Maul
-## Version: Hydrogen-3
+## Version: Hydrogen-4
 ## Notes: Pet action bar for Ion
 ## DefaultState: enabled
 ## Dependencies: Ion

@@ -1,19 +1,19 @@
 local config, L = OneRingLib.ext.config, OneRingLib.lang
 local frame = config.createFrame("Bindings", "OPie")
 local OBC_Profile = CreateFrame("Frame", "OBC_Profile", frame, "UIDropDownMenuTemplate")
-	OBC_Profile:SetPoint("TOPLEFT", frame.desc, "BOTTOMLEFT", 0, -8) UIDropDownMenu_SetWidth(OBC_Profile, 200)
+	OBC_Profile:SetPoint("TOPLEFT", 0, -85) UIDropDownMenu_SetWidth(OBC_Profile, 200)
 	OBC_Profile.initialize = OPC_Profile.initialize
 local bindSet = CreateFrame("Frame", "OPC_BindingSet", frame, "UIDropDownMenuTemplate")
 	bindSet:SetPoint("LEFT", OBC_Profile, "RIGHT")	UIDropDownMenu_SetWidth(bindSet, 250)
 
 local lRing = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 local lBinding = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	lBinding:SetPoint("TOPLEFT", frame.desc, "BOTTOMLEFT", 0, -45)
+	lBinding:SetPoint("TOPLEFT", 16, -125)
 	lRing:SetPoint("LEFT", lBinding, "LEFT", 215, 0)
 	lBinding:SetWidth(180)
 local bindLines = {}
 local function mClick(self) frame.showMacroPopup(self:GetParent():GetID()) end
-for i=1,20 do
+for i=1,19 do
 	local bind = config.createBindingButton(frame)
 	local label = bind:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	bind:SetPoint("TOPLEFT", lBinding, "BOTTOMLEFT", 0, 16-20*i)
@@ -60,7 +60,8 @@ function ringBindings:refresh()
 end
 function ringBindings:get(id)
 	local name, key, macro, internal = OneRingLib:GetRingInfo(self.map[id])
-	local bind, isOverride, isActive, cBind, enabled = OneRingLib:GetRingBinding(key)
+	local enabled, bind, cBind, isOverride, isActive = true, OneRingLib:GetRingBinding(key)
+	if not isOverride and not OneRingLib:GetOption("UseDefaultBindings", key) then enabled = false end
 	return bind, name or key or "?", enabled and ((cBind and isActive == false and (isOverride and "|cffFA2800" or "|cffa0a0a0")) or (isOverride and "|cffffffff") or "") or "|cffa0a0a0"
 end
 function ringBindings:set(id, key)
@@ -226,7 +227,8 @@ function bindSet:set(owner, scope)
 end
 
 function frame.localize()
-	frame.title:SetText(L"Ring Bindings")
+	frame.name = L"Ring Bindings"
+	frame.title:SetText(frame.name)
 	frame.desc:SetText(L"Customize OPie key bindings below. |cffa0a0a0Gray|r and |cffFA2800red|r bindings conflict with others and are not currently active." .. "\n" ..
 		(L"Alt+Left Click on a button to set a conditional binding, indicated by %s."):format("|cff4CFF40[+]|r"))
 	lBinding:SetText(L"Binding")
@@ -239,6 +241,7 @@ function frame.refresh()
 	end
 	frame.localize()
 	updatePanelContent()
+	config.checkSVState(frame)
 end
 function frame.default()
 	config.undo.saveProfile()
@@ -254,6 +257,7 @@ frame.cancel = frame.okay
 frame:SetScript("OnShow", frame.refresh)
 
 local function open()
+	InterfaceOptionsFrame_OpenToCategory(frame)
 	InterfaceOptionsFrame_OpenToCategory(frame)
 end
 config.AddSlashSuffix(open, "bind", "binding", "bindings")

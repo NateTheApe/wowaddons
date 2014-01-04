@@ -1,9 +1,8 @@
 local mod	= DBM:NewMod(112, "DBM-Party-Cataclysm", 7, 67)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 48 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 92 $"):sub(12, -3))
 mod:SetCreatureID(42188)
-mod:SetModelID(36475)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
@@ -31,7 +30,7 @@ local timerBulwarkCD		= mod:NewCDTimer(20, 78939)
 local timerGroundSlam		= mod:NewCastTimer(3, 78903)
 local timerShatter			= mod:NewCastTimer(3, 78807)
 
-local soundShatter			= mod:NewSound(78807, nil, mod:IsMelee())
+local soundShatter			= mod:NewSound(78807, mod:IsMelee())
 
 local prewarnEnrage = false
 

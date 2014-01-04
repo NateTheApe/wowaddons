@@ -96,8 +96,7 @@ L:SetTimerLocalization({
 L:SetOptionLocalization({
 	specWarnDespawnFloor	= "Show special warning before floor vanishes",
 	timerDespawnFloor		= "show timer for when floor vanishes",
-	SetIconOnDestabilized	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(132222),
-	SetIconOnCreature		= "Set icons on $journal:6193"
+	SetIconOnDestabilized	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(132222)
 })
 
 ------------
@@ -107,8 +106,8 @@ L= DBM:GetModLocalization(677)
 
 L:SetOptionLocalization({
 	InfoFrame		= "Show info frame for players affected by $spell:116525",
-	CountOutCombo	= "Count out $journal:5673 casts\nNOTE: This currently only has female voice option.",
-	ArrowOnCombo	= "Show DBM Arrow during $journal:5673\nNOTE: This assumes tank is in front of boss and anyone else is behind."
+	CountOutCombo	= "Count out $journal:5673 casts<br/>NOTE: This currently only has female voice option.",
+	ArrowOnCombo	= "Show DBM Arrow during $journal:5673<br/>NOTE: This assumes tank is in front of boss and anyone else is behind."
 })
 
 L:SetMiscLocalization({

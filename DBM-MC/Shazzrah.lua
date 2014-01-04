@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Shazzrah", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 436 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 477 $"):sub(12, -3))
 mod:SetCreatureID(12264)
 mod:SetModelID(13032)
 mod:RegisterCombat("combat")
@@ -20,9 +20,6 @@ local warnBlink			= mod:NewSpellAnnounce(21655)
 local timerCurseCD		= mod:NewNextTimer(20, 19713)
 local timerGrounding	= mod:NewBuffActiveTimer(30, 19714, nil, false)
 local timerBlinkCD		= mod:NewNextTimer(30, 21655)
-
-function mod:OnCombatStart(delay)
-end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 19714 and self:IsInCombat() and not args:IsDestTypePlayer() then

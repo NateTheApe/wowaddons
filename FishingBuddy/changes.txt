@@ -1,4 +1,39 @@
-﻿Version 1.2n
+﻿Version 1.3a
+- Fix moved line that escaped testing
+
+Version 1.3
+- Allow for choosing Mouse4 and Mouse5 for casting
+- Add "/fb fishing start" for use in macros to turn on "fishing mode"
+- Add "FishingBuddy" macro (self modifying macro that emulates the double click sequence)
+- Add support for Bipsi's Bobbing Berg
+- Attempt to fix Curse bug #224 (Minimap Icon moves)
+- Rewrote Fish Watcher display code (some of the oldest code in FB!)
+
+Version 1.2p3
+- Fix for Curse bug #221 (error on mouse over with Gear manager)
+- Updated fix for Curse bug #218 (ammo slot still has a value in it, but it's zero now)
+
+Version 1.2p2
+- Fix for UpdateMicroButtons taint
+
+Version 1.2p1
+- Update to latest LibTourist (added Timeless Isle)
+
+Version 1.2p
+- Updated TOC to 5.4
+- Fixed About box, because credit where credit is due is what you do
+- Better Extravaganza time handling based on code from Salty Badmunkay the Limnologist (@Shadow Council)
+- Additional clean up in Extravaganza code
+- Rewrite drop down handling (for FB_Broker, etc.) to not trigger Blizz raid frame bug
+- Summon pets again when we start to fish
+- Fix "Open Quest Item" handling
+- Updated to latest versions of LibTourist and LibBabble-SubZone
+
+Version 1.2o
+- Rewrite pet menu handling to use LibPetJournal
+- Fix for CurseForge bug #217 and #218
+
+Version 1.2n
 - Fix for CurseForge bug #216, error in option screen with Outfitter selected
 - Latest version of LibTourist
 

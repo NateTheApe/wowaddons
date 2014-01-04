@@ -1,5 +1,5 @@
-﻿## Interface: 50300
-## X-Curse-Packaged-Version: v1.4.2
+﻿## Interface: 50400
+## X-Curse-Packaged-Version: v1.4.3
 ## X-Curse-Project-Name: Scorchio! 2
 ## X-Curse-Project-ID: scorchio2
 ## X-Curse-Repository-ID: wow/scorchio2/mainline
@@ -10,7 +10,7 @@
 ## Notes-ruRU: Отслеживает уязвимости к дебаффам у мобов
 ## Notes-esES: Seguimiento de debuffs en múltiples objetivos
 ## Notes-zhTW: 監測多個怪物間的傷害減益
-## Version: v1.4.2
+## Version: v1.4.3
 ## Author: ennui@bloodhoof-eu
 
 ## SavedVariables: Scorchio2DB

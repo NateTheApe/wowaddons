@@ -1,14 +1,14 @@
 local mod	= DBM:NewMod("TerestianIllhoof", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 474 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 527 $"):sub(12, -3))
 mod:SetCreatureID(15688)
 mod:SetModelID(11343)
 
 --mod:RegisterCombat("yell", L.DBM_TI_YELL_PULL)
 mod:RegisterCombat("combat", 15688)
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_REMOVED",
 	"SPELL_CAST_SUCCESS",
@@ -16,9 +16,7 @@ mod:RegisterEvents(
 )
 
 local warningWeakened	= mod:NewTargetAnnounce(30065, 2)
-local warningImpSoon	= mod:NewSoonAnnounce(30066, 2)
 local warningImp		= mod:NewSpellAnnounce(30066, 3)
-local warningSacSoon	= mod:NewSoonAnnounce(30115, 3)
 local warningSacrifice	= mod:NewTargetAnnounce(30115, 4)
 
 local specWarnSacrifice	= mod:NewSpecialWarningYou(30115)
@@ -35,19 +33,18 @@ end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 30115 then
-		DBM.BossHealth:AddBoss(17248, L.DChains)
+		if DBM.BossHealth:IsShown() then
+			DBM.BossHealth:AddBoss(17248, L.DChains)
+		end
 		warningSacrifice:Show(args.destName)
 		timerSacrifice:Start(args.destName)
 		timerSacrificeCD:Start()
-		warningSacSoon:Cancel()
-		warningSacSoon:Schedule(38)
 		if args:IsPlayer() then
 			specWarnSacrifice:Show()
 		end
 	elseif args.spellId == 30065 then
 		warningWeakened:Show(args.destName)
 		timerWeakened:Start()
-		warningImpSoon:Schedule(26)
 	end
 end
 
@@ -59,17 +56,18 @@ end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 30066 then
-		warningImpSoon:Cancel()
 		warningImp:Show()
-		DBM.BossHealth:AddBoss(17229, L.Kilrek)
+		if DBM.BossHealth:IsShown() then
+			DBM.BossHealth:AddBoss(17229, L.Kilrek)
+		end
 	end
 end
 
 function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
-	if cid == 17229 then--Kil'rek
+	if cid == 17229 and DBM.BossHealth:IsShown() then--Kil'rek
 		DBM.BossHealth:RemoveBoss(cid)
-	elseif cid == 17248 then--Demon Chains
+	elseif cid == 17248 and DBM.BossHealth:IsShown() then--Demon Chains
 		DBM.BossHealth:RemoveBoss(cid)
 	end
 end

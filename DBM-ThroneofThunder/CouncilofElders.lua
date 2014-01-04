@@ -1,9 +1,9 @@
 local mod	= DBM:NewMod(816, "DBM-ThroneofThunder", nil, 362)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9709 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10805 $"):sub(12, -3))
 mod:SetCreatureID(69078, 69132, 69134, 69131)--69078 Sul the Sandcrawler, 69132 High Prestess Mar'li, 69131 Frost King Malakk, 69134 Kazra'jin --Adds: 69548 Shadowed Loa Spirit,
-mod:SetQuestID(32746)
+mod:SetEncounterID(1570)
 mod:SetZone()
 mod:SetUsedIcons(7, 6)
 mod:SetBossHPInfoToHighest()
@@ -92,8 +92,8 @@ local timerBitingCold				= mod:NewBuffFadesTimer(30, 136917)
 local timerBitingColdCD				= mod:NewCDTimer(45, 136917)--10 man Cds (and probably LFR), i have no doubt on 25 man this will either have a shorter cd or affect 3 targets with same CD. Watch for timer diffs though
 local timerFrostBite				= mod:NewBuffFadesTimer(30, 136990)
 local timerFrostBiteCD				= mod:NewCDTimer(45, 136990)--^same comment as above
-local timerFrigidAssault			= mod:NewTargetTimer(15, 136903)
-local timerFrigidAssaultCD			= mod:NewCDTimer(30, 136904)--30 seconds after last one ended (maybe even a next timer, i'll change it with more logs.)
+local timerFrigidAssault			= mod:NewTargetTimer(15, 136903, nil, mod:IsTank() or mod:IsHealer())
+local timerFrigidAssaultCD			= mod:NewCDTimer(30, 136904, nil, mod:IsTank() or mod:IsHealer())--30 seconds after last one ended (maybe even a next timer, i'll change it with more logs.)
 --Kazra'jin
 
 local soundMarkedSoul				= mod:NewSound(137359)
@@ -113,43 +113,6 @@ local kazraPossessed = false
 local possessesDone = 0
 local dischargeCount = 0
 local darkPowerWarned = false
-
-local showDamagedHealthBar, hideDamagedHealthBar
-do
-	local frame = CreateFrame("Frame") -- using a separate frame avoids the overhead of the DBM event handlers which are not meant to be used with frequently occuring events like all damage events...
-	local damagedMob
-	local hpRemaining = 0
-	local maxhp = 0
-	local function getDamagedHP()
-		return math.max(1, math.floor(hpRemaining / maxhp * 100))
-	end
-	frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	frame:SetScript("OnEvent", function(self, event, timestamp, subEvent, _, _, _, _, _, destGUID, _, _, _, ...)
-		if damagedMob == destGUID then
-			local damage
-			if subEvent == "SWING_DAMAGE" then 
-				damage = select( 1, ... ) 
-			elseif subEvent == "RANGE_DAMAGE" or subEvent == "SPELL_DAMAGE" or subEvent == "SPELL_PERIODIC_DAMAGE" then 
-				damage = select( 4, ... )
-			end
-			if damage then
-				hpRemaining = hpRemaining - damage
-			end
-		end
-	end)
-	
-	function showDamagedHealthBar(self, mob, spellName, health)
-		damagedMob = mob
-		hpRemaining = health
-		maxhp = health
-		DBM.BossHealth:RemoveBoss(getDamagedHP)
-		DBM.BossHealth:AddBoss(getDamagedHP, spellName)
-	end
-	
-	function hideDamagedHealthBar()
-		DBM.BossHealth:RemoveBoss(getDamagedHP)
-	end
-end
 
 function mod:OnCombatStart(delay)
 	kazraPossessed = false
@@ -197,6 +160,8 @@ function mod:SPELL_CAST_START(args)
 		warnTwistedFate:Show()
 		specWarnTwistedFate:Show()
 		timerTwistedFateCD:Start()
+	elseif args.spellId == 136990 then
+		timerFrostBiteCD:Schedule(1.5)
 	end
 end
 
@@ -258,9 +223,9 @@ function mod:SPELL_AURA_APPLIED(args)
 			dischargeCount = 0
 			kazraPossessed = true
 		end
-		if (self.Options.HealthFrame or DBM.Options.AlwaysShowHealthFrame) and self.Options.PHealthFrame then
+		if DBM.BossHealth:IsShown() and self.Options.PHealthFrame then
 			local bossHealth = math.floor(UnitHealthMax(uid or "boss4") * 0.25)
-			showDamagedHealthBar(self, args.destGUID, args.spellName.." : "..args.destName, bossHealth)
+			self:ShowDamagedHealthBar(args.destGUID, args.spellName.." : "..args.destName, bossHealth)
 		end
 	elseif args.spellId == 136903 then--Player Debuff version, not cast version
 		timerFrigidAssault:Start(args.destName)
@@ -292,7 +257,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.SetIconOnFrostBite then
 			self:SetIcon(args.destName, 6)--Square
 		end
-		timerFrostBiteCD:Start()
 		if args:IsPlayer() then
 			specWarnFrostBite:Show()
 			timerFrostBite:Start()
@@ -349,8 +313,8 @@ function mod:SPELL_AURA_REMOVED(args)
 			kazraPossessed = false
 			timerRecklessChargeCD:Cancel()--Because it's not going to be 25 sec anymore. It'll go back to 6 seconds. He'll probably do it right away since more than likely it'll be off CD
 		end
-		if (self.Options.HealthFrame or DBM.Options.AlwaysShowHealthFrame) and self.Options.PHealthFrame then
-			hideDamagedHealthBar()
+		if DBM.BossHealth:IsShown() and self.Options.PHealthFrame then
+			self:RemoveDamagedHealthBar()
 		end
 	elseif args.spellId == 136903 then
 		timerFrigidAssault:Cancel(args.destName)

@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
+    Decursive (v 2.7.3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -17,7 +17,7 @@
     Decursive is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY.
     
-    This file was last updated on 2013-03-17T04:19:07Z
+    This file was last updated on 2013-08-18T00:01:40Z
 --]]
 -------------------------------------------------------------------------------
 
@@ -54,11 +54,13 @@ local LC = D.LC;
 local DC = T._C;
 -------------------------------------------------------------------------------
 
+local _G                = _G;
 local pairs             = _G.pairs;
 local ipairs            = _G.ipairs;
 local type              = _G.type;
 local table             = _G.table;
 local t_sort            = _G.table.sort;
+local t_wipe            = _G.table.wipe;
 local UnitName          = _G.UnitName;
 local UnitDebuff        = _G.UnitDebuff;
 local UnitBuff          = _G.UnitBuff;
@@ -244,7 +246,7 @@ end --}}}
 function D:PlaySound (UnitID, Caller) --{{{
     if self.profile.PlaySound and not self.Status.SoundPlayed then
         local Debuffs, IsCharmed = self:UnitCurableDebuffs(UnitID, true);
-        if Debuffs and Debuffs[1] and Debuffs[1].Type or IsCharmed then
+        if Debuffs[1] or IsCharmed then
 
             -- good sounds: Sound\\Doodad\\BellTollTribal.wav
             --          Sound\\interface\\AuctionWindowOpen.wav
@@ -259,8 +261,6 @@ function D:PlaySound (UnitID, Caller) --{{{
                 self:Debug("Sound scheduled by", Caller);
             end
 
-        else
-            self.UnitDebuffed[UnitID] = false;
         end
     end
 end --}}}
@@ -403,19 +403,28 @@ do
     local UnitCanAttack     = _G.UnitCanAttack;
     local GetTime           = _G.GetTime;
 
+    local UnTrustedUnitIDs = {
+        ['mouseover'] = true,
+        ['target'] = true,
+    };
+
     -- This local function only sets interesting values of UnitDebuff()
-    local Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime;
+    local Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime, _, SpellID;
     local function GetUnitDebuff  (Unit, i) --{{{
 
-        if D.LiveList.TestItemDisplayed and i == 1 and UnitExists(Unit) and Unit ~= "target" and Unit ~= "mouseover" then
-            Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime = "Test item", 1, "Interface\\AddOns\\Decursive\\iconON.tga", 2, DC.TypeNames[D.Status.ReversedCureOrder[1]], 70, (D.LiveList.TestItemDisplayed + 70);
-            D:Debug("|cFFFF0000Setting test debuff for ", Unit, " (debuff ", i, ")|r");--, Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime);
-            return true;
+        if D.LiveList.TestItemDisplayed and UnitExists(Unit) then -- and not UnTrustedUnitIDs[Unit] then
+            if i == 1 then
+                Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime, SpellID = "Test item", 1, "Interface\\AddOns\\Decursive\\iconON.tga", 2, DC.TypeNames[D.Status.ReversedCureOrder[1]], 70, (D.LiveList.TestItemDisplayed + 70), 0;
+                D:Debug("|cFFFF0000Setting test debuff for ", Unit, " (debuff ", i, ")|r");--, Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime);
+                return true;
+            else
+                i = i - 1;
+            end
         end
 
         --    Name, Rank, Texture, Applications, TypeName, duration, ExpirationTime, unitCaster, isStealable = UnitAura("unit", index or ["name", "rank"][, "filter"])
 
-        Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime = UnitDebuff (Unit, i);
+        Name, Rank, Texture, Applications, TypeName, Duration, ExpirationTime, _, _, _, SpellID = UnitDebuff (Unit, i);
 
         if Name then
             return true;
@@ -434,10 +443,6 @@ do
 
     
 
-    local UnTrustedUnitIDs = {
-        ['mouseover'] = true,
-        ['target'] = true,
-    };
 
     -- This is the core debuff scanning function of Decursive
     -- This function does more than just reporting Debuffs. it also detects charmed units
@@ -445,7 +450,7 @@ do
     function D:GetUnitDebuffAll (Unit) --{{{
 
         -- create a Debuff table for this unit if there is not already one
-        if (not DebuffUnitCache[Unit]) then
+        if not DebuffUnitCache[Unit] then
             DebuffUnitCache[Unit] = {};
         end
 
@@ -465,8 +470,12 @@ do
             IsCharmed = false;
         end
 
+        if self.LiveList.TestItemDisplayed and not UnTrustedUnitIDs[Unit] and D.Status.ReversedCureOrder[1] == DC.CHARMED then
+            IsCharmed = true;
+        end
+
         -- iterate all available debuffs
-        while (true) do
+        while true do
             if not GetUnitDebuff(Unit, i) then
                 if not IsCharmed or CharmFound then
                     break;
@@ -482,7 +491,7 @@ do
 
         
             -- test for a type (Magic Curse Disease or Poison)
-            if (TypeName and TypeName ~= "") then
+            if TypeName and TypeName ~= "" then
                 Type = DC.NameToTypes[TypeName];
             else
                 Type = false;
@@ -525,6 +534,12 @@ do
             end
 
             i = i + 1;
+
+            -- if a deadly debuff has been found, just forget everything...
+            if DC.IS_DEADLY_DEBUFF[SpellID] then
+                StoredDebuffIndex = 1;
+                break;
+            end
         end
 
         -- erase remaining unused entries without freeing the memory (less garbage)
@@ -548,6 +563,7 @@ do
     local ManagedDebuffUnitCache = D.ManagedDebuffUnitCache;
 
 
+    local continue_; -- if we have to ignore a debuff, this will become false
     local D = D;
     local _;
     local CureOrder;
@@ -555,10 +571,7 @@ do
 
         CureOrder = D.classprofile.CureOrder;
 
-        -- local cura = (a.Type and CureOrder[a.Type] and CureOrder[a.Type] > 0) and CureOrder[a.Type] or 1024;
-        -- local curb = (b.Type and CureOrder[b.Type] and CureOrder[b.Type] > 0) and CureOrder[b.Type] or 1024;
-
-        return ((a.Type and CureOrder[a.Type] and CureOrder[a.Type] > 0) and CureOrder[a.Type] or 1024) < ((b.Type and CureOrder[b.Type] and CureOrder[b.Type] > 0) and CureOrder[b.Type] or 1024);
+        return CureOrder[a.Type] * 10000 - a.Applications < CureOrder[b.Type] * 10000 - b.Applications;
     end
 
     local NotRaidOrParty = {
@@ -569,7 +582,7 @@ do
     };
     local function UnitFilteringTest(unit, filterValue)
 
-        D:Debug("UnitFilteringTest:", unit, filterValue);
+        --D:Debug("UnitFilteringTest:", unit, filterValue);
 
         if not filterValue then
             return nil;
@@ -590,62 +603,50 @@ do
     function D:UnitCurableDebuffs (Unit, JustOne) -- {{{
 
         if not Unit then
-            self:Debug("No unit supplied to UnitCurableDebuffs()");
-            return false;
+            D:AddDebugText("No unit supplied to UnitCurableDebuffs()");
+            return DC.EMPTY_TABLE, false;
         end
 
-        if (not ManagedDebuffUnitCache[Unit]) then
+        if not ManagedDebuffUnitCache[Unit] then
             ManagedDebuffUnitCache[Unit] = {};
+        end
+
+        local ManagedDebuffs = ManagedDebuffUnitCache[Unit]; -- shortcut for readability
+
+        if ManagedDebuffs[1] then
+            t_wipe(ManagedDebuffs);
         end
 
         local AllUnitDebuffs, IsCharmed = self:GetUnitDebuffAll(Unit); -- always return a table, may be empty though
 
-        if not (AllUnitDebuffs[1] and AllUnitDebuffs[1].Type ) then -- if there is no curable debuff (a debuff with a type)
-            return false, IsCharmed;
-        end
-
         local Spells    = self.Status.CuringSpells; -- shortcut to available spells by debuff type
-
-
-        local ManagedDebuffs = ManagedDebuffUnitCache[Unit]; -- shortcut for readability
-
-        --self:Debug("Debuffs were found");
-
-        local DebuffNum = 1; -- number of found debuff (used for indexing)
-
-        local continue_ = true; -- if we have to ignore a debuff, this will become false
-
-
 
         for _, Debuff in ipairs(AllUnitDebuffs) do
 
-            if (not Debuff.Type) then -- useless test, only debuffs with a type are returned...
-                break;
-            end
             continue_ = true;
 
             -- test if we have to ignore this debuf  {{{ --
            
             if UnitFilteringTest(Unit, self.Status.UnitFilteringTypes[Debuff.Type]) then
-                continue_ = false;
+                continue_ = false; -- == skip this debuff
             end
-            
-            if (self.profile.DebuffsToIgnore[Debuff.Name]) then
+           
+            if self.profile.DebuffsToIgnore[Debuff.Name] then -- XXX not sure it has any actual use nowadays (2013-06-18)
                 -- these are the BAD ones... the ones that make the target immune... abort this unit
                 --D:Debug("UnitCurableDebuffs(): %s is ignored", Debuff.Name);
                 break; -- exit here
             end
 
-            if (self.profile.BuffDebuff[Debuff.Name]) then
+            if self.profile.BuffDebuff[Debuff.Name] then
                 -- these are just ones you don't care about (sleepless deam etc...)
-                continue_ = false;
+                continue_ = false; -- == skip this debuff
                 --D:Debug("UnitCurableDebuffs(): %s is not a real debuff", Debuff.Name);
             end
 
-            if (self.Status.Combat or self.profile.DebuffAlwaysSkipList[Debuff.Name]) then
+            if self.Status.Combat or self.profile.DebuffAlwaysSkipList[Debuff.Name] then
                 local _, EnUClass = UnitClass(Unit);
-                if (self.profile.skipByClass[EnUClass]) then
-                    if (self.profile.skipByClass[EnUClass][Debuff.Name]) then
+                if self.profile.skipByClass[EnUClass] then
+                    if self.profile.skipByClass[EnUClass][Debuff.Name] then
                         -- these are just ones you don't care about by class while in combat
 
                         -- This lead to a problem because once the fight is finished there are no event to trigger
@@ -678,28 +679,20 @@ do
                 -- (it happens for warlocks or when using the same profile with
                 -- several characters)
                 --if (self.classprofile.CureOrder[Debuff.Type] and self.classprofile.CureOrder[Debuff.Type] > 0) then
-                if (self:GetCureTypeStatus(Debuff.Type)) then
+                if self:GetCureTypeStatus(Debuff.Type) then
 
 
                     -- self:Debug("we can cure it");
 
                     -- if we do have a spell to cure
-                    if (Spells[Debuff.Type]) then
+                    if Spells[Debuff.Type] then
 
                         -- self:Debug("It's managed");
 
-                        -- create an entry for this debuff index if necessary
-                        if (not ManagedDebuffs[DebuffNum]) then
-                            ManagedDebuffs[DebuffNum] = {};
-                        end
-
-                        -- copy the debuff information to this table.
-                        self:tcopy(ManagedDebuffs[DebuffNum], Debuff);
-
-                        DebuffNum = DebuffNum + 1;
+                        ManagedDebuffs[#ManagedDebuffs + 1] = Debuff;
 
                         -- the live-list only reports the first debuf found and set JustOne to true
-                        if (JustOne) then
+                        if JustOne then
                             break;
                         end
                     end
@@ -707,31 +700,32 @@ do
             end
         end -- for END
 
-        -- erase unused entries without freeing the memory (less garbage)
-        if (not JustOne or DebuffNum == 1)  then -- if JustOne is set don't clear anything except if we found nothing
-            while (ManagedDebuffs[DebuffNum]) do
-                ManagedDebuffs[DebuffNum].Type = false;
-                -- ManagedDebuffs[DebuffNum].TimeStamp = false;
-                DebuffNum = DebuffNum + 1;
-            end
-        end
+        if ManagedDebuffs[1] then
 
-        -- sort the table only if it's not 'empty' and only if there is at least two debuffs
-        if (ManagedDebuffs[1] and ManagedDebuffs[1].Type) then
-
-            -- order Debuffs according to type priority order
-            if (not JustOne and ManagedDebuffs[2] and ManagedDebuffs[2].Type) then
-                t_sort(ManagedDebuffs, sorting); -- uses memory..
+            -- sort the table only if it contains more than 1 debuff
+            if #ManagedDebuffs > 1 then
+                t_sort(ManagedDebuffs, sorting);
             end
-            return ManagedDebuffs, IsCharmed;
+
+            if not D.UnitDebuffed[Unit] then
+                D.UnitDebuffed[Unit] = true;
+                D.ForLLDebuffedUnitsNum = D.ForLLDebuffedUnitsNum + 1;
+            end
+
         else
-            return false, IsCharmed;
+            if D.UnitDebuffed[Unit] then
+                D.UnitDebuffed[Unit] = false;
+                D.ForLLDebuffedUnitsNum = D.ForLLDebuffedUnitsNum - 1;
+            end
+            return DC.EMPTY_TABLE, false; -- avoid race conditions
         end
+
+        return ManagedDebuffs, IsCharmed;
 
     end -- // }}}
 
     local GetTime               = _G.GetTime;
-    local Debuffs               = {}; local IsCharmed = false; local Unit; local MUF; local IsDebuffed = false; local IsMUFDebuffed = false; local CheckStealth = false;
+    local Debuffs               = DC.EMPTY_TABLE; local IsCharmed = false; local Unit; local MUF; local IsDebuffed = false; local IsMUFDebuffed = false; local CheckStealth = false;
     local NoScanStatuses        = false;
     local band                  = _G.bit.band;
     --[===[@debug@
@@ -755,14 +749,15 @@ do
             MUF = self.MicroUnitF.UnitToMUF[Unit];
 
             if MUF and not NoScanStatuses[MUF.UnitStatus] then
+                IsMUFDebuffed = MUF.Debuffs[1] and true or band(MUF.UnitStatus, DC.CHARMED_STATUS) == DC.CHARMED_STATUS;
+
                 Debuffs, IsCharmed = self:UnitCurableDebuffs(Unit, true);
 
                 if CheckStealth then
                     self.Stealthed_Units[Unit] = self:CheckUnitStealth(Unit); -- update stealth status
                 end
 
-                IsDebuffed = (Debuffs and true) or IsCharmed;
-                IsMUFDebuffed = MUF.IsDebuffed and true or band(MUF.UnitStatus, DC.CHARMED_STATUS) == DC.CHARMED_STATUS;
+                IsDebuffed = (Debuffs[1] and true) or IsCharmed;
                 -- If MUF disagrees
                 if (IsDebuffed ~= IsMUFDebuffed) and not D:DelayedCallExixts("Dcr_Update" .. Unit) then
                     --[===[@debug@
@@ -770,7 +765,7 @@ do
                         self:AddDebugText("delayed debuff found by scaneveryone");
                         --D:ScheduleDelayedCall("Dcr_lateanalysis" .. Unit, self.MicroUnitF.LateAnalysis, 1, self.MicroUnitF, "ScanEveryone", Debuffs, MUF, MUF.UnitStatus);
                     else
-                        self:AddDebugText("delayed UNdebuff found by scaneveryone on", Unit);
+                        self:AddDebugText("delayed UNdebuff found by scaneveryone on", Unit, IsDebuffed, IsMUFDebuffed);
                     end
                     --@end-debug@]===]
 
@@ -855,6 +850,6 @@ end
 
 
 
-T._LoadedFiles["Decursive.lua"] = "2.7.2.9";
+T._LoadedFiles["Decursive.lua"] = "2.7.3";
 
 -- Sin

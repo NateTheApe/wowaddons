@@ -122,44 +122,95 @@ local function GetFreePoolIcon()
 	return iconcache[pdx];
 end
 
+-- Salty Badmunkay the Limnologist (@Shadow Council, a MST server with a EST player...guh)
 -- Should we display the extravaganza message?
+local checkedDay = nil;
+local eventHour;
 local function IsTime(activate)
-	CurrentContest = nil;
-	if ( FishingBuddy.IsLoaded() ) then
-		if ( GetSettingBool("STVTimer") ) then
-			local hour,minute = GetGameTime();
-			local weekday, _, _, _ = CalendarGetDate();
-			for idx=1,#Contests do
-				local c = Contests[idx];
-				if ( GetSettingBool(c.setting) ) then
-					if ( weekday == c.day ) then
-						local s = c.hour - 2;
-						local e = c.hour + c.dur;
-						if ( hour >= s and hour < e ) then
-							CurrentContest = c;
-						end
-					end
-				end
-			end
-		end
-	end
-	if ( CurrentContest ) then
-		if ( activate ) then
-			FishingExtravaganzaFrame:Show();
-		end
-		if ( GetSettingBool("STVPoolsOnly") ) then
-			if ( IsContestZone() ) then
-				FishingBuddy.SetHijackCheck(ExtravaganzaHijackCheck);
-			else
-				FishingBuddy.SetHijackCheck();
-			end
-		end
+	local currentMonthOffset = 0;
+	-- This is *mostly* constant (gaming Saturday night in a marathon session?) but let's
+	-- set it every time and count on date() being reasonably fast as a C fall-through.
+	local currentDay = date("%d");
+
+	if (checkedDay == currentDay and CurrentContest) then
 		return true;
+	end
+
+	-- As of patch 5.1, extravaganza starts at 14:00 to 16:00 - PST for US realms, CET for
+	-- EU realms, and Australian EST for Oceanic realms regardless of sever or player local
+	-- time. Luckily the start time is refelected in the CalendarHolidayEvent entry (so
+	-- Euro/Aussie/Oceanic players should be OK too). A limitation appears to be if the
+	-- player has selected to not to show weekly holiday events (but they're probably not
+	-- using FB anyway[thus lessening our competition!])
+	-- Can't find an API call to enable Calendar filters for holidays...would make this
+	-- less user dependent
+	local fishingEvent = nil;
+	local startHour = 14; -- default to 14 regardless of player time zone
+
+	-- Loop through all CalendarEvents for the currentDay
+	for idx=1, CalendarGetNumDayEvents(currentMonthOffset, currentDay) do
+		-- Can't use eventTitle as it is localized, but eventTexture does not appear to be localized.
+		local eventTexture;
+		local eventTitle, eh, _, calendarType, _, eventType, eventTexture, _, inviteStatus = CalendarGetDayEvent(currentMonthOffset, currentDay, idx);
+		eventHour = eh;
+		if eventTexture == "Calendar_FishingExtravaganza" then
+			fishingEvent = 1;
+			startHour = tonumber(eventHour)
+		elseif eventType == CALENDAR_EVENTTYPE_OTHER and string.find(eventTitle, "FISHING") then
+			local invited = true;
+			
+			if (calendarType == "GUILD") then
+				invited = (inviteStatus == CALENDAR_INVITESTATUS_ACCEPTED or
+							inviteStatus == CALENDAR_INVITESTATUS_CONFIRMED or
+							inviteStatus == CALENDAR_INVITESTATUS_SIGNEDUP);
+			end
+			
+			if (invited) then
+				fishingEvent = 1;
+				startHour = tonumber(eventHour)
+			end
+		end
+	end -- for CalendarGetNumDayEvents loop
+
+	checkedDay = currentDay;	
+
+	-- Let's go fishing!
+	if fishingEvent then -- no fishingEvent, fall through
+		-- Loop through all available contests, even though as of patch 5.1 there is only one.
+		for idx=1,#Contests do
+			local c = Contests[idx];
+			-- Player is tracking this contest
+			if ( GetSettingBool(c.setting) ) then
+				-- Give player 2 hours lead time to get prepared
+				local currentHour = GetGameTime();
+				if ( currentHour >= (startHour - 2) ) and ( currentHour < (startHour + c.dur) ) then
+					-- Its time to go fishing!
+					CurrentContest = c;
+					FishingExtravaganzaFrame:Show();
+						
+					-- Additional user preference checks
+					if ( GetSettingBool("STVPoolsOnly") ) then
+						if ( IsContestZone() ) then
+							FishingBuddy.SetHijackCheck(ExtravaganzaHijackCheck);
+						else
+							FishingBuddy.SetHijackCheck();
+						end
+					end -- end user preference checks
+
+					-- Signal the caller that we are in Extravaganza time
+					return true;
+
+				end -- startHour checks
+			end -- contest/day check
+		end -- for #Contests loop
+
 	else
 		FishingBuddy.SetHijackCheck();
-	end
-	-- return nil;
-end
+		CurrentContest = nil;
+	end -- fishingEvent check
+
+end -- end IsTime
+
 FishingBuddy.Extravaganza.IsTime = IsTime;
 
 -- Check for mouse down event for dragging frame.
@@ -229,20 +280,22 @@ end
 -- Elder Clearwater yells: NAME has won the Kalu'ak Fishing Derby!
 
 FishingBuddy.Extravaganza.OnEvent = function(self, event, ...)
-	if ( event == "CHAT_MSG_YELL" ) then
+	if ( event == "CHAT_MSG_YELL" or event == "CHAT_MSG_MONSTER_YELL") then
 		if ( CurrentContest ) then
 			-- Riggle Bassbait yells: We have a winner! (.*) is the Master Angler!
-			local arg1 = select(1, ...);
-			local e,s,n = string.find(arg1, CurrentContest.yell);
-			if ( e ) then
+			local message = select(1, ...);
+			local name = string.match(message, CurrentContest.yell);
+			if ( name ) then
 				ContestIsOver = true;
 			end
 		end
 	elseif ( event == "ZONE_CHANGED_NEW_AREA" or event == "PLAYER_LOGIN" ) then
 		if ( IsContestZone() and IsTime() ) then
 			self:RegisterEvent("CHAT_MSG_YELL");
+			self:RegisterEvent("CHAT_MSG_MONSTER_YELL");
 		else
 			self:UnregisterEvent("CHAT_MSG_YELL");
+			self:UnregisterEvent("CHAT_MSG_MONSTER_YELL");
 		end
 	elseif ( event == "VARIABLES_LOADED" ) then
 		for _,contest in ipairs(Contests) do
@@ -265,13 +318,12 @@ FishingBuddy.Extravaganza.OnUpdate = function(self, elapsed)
 		UpdateTimer = UpdateTimer - elapsed;
 		if ( UpdateTimer <= 0 ) then
 			local numCaught = GetItemCount(CurrentContest.fishid);
-			local hour,minute = GetGameTime();
+			local currentHour,minute = GetGameTime(); -- server time
 			local minleft;
-			local checkhour = CurrentContest.hour;
 			local cname = CurrentContest.name;
 			local line;
 			local contestNow = false;
-			if ( hour >= checkhour ) then
+			if ( currentHour >= eventHour ) then -- using global eventHour
 				if ( ContestIsOver ) then
 					line = FBConstants.FATLADYSINGS;
 				else
@@ -280,12 +332,11 @@ FishingBuddy.Extravaganza.OnUpdate = function(self, elapsed)
 				line = line..FBConstants.DASH.." |cff";
 				line = line..Crayon:GetThresholdHexColor(numCaught/40);
 				line = line..FBConstants.FISHCAUGHT.."|r";
-				checkhour = checkhour + CurrentContest.dur;
 				contestNow = true;
 			else
 				line = FBConstants.TIMETOGO;
 			end
-			minleft = (checkhour - hour)*60 - minute;
+			minleft = (eventHour - currentHour)*60 - minute; -- using global eventHour
 			if ( minleft >= 0 ) then
 				if ( minleft < 10 ) then
 					FishingExtravaganzaFrameText:SetTextColor(1.0, 0.1, 0.1);
@@ -326,23 +377,25 @@ FishingBuddy.Commands[FBConstants.TIMER].func =
 		if ( what == FBConstants.RESET ) then
 			FishingExtravaganzaFrame:ClearAllPoints();
 			FishingExtravaganzaFrame:SetPoint("CENTER", "UIParent", "CENTER", 0, 0);
+			IsTime(true);
 		end
 		return true;
 	end;
 
 if ( FishingBuddy.Debugging ) then
-	local start = 0;
-	-- debugging routines
-	FishingBuddy.Extravaganza.Debug = function(day, hour, zone, continent)
-		FishingBuddy.Debug("Contest debug: %q %q %s %s", FL:printable(continent), FL:printable(zone), FL:printable(day), FL:printable(hour));
-		-- Contests[1].zone = zone;
-		-- Contests[1].continent = continent;
-		-- Contests[1].day = day;
-		-- Contests[1].hour = hour;
-		-- Contests[1].kind = nil;
-		Contests[2].day = day;
-		Contests[2].hour = hour;
-		Contests[2].kind = nil;
-		IsTime(true);
-	end	
+	FishingBuddy.Commands["contest"] = {};
+	FishingBuddy.Commands["contest"].func =
+		function(day, hour, zone, continent)
+			FishingBuddy.Debug("Contest debug: %q %q %s %s", continent, zone, day, hour);
+			-- Contests[1].zone = zone;
+			-- Contests[1].continent = continent;
+			-- Contests[1].day = day;
+			-- Contests[1].hour = hour;
+			-- Contests[1].kind = nil;
+			-- Contests[2].day = day;
+			-- Contests[2].hour = hour;
+			-- Contests[2].kind = nil;
+			IsTime(true);
+			return true;
+		end;
 end

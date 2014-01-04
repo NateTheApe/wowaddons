@@ -1,7 +1,7 @@
 --[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
+    Decursive (v 2.7.3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
     Starting from 2009-10-31 and until said otherwise by its author, Decursive
@@ -73,7 +73,7 @@ T._LoadedFiles["frFR.lua"] = false;
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "frFR");
 
 if not L then 
-    T._LoadedFiles["frFR.lua"] = "2.7.2.9";
+    T._LoadedFiles["frFR.lua"] = "2.7.3";
     return;
 end
 
@@ -108,8 +108,8 @@ L["CLASS_HUNTER"] = "Chasseur"
 L["CLEAR_PRIO"] = "E"
 L["CLEAR_SKIP"] = "E"
 L["COLORALERT"] = "Règle la couleur d'alerte quand un '%s' est requis."
-L["COLORCHRONOS"] = "Chronomètres"
-L["COLORCHRONOS_DESC"] = "Règle la couleur des chrnomètres"
+L["COLORCHRONOS"] = "Compteur central"
+L["COLORCHRONOS_DESC"] = "Règle la couleur du compteur au centre de chaque micro-portrait"
 L["COLORSTATUS"] = "Règle la couleur du statut '%s'."
 L["CTRL"] = "Ctrl"
 L["CURE_PETS"] = "Contrôler et guérir les familiers"
@@ -158,7 +158,6 @@ Il était dans la vie comme dans le jeux, désintéressé, généreux, dévoué 
 Il nous a quitté à l'âge de 38 ans laissant derrière lui pas seulement des joueurs anonymes dans un monde virtuel, mais un groupe de véritables amis à qui il manquera éternellement.]=]
 L["GLOR5"] = "On ne l'oubliera jamais..."
 L["HANDLEHELP"] = "Déplacer tous les micro-portraits"
-L["HIDE_LIVELIST"] = "Cacher la liste"
 L["HIDE_MAIN"] = "Cacher la fenêtre \"Decursive\""
 L["HIDESHOW_BUTTONS"] = "Cacher/Afficher les boutons et Verrouiller/Déverrouiller la barre \"Decursive\""
 L["HLP_LEFTCLICK"] = "Clic Gauche"
@@ -214,6 +213,17 @@ L["OPT_AUTOHIDEMFS_DESC"] = "Choisissez quand la fenêtre des micro-portraits do
 L["OPT_BLACKLENTGH_DESC"] = "Définit combien de temps quelqu'un reste sur liste noire"
 L["OPT_BORDERTRANSP"] = "Transparence de la bordure"
 L["OPT_BORDERTRANSP_DESC"] = "Règle la transparence de la bordure"
+L["OPT_CENTERTEXT"] = "Compteur central :"
+L["OPT_CENTERTEXT_DESC"] = [=[Affiche des informations concernant l'affliction la plus importante (selon vos priorités) au centre de chaque micro-portrait.
+
+Soit:
+- Le temps restant avant l'expiration naturelle
+- Le temps écoulé depuis l'infection
+- Le nombre d'applications]=]
+L["OPT_CENTERTEXT_DISABLED"] = "Désactivé"
+L["OPT_CENTERTEXT_ELAPSED"] = "Temps écoulé"
+L["OPT_CENTERTEXT_STACKS"] = "Nombre d'applications"
+L["OPT_CENTERTEXT_TIMELEFT"] = "Temps restant"
 L["OPT_CENTERTRANSP"] = "Transparence du centre"
 L["OPT_CENTERTRANSP_DESC"] = "Règle la transparence du centre"
 L["OPT_CHARMEDCHECK_DESC"] = "Si cochée, vous pourrez voir et guérir les unités possédées"
@@ -239,10 +249,13 @@ Les chiffres en vert indiquent la priorité du type d'affections. Cette priorit�
 (Pour changer l'ordre, dé-sélectionnez tous les types et cochez-les dans l'ordre souhaité)]=]
 L["OPT_CURINGORDEROPTIONS"] = "Types d'affections et priorités"
 L["OPT_CURSECHECK_DESC"] = "Si cochée, vous pourrez voir et guérir les unités maudites"
-L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "Autoriser l'édition de la macro (utilisateurs avancés seulement)"
-L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = [=[Cochez cela si vous voulez modifier la macro interne que Decursive utilisera pour votre sort personnalisé.
+L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "Autoriser la modification de la macro interne pour le sort ci-dessus"
+L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = [=[Cochez cela si vous voulez modifier la macro interne que Decursive utilisera pour le sort personnalisé que vous êtes en train d'ajouter.
 
 Note: En cochant cela vous pourrez modifier les sorts gérés par Decursive.
+
+Si un sort est déjà listé, il faudra d'abord le retirer pour activer cette option.
+
 (---Seulement pour les utilisateurs avancés---)]=]
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "Types d'afflictions"
 L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "Ce sort fait partie de la configuration automatique de Decursive. Si le sort ne fonctionne plus correctement, vous pouvez l'effacer pour retrouver le comportement par défaut de Decursive."
@@ -288,11 +301,14 @@ L["OPT_ENABLE_A_CUSTOM_SPELL"] = "Activer"
 L["OPT_ENABLEDEBUG"] = "Debug"
 L["OPT_ENABLEDEBUG_DESC"] = "Activer les informations de debuggage"
 L["OPT_ENABLEDECURSIVE"] = "Activer Decursive"
+L["OPT_ENABLE_LIVELIST"] = "Activer la liste des affligés"
+L["OPT_ENABLE_LIVELIST_DESC"] = [=[Affiche une liste des gens affligés.
+
+vous pouvez déplacer cette liste en déplaçant la barre de Decursive (tapper /DCRSHOW pour afficher cette barre)]=]
 L["OPT_FILTEROUTCLASSES_FOR_X"] = "%q sera ignoré sur les classes spécifiées pendant que vous êtes en combat."
 L["OPT_GENERAL"] = "Options générales"
 L["OPT_GROWDIRECTION"] = "Inverser l'affichage des micro-portraits"
 L["OPT_GROWDIRECTION_DESC"] = "Les micro-portraits seront affichés de bas en haut"
-L["OPT_HIDELIVELIST_DESC"] = "Si non cochée, affiche une liste des personnes affligés"
 L["OPT_HIDEMFS_GROUP"] = "en solo ou en groupe"
 L["OPT_HIDEMFS_GROUP_DESC"] = "Masque la fenêtre lorsque vous n'êtes pas dans un groupe de raid."
 L["OPT_HIDEMFS_NEVER"] = "Ne jamais masquer"
@@ -327,7 +343,7 @@ L["OPT_MACROBIND_DESC"] = [=[Définit la touche à partir de laquelle la macro '
 
 Appuyer sur la touche puis sur 'Entrée' pour sauvegarder la nouvelle affectation.]=]
 L["OPT_MACROOPTIONS"] = "Options de la macro"
-L["OPT_MACROOPTIONS_DESC"] = "Définit le comportement de la macro créée par Decursive"
+L["OPT_MACROOPTIONS_DESC"] = "Définit le comportement de la macro 'mouseover' créée par Decursive"
 L["OPT_MAGICCHARMEDCHECK_DESC"] = "Si cochée, vous pourrez voir et guérir les unités contrôlées par magie"
 L["OPT_MAGICCHECK_DESC"] = "Si cochée, vous pourrez voir et guérir les unités affectées par la magie"
 L["OPT_MAXMFS"] = "Nombre maximum d'unités affichées"
@@ -396,10 +412,6 @@ L["OPT_REVERSE_LIVELIST_DESC"] = "La liste des affectés se remplit de bas en ha
 L["OPT_SCANLENGTH_DESC"] = "Définit le temps entre chaque scan"
 L["OPT_SHOWBORDER"] = "Afficher la bordure colorée des classes"
 L["OPT_SHOWBORDER_DESC"] = "Une bordure colorée représentant la classe de l'unité est affichée autour des micro-portraits"
-L["OPT_SHOWCHRONO"] = "Afficher les chronomètres"
-L["OPT_SHOWCHRONO_DESC"] = "Le nombre de secondes écoulées depuis qu'une unité a été affecté est affiché."
-L["OPT_SHOWCHRONOTIMElEFT"] = "Temps restant"
-L["OPT_SHOWCHRONOTIMElEFT_DESC"] = "Affiche le temps restant au lieu du temps écoulé."
 L["OPT_SHOWHELP"] = "Affiche l'aide"
 L["OPT_SHOWHELP_DESC"] = "Affiche une bulle d'aide lorsque la souris passe au-dessus d'un micro-portrait"
 L["OPT_SHOWMFS"] = "Affiche la fenêtre de micro-portraits"
@@ -472,4 +484,4 @@ L["UNSTABLERELEASE"] = "Version instable"
 
 
 
-T._LoadedFiles["frFR.lua"] = "2.7.2.9";
+T._LoadedFiles["frFR.lua"] = "2.7.3";

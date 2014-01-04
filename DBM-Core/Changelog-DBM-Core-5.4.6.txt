@@ -1,0 +1,113 @@
+tag 5.4.6
+1e0f53dce5109b5621ca0a554ddeb618c766ef47
+subversion <svn@deadlybossmods.com>
+2013-12-20 11:19:53 +0100
+
+Tagging as 5.4.6
+
+
+--------------------
+
+subversion:
+	- increment version number to 5.4.6
+	- oops.
+	- tandanu via svn r10835: test commit to see if the curse issue is fixed
+	- nbluewiz via svn r10834: # Gain count voice volume (Kolt and Mosh).
+	- ultrashining via svn r10833: zhTW update
+	- Omega via svn r10832: incrim
+	- Omega via svn r10831: Can't wait forever, so doing an improper tag so users don't have to use broken out of date mods while they wait.
+	- nbluewiz via svn r10830: # Fix flash bar is not working.
+	- nbluewiz via svn r10829: # Fix move bar not starts as enlarged. # koKR update.
+	- Omega via svn r10828: oops, sometimes I forget how frame works
+	- Omega via svn r10827: Add smart clump check range finder to garrosh
+	- nbluewiz via svn r10826: # Debug to figure out rare icon bugs.
+	- Omega via svn r10825: shorten option text so it fits
+	- nbluewiz via svn r10824: # koKR update.
+	- nbluewiz via svn r10823: # Add scenario victory message.
+	- nbluewiz via svn r10822: # Add scenario in progress check.
+	- nbluewiz via svn r10821: # Fix bar flashing bug. # Fix non-working show timer recovery message. # koKR update.
+	- Omega via svn r10820: make all things match
+	- Omega via svn r10819: Some warning improvements for more clarifications. Some spells always have moveaway or moveto rules so more specific warnings useful. Maybe now people with debuff on ordos will be less likely to stand in group and annoy everyone. NOTE: Moveaway ~= Run away. Run away is running away from/kiting an attack. Move away is just telling you to look at your dang range finder and make sure no one is near you. Also, made the sha shear warning smarter on fallen protectors. Now it won't tell the inferno strike target to run out of group if they get targeted by sha shear. :)
+	- nbluewiz via svn r10818: # Core : Add Boss health frame block option. # Added DBM bar style option. Also added missing bar option to GUI. / Support bar height adjust. / BigWigs style bar (no animation) added.
+	- Omega via svn r10817: Trim args table. These events have never been used by any boss mod nor are they likely to be used by one either.
+	- Omega via svn r10816: Improve garrosh set icon
+	- nbluewiz via svn r10815: # Better Transcriptor support.
+James D. Callahan III:
+	- Added .pkgmeta directive for moving DBM-DMF
+subversion:
+	- Omega via svn r10814: Fix plants
+	- Omega via svn r10813: also add metzen to load CIDs for greench
+	- Omega via svn r10812: Split DMF from world events to reduce load time of both areas. re-enable loading in combat
+	- Omega via svn r10811: Prep
+	- Omega via svn r10810: Fix greench mod.
+	- nbluewiz via svn r10809: # Core : fix very stupid typo:)
+	- nbluewiz via svn r10808: # Core : Prevent rare error on multiple boss pulled. (Earth, wind and fire)
+	- Omega via svn r10807: Rename phase 1 ironstar spell since the current name is actually phase 4 version. Add phase 4 iron star warnings. Add smart interrupt warning for manifestrage that will only warn you if you are the iron star kiter. Fix bombardment timers. Added clump timer Added malice icon
+	- nbluewiz via svn r10806: # Paragons : Fix lua error.
+	- nbluewiz via svn r10805: # Core : Do not start/stop logging if already logging. # Core : Move Shield, Damaged, Healed health bar stuff to core. # GUI : Display warning on GUI load if invalid spell id found. # Kill invalid spell IDs.
+	- nbluewiz via svn r10804: # Core : removed trusted zone hack.
+	- Omega via svn r10803: improve EE hack. only trust status 0 in MoP raids. Also, don't let wipe endcombat fire after a success endcombat. if mod is out of combat when delay check fires, do nothing.
+	- nbluewiz via svn r10802: # Fix EE for ICC raids.
+	- ultrashining via svn r10801: zhTW update
+	- nbluewiz via svn r10800: # koKR update.
+	- Omega via svn r10799: fix box size
+	- Omega via svn r10798: split warnings and special warning in chat options
+	- nbluewiz via svn r10797: # Core : Small improve BossTargetScanner. # Fallen Protectors : Re-add Inferno Strike stuff. (Tested in LFR 10+ times) # Spoils, Thok : Adjust useless and duplicated special warning.
+	- Omega via svn r10796: Fix some stupid on paragons
+	- nbluewiz via svn r10795: # Core : Fix BossTargetScanner bug. # Norushen : Fix Manifestation switch warning.
+	- nbluewiz via svn r10794: # Sha of Pride : Fix mark CD, Enable Self Reflection countdown.
+	- nbluewiz via svn r10793: # Iron Qon : Fix some bug.
+	- Omega via svn r10792: fix another error
+	- nbluewiz via svn r10791: # Core : fix variable bug.
+	- nbluewiz via svn r10790: # Core : Rearrange function order. Merge duplicated function.
+	- Omega via svn r10789: Change siege engineer warning to a 4 second pre warn instead of a warning when it's coming out.
+	- Omega via svn r10788: Fix iron star timers and CDs (maybe) Readd flame arrow warning since some still prefer it, even if it does only prevent you from getting a 2nd tick at most.
+	- nbluewiz via svn r10787: # Fix stats table bug.
+	- nbluewiz via svn r10786: # Core : Kill ugly stats record code. Add IsHeroic() prototype.
+	- Omega via svn r10785: fix an option default screwup on paragons
+	- nbluewiz via svn r10784: # Core : Add duration information to timer callback # Twin Consorts : adjust crashing star.
+	- nbluewiz via svn r10783: # Core : Remove debug
+	- nbluewiz via svn r10782: # Core : Add more callbacks.
+	- nbluewiz via svn r10781: # Core : Added UnregisterCallback.
+	- nbluewiz via svn r10780: # Core : Added DBM_Message callback support.
+	- Omega via svn r10779: remove no longer needed IsEncounterInProgress check
+	- nbluewiz via svn r10778: # Core : 1. "C" sync combat start requires at least 3 person. / 2. Merge Timer Recovery and StartCombat.
+	- ultrashining via svn r10777: zhTW update
+	- nbluewiz via svn r10776: # Core : Security update.
+	- nbluewiz via svn r10775: # Core : Fix lua error. # Galakras : Fix phase timer not works.
+	- nbluewiz via svn r10774: # Core : Fix some stuff not working on timer recovery. Prevent spam UNIT_HEALTH call.
+	- Omega via svn r10773: Add some security.
+	- Omega via svn r10772: Support minsync revision for ENCOUNTER_END
+	- Omega via svn r10771: add elegon to the ES disable
+	- nbluewiz via svn r10770: # Core : Add "EE" sync.
+	- Omega via svn r10769: remove the no longer needed translations
+	- nbluewiz via svn r10768: # fix noESDetection.
+	- Omega via svn r10767: immerseus stuff
+	- nbluewiz via svn r10766: # Remove useless variable.
+	- nbluewiz via svn r10765: # Core : ES stuff update.
+	- Omega via svn r10764: add notices to 4 fights that will require update to fix ES pulls (since ES was in last release and those fights will have false starts from couple alpha versions)
+	- Omega via svn r10763: Had one false ENCOUNTER_START event with no ENCOUNTER_END event, so still need to schedule checkwipe on ES :\
+	- Omega via svn r10762: add minsync to those 4, to prevent bad pulls from the 2 or so alphas that ES didn't work out on.
+	- Omega via svn r10761: Disable ES on following bosses do to start being in a poor location Galakras, Norushen, paragons, spoils. These fights will keep using IEEU
+	- Omega via svn r10760: Make ENCOUNTER_START require type instead of always being on. there may be some mods we don't desire to use this method on.
+	- Omega via svn r10759: hack ES to behave as "combat" on 5.4.1 until patch is live everywhere.
+	- Omega via svn r10758: closer to the problem, this should fix it
+	- Omega via svn r10757: maybe fix ENCOUNTER_END. add more debug just in case it didn't.
+	- Omega via svn r10756: Test some ES changes in SoO mods (disabled all other combat detection in mods as well as disabled checkWipe function on ES mods)
+	- Omega via svn r10755: ##Add option to hide tooltips in combat. #Fix one timer on heroic garrosh.
+	- alcortes via svn r10754: Spanish update
+	- nbluewiz via svn r10753: # Updated Galakras combat start timer. (Needs Review)
+	- Omega via svn r10752: Added first pull combat timer for galakras Added optional spec warn for mesmerize target. Hopefully this one actually pushes to curse, last one didn't.
+	- Omega via svn r10751: Mesmerize fixes
+	- nbluewiz via svn r10750: # Core : fix icon set issue.
+	- nbluewiz via svn r10749: # Update LSM to r86. # Remove table in Durumu, small adjust to Twin Consorts.
+	- Omega via svn r10748: Improve paragons bug workaround. It isn't as simpe as .5, there is a variance. :\
+	- Omega via svn r10747: Bump LibSharedMedia to r85 to ensure a mod running broken r84 doesn't load broken euro characters.
+	- Omega via svn r10746: #Paragons of Klaxxi Updates: 1. Work around a blizzard bug where xaril does NOT cast Toxic Injection, causing colors not to be assigned until AFTER first catalyst cast. Now, the mod will detect this and delay debuff check until you have a color, before deciding if you are affected by the catalyst being cast or not. 2. Add icon option for mesmerize.
+	- ebmor via svn r10745: deDE update
+	- nbluewiz via svn r10744: # Core : Re-fix r10743 # koKR update.
+	- nbluewiz via svn r10743: # Fix rare lua error on mod load.
+	- Omega via svn r10742: ru update Garrosh: Remove broken icon setting on minions Added icon setting for MCs instead. Paragons: Several range frame improvements.
+	- nbluewiz via svn r10741: # Twin Consorts : Added corrupted healing stack warning.
+	- nbluewiz via svn r10740: # Small ToT Fix.
+	- tandanu via svn r10739: increment alpha version

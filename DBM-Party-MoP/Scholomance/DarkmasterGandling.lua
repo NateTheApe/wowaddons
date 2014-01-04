@@ -1,8 +1,9 @@
 local mod	= DBM:NewMod(684, "DBM-Party-MoP", 7, 246)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9469 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10728 $"):sub(12, -3))
 mod:SetCreatureID(59080)
+mod:SetEncounterID(1430)
 mod:SetZone()
 
 mod:RegisterCombat("combat")
@@ -32,7 +33,7 @@ end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)--Just until there is a better way
 	if msg:find("spell:113395") then
-		warnLesson:Show(DBM:GetFullNameByShortName(target))
+		warnLesson:Show(DBM:GetUnitFullName(target))
 		timerLessonCD:Start()
 	end
 end

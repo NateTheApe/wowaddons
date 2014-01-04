@@ -1,13 +1,13 @@
-## Interface: 50001
+## Interface: 50400
 ## Title: SellJunk
 ## Notes: Sells all junk in your inventory at once.
 ## Notes-zhTW: 一次販售掉你背包內的垃圾物品。
 ## Notes-zhCN: 一次贩卖掉你背包内的垃圾物品。
 ## Author: CrazyBenny of Stormrage-EU
 ## X-Email: cbenneh AT gmail DOT com
-## LastUpdate: 2012-09-22T20:15:16Z
-## Version: 3.0.8
-## X-Curse-Packaged-Version: 3.0.8
+## LastUpdate: 2013-11-29T20:40:03Z
+## Version: 3.0.10
+## X-Curse-Packaged-Version: 3.0.10
 ## X-Curse-Project-Name: SellJunk
 ## X-Curse-Project-ID: sell-junk
 ## X-Curse-Repository-ID: wow/sell-junk/mainline

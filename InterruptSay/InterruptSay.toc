@@ -1,8 +1,8 @@
-## Interface: 50001
+## Interface: 50400
 ## Title: |cff267EFFElphie's Interrupt Say|r
 ## Notes: You interrupted something! /iit
 ## Author: Elphie [Matanya of Arthas], qod
-## Version: 3.4.2
+## Version: 3.5.0
 ## Credits: Lythelia, qod
 ## E-mail: krys.the.ish@gmail.com (Elphie) or crickerbug@gmail.com (qod)
 ## SavedVariables: InterruptSayDB

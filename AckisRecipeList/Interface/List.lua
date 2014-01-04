@@ -251,23 +251,6 @@ function private.InitializeListFrame()
 		spell_tip:Hide()
 	end
 
-	local function Bar_OnClick(self)
-		local old_selected = ListFrame.selected_entry
-		ListFrame.selected_entry = nil
-
-		if old_selected and old_selected.button then
-			old_selected.button.selected_texture:Hide()
-			Bar_OnLeave(old_selected.button)
-		end
-		Bar_OnEnter(self)
-
-		local entry = ListFrame.entries[self.string_index]
-		if old_selected ~= entry then
-			self.selected_texture:Show()
-			ListFrame.selected_entry = entry
-		end
-	end
-
 	local function ListItem_OnClick(self, _, _)
 		local clicked_index = self.string_index
 
@@ -379,6 +362,28 @@ function private.InitializeListFrame()
 			end
 		end
 		ListFrame:Update(nil, true)
+	end
+
+	local function Bar_OnClick(self)
+		local old_selected = ListFrame.selected_entry
+		ListFrame.selected_entry = nil
+
+		if old_selected and old_selected.button then
+			old_selected.button.selected_texture:Hide()
+			Bar_OnLeave(old_selected.button)
+		end
+		Bar_OnEnter(self)
+
+		local entry = ListFrame.entries[self.string_index]
+		if old_selected ~= entry then
+			self.selected_texture:Show()
+			ListFrame.selected_entry = entry
+		end
+
+		if _G.IsModifierKeyDown() then
+			ListItem_OnClick(self)
+		end
+
 	end
 
 	-------------------------------------------------------------------------------
@@ -536,6 +541,7 @@ function private.InitializeListFrame()
 			trainer		= { flag = COMMON1.TRAINER,	field = "common1",	sv_root = obtain_filters },
 			vendor		= { flag = COMMON1.VENDOR,	field = "common1",	sv_root = obtain_filters },
 			worlddrop	= { flag = COMMON1.WORLD_DROP,	field = "common1",	sv_root = obtain_filters },
+			misc1		= { flag = COMMON1.MISC1,	field = "common1",	sv_root = obtain_filters },
 		}
 
 		local REP1 = private.REP_FLAGS_WORD1
@@ -974,7 +980,7 @@ function private.InitializeListFrame()
 		self:ClearLines()
 
 		local button_index = 1
-		local string_index = button_index + offset
+		local string_index = math.floor(button_index + offset)
 
 		-- Populate the buttons with new values
 		while button_index <= NUM_RECIPE_LINES and string_index <= num_entries do

@@ -214,8 +214,18 @@ function Gnosis:OptCreateBasicTables()
 				end,
 				width = "full",
 			},
-			autoloadoptions = {
+			resizeoptionsframe = {
 				order = 6,
+				name = Gnosis.L["OptResizeOptions"],
+				type = "toggle",
+				get = function(info) return Gnosis.s.bResizeOptions; end,
+				set = function(info,val)
+					Gnosis.s.bResizeOptions = val;
+				end,
+				width = "full",
+			},
+			autoloadoptions = {
+				order = 7,
 				name = Gnosis.L["OptEnAutoCreateOptons"],
 				type = "toggle",
 				get = function(info) return Gnosis.s.bAutoCreateOptions; end,
@@ -225,7 +235,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			rotctext = {
-				order = 7,
+				order = 8,
 				name = Gnosis.L["OptTimerScanEveryN"],
 				type = "range",
 				min = 10, max = 1000,
@@ -236,7 +246,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			locale = {
-				order = 8,
+				order = 9,
 				name = Gnosis.L["OptLocale"],
 				type = "select",
 				values = Gnosis.LSet,
@@ -249,7 +259,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			fsframe = {
-				order = 9,
+				order = 10,
 				name = Gnosis.L["OptFirstStartFrame"],
 				type = "execute",
 				func = function()
@@ -258,16 +268,16 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			ccbset = {
-				order = 10,
+				order = 11,
 				name = Gnosis.L["OptCreateCBSet"],
 				type = "execute",
 				func = function()
-					Gnosis:CreateBasicCastbarSet();
+					Gnosis:CreateCustomCastbarSet();
 				end,
 				width = "full",
 			},
 			impbars = {
-				order = 11,
+				order = 12,
 				name = Gnosis.L["OptImportBar"],
 				type = "execute",
 				func = function()
@@ -276,7 +286,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			expbars = {
-				order = 12,
+				order = 13,
 				name = Gnosis.L["OptExportAllBars"],
 				type = "execute",
 				func = function()
@@ -285,7 +295,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			respd = {
-				order = 13,
+				order = 14,
 				name = Gnosis.L["OptResetPlayerData"],
 				type = "execute",
 				func = function()
@@ -339,89 +349,158 @@ function Gnosis:OptCreateCTpage()
 			style = "dropdown",
 			width = "full",
 		},
-		bsound = {
+		soundgrp = {
 			order = 2,
-			name = Gnosis.L["OptPSoC"],
-			type = "toggle",
-			get = function(info) return Gnosis.s.ct.bsound; end,
-			set = function(info,val) Gnosis.s.ct.bsound = val; end,
+			name = " ",
+			type = "group",
+			inline = true,
+			args = {
+				bsound = {
+					order = 1,
+					name = Gnosis.L["OptPSoC"],
+					type = "toggle",
+					get = function(info) return Gnosis.s.ct.bsound; end,
+					set = function(info,val) Gnosis.s.ct.bsound = val; end,
+				},
+				sound = {
+					order = 2,
+					name = Gnosis.L["OptSnd"],
+					type = "select",
+					values = Gnosis.BlizzSounds,
+					get = function(info) return Gnosis.s.ct.sound; end,
+					set = function(info,val) Gnosis.s.ct.sound = val; end,
+					style = "dropdown",
+					width = "double",
+				},
+				playsound = {
+					order = 3,
+					name = Gnosis.L["OptPlaySnd"],
+					type = "execute",
+					func = function() if(Gnosis.s.ct.sound) then
+						 PlaySound(Gnosis.s.ct.sound, Gnosis.s.ct.channel and Gnosis.tSoundChannels[Gnosis.s.ct.channel] or Gnosis.tSoundChannels[1]); end
+					end,
+					width = "full",
+				},
+				bmusic = {
+					order = 4,
+					name = Gnosis.L["OptPMoC"],
+					type = "toggle",
+					get = function(info) return Gnosis.s.ct.bmusic; end,
+					set = function(info,val) Gnosis.s.ct.bmusic = val; end,
+				},		
+				music = {
+					order = 5,
+					name = Gnosis.L["OptMusic"],
+					type = "select",
+					dialogControl = "LSM30_Sound",
+					values = AceGUIWidgetLSMlists.sound,
+					get = function(info) return Gnosis.s.ct.music; end,
+					set = function(info,val) Gnosis.s.ct.music = val; end,
+					style = "dropdown",
+					width = "double",
+				},		
+				playmusic = {
+					order = 6,
+					name = Gnosis.L["OptPlayMusic"],
+					type = "execute",
+					func = function() if (Gnosis.s.ct.music) then
+						PlaySoundFile(self.lsm:Fetch("sound", Gnosis.s.ct.music),
+						Gnosis.s.ct.channel and Gnosis.tSoundChannels[Gnosis.s.ct.channel] or Gnosis.tSoundChannels[1]); end
+					end,
+					width = "full",
+				},
+				bfile = {
+					order = 7,
+					name = Gnosis.L["OptPFoC"],
+					type = "toggle",
+					get = function(info) return Gnosis.s.ct.bfile; end,
+					set = function(info,val) Gnosis.s.ct.bfile = val; end,
+				},
+				file = {
+					order = 8,
+					name = Gnosis.L["OptFile"],
+					type = "input",
+					get = function(info) return Gnosis.s.ct.file; end,
+					set = function(info,val)
+						Gnosis.s.ct.file = val;
+					end,
+					width = "double",
+				},
+				playfile = {
+					order = 9,
+					name = Gnosis.L["OptPlayFile"],
+					type = "execute",
+					func = function() if (Gnosis.s.ct.music) then
+						if (Gnosis.s.ct.file) then
+							PlaySoundFile(Gnosis.s.ct.file,
+							Gnosis.s.ct.channel and Gnosis.tSoundChannels[Gnosis.s.ct.channel] or Gnosis.tSoundChannels[1]); end
+						end
+					end,
+					width = "full",
+				},
+				playinchannel = {
+					order = 10,
+					name = "Play sound/music/file in channel",
+					type = "select",
+					values = Gnosis.tSoundChannels,
+					get = function(info) return Gnosis.s.ct.channel and Gnosis.s.ct.channel or 1; end,
+					set = function(info,val) Gnosis.s.ct.channel = val; end,
+					style = "dropdown",
+				},
+			},
 		},
-		bmusic = {
+		ctgroup = {
 			order = 3,
-			name = Gnosis.L["OptPMoC"],
-			type = "toggle",
-			get = function(info) return Gnosis.s.ct.bmusic; end,
-			set = function(info,val) Gnosis.s.ct.bmusic = val; end,
-		},
-		sound = {
-			order = 4,
-			name = Gnosis.L["OptSnd"],
-			type = "select",
-			values = Gnosis.BlizzSounds,
-			get = function(info) return Gnosis.s.ct.sound; end,
-			set = function(info,val) Gnosis.s.ct.sound = val; end,
-			style = "dropdown",
-		},
-		music = {
-			order = 5,
-			name = Gnosis.L["OptMusic"],
-			type = "select",
-			dialogControl = "LSM30_Sound",
-			values = AceGUIWidgetLSMlists.sound,
-			get = function(info) return Gnosis.s.ct.music; end,
-			set = function(info,val) Gnosis.s.ct.music = val; end,
-			style = "dropdown",
-		},
-		playsound = {
-			order = 6,
-			name = Gnosis.L["OptPlaySnd"],
-			type = "execute",
-			func = function() if(Gnosis.s.ct.sound) then
-				 PlaySound(Gnosis.s.ct.sound); end
-			end,
-		},
-		playmusic = {
-			order = 7,
-			name = Gnosis.L["OptPlayMusic"],
-			type = "execute",
-			func = function() if(Gnosis.s.ct.music) then
-				PlaySoundFile(self.lsm:Fetch("sound", Gnosis.s.ct.music)); end
-			end,
-		},
-		wfcl = {
-			order = 9,
-			name = Gnosis.L["OptWfCL_Name"],
-			desc = Gnosis.L["OptWfCL_Desc"],
-			type = "range",
-			min = 0, max = 1500,
-			step = 10, bigStep = 10,
-			get = function(info) return Gnosis.s.wfcl; end,
-			set = function(info,val) Gnosis.s.wfcl = val; end,
-			isPercent = false,
-		},
-		ctt = {
-			order = 10,
-			name = Gnosis.L["OptClipWarn_Name"],
-			desc = Gnosis.L["OptClipWarn_Desc"],
-			type = "range",
-			min = 0, max = 500,
-			step = 10, bigStep = 10,
-			get = function(info) return Gnosis.s.ctt; end,
-			set = function(info,val) Gnosis.s.ctt = val; end,
-			isPercent = false,
-		},
+			name = " ",
+			type = "group",
+			inline = true,
+			args = {
+				wfcl = {
+					order = 1,
+					name = Gnosis.L["OptWfCL_Name"],
+					desc = Gnosis.L["OptWfCL_Desc"],
+					type = "range",
+					min = 0, max = 1500,
+					step = 10, bigStep = 10,
+					get = function(info) return Gnosis.s.wfcl; end,
+					set = function(info,val) Gnosis.s.wfcl = val; end,
+					isPercent = false,
+					width = "full",
+				},
+				ctt = {
+					order = 2,
+					name = Gnosis.L["OptClipWarn_Name"],
+					desc = Gnosis.L["OptClipWarn_Desc"],
+					type = "range",
+					min = 0, max = 500,
+					step = 10, bigStep = 10,
+					get = function(info) return Gnosis.s.ctt; end,
+					set = function(info,val) Gnosis.s.ctt = val; end,
+					isPercent = false,
+					width = "full",
+				},
+			},
+		},			
 	};
 end
 
 function Gnosis:OptCreateNewCastbar(passedname, passedunit)
 	local name = passedname and passedname or self.s.nameNewBar;
 
-	if(name == "") then
+	if (name == "") then
 		self:Print(self.L["OptCreatenewbarInvalidName"]);
-	elseif(self.castbars[name] ~= nil) then
+	elseif (self.castbars[name] ~= nil) then
 		self:Print(self.L["OptCreatenewbarExists"]);
 	else
 		self.s.cbconf[name] = self:CreateDefaultBarTable(passedunit and passedunit or "player");
+		
+		if (IsShiftKeyDown()) then
+			-- convert to icon-like bar
+			for k, v in pairs(self.tIconLikeOverrides) do
+				self.s.cbconf[name][k] = v;
+			end
+		end
+		
 		self.castbars[name] = self:CreateBarFrame(name, nil, 0, 1.0);
 		self:SetBarParams(name);
 
@@ -449,18 +528,18 @@ end
 
 function Gnosis:OptCreateNewChanneledSpell()
 	local id = tonumber(self.s.nameNewSpell);
-
+	
 	if(id == nil) then
-		self:AddChanneledSpellByName(self.s.nameNewSpell, 1, 1, false, false);
+		self:AddChanneledSpellByName(self.s.nameNewSpell, 1, false, 1, false, false);
 	else
-		self:AddChanneledSpellById(id, 1, 1, false, false);
+		self:AddChanneledSpellById(id, 1, false, 1, false, false);
 	end
 
 	self:CreateChannelSpellsOpt();
 end
 
 function Gnosis:CreateChannelSpellsOpt()
-	local iCount = 4;
+	local iCount = 6;
 	local tCSs = {};
 
 	tCSs.newbarbutton = {
@@ -477,7 +556,7 @@ function Gnosis:CreateChannelSpellsOpt()
 		get = function(info) return Gnosis.s.nameNewSpell; end,
 		set = function(info,val) Gnosis.s.nameNewSpell = val; end,
 	};
-
+	
 	-- created sorted table
 	local tSorted = {};
 	for key, value in pairs(self.s.channeledspells) do
@@ -499,6 +578,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].ben; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].ben = val; end,
+					width = "full",
 				},
 				ticks = {
 					order = self:GetNextTableIndex(),
@@ -526,6 +606,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].baddticks; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].baddticks = val; end,
+					width = "full",
 				},
 				binit = {
 					order = self:GetNextTableIndex(),
@@ -533,6 +614,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].binit; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].binit = val; end,
+					width = "full",
 				},
 				baoe = {
 					order = self:GetNextTableIndex(),
@@ -540,6 +622,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].baoe; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].baoe = val; end,
+					width = "full",
 				},
 				bhidenp = {
 					order = self:GetNextTableIndex(),
@@ -547,6 +630,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].bhidenonplayer; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].bhidenonplayer = val; end,
+					width = "full",
 				},
 				bclip = {
 					order = self:GetNextTableIndex(),
@@ -554,6 +638,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].bcliptest; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].bcliptest = val; end,
+					width = "full",
 				},
 				bticksound = {
 					order = self:GetNextTableIndex(),
@@ -562,6 +647,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].bticksound; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].bticksound = val; end,
+					width = "full",
 				},
 				bcombattext = {
 					order = self:GetNextTableIndex(),
@@ -569,6 +655,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].bcombattext; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].bcombattext = val; end,
+					width = "full",
 				},
 				ctoutput = {
 					order = self:GetNextTableIndex(),
@@ -577,6 +664,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "input",
 					get = function(info) return  Gnosis.s.channeledspells[key].ctstring; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].ctstring = val; end,
+					width = "full",
 				},
 				bicon = {
 					order = self:GetNextTableIndex(),
@@ -617,6 +705,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					name = Gnosis.L["OptCSRemove"],
 					type = "execute",
 					func = function() Gnosis:RemoveChanneledSpell(key); end,
+					width = "full",
 				},
 			},
 		};
@@ -638,9 +727,17 @@ function Gnosis:GetNextTableIndexInner(resetto)
 end
 
 function Gnosis:CreateCastbarsOpt()
-	local iCount = 4;
+	local iCount = 6;
 	local tCBs = {};
 
+	-- created sorted table
+	local tSorted = {};
+	for key, value in pairs(self.castbars) do
+		table_insert(tSorted, key);
+	end
+	table_sort(tSorted);
+	
+	-- new bar button
 	tCBs.newbarbutton = {
 		order = 1,
 		name = Gnosis.L["OptCBNewCB_N"],
@@ -649,6 +746,7 @@ function Gnosis:CreateCastbarsOpt()
 		func = function() Gnosis:OptCreateNewCastbar(); end,
 	};
 
+	-- new barname text field
 	tCBs.newbarname = {
 		order = 2,
 		name = "",
@@ -657,14 +755,53 @@ function Gnosis:CreateCastbarsOpt()
 		get = function(info) return Gnosis.s.nameNewBar; end,
 		set = function(info,val) Gnosis.s.nameNewBar = val; end,
 	};
-
-	-- created sorted table
-	local tSorted = {};
-	for key, value in pairs(self.castbars) do
-		table_insert(tSorted, key);
-	end
-	table_sort(tSorted);
-
+	
+	-- lock all bars button
+	tCBs.lockallbars = {
+		order = 3,
+		name = Gnosis.L["OptCBLockAll_N"],
+		desc = Gnosis.L["OptCBLockAll_D"],
+		type = "execute",
+		func = function()
+			local bDidLock = false;
+			for k, v in pairs(self.castbars) do
+				if (Gnosis.s.cbconf[k].bUnlocked) then
+					Gnosis.s.cbconf[k].bUnlocked = false;
+					Gnosis:SetBarParams(k);
+					bDidLock = true;
+				end
+			end
+			
+			if (bDidLock) then
+				self:CreateCastbarsOpt();
+			end
+		end,
+		width = "half",
+	};
+	
+	-- unlock all bars button
+	tCBs.unlockallbars = {
+		order = 4,
+		name = Gnosis.L["OptCBUnlockAll_N"],
+		desc = Gnosis.L["OptCBUnlockAll_D"],
+		type = "execute",
+		func = function()
+			local bDidUnlock = false;
+			for k, v in pairs(self.castbars) do
+				if (not Gnosis.s.cbconf[k].bUnlocked) then
+					Gnosis.s.cbconf[k].bUnlocked = true;
+					Gnosis:SetBarParams(k);
+					bDidUnlock = true;
+				end
+			end
+			
+			if (bDidUnlock) then
+				self:CreateCastbarsOpt();
+			end
+		end,
+		width = "half",
+	};
+	
 	for keyindex, key in ipairs(tSorted) do
 		iCount = iCount + 1;
 		tCBs[key] = {
@@ -715,6 +852,14 @@ function Gnosis:CreateCastbarsOpt()
 					name = Gnosis.L["OptCBExportBar"],
 					type = "execute",
 					func = function() Gnosis:ExportBar(key); end,
+					width = "full",
+				},
+				exportcblink = {
+					order = self:GetNextTableIndex(),
+					name = Gnosis.L["OptCBExportBarChatlink_N"],
+					desc = Gnosis.L["OptCBExportBarChatlink_D"],
+					type = "execute",
+					func = function() Gnosis:ExportBarChatlink(key); end,
 					width = "full",
 				},				
 				removecb = {
@@ -1379,7 +1524,7 @@ function Gnosis:CreateCastbarsOpt()
 							name = Gnosis.L["OptCBBWListedSpells"],
 							desc = Gnosis.L["OptCBNewListElem_D"],
 							type = "input",
-							multiline = 10,
+							multiline = 15,
 							get = function(info)
 								return Gnosis:MultilineFromTable(Gnosis.s.cbconf[key].bnwlist);
 							end,
@@ -1509,9 +1654,10 @@ function Gnosis:LoadConfig(name, bMainTab, bCastbars, bChanneledSpells, bClipTes
 			local c = GnosisConfigs[name].maintab;
 			Gnosis.s.bAddonEn = c.bAddonEn;			-- already enabled
 			Gnosis.s.bHideAddonMsgs = c.bHideAddonMsgs;
-			Gnosis.s.bAutoCreateOptions = c.bAutoCreateOptions and c.bAutoCreateOptions or Gnosis.tDefaults.bAutoCreateOptions;
-			Gnosis.s.iTimerScanEvery = c.iTimerScanEvery and c.iTimerScanEvery or Gnosis.tDefaults.iTimerScanEvery;
-
+			Gnosis.s.bAutoCreateOptions = c.bAutoCreateOptions == nil and Gnosis.tDefaults.bAutoCreateOptions or c.bAutoCreateOptions;
+			Gnosis.s.iTimerScanEvery = c.iTimerScanEvery == nil and Gnosis.tDefaults.iTimerScanEvery or c.iTimerScanEvery;
+			Gnosis.s.bResizeOptions = c.bResizeOptions == nil and Gnosis.tDefaults.bResizeOptions or c.bResizeOptions;
+			
 			local strLocale = c.strLocale and c.strLocale or nil;
 			if(strLocale and Gnosis.s.strLocale ~= strLocale) then
 				Gnosis.s.strLocale = strLocale;
@@ -1764,6 +1910,7 @@ function Gnosis:OptSaveNewConfig(_name, _def, _cb, _cs, _ct)
 				GnosisConfigs[name].maintab.bAutoCreateOptions = self.s.bAutoCreateOptions;
 				GnosisConfigs[name].maintab.strLocale = self.s.strLocale;
 				GnosisConfigs[name].maintab.iTimerScanEvery = self.s.iTimerScanEvery;
+				GnosisConfigs[name].maintab.bResizeOptions = self.s.bResizeOptions;				
 			end
 
 			if(bcb) then
@@ -1832,7 +1979,7 @@ function Gnosis:CreateBarValueScript(key, tab)
 end
 
 function Gnosis:ExportAllBars()
-	if(self.s and self.s.cbconf) then
+	if (self.s and self.s.cbconf) then
 		local output = "";
 		
 		-- created sorted table
@@ -1843,14 +1990,11 @@ function Gnosis:ExportAllBars()
 		table_sort(tSorted);
 	
 		for i, cbname in ipairs(tSorted) do
-			if(self.s.cbconf[cbname]) then
-				local key_name = string_gsub(cbname, "\"", "\\\"");
-				local str = Gnosis:CreateBarValueScript("Gnosis.s.cbconf[\"" .. key_name .. "\"]", Gnosis.s.cbconf[cbname]);
-
-				if(str) then
-					local dispstr = "Gnosis:ImportBarInit(\"" .. key_name .. "\"); " .. str .. " Gnosis:ImportBarFinalize(\"" .. key_name .. "\");"
-					
-					output = output .. "--[[ Exported bar: " .. cbname .. " ]]\n" .. dispstr .. "\n\n";				
+			if (self.s.cbconf[cbname]) then
+				local barexpstr = Gnosis:ExportBarEncStr(cbname);
+				
+				if (barexpstr) then
+					output = output .. barexpstr .. "\n\n";
 				end
 			end
 		end
@@ -1882,42 +2026,50 @@ function Gnosis:ExportAllBars()
 end
 
 function Gnosis:ExportBar(key)
-	if(key) then
-		local key_name = string_gsub(key, "\"", "\\\"");
-		local str = Gnosis:CreateBarValueScript("Gnosis.s.cbconf[\"" .. key_name .. "\"]", Gnosis.s.cbconf[key]);
-
-		if(str) then
-			local dispstr = "Gnosis:ImportBarInit(\"" .. key_name .. "\"); " .. str .. " Gnosis:ImportBarFinalize(\"" .. key_name .. "\");";
-			
-			Gnosis.dialog:Register("GNOSIS_EXPORT",
-				{
-					text = string_format(Gnosis.L["CpyScriptFromEditBox"], key),
-					editboxes = {
-						{
-							width = 400,
-							height = 200,
-						},
+	local encstr = self:ExportBarEncStr(key);
+	
+	-- send 6bit encoded bar table information
+	if (encstr) then
+		Gnosis.dialog:Register("GNOSIS_EXPORT",
+			{
+				text = string_format(Gnosis.L["CpyScriptFromEditBox"], key),
+				editboxes = {
+					{
+						width = 400,
+						height = 200,
 					},
-					on_show = function(self, data) 
-						self.editboxes[1]:SetText(dispstr);
-						self.editboxes[1]:HighlightText();
-						self.editboxes[1]:SetFocus();
-					end,
-					hide_on_escape = false,
-					show_while_dead = true,
-					exclusive = true,
-					width = 420,
-					strata = 5,
-				}
-			);
-			
-			Gnosis.dialog:Spawn("GNOSIS_EXPORT");
-		end
+				},
+				on_show = function(self, data) 
+					self.editboxes[1]:SetText(encstr);
+					self.editboxes[1]:HighlightText();
+					self.editboxes[1]:SetFocus();
+				end,
+				hide_on_escape = false,
+				show_while_dead = true,
+				exclusive = true,
+				width = 420,
+				strata = 5,
+			}
+		);
+		
+		Gnosis.dialog:Spawn("GNOSIS_EXPORT");
+	end
+end
+
+function Gnosis:ExportBarChatlink(key)
+	local link = "[Gnosis:" .. UnitName("player") .. '-' .. GetRealmName() .. ":" ..
+		self:ExchangeEscapeSequenceChars(key, "\\:%[%]") .. "]";
+		
+	local eb = GetCurrentKeyBoardFocus();
+	if (eb) then
+		eb:Insert(link);
 	end
 end
 
 function Gnosis:ImportBarInit(key)
-	self:OptCreateNewCastbar(key);
+	if (self.castbars[key] == nil) then
+		self:OptCreateNewCastbar(key);
+	end
 end
 
 function Gnosis:ImportBarFinalize(key)
@@ -1941,9 +2093,15 @@ function Gnosis:ImportBars()
 					text = Gnosis.L["Import"],
 					on_click = function(self)
 						local str = self.editboxes[1]:GetText();
-						if(str and string_len(str) > 0) then
-							RunScript(str);
-							InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+						if (str and string_len(str) > 0) then
+							-- import by executing lua script
+							local func, errorMessage = loadstring(str, "import");
+							if (func) then
+								func();
+								InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+							else
+								Gnosis:ImportBarsFromStr(str);
+							end								
 						end
 					end,
 				},

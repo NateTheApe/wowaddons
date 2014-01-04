@@ -102,11 +102,7 @@ L:SetWarningLocalization({
 
 L:SetOptionLocalization({
 	WarningSplitSoon	= "Mostrar pre-aviso para Separación (54%)",
-	RangeFrame			= "Mostrar distancia (12 yardas)",
-	SetIconOnBrand		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74505)
-})
-
-L:SetMiscLocalization({
+	RangeFrame			= "Mostrar distancia (12 yardas)"
 })
 
 -------------------------
@@ -118,19 +114,9 @@ L:SetGeneralLocalization({
 	name = "Saviana Furia Ardiente"
 })
 
-L:SetWarningLocalization({
-	SpecialWarningTranq		= "Enrage ¡Tranquilizadlo!"
-})
-
 L:SetOptionLocalization({
-	SpecialWarningTranq		= "Mostrar aviso especial para $spell:78722 (para tranquilizar)",
-	RangeFrame				= "Mostrar distancia (10 yardas)",
-	BeaconIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74453)
+	RangeFrame				= "Mostrar distancia (10 yardas)"
 })
-
-L:SetMiscLocalization{
-}
-
 
 --------------------------
 --  General Zarithrian  --
@@ -152,8 +138,7 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	WarnAdds		= "Anunciar nuevos adds",
-	TimerAdds		= "Mostrar tiempo para nuevos adds",
-	warnCleaveArmor	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(74367)
+	TimerAdds		= "Mostrar tiempo para nuevos adds"
 })
 
 L:SetMiscLocalization({
@@ -171,14 +156,10 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	WarnPhase2Soon		= "Fase 2 pronto",
-	WarnPhase3Soon		= "Fase 3 pronto",
 	TwilightCutterCast	= "Casteando Corte Crepuscular: 5 seg"
 })
 
 L:SetOptionLocalization({
-	WarnPhase2Soon			= "Mostrar pre-aviso para Fase 2 (al ~79%)",
-	WarnPhase3Soon			= "Mostrar pre-aviso para Fase 3 (al ~54%)",
 	TwilightCutterCast		= "Mostrar aviso cuando $spell:77844 se esté casteando",
 	AnnounceAlternatePhase	= "Mostrar también avisos/tiempos de la fase en la que no estás",
 	SoundOnConsumption		= "Reproducir sonido en $spell:74562 y $spell:74792",

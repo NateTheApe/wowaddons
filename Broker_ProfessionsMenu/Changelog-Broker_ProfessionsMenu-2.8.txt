@@ -1,0 +1,24 @@
+------------------------------------------------------------------------
+r135 | pathur | 2013-09-26 16:10:14 +0000 (Thu, 26 Sep 2013) | 1 line
+Changed paths:
+   A /tags/2.8 (from /trunk:134)
+
+Tagged as 2.8
+------------------------------------------------------------------------
+r132 | pathur | 2013-09-26 15:57:14 +0000 (Thu, 26 Sep 2013) | 1 line
+Changed paths:
+   M /trunk/Broker_ProfessionsMenu.toc
+   M /trunk/core.lua
+   M /trunk/dropdownmenu.lua
+
+- Reintroduced the possibility to view the professions of your alts with a self made frame incl. search (wow trade links of your alts don't work anymore cause of patch 5.4, so linking professions to other player is not possible)
+------------------------------------------------------------------------
+r131 | pathur | 2013-09-25 09:39:15 +0000 (Wed, 25 Sep 2013) | 2 lines
+Changed paths:
+   M /trunk/core.lua
+   M /trunk/dropdownmenu.lua
+   A /trunk/icons/nofav.tga
+
+- Removed the possibility to view the professions of your alts (this is not possible anymore as of patch 5.4!)
+- Fixed an incompatibility to the addon Skinner (Favstars disappeared)
+------------------------------------------------------------------------

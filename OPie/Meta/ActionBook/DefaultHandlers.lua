@@ -1,6 +1,5 @@
-local AB = assert(OneRingLib.ext.ActionBook:compatible(1,7), "Requires a compatible ActionBook library version")
-
-local spellFeedback, itemFeedback
+local AB, _, T = assert(OneRingLib.ext.ActionBook:compatible(1,8), "Requires a compatible ActionBook library version"), ...
+local EV, spellFeedback, itemFeedback = T.Evie
 
 do -- spell: player's spellbook, mounts
 	local function currentShapeshift()
@@ -27,8 +26,8 @@ do -- spell: player's spellbook, mounts
 		function OneRingLib.xlu.companionSpellCache(sname)
 			return companionMap[sname]
 		end
-		EC_Register("COMPANION_LEARNED", "AB.handlers.companion", companionUpdate)
-		EC_Register("PLAYER_ENTERING_WORLD", "AB.handlers.companion", companionUpdate)
+		EV.RegisterEvent("COMPANION_LEARNED", companionUpdate)
+		EV.RegisterEvent("PLAYER_ENTERING_WORLD", companionUpdate)
 	end
 
 	local function SetSpellBookItem(self, id)
@@ -48,8 +47,8 @@ do -- spell: player's spellbook, mounts
 			end
 			return usable and cdStart == 0, active and 1 or 0, icon, cname, 0, (cdStart or 0) > 0 and (cdStart+cdLength-time) or 0, cdLength, GameTooltip.SetSpellByID, csid
 		end
-		local inRange, usable, nomana = IsSpellInRange(n, aid == false and target or "target"), IsUsableSpell(n)
-		local usable, cooldown, cdLength, enabled = usable and inRange ~= 0, GetSpellCooldown(n)
+		local inRange, usable, nomana = IsSpellInRange(n, aid == false and target or "target") ~= 0, IsUsableSpell(n)
+		local usable, cooldown, cdLength, enabled = usable and inRange, GetSpellCooldown(n)
 		local cdLeft = (cooldown or 0) > 0 and (enabled ~= 0) and (cooldown + cdLength - time) or 0
 		local count, charges, maxCharges, chargeStart, chargeDuration = GetSpellCount(n), GetSpellCharges(n)
 		local state = ((IsSelectedSpellBookItem(n) or IsCurrentSpell(n) or n == currentShapeshift() or enabled == 0) and 1 or 0) +
@@ -86,7 +85,7 @@ do -- spell: player's spellbook, mounts
 		
 		return csidMap[id] and "Mount" or "Spell", name2 or name, icon2 or icon, nil, GameTooltip.SetSpellByID, id
 	end)
-	EC_Register("SPELLS_CHANGED", "ActionBook.spell.notify", function() AB:notify("spell") end)
+	EV.RegisterEvent("SPELLS_CHANGED", function() AB:notify("spell") end)
 end
 do -- item: an item by ID, inventory slot
 	local actionMap, itemIdMap, lastSlot = {}, {}, INVSLOT_LAST_EQUIPPED
@@ -102,8 +101,8 @@ do -- item: an item by ID, inventory slot
 		end
 		local iid, cdStart, cdLen, cdEnabled = (link and tonumber(link:match("item:(%d+)"))) or itemIdMap[aid]
 		if iid then cdStart, cdLen, cdEnabled = GetItemCooldown(iid) end
-		local inRange = IsItemInRange(ident, aid == false and target or "target")
-		return (cdLen or 0) == 0 and ((GetItemSpell(ident) == nil) or (IsUsableItem(ident) and inRange ~= 0)), (IsCurrentItem(ident) and 1 or 0) + (inRange ~= 0 and 0 or 16),
+		local inRange = IsItemInRange(ident, aid == false and target or "target") ~= 0
+		return (cdLen or 0) == 0 and ((GetItemSpell(ident) == nil) or (IsUsableItem(ident) and inRange)), (IsCurrentItem(ident) and 1 or 0) + (inRange and 0 or 16),
 			icon or GetItemIcon(ident), name or ident, GetItemCount(ident, false, true) or 0,
 			(cdStart or 0) > 0 and (cdStart - GetTime() + cdLen) or 0, cdLen or 0,
 			iid and GameTooltip.SetItemByID, iid
@@ -123,9 +122,7 @@ do -- item: an item by ID, inventory slot
 		end
 		return actionMap[name]
 	end, function(id) return "Item", GetItemInfo(id), GetItemIcon(id), nil, GameTooltip.SetItemByID, tonumber(id) end, {"byName", "forceShow", "onlyEquipped"})
-	EC_Register("BAG_UPDATE", "ActionBook.item.notify", function()
-		AB:notify("item")
-	end)
+	EV.RegisterEvent("BAG_UPDATE", function() AB:notify("item") end)
 end
 do -- macro, macrotext: built in macro (by name) or custom macros (by text)
 	local castAlias = {[SLASH_CAST1]=0,[SLASH_CAST2]=0,[SLASH_CAST3]=0,[SLASH_CAST4]=0,[SLASH_USE1]=0,[SLASH_USE2]=0,[SLASH_STOPMACRO1]=2,[SLASH_STOPMACRO2]=2,[SLASH_CASTSEQUENCE1]=3,[SLASH_CASTSEQUENCE2]=3,[SLASH_CASTRANDOM1]=4,[SLASH_CASTRANDOM2]=4}
@@ -231,21 +228,33 @@ do -- macro, macrotext: built in macro (by name) or custom macros (by text)
 		local _, _, ico = hint(compactMacros[macrotext])
 		return "Custom Macro", "", ico
 	end)
-	EC_Register("UPDATE_MACROS", "AB.macro", function() AB:notify("macro") end)
+	EV.RegisterEvent("UPDATE_MACROS", function() AB:notify("macro") end)
 	AB:miscaction("macrotext", "")
 end
 do -- battlepet (pet id)
-	local petAction, actionPet = {}, {}
+	local petAction, actionPet, tipIdt, tipLvt = {}, {}, {}, {}
+	local function tip(self, id)
+		local sid, cname, lvl, xp, mxp, _, _, name, icon, ptype, _, _, _, _, cb = C_PetJournal.GetPetInfoByPetID(id)
+		if not sid then return false end
+		local hp, mhp, ap, spd, rarity = C_PetJournal.GetPetStats(id)
+		local qc, nc, icof = ITEM_QUALITY_COLORS[rarity-1], HIGHLIGHT_FONT_COLOR, "|TInterface\\PetBattles\\PetBattle-StatIcons:0:0:0:0:32:32:%d:%d:%d:%d|t %s"
+		self:AddLine(cname or name, qc.r, qc.g, qc.b)
+		if cb then
+			self:AddLine(UNIT_TYPE_LEVEL_TEMPLATE:format(lvl, _G["BATTLE_PET_NAME_".. ptype]), nc.r, nc.g, nc.b)
+			self:AddLine(icof:format(0, 16, 0, 16, ap) .. "   " .. icof:format(0, 16, 16, 32, spd) .. "   " .. icof:format(16,32,16,32, hp < mhp and (hp .. "/" .. mhp) or hp), nc.r, nc.g, nc.b)
+		end
+	end
 	local function hint(id)
 		local pid = actionPet[id]
 		local sid, cn, _, _, _, _, _, n, tex = C_PetJournal.GetPetInfoByPetID(pid)
-		local start, duration, enabled = C_PetJournal.GetPetCooldownByGUID(pid)
-		local cdLeft = (cooldown or 0) > 0 and (enabled ~= 0) and (cooldown + duration - time)
-		return not not sid, C_PetJournal.GetSummonedPetGUID() == pid and 1 or 0, tex, cn or n or "", cdLeft or 0, duration or 0, 0
+		local cooldown, duration, enabled = C_PetJournal.GetPetCooldownByGUID(pid)
+		local cdLeft = (cooldown or 0) > 0 and (enabled ~= 0) and (cooldown + duration - GetTime())
+		return sid and not cdLeft, C_PetJournal.GetSummonedPetGUID() == pid and 1 or 0, tex, cn or n or "", 0, cdLeft or 0, duration or 0, tip, pid
 	end
 	local function create(pid)
-		if type(pid) == "number" then return create(("0x%016x"):format(pid)) end
+		if type(pid) == "number" then return create(("0x%016X"):format(pid)) end
 		if not C_PetJournal.GetPetInfoByPetID(pid) then return end
+		pid = pid:gsub("%x", string.upper)
 		if not petAction[pid] then
 			petAction[pid] = AB:create("func", hint, C_PetJournal.SummonPetByGUID, pid)
 			actionPet[petAction[pid]] = pid
@@ -253,10 +262,10 @@ do -- battlepet (pet id)
 		return petAction[pid]
 	end
 	local function describe(pid)
-		if type(pid) == "number" then return describe(("0x%016x"):format(pid)) end
+		if type(pid) == "number" then return describe(("0x%016X"):format(pid)) end
 		local _, cn, lvl, _, _, _, _, n, tex = C_PetJournal.GetPetInfoByPetID(pid)
 		if (cn or n) and ((lvl or 0) > 1) then cn = "[" .. lvl .. "] " .. (cn or n) end
-		return "Battle Pet", cn or n or ("#" .. tostring(pid)), tex
+		return "Battle Pet", cn or n or ("#" .. tostring(pid)), tex, nil, tip, pid
 	end
 	AB:register("battlepet", create, describe)
 end
@@ -348,8 +357,8 @@ do -- extrabutton: extra action bar button 1
 			return false, 0, "Interface/Icons/temp", "", 0, 0, 0
 		end
 		local at, aid = GetActionInfo(slot)
-		local inRange, usable, nomana = IsActionInRange(slot), IsUsableAction(slot)
-		local usable, cooldown, cdLength, enabled = usable and inRange ~= 0, GetActionCooldown(slot)
+		local inRange, usable, nomana = IsActionInRange(slot) ~= 0, IsUsableAction(slot)
+		local usable, cooldown, cdLength, enabled = usable and inRange, GetActionCooldown(slot)
 		local cdLeft = (cooldown or 0) > 0 and (enabled ~= 0) and (cooldown + cdLength - GetTime()) or 0
 		local count, charges, maxCharges = GetActionCount(slot), GetActionCharges(slot)
 		local state = ((IsCurrentAction(slot) or enabled == 0) and 1 or 0) +
@@ -371,4 +380,69 @@ do -- extrabutton: extra action bar button 1
 		return "Extra Action Button", name, tex
 	end, {"forceShow"})
 	AB:miscaction("extrabutton", 1)
+end
+do -- petspell: pet spellbook
+	local spellID, actionID = {}, {}
+	local actionInfo = { {"Interface\\Icons\\Spell_Nature_TimeStop", "PET_ACTION_WAIT"}, {"Interface\\Icons\\Ability_Hunter_Pet_Goto", "PET_ACTION_MOVE_TO", 1}, {"Interface\\Icons\\Ability_Tracking", "PET_ACTION_FOLLOW"}, {"Interface\\Icons\\Ability_GhoulFrenzy", "PET_ACTION_ATTACK"},
+		{"Interface\\Icons\\Ability_Defend", "PET_MODE_DEFENSIVE"}, {"Interface\\Icons\\Ability_Hunter_Pet_Assist", "PET_MODE_ASSIST"}, {"Interface\\Icons\\Ability_Seal", "PET_MODE_PASSIVE"} }
+	local reqSpell do
+		local _, class = UnitClass("player")
+		reqSpell = class == "HUNTER" and 93321 or class == "WARLOCK" and 93375
+		reqSpell = reqSpell and ("FindSpellBookSlotBySpellID(" .. reqSpell .. ", false) and ") or ""
+	end
+	local function petTip(self, slot)
+		return self:SetSpellBookItem(slot, "pet")
+	end
+	local function hint(id)
+		local sid = spellID[id]
+		if not sid then
+		elseif sid < 0 and sid > -8 then
+			local info, slot = actionInfo[-sid]
+			local ico, name, slot = info[1], info[2], info[3]
+			if GetSpellBookItemTexture(slot or 0, "pet") ~= ico then
+				slot = nil
+				for i=1,HasPetSpells() or 0 do
+					if GetSpellBookItemTexture(i, "pet") == ico and GetSpellBookItemInfo(i, "pet") == "PETACTION" then
+						info[3], slot = i, i
+						break
+					end
+				end
+			end
+			return not not slot, slot and IsSelectedSpellBookItem(slot, "pet") and 1 or 0, ico, _G[name] or (slot and GetSpellBookItemName(i, "pet")) or "", 0, 0, 0, slot and petTip or nil, slot
+		else
+			return spellFeedback(sid, nil, sid)
+		end
+	end
+	local function create(id)
+		if type(id) == "number" and id > 0 and not actionID[id] then
+			local aid = AB:create("conditional", hint, "-- \nreturn " .. reqSpell .. "FindSpellBookSlotBySpellID(" .. id .. ", true) or nil", "attribute", "type","spell", "spell",id)
+			actionID[id], spellID[aid] = aid, id
+		end
+		return actionID[id]
+	end
+	local function describe(id)
+		if type(id) ~= "number" then
+			local aid = actionID[id]
+			if not aid then return end
+			local _, _, icon, name, _, _, _, tipf, tipa = hint(aid)
+			local _, st = GetSpellBookItemName(tipa or 0, "pet")
+			return st or "Pet Ability", name, icon, nil, tipf, tipa
+		end
+		local name, _, icon = GetSpellInfo(id)
+		return "Pet Ability", name, icon, nil, GameTooltip.SetSpellByID, id
+	end
+	local cnd = "[@pet,help,novehicleui]"
+	if reqSpell ~= "" then
+		cnd = ("-- \nreturn %s SecureCmdOptionParse(%q)"):format(reqSpell, cnd)
+	end
+	actionID.stay = AB:create("conditional", hint, cnd, "attribute", "type","macro", "macrotext",SLASH_PET_STAY1)
+	actionID.move = AB:create("conditional", hint, cnd, "attribute", "type","macro", "macrotext",SLASH_PET_MOVE_TO1)
+	actionID.follow = AB:create("conditional", hint, cnd, "attribute", "type","macro", "macrotext",SLASH_PET_FOLLOW1)
+	actionID.attack = AB:create("conditional", hint, cnd, "attribute", "type","macro", "macrotext",SLASH_PET_ATTACK1)
+	actionID.defend = AB:create("conditional", hint, cnd, "attribute", "type","macro", "macrotext",SLASH_PET_DEFENSIVE1)
+	actionID.assist = AB:create("conditional", hint, cnd, "attribute", "type","macro", "macrotext",SLASH_PET_ASSIST1)
+	actionID.passive = AB:create("conditional", hint, cnd, "attribute", "type","macro", "macrotext",SLASH_PET_PASSIVE1)
+	spellID[actionID.stay], spellID[actionID.move], spellID[actionID.follow], spellID[actionID.attack] = -1, -2, -3, -4
+	spellID[actionID.defend], spellID[actionID.assist], spellID[actionID.passive] = -5, -6, -7
+	AB:register("petspell", create, describe)
 end

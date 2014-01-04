@@ -1,0 +1,213 @@
+2013-12-15  sylvanaar  <sylvanaar@mindspring.com>
+
+[fa2f25805f4b] [tip]
+* Prat.iml, modules/Editbox.lua:
+
+reverse up and down meaning in chat command history
+
+
+2013-12-01  sylvanaar  <sylvanaar@mindspring.com>
+
+[1df1e5e2be63]
+* modules/Editbox.lua:
+
+Handle empty cmdhistory in already pushed code
+
+
+[7ea08a1b9f48]
+* modules/Editbox.lua:
+
+Based on code suggested by Torhal (perhaps from CrappyChatFix), but uses the
+updated command history supplied by the history module
+
+
+[47e0a3d14b5e]
+* modules/History.lua:
+
+Rework editbox history to be per-frame.
+
+
+2013-09-24  sylvanaar  <sylvanaar@mindspring.com>
+
+[dc67592f1e08]
+* addon/options.lua, modules/AddonMessages.lua, modules/Alias.lua, modules/Buttons.lua, modules/ChatFrames.lua, modules/ChatLog.lua, modules/ChatTabs.lua, modules/Clear.lua, modules/CopyChat.lua, modules/Filtering.lua, modules/Font.lua, modules/OriginalButtons.lua, modules/OriginalEditbox.lua, modules/Paragraph.lua, modules/PopupMessage.lua, modules/Scroll.lua, modules/Substitutions.lua:
+
+added localizations for itIT and ptBR
+
+
+[3f95c872554a]
+* modules/Editbox.lua:
+
+Added localized note about ALT key requirement.
+
+
+[880cd2fecd91]
+* .idea/compiler.xml, Prat.iml, modules/ChannelSticky.lua, modules/Editbox.lua:
+
+Instance chat sticky name corrections. fixes #673
+
+
+2013-09-11  sylvanaar  <sylvanaar@mindspring.com>
+
+[e12c86917973]
+* modules/CopyChat.lua:
+
+Use wipe to clear the lines arrays in every case to be consistent.
+
+
+[22b759aba83e]
+* addon/addon.lua:
+
+Prevent string overflow when using /pratdebugmsg with a chatframe besides
+chatframe1 active.
+
+
+[ed43118b1d13]
+* services/chatsections.lua:
+
+Support raid groups in chat, ie {g1} etc
+
+
+2013-09-10  sylvanaar  <sylvanaar@mindspring.com>
+
+[1f8efbf3d35a]
+* .hgtags:
+
+Added tag 3.5.7 for changeset 60bf58c958a0
+
+
+[60bf58c958a0] [3.5.7]
+* Prat-3.0.toc, libraries/Prat-3.0_Libraries.toc, pullouts/!AddMsgFilterReport/!AddMsgFilterReport.toc, pullouts/Prat-3.0_Debug/Prat-3.0_Debug.toc, pullouts/Prat-3.0_Experimental/Prat-3.0_Experimental.toc, pullouts/Prat-3.0_HighCPUUsageModules/Prat-3.0_HighCPUUsageModules.toc, pullouts/Prat-3.0_Loader/Prat-3.0_Loader.toc, samples/MyGuildAlts/MyGuildAlts.toc:
+
+TOC 50400
+
+
+2013-05-22  sylvanaar  <sylvanaar@mindspring.com>
+
+[914976b80480]
+* .hgtags:
+
+Added tag 3.5.6 for changeset ff0d8159f7fa
+
+
+[ff0d8159f7fa] [3.5.6]
+* Prat-3.0.toc, libraries/Prat-3.0_Libraries.toc, pullouts/!AddMsgFilterReport/!AddMsgFilterReport.toc, pullouts/Prat-3.0_Debug/Prat-3.0_Debug.toc, pullouts/Prat-3.0_Experimental/Prat-3.0_Experimental.toc, pullouts/Prat-3.0_HighCPUUsageModules/Prat-3.0_HighCPUUsageModules.toc, pullouts/Prat-3.0_Loader/Prat-3.0_Loader.toc, samples/MyGuildAlts/MyGuildAlts.toc:
+
+TOC 50300
+
+
+2013-03-08  sylvanaar  <sylvanaar@mindspring.com>
+
+[3217079210a6]
+* .hgtags:
+
+Added tag 3.5.5 for changeset a1eac862858c
+
+
+[a1eac862858c] [3.5.5]
+* services/chatsections.lua:
+
+Get the correct typeId for the chat history.
+
+
+[4444533279b0]
+* modules/AltNames.lua:
+
+Disable the dropdown menus for setting alt names.
+
+
+[0f262a8ddeee]
+* Prat-3.0.toc, libraries/Prat-3.0_Libraries.toc, pullouts/!AddMsgFilterReport/!AddMsgFilterReport.toc, pullouts/Prat-3.0_Debug/Prat-3.0_Debug.toc, pullouts/Prat-3.0_Experimental/Prat-3.0_Experimental.toc, pullouts/Prat-3.0_HighCPUUsageModules/Prat-3.0_HighCPUUsageModules.toc, pullouts/Prat-3.0_Loader/Prat-3.0_Loader.toc, samples/MyGuildAlts/MyGuildAlts.toc:
+
+Update TOCs to 50200
+
+
+2013-02-10  sylvanaar  <sylvanaar@mindspring.com>
+
+[7d439dea2219]
+* .hgtags:
+
+Added tag 3.5.4 for changeset 42459ee99a38
+
+
+2013-02-10  funkydude  <funkydude>
+
+[42459ee99a38] [3.5.4]
+* .pkgmeta, Prat-3.0.toc, libraries/Prat-3.0_Libraries.toc, libraries/includes.xml, modules/OriginalButtons.lua, modules/PopupMessage.lua:
+
+Prevent talent blocking by 1) Replacing UIFrameFlash calls with animations and 2) Embedding LibChatAnims
+
+
+2012-12-03  pompachomp  <pompachomp>
+
+[e3954d7c1ff8]
+* addon/locales.lua:
+
+dummy commit to catch the changes to the loc app... "Battleground Channel" to "Instance Channel"
+
+
+2012-12-02  Talyrius  <talyrius@gmail.com>
+
+[e87e0ddea945]
+* Bindings.xml, modules/ChannelNames.lua, modules/ChannelSticky.lua, modules/CustomFilters.lua, modules/Keybindings.lua, modules/PlayerNames.lua, modules/Sounds.lua, services/events.lua:
+
+Removed BATTLEGROUND / BATTLEGROUND_LEADER
+Added INSTANCE_CHAT / INSTANCE_CHAT_LEADER
+
+
+2012-11-27  sylvanaar  <sylvanaar@mindspring.com>
+
+[d4737ad0851b]
+* .hgtags:
+
+Added tag 3.5.3 for changeset c997b2d8ee38
+
+
+[c997b2d8ee38] [3.5.3]
+* modules/ChannelSticky.lua:
+
+smartgroup chat commmand conflicts with group loot command. just removing smart group.
+
+
+[4005766e8ad8]
+* .hgtags:
+
+Added tag 3.5.2 for changeset 97504f6e31fb
+
+
+[97504f6e31fb] [3.5.2]
+* Prat-3.0.toc, libraries/Prat-3.0_Libraries.toc, pullouts/!AddMsgFilterReport/!AddMsgFilterReport.toc, pullouts/Prat-3.0_Debug/Prat-3.0_Debug.toc, pullouts/Prat-3.0_Experimental/Prat-3.0_Experimental.toc, pullouts/Prat-3.0_HighCPUUsageModules/Prat-3.0_HighCPUUsageModules.toc, pullouts/Prat-3.0_Loader/Prat-3.0_Loader.toc, samples/MyGuildAlts/MyGuildAlts.toc:
+
+TOC 50100
+
+
+[09fecc227779]
+* modules/ChannelSticky.lua:
+
+stick chat type error
+
+
+2012-09-30  sylvanaar  <sylvanaar@mindspring.com>
+
+[7bfd7dfcac1f]
+* .hgtags:
+
+Added tag 3.5.1 for changeset dbdcda8ee22e
+
+
+2012-09-10  nebula  <nebula@the-syn.com>
+
+[dbdcda8ee22e] [3.5.1]
+* modules/PlayerNames.lua:
+
+Fix battle.net names
+
+
+2012-09-10  sylvanaar  <sylvanaar@mindspring.com>
+
+[57870b6cb583]
+* modules/PlayerNames.lua:
+
+Use BNTokenFindName instead of BNTokenCombineGivenAndSurname
+
+

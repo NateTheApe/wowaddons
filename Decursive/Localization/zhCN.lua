@@ -1,7 +1,7 @@
 ﻿--[[
     This file is part of Decursive.
     
-    Decursive (v 2.7.2.9) add-on for World of Warcraft UI
+    Decursive (v 2.7.3) add-on for World of Warcraft UI
     Copyright (C) 2006-2007-2008-2009-2010-2011-2012 John Wellesz (archarodim AT
     teaser.fr) ( http://www.2072productions.com/to/decursive.php )
 
@@ -74,7 +74,7 @@ T._LoadedFiles["zhCN.lua"] = false;
 local L = LibStub("AceLocale-3.0"):NewLocale("Decursive", "zhCN");
 
 if not L then
-    T._LoadedFiles["zhCN.lua"] = "2.7.2.9";
+    T._LoadedFiles["zhCN.lua"] = "2.7.3";
     return;
 end;
 
@@ -109,8 +109,8 @@ L["CLASS_HUNTER"] = "猎人"
 L["CLEAR_PRIO"] = "C"
 L["CLEAR_SKIP"] = "C"
 L["COLORALERT"] = "当“%s”需要时设置预警颜色。"
-L["COLORCHRONOS"] = "秒表"
-L["COLORCHRONOS_DESC"] = "设置秒表颜色"
+L["COLORCHRONOS"] = "中央计数器"
+L["COLORCHRONOS_DESC"] = "设置中央计数器颜色"
 L["COLORSTATUS"] = "设定“%s”时微单元框体的颜色。"
 L["CTRL"] = "Ctrl"
 L["CURE_PETS"] = "检测并净化宠物"
@@ -160,7 +160,6 @@ L["GLOR4"] = [=[对于那些在魔兽世界里遇见过 Glorfindal 的人来说�
 他离开我们的时候才仅仅38岁，随他离去的绝不会是虚拟世界匿名的角色；在这里还有一群忠实的朋友在永远想念他。]=]
 L["GLOR5"] = "他将永远被我们所铭记……"
 L["HANDLEHELP"] = "拖动所有微单位框体"
-L["HIDE_LIVELIST"] = "隐藏实时列表"
 L["HIDE_MAIN"] = "隐藏 Decursive 窗口"
 L["HIDESHOW_BUTTONS"] = "显示/隐藏按钮和锁定/解锁“Decursive”条"
 L["HLP_LEFTCLICK"] = "鼠标左键"
@@ -205,7 +204,7 @@ L["OPT_ADDDEBUFF_USAGE"] = "<减益名称>"
 L["OPT_ADVDISP"] = "高级显示选项"
 L["OPT_ADVDISP_DESC"] = "允许分别设置面板和边框的透明度，以及微单元框体的间距。"
 L["OPT_AFFLICTEDBYSKIPPED"] = "%s受到%s的影响，但将被忽略。"
-L["OPT_ALLOWMACROEDIT"] = "允许使用宏模式"
+L["OPT_ALLOWMACROEDIT"] = "允许使用宏模式" -- Needs review
 L["OPT_ALLOWMACROEDIT_DESC"] = "启用此项以防止 Decursive 更新宏，让你自己编辑你所需的宏。"
 L["OPT_ALWAYSIGNORE"] = "不在战斗状态时也忽略"
 L["OPT_ALWAYSIGNORE_DESC"] = "选中后不在状态时此减益也会被忽略。"
@@ -216,6 +215,11 @@ L["OPT_AUTOHIDEMFS_DESC"] = "选择何时自动隐藏微单元框体。"
 L["OPT_BLACKLENTGH_DESC"] = "设置被暂时加入黑名单的玩家在名单中停留的时间"
 L["OPT_BORDERTRANSP"] = "边框透明度"
 L["OPT_BORDERTRANSP_DESC"] = "设置边框的透明度"
+L["OPT_CENTERTEXT"] = "中央计数器："
+L["OPT_CENTERTEXT_DISABLED"] = "已禁用"
+L["OPT_CENTERTEXT_ELAPSED"] = "已用时间"
+L["OPT_CENTERTEXT_STACKS"] = "层数"
+L["OPT_CENTERTEXT_TIMELEFT"] = "剩余时间"
 L["OPT_CENTERTRANSP"] = "面板透明度"
 L["OPT_CENTERTRANSP_DESC"] = "设置面板的透明度"
 L["OPT_CHARMEDCHECK_DESC"] = "选中后你将可以查看和处理被诱惑的玩家"
@@ -241,11 +245,11 @@ L["OPT_CURINGOPTIONS_EXPLANATION"] = [=[选择你想要治疗的伤害类型，�
 （如要更改顺序，反选所有类型并再次检查所需顺序）]=]
 L["OPT_CURINGORDEROPTIONS"] = "净化类型和优先级"
 L["OPT_CURSECHECK_DESC"] = "选中后你将可以查看和净化受到诅咒效果影响的单位"
-L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "允许宏编辑（只限高级用户）"
+L["OPT_CUSTOM_SPELL_ALLOW_EDITING"] = "允许宏编辑（只限高级用户）" -- Needs review
 L["OPT_CUSTOM_SPELL_ALLOW_EDITING_DESC"] = [=[勾选此项如想编辑内置宏 Decursive 将使用自定义法术。
 
 注意：检查此项允许 Decursive 管理修改法术。
-（---只限高级用户---）]=]
+（---只限高级用户---）]=] -- Needs review
 L["OPT_CUSTOM_SPELL_CURE_TYPES"] = "伤害类型"
 L["OPT_CUSTOM_SPELL_IS_DEFAULT"] = "这个法术是 Decursive 自动配置的一部分。如果这个法术不再正常工作，可以删除或禁用它恢复预设 Decursive 行为。"
 L["OPT_CUSTOM_SPELL_ISPET"] = "宠物技能"
@@ -291,11 +295,11 @@ L["OPT_ENABLE_A_CUSTOM_SPELL"] = "启用"
 L["OPT_ENABLEDEBUG"] = "启用除错"
 L["OPT_ENABLEDEBUG_DESC"] = "启用除错输出"
 L["OPT_ENABLEDECURSIVE"] = "启用 Decursive"
+L["OPT_ENABLE_LIVELIST"] = "启用实时列表"
 L["OPT_FILTEROUTCLASSES_FOR_X"] = "在战斗中指定的职业%q将被忽略。"
 L["OPT_GENERAL"] = "一般选项"
 L["OPT_GROWDIRECTION"] = "反向显示微单元框体"
 L["OPT_GROWDIRECTION_DESC"] = "微单元框体将从下向上显示"
-L["OPT_HIDELIVELIST_DESC"] = "如不隐藏，显示受到减益影响的玩家列表"
 L["OPT_HIDEMFS_GROUP"] = "单人或小队"
 L["OPT_HIDEMFS_GROUP_DESC"] = "不在团队中时隐藏微单元框体"
 L["OPT_HIDEMFS_NEVER"] = "从不自动隐藏"
@@ -328,7 +332,7 @@ L["OPT_MACROBIND_DESC"] = [=[Decursive 宏的按键。
 
 按你想設定的按键后按 'Enter' 键保存设置(鼠标需要移动到编辑区域之外)]=]
 L["OPT_MACROOPTIONS"] = "宏选项"
-L["OPT_MACROOPTIONS_DESC"] = "有关 Decursive 创建的宏的选项设置"
+L["OPT_MACROOPTIONS_DESC"] = "有关 Decursive 创建的宏的选项设置" -- Needs review
 L["OPT_MAGICCHARMEDCHECK_DESC"] = "选中后你将可以查看和净化受到魔法诱惑效果影响的玩家"
 L["OPT_MAGICCHECK_DESC"] = "选中后你将可以查看和净化受到不良魔法效果影响的玩家"
 L["OPT_MAXMFS"] = "最大单位显示"
@@ -397,10 +401,6 @@ L["OPT_REVERSE_LIVELIST_DESC"] = "实时列表将从下往上显示"
 L["OPT_SCANLENGTH_DESC"] = "设置实时检测的时间间隔"
 L["OPT_SHOWBORDER"] = "显示职业彩色边框"
 L["OPT_SHOWBORDER_DESC"] = "微单元框体边框将会显示出代表该单位职业的颜色"
-L["OPT_SHOWCHRONO"] = "显示秒表"
-L["OPT_SHOWCHRONO_DESC"] = "显示单位受到不良效果的时间"
-L["OPT_SHOWCHRONOTIMElEFT"] = "剩余时间"
-L["OPT_SHOWCHRONOTIMElEFT_DESC"] = "显示剩余时间而不是消耗时间。"
 L["OPT_SHOWHELP"] = "显示帮助"
 L["OPT_SHOWHELP_DESC"] = "当鼠标移动到微单元框体上时显示信息提示窗口"
 L["OPT_SHOWMFS"] = "在屏幕上显示微单元框体"
@@ -473,4 +473,4 @@ L["UNSTABLERELEASE"] = "不稳定版本"
 
 
 
-T._LoadedFiles["zhCN.lua"] = "2.7.2.9";
+T._LoadedFiles["zhCN.lua"] = "2.7.3";

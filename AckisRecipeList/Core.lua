@@ -3,10 +3,10 @@
 Core.lua
 Core functions for Ackis Recipe List
 ************************************************************************
-File date: 2013-03-10T04:12:23Z
-File hash: c391c17
-Project hash: 3fa6ce4
-Project version: 2.4.8
+File date: 2013-11-03T23:07:50Z
+File hash: fcbd811
+Project hash: e8a8419
+Project version: 2.5.13
 ************************************************************************
 Please see http://www.wowace.com/addons/arl/ for more information.
 ************************************************************************
@@ -52,9 +52,10 @@ _G.ARL = addon
 local L = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Toast = LibStub("LibToast-1.0")
 
-local debugger = _G.tekDebug and _G.tekDebug:GetFrame(private.addon_name)
+local debugger -- Only defined if needed.
 
 private.build_num = select(2, _G.GetBuildInfo())
+private.TextDump = LibStub("LibTextDump-1.0"):New(private.addon_name)
 
 ------------------------------------------------------------------------------
 -- Constants.
@@ -73,19 +74,23 @@ addon.optionsFrame = {}
 -------------------------------------------------------------------------------
 -- Debugger.
 -------------------------------------------------------------------------------
-function addon:Debug(...)
+local function CreateDebugFrame()
 	if debugger then
-		local text = string.format(...)
-		debugger:AddMessage(text)
-
-		--[===[@debug@
-		Toast:Spawn("ARL_DebugToast", text)
-		--@end-debug@]===]
-	else
-		--[===[@debug@
-		self:Printf(...)
-		--@end-debug@]===]
+		return
 	end
+	debugger = LibStub("LibTextDump-1.0"):New(("%s Debug Output"):format(private.addon_name), 640, 480)
+end
+
+function addon:Debug(...)
+	if not debugger then
+		CreateDebugFrame()
+	end
+	local text = string.format(...)
+	debugger:AddLine(text)
+
+	--[===[@debug@
+	Toast:Spawn("ARL_DebugToast", text)
+	--@end-debug@]===]
 end
 
 Toast:Register("ARL_DebugToast", function(toast, ...)
@@ -233,6 +238,7 @@ function addon:OnInitialize()
 					trainer = true,
 					vendor = true,
 					worlddrop = true,
+					misc1 = true,
 				},
 				-------------------------------------------------------------------------------
 				-- Profession Item Filters
@@ -340,7 +346,6 @@ function addon:OnInitialize()
 					shaman = true,
 					warlock = true,
 					warrior = true,
-					monk = true,
 				},
 			}
 		}
@@ -403,7 +408,7 @@ function addon:OnInitialize()
 		end
 		local _, tooltip_unit = self:GetUnit()
 
-		if not tooltip_unit then
+		if not tooltip_unit or not _G.UnitGUID(tooltip_unit) then
 			return
 		end
 		local id_num = private.MobGUIDToIDNum(_G.UnitGUID(tooltip_unit))
@@ -537,13 +542,16 @@ local TRADESKILL_ADDON_INITS = {
 		scan_button:SetWidth(80)
 		_G.Skillet:AddButtonToTradeskillWindow(scan_button)
 	end,
+	TSMCraftingTradeSkillFrame = function(scan_button)
+		local anchor = _G.TSMCraftingTradeSkillFrame
+		scan_button:SetParent(anchor)
+		scan_button:SetPoint("TOPRIGHT", anchor, "TOPRIGHT", -30, -3)
+		scan_button:Show()
+	end,
 }
 
-function addon:CreateScanButton()
-	local scan_button = _G.CreateFrame("Button", nil, _G.TradeSkillFrame, "UIPanelButtonTemplate")
-	scan_button:SetHeight(20)
-	scan_button:RegisterForClicks("LeftButtonUp")
-	scan_button:SetText(L["Scan"])
+function addon:InitializeScanButton()
+	local scan_button = self.scan_button
 
 	-------------------------------------------------------------------------------
 	-- Grab the first lucky Trade Skill AddOn that exists and hand the scan button to it.
@@ -559,46 +567,6 @@ function addon:CreateScanButton()
 	scan_button:SetFrameLevel(scan_parent:GetFrameLevel() + 1)
 	scan_button:SetFrameStrata(scan_parent:GetFrameStrata())
 	scan_button:Enable()
-
-	scan_button:SetScript("OnClick", function(self, _, _)
-		local main_panel = addon.Frame
-		local prev_profession
-
-		if main_panel then
-			prev_profession = private.ORDERED_PROFESSIONS[main_panel.current_profession]
-		end
-		local shift_pressed = _G.IsShiftKeyDown()
-		local alt_pressed = _G.IsAltKeyDown()
-		local ctrl_pressed = _G.IsControlKeyDown()
-
-		if shift_pressed and not alt_pressed and not ctrl_pressed then
-			addon:Scan(true)
-		elseif alt_pressed and not shift_pressed and not ctrl_pressed then
-			addon:ClearWaypoints()
-		elseif ctrl_pressed and not shift_pressed and not alt_pressed then
-			local current_prof = _G.GetTradeSkillLine()
-			addon:DumpProfession(current_prof)
-		elseif not shift_pressed and not alt_pressed and not ctrl_pressed then
-			if main_panel and main_panel:IsVisible() and prev_profession == _G.GetTradeSkillLine() then
-				main_panel:Hide()
-			else
-				addon:Scan(false)
-				addon:AddWaypoint()
-			end
-		end
-	end)
-
-	scan_button:SetScript("OnEnter", function(self)
-		local tooltip = _G.GameTooltip
-
-		_G.GameTooltip_SetDefaultAnchor(tooltip, self)
-		tooltip:SetText(L["SCAN_RECIPES_DESC"])
-		tooltip:Show()
-	end)
-	scan_button:SetScript("OnLeave", function() _G.GameTooltip:Hide() end)
-
-	self.scan_button = scan_button
-	return scan_button
 end
 
 function addon:TRADE_SKILL_SHOW()
@@ -613,9 +581,62 @@ function addon:TRADE_SKILL_SHOW()
 	local scan_button = self.scan_button
 
 	if not scan_button then
-		scan_button = self:CreateScanButton()
-		self.CreateScanButton = nil
+		scan_button = _G.CreateFrame("Button", nil, _G.TradeSkillFrame, "UIPanelButtonTemplate")
+		scan_button:SetHeight(20)
+		scan_button:RegisterForClicks("LeftButtonUp")
+		scan_button:SetText(L["Scan"])
+
+		scan_button:SetScript("OnClick", function(self, _, _)
+			local main_panel = addon.Frame
+			local prev_profession
+
+			if main_panel then
+				prev_profession = private.ORDERED_PROFESSIONS[main_panel.current_profession]
+			end
+			local shift_pressed = _G.IsShiftKeyDown()
+			local alt_pressed = _G.IsAltKeyDown()
+			local ctrl_pressed = _G.IsControlKeyDown()
+
+			if shift_pressed and not alt_pressed and not ctrl_pressed then
+				addon:Scan(true)
+			elseif alt_pressed and not shift_pressed and not ctrl_pressed then
+				addon:ClearWaypoints()
+				--[===[@debug@
+			elseif ctrl_pressed then
+				local current_prof = _G.GetTradeSkillLine()
+
+				if shift_pressed and not alt_pressed then
+					addon:ScanProfession(current_prof)
+				elseif not shift_pressed and not alt_pressed then
+					addon:DumpProfession(current_prof)
+				end
+				--@end-debug@]===]
+			elseif not shift_pressed and not alt_pressed and not ctrl_pressed then
+				if main_panel and main_panel:IsVisible() and prev_profession == _G.GetTradeSkillLine() then
+					main_panel:Hide()
+				else
+					addon:Scan(false)
+					addon:AddWaypoint()
+				end
+			end
+		end)
+
+		scan_button:SetScript("OnEnter", function(self)
+			local tooltip = _G.GameTooltip
+
+			_G.GameTooltip_SetDefaultAnchor(tooltip, self)
+			tooltip:SetText(L["SCAN_RECIPES_DESC"])
+			--[===[@debug@
+			tooltip:AddLine("Control-click to generate a Lua code dump.")
+			tooltip:AddLine("Control-Shift-click to scan for issues.")
+			--@end-debug@]===]
+			tooltip:Show()
+		end)
+		scan_button:SetScript("OnLeave", function() _G.GameTooltip:Hide() end)
+
+		self.scan_button = scan_button
 	end
+	self:InitializeScanButton()
 
 	if scan_button:GetParent() == _G.TradeSkillFrame then
 		scan_button:ClearAllPoints()
@@ -710,68 +731,101 @@ do
 	end
 end -- do-block
 
-do
-	-- Code snippet stolen from GearGuage by Torhal and butchered by Ackis
-	local function StrSplit(input)
-		if not input then
-			return nil, nil
+local SUBCOMMAND_FUNCS = {
+	[L["About"]:lower()] = function()
+		if addon.optionsFrame["About"] then
+			_G.InterfaceOptionsFrame_OpenToCategory(addon.optionsFrame["About"])
+		else
+			_G.InterfaceOptionsFrame_OpenToCategory(addon.optionsFrame)
 		end
-		local arg1, arg2, var1
+	end,
+	[L["Documentation"]:lower()] = function()
+		_G.InterfaceOptionsFrame_OpenToCategory(addon.optionsFrame["Documentation"])
+	end,
+	[L["Profile"]:lower()] = function()
+		_G.InterfaceOptionsFrame_OpenToCategory(addon.optionsFrame["Profiles"])
+	end,
+	[L["Scan"]:lower()] = function(input)
+		if not input or input == "" then
+			addon:Print(L["COMMAND_LINE_SCAN"])
+			return
+		end
+		local found
+		input = input:lower()
 
-		arg1, var1 = input:match("^([^%s]+)%s*(.*)$")
-		arg1 = (arg1 and arg1:lower() or input:lower())
-
-		if var1 then
-			-- Small hack to get code to work with first aid.
-			if var1:lower() == private.LOCALIZED_PROFESSION_NAMES.FIRSTAID:lower() then
-				arg2 = var1
-			else
-				local var2
-				arg2, var2 = var1:match("^([^%s]+)%s*(.*)$")
-				arg2 = (arg2 and arg2:lower() or var1:lower())
+		for profession_name in pairs(private.PROFESSION_NAME_MAP) do
+			if input == profession_name:lower() then
+				found = true
+				break
 			end
 		end
-		return arg1, arg2
+
+		if not found then
+			addon:Print(L["COMMAND_LINE_SCAN"])
+			return
+		end
+		_G.CastSpellByName(input)
+
+		if addon.Frame and addon.Frame:IsVisible() then
+			addon.Frame:Hide()
+		else
+			if private.InitializeFrame then
+				private.InitializeFrame()
+			end
+			addon:Scan(false, false)
+		end
+	end,
+	debug = function()
+		if not debugger then
+			CreateDebugFrame()
+		end
+
+		if debugger:Lines() == 0 then
+			debugger:AddLine("Nothing to report.")
+			debugger:Display()
+			debugger:Clear()
+			return
+		end
+		debugger:Display()
+	end,
+	--[===[@debug@
+	dump = function(arg1, arg2)
+		local func = private.DUMP_COMMANDS[arg1]
+
+		if func then
+			func(arg2)
+		else
+			addon:Print("Unknown dump command:")
+
+			for command in pairs(private.DUMP_COMMANDS) do
+				addon:Print(command)
+			end
+		end
+	end,
+	scanprofs = function()
+		addon:ScanProfession("all")
+	end,
+	--@end-debug@]===]
+	tradelinks = function()
+		addon:GenerateLinks()
+	end,
+}
+
+function addon:ChatCommand(input)
+	local arg1, arg2, arg3 = self:GetArgs(input, 3)
+
+	if arg1 then
+		arg1 = arg1:trim():lower()
 	end
 
-	-- Determines what to do when the slash command is called.
-	function addon:ChatCommand(input)
-		local arg1, arg2 = StrSplit(input)
-
-		-- Open About panel if there's no parameters or if we do /arl about
-		if not arg1 or (arg1 and arg1:trim() == "") or arg1 == L["Sorting"]:lower() or arg1 == L["Sort"]:lower() or arg1 == _G.DISPLAY:lower() then
-			_G.InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
-		elseif arg1 == L["About"]:lower() then
-			if self.optionsFrame["About"] then
-				_G.InterfaceOptionsFrame_OpenToCategory(self.optionsFrame["About"])
-			else
-				_G.InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
-			end
-		elseif arg1 == L["Profile"]:lower() then
-			_G.InterfaceOptionsFrame_OpenToCategory(self.optionsFrame["Profiles"])
-		elseif arg1 == L["Documentation"]:lower() then
-			_G.InterfaceOptionsFrame_OpenToCategory(self.optionsFrame["Documentation"])
-		elseif arg1 == L["Scan"]:lower() then
-			if not arg2 or arg2 == "" then
-				self:Print(L["COMMAND_LINE_SCAN"])
-			else
-				_G.CastSpellByName(arg2)
-
-				if self.Frame and self.Frame:IsVisible() then
-					self.Frame:Hide()
-				else
-					if private.InitializeFrame then
-						private.InitializeFrame()
-					end
-					self:Scan(false, false)
-				end
-			end
-		elseif arg1 == "scanprof" then
-			self:ScanProfession("all")
-		elseif arg1 == "tradelinks" then
-			self:GenerateLinks()
+	-- Open About panel if there's no parameters or if we do /arl about
+	if not arg1 or arg1 == L["Sorting"]:lower() or arg1 == L["Sort"]:lower() or arg1 == _G.DISPLAY:lower() then
+		_G.InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
+	else
+		local func = SUBCOMMAND_FUNCS[arg1]
+		if func then
+			func(arg2, arg3)
 		else
-			-- What happens when we get here?
 			LibStub("AceConfigCmd-3.0"):HandleCommand("arl", "Ackis Recipe List", arg1)
 		end
 	end
@@ -996,8 +1050,7 @@ do
 		-- Everything is ready - display the GUI or dump the list to text.
 		-------------------------------------------------------------------------------
 		if textdump then
-			private.TextDump:AddLine(self:GetTextDump(profession_name))
-			private.TextDump:Display()
+			self:GetTextDump(profession_name)
 		else
 			if private.InitializeFrame then
 				private.InitializeFrame()
@@ -1011,7 +1064,6 @@ do
 	-------------------------------------------------------------------------------
 	-- Dumps recipe output in the format requested by the user
 	-------------------------------------------------------------------------------
-	local text_table = {}
 	local acquire_list = {}
 
 	local GetFilterFlagNames
@@ -1048,6 +1100,7 @@ do
 				HEALER = _G.HEALER,
 				CASTER = _G.DAMAGER,
 				ACHIEVEMENT = _G.ACHIEVEMENTS,
+				REPUTATION = _G.REPUTATION,
 				-------------------------------------------------------------------------------
 				-- Class flags.
 				-------------------------------------------------------------------------------
@@ -1136,17 +1189,18 @@ do
 
 	--- Dumps the recipe database in a format that is readable to humans (or machines)
 	function addon:GetTextDump(profession_name)
-		local output = addon.db.profile.textdumpformat or "Comma"
-		table.wipe(text_table)
+		local output_format = addon.db.profile.textdumpformat or "Comma"
+		local output = private.TextDump
+		output:Clear()
 
-		if output == "Comma" then
-			table.insert(text_table, ("Ackis Recipe List Text Dump for %s's %s, in the form of Comma Separated Values.\n  "):format(private.PLAYER_NAME, profession_name))
-			table.insert(text_table, "Spell ID,Recipe Name,Skill Level,ARL Filter Flags,Acquire Methods,Known\n")
-		elseif output == "BBCode" then
-			table.insert(text_table, ("Ackis Recipe List Text Dump for %s's %s, in the form of BBCode.\n"):format(private.PLAYER_NAME, profession_name))
-		elseif output == "XML" then
-			table.insert(text_table, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>")
-			table.insert(text_table, "\n<profession>")
+		if output_format == "Comma" then
+			output:AddLine(("Ackis Recipe List Text Dump for %s's %s, in the form of Comma Separated Values.\n  "):format(private.PLAYER_NAME, profession_name))
+			output:AddLine("Spell ID,Recipe Name,Skill Level,ARL Filter Flags,Acquire Methods,Known\n")
+		elseif output_format == "BBCode" then
+			output:AddLine(("Ackis Recipe List Text Dump for %s's %s, in the form of BBCode.\n"):format(private.PLAYER_NAME, profession_name))
+		elseif output_format == "XML" then
+			output:AddLine("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>")
+			output:AddLine("\n<profession>")
 		end
 
 		local profession_recipes = private.profession_recipe_list[profession_name]
@@ -1155,28 +1209,28 @@ do
 			local recipe = profession_recipes[recipe_id]
 			local is_known = recipe:HasState("KNOWN")
 
-			if output == "Comma" then
+			if output_format == "Comma" then
 				-- Add Spell ID, Name and Skill Level to the list
-				table.insert(text_table, recipe_id)
-				table.insert(text_table, ",")
-				table.insert(text_table, recipe.name)
-				table.insert(text_table, ",")
-				table.insert(text_table, recipe.skill_level)
-				table.insert(text_table, ",\"")
-			elseif output == "BBCode" then
+				output:AddLine(recipe_id)
+				output:AddLine(",")
+				output:AddLine(recipe.name)
+				output:AddLine(",")
+				output:AddLine(recipe.skill_level)
+				output:AddLine(",\"")
+			elseif output_format == "BBCode" then
 				-- Make the entry red
-				table.insert(text_table, ("\n%s[b]%d[/b] - %s (%d)%s\n"):format(is_known and "" or "[color=red]", recipe_id, recipe.name, recipe.skill_level, is_known and "" or "[/color]"))
+				output:AddLine(("\n%s[b]%d[/b] - %s (%d)%s\n"):format(is_known and "" or "[color=red]", recipe_id, recipe.name, recipe.skill_level, is_known and "" or "[/color]"))
 
-				table.insert(text_table, "\nRecipe Flags:\n[list]\n")
-			elseif output == "XML" then
-				table.insert(text_table, "\n<recipe>\n")
-				table.insert(text_table, "  <id>" .. recipe_id .. "</id>\n")
-				table.insert(text_table, "  <name>" .. recipe.name .. "</name>\n")
-				table.insert(text_table, "  <skilllevel>" .. recipe.skill_level .. "</skilllevel>\n")
-				table.insert(text_table, "  <known>" .. tostring(is_known) .. "</known>\n")
-				table.insert(text_table, "  <flags>\n")
-			elseif output == "Name" then
-				table.insert(text_table, recipe.name)
+				output:AddLine("\nRecipe Flags:\n[list]\n")
+			elseif output_format == "XML" then
+				output:AddLine("\n<recipe>\n")
+				output:AddLine("  <id>" .. recipe_id .. "</id>\n")
+				output:AddLine("  <name>" .. recipe.name .. "</name>\n")
+				output:AddLine("  <skilllevel>" .. recipe.skill_level .. "</skilllevel>\n")
+				output:AddLine("  <known>" .. tostring(is_known) .. "</known>\n")
+				output:AddLine("  <flags>\n")
+			elseif output_format == "Name" then
+				output:AddLine(recipe.name)
 			end
 
 			-- Add in all the filter flags
@@ -1189,28 +1243,34 @@ do
 					local bitfield = recipe.flags[private.FLAG_MEMBERS[table_index]]
 
 					if bitfield and bit.band(bitfield, flag) == flag then
-						if output == "Comma" then
+						local filter_name = filter_names[flag_name] or _G.UNKNOWN
+
+						if filter_name == _G.UNKNOWN then
+							addon:Debug("%s is unknown", flag_name)
+						end
+
+						if output_format == "Comma" then
 							if prev then
-								table.insert(text_table, ",")
+								output:AddLine(",")
 							end
-							table.insert(text_table, filter_names[flag_name])
+							output:AddLine(filter_name)
 							prev = true
-						elseif output == "BBCode" then
-							table.insert(text_table, "[*]" .. filter_names[flag_name] .. "\n")
-						elseif output == "XML" then
-							table.insert(text_table, "    <flag>" .. filter_names[flag_name] .. "</flag>")
+						elseif output_format == "BBCode" then
+							output:AddLine("[*]" .. filter_name .. "\n")
+						elseif output_format == "XML" then
+							output:AddLine("    <flag>" .. filter_name .. "</flag>")
 						end
 					end
 				end
 			end
 
-			if output == "Comma" then
-				table.insert(text_table, "\",\"")
-			elseif output == "BBCode" then
-				table.insert(text_table, "[/list]\nAcquire Methods:\n[list]\n")
-			elseif output == "XML" then
-				table.insert(text_table, "  </flags>")
-				table.insert(text_table, "  <acquire>")
+			if output_format == "Comma" then
+				output:AddLine("\",\"")
+			elseif output_format == "BBCode" then
+				output:AddLine("[/list]\nAcquire Methods:\n[list]\n")
+			elseif output_format == "XML" then
+				output:AddLine("  </flags>")
+				output:AddLine("  <acquire>")
 			end
 
 			-- Find out which unique acquire methods we have
@@ -1224,38 +1284,33 @@ do
 			-- Add all the acquire methods in
 			prev = false
 
-			for i in pairs(acquire_list) do
-				if output == "Comma" then
+			for acquire_name in pairs(acquire_list) do
+				if output_format == "Comma" then
 					if prev then
-						table.insert(text_table, ",")
+						output:AddLine(",")
 					end
-					table.insert(text_table, i)
+					output:AddLine(acquire_name)
 					prev = true
-				elseif output == "BBCode" then
-					table.insert(text_table, "[*] " .. i)
-				elseif output == "XML" then
-					table.insert(text_table, "<acquiremethod>" .. i .. "</acquiremethod>")
+				elseif output_format == "BBCode" then
+					output:AddLine("[*] " .. acquire_name)
+				elseif output_format == "XML" then
+					output:AddLine("<acquiremethod>" .. acquire_name .. "</acquiremethod>")
 				end
 			end
 
-			if output == "Comma" then
-				table.insert(text_table, "\"," .. tostring(is_known) .. "\n")
-				--if is_known then
-				--	table.insert(text_table, "\",true\n")
-				--else
-				--	table.insert(text_table, "\",false\n")
-				--end
-			elseif output == "BBCode" then
-				table.insert(text_table, "\n[/list]\n")
-			elseif output == "XML" then
-				table.insert(text_table, "  </acquire>")
-				table.insert(text_table, "</recipe>")
+			if output_format == "Comma" then
+				output:AddLine("\"," .. tostring(is_known) .. "\n")
+			elseif output_format == "BBCode" then
+				output:AddLine("\n[/list]\n")
+			elseif output_format == "XML" then
+				output:AddLine("  </acquire>")
+				output:AddLine("</recipe>")
 			end
 		end -- for
 
-		if output == "XML" then
-			table.insert(text_table, "\n</profession>")
+		if output_format == "XML" then
+			output:AddLine("\n</profession>")
 		end
-		return table.concat(text_table, "")
+		output:Display("")
 	end
 end

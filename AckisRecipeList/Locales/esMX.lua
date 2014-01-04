@@ -6,7 +6,7 @@ esMX localization strings for Ackis Recipe List
 File date: 2012-08-18T04:52:05Z 
 File revision: @file-revision@ 
 Project revision: @project-revision@
-Project version: 2.4.8
+Project version: 2.5.13
 ************************************************************************
 Currently maintained by:
 http://www.wowace.com/addons/arl/localization/translators/
@@ -316,6 +316,7 @@ L["Display Exclusions"] = "Mostrar Exclusiones"
 L["DISPLAY_OPTIONS_DESC"] = "Permite personalizar cómo se comporta el GUI."
 L["DM_TRIBUTE"] = "Obtenido del cofre Tributo a Gordok en La Masacre tras hacer un tribute run."
 L["Doba"] = true
+L["Doctor Gustaf VanHowzen"] = true
 L["Doctor Herbert Halsey"] = true
 L["Documentation"] = "Documentación"
 L["Don Carlos"] = true

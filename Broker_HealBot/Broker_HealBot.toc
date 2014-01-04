@@ -1,0 +1,22 @@
+## Interface: 50400
+## Title: Broker_HealBot
+## Notes: LDB Broker launcher for HealBot
+## Author: oscarucb
+## RequiredDeps: HealBot
+## OptionalDeps: LibDataBroker-1.1
+## Credits: piranther of FuBar_HealBotFu
+## Version: 2.3.5
+## X-Build: 44
+## X-ReleaseDate: 2013-09-18T04:26:38Z
+## X-Revision: $Revision: 42 $
+## SavedVariables: 
+## SavedVariablesPerCharacter: Broker_HealBotDB
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+## X-Curse-Packaged-Version: 2.3.5
+## X-Curse-Project-Name: Broker_HealBot
+## X-Curse-Project-ID: broker_healbot
+## X-Curse-Repository-ID: wow/broker_healbot/mainline
+
+locale.lua
+Broker_HealBot.lua

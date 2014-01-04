@@ -73,7 +73,7 @@ combuoptioninfotableEN = {
 	["CombuTimervalue"] = "Enter a value in seconds to adjust the red zone of all the timer bars of the addon.",
 	["ComburefreshpyroButton"] = "Enable the warning in chat frame when you forget to use your Hot Streak proc and also enable the report at the end of the fight.",
 	["CombuimpactButton"] = "Enable tracking of Impact procs and background color changing in when combustion is on cooldown.",
-	["CombutrackerButton"] = "Add a timer bar in Combustion status frame to show the current duration of applied Combustion on your target. Also add information report in chat frame.",
+	["CombutrackerButton"] = "Add a timer bar in Combustion status frame to show the current duration of applied Combustion on your target and the cooldown. Also add information report in chat frame.",
 	["CombuchatButton"] = "Enable or disable outputs in chat frame for settings changes and autohide information.",
 	["CombuLBtrackerButton"] = "Enable or disable the multi target Bomb tracker. This add a small panel with information on all your Bomb spells.",
 	["CombuLBtargetButton"] = "When disabled, this settings hide the multi target Bomb tracker when you only have a Bomb active and it's on your target.",
@@ -137,7 +137,6 @@ CombuOptLocEN = {
 	["CombuchatButton"] = "Config messages in chat",
 	["CombuLBtrackerButton"] = "Enable Bomb Tracker",
 	["CombuLBtargetButton"] = "Always show Bomb on target",
-	["LBtrackerPosition"] = "Bomb/FS tracker position :",
 	["CombuAutohideInfo"] = "AutoHide mode :",
 	["CombuBarButton"] = "Enable Bar timer mode",
 	["CombuBarSlider"] = "Bar Width",
@@ -175,15 +174,6 @@ CombuOptLocEN = {
 	["CombuLBEnableButton"] = "Enable Bomb tracking",
 	}
 
--------------------------------
--- table for Bomb tracker position dropdown
-CombuLBpositionEN = {
-   "Upside",
-   "Downside",
-   "Right Side",
-   "Left Side",
-   "Free"
-	}
 
 -------------------------------
 -- table for Autohide dropdown

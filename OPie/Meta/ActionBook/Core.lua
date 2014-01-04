@@ -1,4 +1,4 @@
-local api, MAJ, REV = {}, 1, 7
+local api, MAJ, REV = {}, 1, 8
 
 local function assert(condition, err, ...)
 	return (not condition) and error(tostring(err):format(...), 3) or condition
@@ -17,9 +17,10 @@ function ab:callCustom(unit, button)
 end
 
 local abSec = CreateFrame("FRAME", "ActionBookSecLib", nil, "SecureHandlerBaseTemplate")
+abSec:SetFrameRef("kin", CreateFrame("FRAME", nil, nil, "SecureFrameTemplate"))
 abSec:Execute([=[-- abSec init
-	collections, tokens, metadata, actConditionals, tokConditionals = newtable(), newtable(), newtable(), newtable(), newtable()
-	colStack, idxStack, outCount = newtable(), newtable(), newtable(), newtable()
+	collections, tokens, metadata, actConditionals, kinConditionals, tokConditionals = newtable(), newtable(), newtable(), newtable(), newtable(), newtable()
+	kinEnv, colStack, idxStack, outCount = self:GetFrameRef("kin"), newtable(), newtable(), newtable()
 ]=])
 local abSecEnv = GetManagedEnvironment(abSec)
 abSec:SetAttribute("collection", [=[-- AB.collection
@@ -35,10 +36,11 @@ abSec:SetAttribute("collection", [=[-- AB.collection
 		elseif collections[aid] and not outCount[aid] then
 			i, idxStack[i], colStack[i+1], idxStack[i+1] = i + 1, idx, aid, 1
 		elseif aid and (outCount[aid] or 1) > 0 then
-			local show, tok = true, tokens[col][idx]
-			local check1, check2 = actConditionals[aid], tokConditionals[tok]
+			local tok = tokens[col][idx]
+			local check1, check2, check3 = actConditionals[aid], tokConditionals[tok], kinConditionals[aid]
 			if (check1 == nil or (SecureCmdOptionParse(check1) or "hide") ~= "hide") and
-			   (check2 == nil or (SecureCmdOptionParse(check2) or "hide") ~= "hide") then
+			   (check2 == nil or (SecureCmdOptionParse(check2) or "hide") ~= "hide") and
+				 (check3 == nil or (kinEnv:Run(check3, aid) or "hide") ~= "hide") then
 				ret = ret .. "\n" .. col .. " " .. (outCount[col] + 1) .. " " .. aid .. " " .. tok
 				outCount[col] = outCount[col] + 1
 			end
@@ -114,7 +116,7 @@ function createHandlers.conditional(id, cnt, condition, atype, ...)
 		return false, "Conditional expected, got %s", type(condition)
 	end
 	allocatedActionType[id] = atype
-	DeferExecute(("actConditionals[%d] = %q"):format(id, condition))
+	DeferExecute(("%sConditionals[%d] = %q"):format(condition:match("^%-%-%s") and "kin" or "act", id, condition))
 	return createHandlers[atype](id, cnt-2, ...)
 end
 function createHandlers.collection(id, cnt, idList)
@@ -143,7 +145,7 @@ updateHandlers.collection = createHandlers.collection
 local function nullInfoFunc() return false end
 
 function api:get(ident, ...)
-	assert(type(ident) == "string", "Syntax: actionId = AB:get(identifier, ...)")
+	assert(type(ident) == "string", 'Syntax: actionId = AB:get("identifier", ...)')
 	local id = handlers[ident] and handlers[ident](...)
 	if allocatedActions[id] then
 		return id
@@ -156,7 +158,7 @@ function api:info(id, ...)
 	end
 end
 function api:describe(ident, ...)
-	assert(type(ident) == "string", "Syntax: typeName, actionName, icon, extico, tipFunc, tipArg = AB:describe(identifier, ...)")
+	assert(type(ident) == "string", 'Syntax: typeName, actionName, icon, extico, tipFunc, tipArg = AB:describe("identifier", ...)')
 	if describers[ident] then
 		return describers[ident](...)
 	end
@@ -166,7 +168,7 @@ function api:button(id)
 	return ab:GetName(), id
 end
 function api:options(ident)
-	assert(type(ident) == "string", "Syntax: ... = AB:options(identifier)")
+	assert(type(ident) == "string", 'Syntax: ... = AB:options("identifier")')
 	return unpack(optData, optStart[ident] or 0, optEnd[ident] or -1)
 end
 function api:actionType(id)
@@ -175,7 +177,7 @@ function api:actionType(id)
 end
 
 function api:register(ident, create, describe, opt)
-	assert(type(ident) == "string" and type(create) == "function" and type(describe) == "function" and (opt == nil or type(opt) == "table"), "Syntax: AB:register(identifier, createFunc, describeFunc[, {options}])")
+	assert(type(ident) == "string" and type(create) == "function" and type(describe) == "function" and (opt == nil or type(opt) == "table"), 'Syntax: AB:register("identifier", createFunc, describeFunc[, {options}])')
 	assert(not handlers[ident], "Identifier %q is already registered", atype)
 	handlers[ident], describers[ident] = create, describe
 	if opt and #opt > 0 then
@@ -186,7 +188,7 @@ function api:register(ident, create, describe, opt)
 	end
 end
 function api:create(atype, infoFunc, ...)
-	assert(type(atype) == "string" and (type(infoFunc) == "function" or infoFunc == nil), "Syntax: actionId = AB:create(actionType, infoFunc, ...)")
+	assert(type(atype) == "string" and (type(infoFunc) == "function" or infoFunc == nil), 'Syntax: actionId = AB:create("actionType", infoFunc, ...)')
 	assert(createHandlers[atype], "Action type %q is not creatable", atype)
 	local id = nextActionId
 	allocatedActionType[id], nextActionId = atype, nextActionId + 1
@@ -222,7 +224,7 @@ do -- api:miscaction(...)
 		return n > 0 and rawset(data, i, v) and set(n-1, i+1, ...) or (i-1)
 	end
 	function api:miscaction(ident, ...)
-		assert(type(ident) == "string", "Syntax: AB:miscaction(ident, ...)")
+		assert(type(ident) == "string", 'Syntax: AB:miscaction("identifier", ...)')
 		last[#last+1] = set(1 + select("#", ...), last[#last]+1, ident, ...)
 	end
 end
@@ -241,9 +243,9 @@ api.categories = newproxy(true) do
 	end
 end
 function api:category(name, numFunc, getFunc)
-	assert(type(name) == "string" and type(numFunc) == "function" and type(getFunc) == "function", "Syntax: id = AB:category(name, countFunc, entryFunc)")
+	assert(type(name) == "string" and type(numFunc) == "function" and type(getFunc) == "function", 'Syntax: id = AB:category("name", countFunc, entryFunc)')
 	local count = numFunc()
-	assert(type(count) == "number" and count >= 0, "countFunc must return a non-negative number")
+	assert(type(count) == "number" and count >= 0, "countFunc() must return a non-negative integer")
 	local obj, p = newproxy(catBase), categoryProps
 	p.name[obj], p.entries[obj], p.entry[obj], categories[#categories+1] = name, numFunc, getFunc, obj
 	return #categories
@@ -254,7 +256,7 @@ local function invokenotify()
 	notifyFunc(notifySelf, notifyIdent, notifyArg)
 end
 function api:notify(ident, data)
-	assert(type(ident) == "string", "Syntax: AB:notify(identifier[, data])")
+	assert(type(ident) == "string", 'Syntax: AB:notify("identifier"[, data])')
 	assert(handlers[ident] or observers[ident] ~= nil, "Identifier %q is not registered", ident)
 	notifyCount = (notifyCount + 1) % 4503599627370495
 	local erf = geterrorhandler()
@@ -266,13 +268,13 @@ function api:notify(ident, data)
 	end
 end
 function api:observe(ident, callback, selfarg)
-	assert(type(ident) == "string" and type(callback) == "function", "Syntax: AB:observe(identifier, callbackFunc, callbackSelfArg)")
+	assert(type(ident) == "string" and type(callback) == "function", 'Syntax: AB:observe("identifier", callbackFunc, callbackSelfArg)')
 	assert(ident == "*" or handlers[ident] or observers[ident], "Identifier %q is not registered", ident)
 	if observers[ident] == nil then observers[ident] = {} end
 	observers[ident][callback] = selfarg == nil and true or selfarg
 end
 function api:lastupdate(ident)
-	assert(type(ident) == "string", "Syntax: token = AB:lastupdate(identifier)")
+	assert(type(ident) == "string", 'Syntax: token = AB:lastupdate("identifier")')
 	assert(ident == "*" or handlers[ident], "Identifier %q is not registered", ident)
 	return notifyCount
 end

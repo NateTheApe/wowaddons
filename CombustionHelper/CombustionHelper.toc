@@ -1,8 +1,8 @@
-## Interface: 50200
+## Interface: 50400
 
 ## Author : Angayelle of Nordrassil
 
-## Title: CombustionHelper 3.4.7
+## Title: CombustionHelper 3.5.2
 
 ## Notes: An addon for optimized use of the Combustion Talent for mages
 
@@ -10,7 +10,7 @@
 
 ## SavedVariables: combusettingstable, CombuCautlevelvar, CombuCautscalevar, CombuCautalphavar, CombuCautlockvar, CombuCauthidevar, CombuCautTimevar, CombuCautChatRaidvar, CombuCautChatSayvar, CombuCautChatYellvar, CombuCautAnnouncevar, CombuCautChatAltvar, CombuCautAnnounceAltvar, CombuCautChatAlonevar,CombuCautenablevar, combumbtrackersettingstable
 
-## version: 3.4.7
+## version: 3.5.2
 
 libs\LibStub\LibStub.lua
 
@@ -31,6 +31,8 @@ Localization.tw.lua
 Localization.kr.lua
 
 Localization.cn.lua
+
+Localization.it.lua
 
 CombustionHelper.lua
 

@@ -1,12 +1,13 @@
 local mod	= DBM:NewMod(814, "DBM-Pandaria", nil, 322)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 9541 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 10698 $"):sub(12, -3))
 mod:SetCreatureID(69099)
-mod:SetQuestID(32518)
-mod:SetZone(928)--Isle of Thunder
+mod:SetReCombatTime(20)
+mod:SetZone()
+mod:SetMinSyncRevision(10466)
 
-mod:RegisterCombat("combat")
+mod:RegisterCombat("combat_yell", L.Pull)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START",
@@ -27,9 +28,10 @@ local timerStormcloudCD				= mod:NewCDTimer(24, 136340)
 local timerLightningTetherCD		= mod:NewCDTimer(35, 136339)--Needs more data, they may have tweaked it some.
 local timerArcNovaCD				= mod:NewNextTimer(42, 136338)
 
-local soundArcNova					= mod:NewSound(136338, nil, mod:IsMelee())
+local soundArcNova					= mod:NewSound(136338, mod:IsMelee())
 
 mod:AddBoolOption("RangeFrame")--For Stormcloud, might tweek to not show all the time with actual better logs than me facepulling it and dying with 20 seconds
+mod:AddReadyCheckOption(32518, false)
 
 local stormcloudTargets = {}
 local tetherTargets = {}
@@ -44,12 +46,14 @@ local function warnTetherTargets()
 	table.wipe(tetherTargets)
 end
 
-function mod:OnCombatStart(delay)
+function mod:OnCombatStart(delay, yellTriggered)
 	table.wipe(stormcloudTargets)
 	table.wipe(tetherTargets)
-	timerStormcloudCD:Start(15-delay)--15-17 variation noted
-	timerLightningTetherCD:Start(28-delay)
-	timerArcNovaCD:Start(39-delay)--Not a large sample size
+	if yellTriggered then
+		timerStormcloudCD:Start(15-delay)--15-17 variation noted
+		timerLightningTetherCD:Start(28-delay)
+		timerArcNovaCD:Start(39-delay)--Not a large sample size
+	end
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Show(10)
 	end

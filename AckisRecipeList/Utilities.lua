@@ -84,102 +84,62 @@ function private.MobGUIDToIDNum(guid)
 end
 
 --[===[@debug@
--------------------------------------------------------------------------------
--- Text dumping functions
--------------------------------------------------------------------------------
-
---------------------------------------------------------------------------------
---- Creates a new frame with the contents of a text dump so you can copy and paste
--- Code borrowed from Antiarc (Chatter) with permission
---------------------------------------------------------------------------------
 do
-	local copy_frame = _G.CreateFrame("Frame", "ARL_CopyFrame", _G.UIParent)
-	copy_frame:SetBackdrop({
-		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background]],
-		edgeFile = [[Interface\DialogFrame\UI-DialogBox-Border]],
-		tile = true,
-		tileSize = 16,
-		edgeSize = 16,
-		insets = {
-			left = 3,
-			right = 3,
-			top = 5,
-			bottom = 3
-		}
-	})
-	copy_frame:SetBackdropColor(0, 0, 0, 1)
-	copy_frame:SetWidth(750)
-	copy_frame:SetHeight(400)
-	copy_frame:SetPoint("CENTER", _G.UIParent, "CENTER")
-	copy_frame:SetFrameStrata("DIALOG")
+	local function PrintProfessions()
+		addon:Print("Must supply a valid profession name, or \"all\":")
 
-	table.insert(_G.UISpecialFrames, "ARL_CopyFrame")
+		for index = 1, #private.ORDERED_PROFESSIONS do
+			addon:Print(private.ORDERED_PROFESSIONS[index])
+		end
 
-	local scrollArea = _G.CreateFrame("ScrollFrame", "ARL_CopyScroll", copy_frame, "UIPanelScrollFrameTemplate")
-	scrollArea:SetPoint("TOPLEFT", copy_frame, "TOPLEFT", 8, -30)
-	scrollArea:SetPoint("BOTTOMRIGHT", copy_frame, "BOTTOMRIGHT", -30, 8)
+		for profession_name in pairs(private.PROFESSION_NAME_MAP) do
+		end
+	end
 
-	local edit_box = _G.CreateFrame("EditBox", nil, copy_frame)
-	edit_box:SetMultiLine(true)
-	edit_box:SetMaxLetters(0)
-	edit_box:EnableMouse(true)
-	edit_box:SetAutoFocus(true)
-	edit_box:SetFontObject("ChatFontNormal")
-	edit_box:SetWidth(650)
-	edit_box:SetHeight(270)
-	edit_box:SetScript("OnEscapePressed", function()
-		copy_frame:Hide()
-	end)
-	edit_box:HighlightText(0)
+	private.DUMP_COMMANDS = {
+		bossids = function(input)
+			if not input then
+				addon:Print("Type the name or partial name of a boss.")
+				return
+			end
+			addon:DumpBossIDs(input)
+		end,
+		empties = function()
+			addon:ShowEmptySources()
+		end,
+		phrases = function()
+			addon:DumpPhrases()
+		end,
+		profession = function(input)
+			if not input then
+				PrintProfessions()
+				return
+			end
+			local found
+			input = input:lower():trim()
 
-	scrollArea:SetScrollChild(edit_box)
+			for index = 1, #private.ORDERED_PROFESSIONS do
+				if input == private.ORDERED_PROFESSIONS[index]:lower() then
+					found = true
+					break
+				end
+			end
 
-	local close = _G.CreateFrame("Button", nil, copy_frame, "UIPanelCloseButton")
-	close:SetPoint("TOPRIGHT", copy_frame, "TOPRIGHT")
-
-	copy_frame:Hide()
-
-	private.TextDump = {
-		output = {}
+			if not found then
+				PrintProfessions()
+				return
+			end
+			addon:DumpProfession(input)
+		end,
+		zones = function(input)
+			if not input then
+				addon:Print("Type the name or partial name of a zone.")
+				return
+			end
+			addon:DumpZones(input)
+		end
 	}
 
-	function private.TextDump:AddLine(text)
-		self:InsertLine(#self.output + 1, text)
-	end
-
-	function private.TextDump:Clear()
-		table.wipe(self.output)
-	end
-
-	function private.TextDump:Display(separator)
-		local display_text = table.concat(self.output, separator or "\n")
-
-		if display_text == "" then
-			return
-		end
-		edit_box:SetText(display_text)
-		edit_box:HighlightText(0)
-		edit_box:SetCursorPosition(1)
-		copy_frame:Show()
-	end
-
-	function private.TextDump:InsertLine(position, text)
-		if _G.type(text) ~= "string" or text == "" then
-			return
-		end
-		table.insert(self.output, position, text)
-	end
-
-	function private.TextDump:Lines()
-		return #self.output
-	end
-
-	function private.TextDump:String(separator)
-		return table.concat(self.output, separator or "\n")
-	end
-end -- do
-
-do
 	local L = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 	local output = private.TextDump
 
@@ -233,14 +193,22 @@ do
 		return input:upper():gsub(" ", "_"):gsub("'", ""):gsub(":", ""):gsub("-", "_"):gsub("%(", ""):gsub("%)", "")
 	end
 
-	function addon:DumpZones(name)
+	function addon:DumpZones(input)
 		output:Clear()
 
-		for index = 1, 100000 do
-			local zone_name = _G.GetMapNameByID(index)
+		if type(input) == "number" then
+			local zone_name = _G.GetMapNameByID(input)
 
-			if zone_name and zone_name:lower():find(name:lower()) then
-				output:AddLine(("%s = _G.GetMapNameByID(%d),"):format(TableKeyFormat(zone_name), index))
+			if zone_name then
+				output:AddLine(("%s = _G.GetMapNameByID(%d),"):format(TableKeyFormat(zone_name), input))
+			end
+		else
+			for index = 1, 100000 do
+				local zone_name = _G.GetMapNameByID(index)
+
+				if zone_name and zone_name:lower():find(input:lower()) then
+					output:AddLine(("%s = _G.GetMapNameByID(%d),"):format(TableKeyFormat(zone_name), index))
+				end
 			end
 		end
 		output:Display()
@@ -327,13 +295,14 @@ do
 			end
 
 			if count == 0 then
-				addon:Debug("%s %s (%s) has no recipes.", description, unit.name or _G.UNKNOWN, unit_id)
+				output:AddLine(("* %s %s (%s) has no recipes."):format(description, unit.name or _G.UNKNOWN, unit_id))
 			end
 		end
 	end
 
 	function addon:ShowEmptySources()
 		private.LoadAllRecipes()
+		output:Clear()
 
 		find_empties(private.trainer_list, "Trainer")
 		find_empties(private.vendor_list, "Vendor")
@@ -342,6 +311,12 @@ do
 		find_empties(private.custom_list, "Custom Entry")
 		find_empties(private.discovery_list, "Discovery")
 		find_empties(private.seasonal_list, "World Event")
+
+		if output:Lines() == 0 then
+			output:AddLine("Nothing to display.")
+		end
+
+		output:Display()
 	end
 end -- do
 --@end-debug@]===]

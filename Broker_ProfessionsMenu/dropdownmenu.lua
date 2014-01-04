@@ -31,7 +31,10 @@ function me.dropdown:ShowMenu(level, value, owner)
 		me.dropdown:AddLine()                           --list other chars
 		info.func = function() me.dropdown:Open(owner, 'children', function() me.dropdown:ShowFavorites(owner) end) end
 		me.dropdown:AddFunc("|cffffd100"..me.L["favorites"].."|r",info.func,"Interface\\AddOns\\Broker_ProfessionsMenu\\icons\\fav.tga")
-		me.dropdown:AddArrow("|cff00ff00"..me.L["otherchar"].."|r","tradelinks")
+		me.dropdown:AddArrow("|cff00ff00"..me.L["otherchar"].."|r","tradelinks")  -- not supported anymore by patch 5.4
+		
+		-- me.dropdown:AddFunc("Test",function() me:OpenAltProfFrame("Sanori", 2259) end)
+		
 		me.dropdown:AddLine()
 		me.dropdown:AddArrow(me.L["settings"],"config")
 	--<<LEVEL 2>>--
@@ -65,11 +68,27 @@ function me.dropdown:ShowMenu(level, value, owner)
 				me.dropdown:Close(1)
 			end
 			me.dropdown:AddFunc(me.L["resetcds"], info.func, "Interface\\Icons\\Ability_Rogue_FeignDeath", true)
-		--list other chars
-		elseif value == "tradelinks" then
+		--list other chars -- not supported anymore by patch 5.4
+		--[[elseif value == "tradelinks" then
 			local first=true
 			for k,v in me:pairsByKeys(me.save) do
 				if (k and k~=UnitName("player") and v.tradelinks and me:tcount(v.tradelinks)>0 and (me.save[my].config.bothfactions or UnitFactionGroup("player")==v.faction)) then
+					if (v.class) then
+					 	local coords = CLASS_ICON_TCOORDS[v.class]
+					 	me.dropdown:AddArrow(k,k,"Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",nil,nil,
+							'iconCoordLeft', coords[1],
+							'iconCoordRight', coords[2],
+							'iconCoordTop', coords[3],
+							'iconCoordBottom', coords[4])
+					else
+						me.dropdown:AddArrow(k,k)
+					end
+				end
+			end]]
+		elseif value == "tradelinks" then
+			local first=true
+			for k,v in me:pairsByKeys(me.save) do
+				if (k and k~=UnitName("player") and v.craftableitems and me:tcount(v.craftableitems)>0 and (me.save[my].config.bothfactions or UnitFactionGroup("player")==v.faction)) then
 					if (v.class) then
 					 	local coords = CLASS_ICON_TCOORDS[v.class]
 					 	me.dropdown:AddArrow(k,k,"Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes",nil,nil,
@@ -137,8 +156,8 @@ function me.dropdown:ShowMenu(level, value, owner)
 			--showbuttons
 			me.dropdown:AddToggle(me.L["showbuttons"],me.save[my].config.tooltip.showbuttons,function(var) me.save[my].config.tooltip.showbuttons=var end)
 			--hide professions
-		--list trades from an other char
-		else
+		--list trades from an other char  -- not supported anymore by patch 5.4!
+		--[[else
 			for k,v in me:pairsByKeys(me.save[value].tradelinks) do
 				local name, _, icon = GetSpellInfo(k)
 				info.func = function()
@@ -167,6 +186,20 @@ function me.dropdown:ShowMenu(level, value, owner)
 					GameTooltip:AddLine(me.L["shift"].." + "..me.L["leftclick"]..": |cffffffff"..me.L["linktoother"].."|r")
 				end
 				me.dropdown:AddFunc(name,info.func,icon,nil,info.tooltipFunc)
+			end
+			me.dropdown:AddLine()
+			info.tooltipFunc = function()
+				local frame = GameTooltip:GetOwner()
+				GameTooltip:SetOwner(frame, "ANCHOR_NONE")
+				GameTooltip:SetPoint(me:GetTipAnchor2(frame))
+				GameTooltip:ClearLines()
+				GameTooltip:AddLine(me.L["deletechartooltip"])
+			end
+			me.dropdown:AddFunc(DELETE,function() me.save[value]=nil end,nil,true,info.tooltipFunc)]]
+		else
+			for k,_ in me:pairsByKeys(me.save[value].craftableitems) do
+				local name, _, icon = GetSpellInfo(k)
+				me.dropdown:AddFunc(name,function() me:OpenAltProfFrame(value, k) end,icon)
 			end
 			me.dropdown:AddLine()
 			info.tooltipFunc = function()
@@ -271,6 +304,9 @@ function me.dropdown:ShowFavorites(owner)
 						data = nil
 					end
 					me.save[my].favorites[profid] = data
+					if TradeSkillFrame:IsVisible() then
+						TradeSkillFrame_Update()
+					end
 				else --Craft Item
 					CloseTradeSkill()
 					CastSpellByName(prof)

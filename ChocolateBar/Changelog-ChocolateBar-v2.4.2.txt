@@ -1,0 +1,14 @@
+------------------------------------------------------------------------
+r169 | yess | 2013-09-11 10:08:06 +0000 (Wed, 11 Sep 2013) | 1 line
+Changed paths:
+   A /tags/v2.4.2 (from /trunk:168)
+
+Tagging as v2.4.2
+------------------------------------------------------------------------
+r168 | yess | 2013-09-11 10:06:05 +0000 (Wed, 11 Sep 2013) | 1 line
+Changed paths:
+   M /trunk/ChocolateBar/ChocolateBar.toc
+   M /trunk/ChocolateBar_Options/ChocolateBar_Options.toc
+
+Update TOC
+------------------------------------------------------------------------

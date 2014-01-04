@@ -1,17 +1,17 @@
-local mod = DBM:NewMod("Vorpil", "DBM-Party-BC", 10)
+local mod = DBM:NewMod(546, "DBM-Party-BC", 10, 253)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 315 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 526 $"):sub(12, -3))
 
 mod:SetCreatureID(18732)
-mod:SetModelID(18535)
 mod:RegisterCombat("combat")
 
-mod:RegisterEvents(
+mod:RegisterEventsInCombat(
 	"SPELL_CAST_SUCCESS"
 )
 
 local warnTeleport         = mod:NewSpellAnnounce(33563)
+
 local timerTeleport        = mod:NewNextTimer(37, 33563)
 
 function mod:OnCombatStart(delay)

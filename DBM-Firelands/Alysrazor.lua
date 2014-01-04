@@ -1,11 +1,9 @@
 local mod	= DBM:NewMod(194, "DBM-Firelands", nil, 78)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 48 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 90 $"):sub(12, -3))
 mod:SetCreatureID(52530)
-mod:SetModelID(38446)
 mod:SetZone()
-mod:SetUsedIcons()
 mod:SetModelSound("Sound\\Creature\\ALYSRAZOR\\VO_FL_ALYSRAZOR_AGGRO.wav", "Sound\\Creature\\ALYSRAZOR\\VO_FL_ALYSRAZOR_TRANSITION_02.wav")
 --Long: I serve a new master now, mortals!
 --Short: Reborn in Flame!
@@ -39,7 +37,7 @@ local specWarnGushingWoundSelf	= mod:NewSpecialWarningYou(99308, false)
 local specWarnTantrum			= mod:NewSpecialWarningSpell(99362, mod:IsTank())
 local specWarnGushingWoundOther	= mod:NewSpecialWarningTarget(99308, false)
 
-local timerCombatStart			= mod:NewTimer(35.5, "TimerCombatStart", 2457)
+local timerCombatStart			= mod:NewCombatTimer(35.5)
 local timerFieryVortexCD		= mod:NewNextTimer(179, 99794)
 local timerMoltingCD			= mod:NewNextTimer(60, 99464)
 local timerCataclysm			= mod:NewCastTimer(5, 102111)--Heroic

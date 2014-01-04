@@ -5,6 +5,7 @@
 -- Bring out a "fishing buddy"
 
 local FL = LibStub("LibFishing-1.0");
+local LibPetJournal = LibStub("LibPetJournal-2.0")
 
 -- 5.0.4 has a problem with a global "_" (see some for loops below)
 local _
@@ -66,76 +67,6 @@ local function AddChosenPet(cid, petid)
 	numchosen = numchosen + 1;
 end
 
-local PETS_PER_TICK = 50;
-local getpetsframe = CreateFrame("Frame");
-getpetsframe:Hide();
-getpetsframe.ready = true;
-
-local function GetPetsUpdate(self, ...)
-	C_PetJournal.ClearSearchFilter();
-	C_PetJournal.AddAllPetTypesFilter();
-	C_PetJournal.AddAllPetSourcesFilter();
-	
-	local isWild = false;
-	local start=self.index;
-	local numPets=self.numPets;
-	
-	local finish = start + PETS_PER_TICK;
-	if (finish > numPets) then
-		finish = numPets;
-	end
-	for index=start,finish do
-		local petID, speciesID, isOwned, customName, level, favorite, isRevoked, name, icon, petType, creatureID, sourceText, description, isWildPet, canBattle = C_PetJournal.GetPetInfoByIndex(index, self.isWild);
-		if ( isOwned) then
-			local addit = not petmap[creatureID];
-			if (customName) then
-				name = customName;
-				addit = true;
-			end
-			if (addit) then
-				tinsert(ourpets, { cID=creatureID, icon=icon, name=name, petID=petID, checked=false });
-				petmap[creatureID] = petID;
-			end
-		end
-	end
-	if (finish == numPets) then
-		table.sort(ourpets, function(a, b) return a.name < b.name; end);
-		self.ready = true;
-		self:Hide();
-		if (getpetsframe.callme) then
-			getpetsframe.callme();
-		end
-	else
-		self.index = finish + 1;
-	end
-	if (FishingBuddy.Debugging) then
-		FishingBuddy_Info["ourpets"] = ourpets;
-	end
-end
-
-getpetsframe:SetScript("OnUpdate", GetPetsUpdate);
-
-local function GetOurPets(CallWhenDone)
-	if (getpetsframe.ready) then
-		local isWild = false;
-		
-		ourpets = {};
-		petmap = {};
-	
-		C_PetJournal.ClearSearchFilter();
-		C_PetJournal.AddAllPetTypesFilter();
-		C_PetJournal.AddAllPetSourcesFilter();
-		local numPets, numOwned = C_PetJournal.GetNumPets(isWild);
-	
-		getpetsframe.isWild = isWild;
-		getpetsframe.index = 1;
-		getpetsframe.numPets = numPets;
-		getpetsframe.ready = false;
-		getpetsframe.callme = CallWhenDone;
-		getpetsframe:Show();
-	end	
-end
-
 local function CheckedOurPets()
 	for index=1,#ourpets do
 		ourpets[index].checked = (chosenpets[ourpets[index].cID] == 1);
@@ -149,7 +80,7 @@ local function CheckedOurPets()
 	end
 end
 
-local function DoUpdateChosenPets()
+local function UpdateChosenPets()
 	local settingpets = GetSetting(PETSETTING);
 
 	chosenpets = {};
@@ -180,11 +111,29 @@ local function DoUpdateChosenPets()
 	FishingPets_UpdateMenu();
 end
 
-local function UpdateChosenPets()
-	if (#ourpets == 0) then
-		GetOurPets(DoUpdateChosenPets);
-	else
-		DoUpdateChosenPets()
+local function HandlePetsUpdate()
+	ourpets = {};
+	petmap = {};
+    for _,petid in LibPetJournal:IteratePetIDs() do 
+        local speciesID, customName, level, xp, maxXp, displayID,
+              isFavorite, name, icon, petType, creatureID,
+              sourceText, description, isWild, canBattle,
+              tradable, unique, obtainable = C_PetJournal.GetPetInfoByPetID(petid)
+		local addit = not petmap[creatureID];
+		if (customName) then
+			name = customName;
+			addit = true;
+		end
+		if (addit) then
+			tinsert(ourpets, { cID=creatureID, icon=icon, name=name, petID=petid, checked=false });
+			petmap[creatureID] = petid;
+		end
+    end
+
+	UpdateChosenPets();
+
+	if (FishingBuddy.Debugging) then
+		FishingBuddy_Info["ourpets"] = ourpets;
 	end
 end
 
@@ -458,6 +407,24 @@ local function FishingPetFrame_OnHide(self)
 end
 
 local GSB = FishingBuddy.GetSettingBool;
+local function RaftBergUsable()
+	return ( not IsMounted() and 
+		not FL:HasBuff(GetSpellInfo(116032)) and
+		not FL:HasBuff(GetSpellInfo(119700)));
+end
+
+local function RaftBergCheck(buff, info, need)
+	local _, _, _, _, _, _, et, _, _, _, _ = UnitBuff("player", buff);
+	if (GSB(info.option.setting) and need) then
+		return false;
+	end
+	et = (et or 0) - GetTime();
+	if (need or et <= 60) then
+		return true, 85500;
+	end
+	--return nil;
+end
+
 local FishingItems = {};
 FishingItems[85973] = {
 	["enUS"] = "Ancient Pandaren Fishing Charm",
@@ -473,31 +440,33 @@ FishingItems[85973] = {
 };
 FishingItems[85500] = {
 	["enUS"] = "Angler's Fishing Raft",
+		-- Don't cast the angler's raft if we're doing Scavenger Hunt or on Inkgill Mere
 	["tooltip"] = FBConstants.CONFIG_FISHINGRAFT_INFO,
 	spell = 124036,
 	setting = "UseAnglersRaft",
-	usable = function()
-		-- Don't cast the angler's raft if we're doing Scavenger Hunt or on Inkgill Mere
-			return ( not IsMounted() and 
-				not FL:HasBuff(GetSpellInfo(116032)) and
-				not FL:HasBuff(GetSpellInfo(119700)));
-		end,
-	check = function(buff, info, need)
-			local _, _, _, _, _, _, et, _, _, _, _ = UnitBuff("player", buff);
-			if (GSB(info.option.setting) and need) then
-				return false;
-			end
-			et = (et or 0) - GetTime();
-			if (need or et <= 60) then
-				return true, 85500;
-			end
-			--return nil;
-		end,
+	usable = RaftBergUsable,
+	check = RaftBergCheck,
 	["default"] = 1,
 	["option"] = {
 		["setting"] = "RaftMaintainOnly",
-		["text"] = FBConstants.CONFIG_MAINTAINRAFT_ONOFF,
+		["text"] = FBConstants.CONFIG_MAINTAINRAFTBERG_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_MAINTAINRAFT_INFO,
+		["default"] = 1,
+	},
+};
+FishingItems[107950] = {
+	["enUS"] = "Bipsi's Bobbing Berg",
+		-- Don't cast the angler's raft if we're doing Scavenger Hunt or on Inkgill Mere
+	["tooltip"] = FBConstants.CONFIG_BOBBINGBERG_INFO,
+	spell = 152421,
+	setting = "UseBobbingBerg",
+	usable = RaftBergUsable,
+	check = RaftBergCheck,
+	["default"] = 1,
+	["option"] = {
+		["setting"] = "BergMaintainOnly",
+		["text"] = FBConstants.CONFIG_MAINTAINRAFTBERG_ONOFF,
+		["tooltip"] = FBConstants.CONFIG_MAINTAINBERG_INFO,
 		["default"] = 1,
 	},
 };
@@ -536,12 +505,15 @@ local FluffOptions = {
 		["text"] = FBConstants.CONFIG_FISHINGFLUFF_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_FISHINGFLUFF_INFO,
 		["v"] = 1,
+		["m1"] = 1,
+		["p"] = 1,
 		["default"] = 1
 	},
 	["FindFish"] = {
 		["text"] = FBConstants.CONFIG_FINDFISH_ONOFF,
 		["tooltip"] = FBConstants.CONFIG_FINDFISH_INFO,
 		["v"] = 1,
+		["m"] = 1,
 		["deps"] = { ["FishingFluff"] = "d" },
 		["default"] = 1
 	},
@@ -632,7 +604,8 @@ FluffEvents["VARIABLES_LOADED"] = function(started)
 	FishingPetsMenu:SetHeight(FLUFF_DISPLAYED_PETS * FLUFF_LINE_HEIGHT + 1);
 	HybridScrollFrame_CreateButtons(FishingPetsMenu, "FishingPetButtonTemplate");
 	
-	UpdateChosenPets();
+	HandlePetsUpdate();
+	LibPetJournal.RegisterCallback(FBConstants.ID, "PetListUpdated", HandlePetsUpdate)
 
 	FishingPetFrameLabel:SetText(PET_TYPE_PET..": ");
 	
@@ -641,7 +614,7 @@ FluffEvents["VARIABLES_LOADED"] = function(started)
 	
 	FishingPetsMenu:SetWidth(210);
 	FishingPetsMenuHolder:ClearAllPoints();
-	FishingPetsMenuHolder:SetPoint("TOPLEFT", FishingPetFrameButton, "BOTTOMLEFT", 0, 8);
+	FishingPetsMenuHolder:SetPoint("TOP", FishingPetFrameButton, "BOTTOM", 0, 8);
 	FishingPetsMenuHolder:Hide();
 
 	UpdateItemOptions();
@@ -649,19 +622,11 @@ FluffEvents["VARIABLES_LOADED"] = function(started)
 	-- FishingBuddy.OptionsFrame.HandleOptions(nil, nil, FluffInvisible);
 end
 
-FluffEvents["PET_STABLE_UPDATE"] = function()
-	ourpets = {};
-end
-
-FluffEvents["SPELLS_CHANGED"] = function()
-	ourpets = {};
-end
-
 FishingBuddy.RegisterHandlers(FluffEvents);
 
 if ( FishingBuddy.Debugging ) then
 	local function DumpChosen()
-		DoUpdateChosenPets();
+		UpdateChosenPets();
 		local Debug = FishingBuddy.Debug;
 		local pets = FishingPetFrame.petnames;
 		local n = FL:tablecount(chosenpets);
@@ -674,7 +639,7 @@ if ( FishingBuddy.Debugging ) then
 	FishingBuddy.Commands["pets"] = {};
 	FishingBuddy.Commands["pets"].func =
 		function(what)
-			GetOurPets(DumpChosen);
+			DumpChosen();
 			return true;
 		end
 end
