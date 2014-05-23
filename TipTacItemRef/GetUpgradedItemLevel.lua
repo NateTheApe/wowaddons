@@ -1,5 +1,6 @@
 -- GetUpgradedItemLevelFromItemLink() -- REV-04 -- Modified: 13.09.21
 -- Until Blizzard adds an easier solution, this function is supposed to be portable between addons, and is placed in the global namespace.
+-- FANREV-05: Patch 5.4.8: Added IDs 504 to 507 for new upgrades
 -- REV-04: Patch 5.4: Added IDs 491 to 498 to the table.
 -- REV-03: Patch 5.3: Added the 465/466/467 IDs (0/4/8 lvls) to the table.
 -- REV-02: Patch 5.2: Added the 470 ID (8 lvls) to the table.
@@ -60,6 +61,10 @@ local UPGRADED_LEVEL_ADJUST = {
 	[496] = 8,
 	[497] = 12,
 	[498] = 16,
+	[504] = 12,
+	[505] = 16,
+	[506] = 20,
+	[507] = 24,
 };
 
 -- Analyses the itemLink and checks for upgrades that affects itemLevel -- Only itemLevel 450 and above will have this
